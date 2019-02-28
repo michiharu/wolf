@@ -1,6 +1,6 @@
 import * as React from 'react';
 import TreeNode from '../../../data-types/tree-node';
-import NodeView from './node-view';
+import NodeEditorState from './node-editor-state';
 
 interface Props {
   selectedNodeList: TreeNode[] | null;
@@ -13,7 +13,7 @@ const NodeNullChecker: React.SFC<Props> = (props: Props) => {
     return <p>Now Loading..</p>;
   }
   
-  return <NodeView node={selectedNodeList[selectedNodeList.length - 1]} changeNode={changeNode}/>;
+  return <NodeEditorState node={selectedNodeList[selectedNodeList.length - 1]} changeNode={changeNode}/>;
 };
 
 export default NodeNullChecker;

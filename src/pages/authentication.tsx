@@ -52,7 +52,14 @@ class Authentication extends React.Component<{}, State> {
     this.setState({selectedNodeList});
   }
 
-  changeNode = () => {}
+  changeNode = (target: TreeNode) => {
+    const {nodeList, selectedNodeList} = this.state;
+    const newNodeList = TreeUtil.replace(nodeList!, target);
+    this.setState({nodeList: newNodeList});
+    const selectedNode = selectedNodeList![selectedNodeList!.length - 1];
+    const newSelectedNode = TreeUtil.find(newNodeList, selectedNode)!;
+    process.nextTick(() => this.selectNode(newSelectedNode));
+  }
 
   loadNode = () => axios.get(nodeURL).then(res => this.setState({nodeList: res.data, selectedNodeList: []}));
 

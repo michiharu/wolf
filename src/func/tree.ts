@@ -1,4 +1,4 @@
-import  TreeNode from "../data-types/tree-node";
+import TreeNode from "../data-types/tree-node";
 
 export default class TreeUtil {
 
@@ -23,5 +23,22 @@ export default class TreeUtil {
     })
     .reduce((a, b) => a !== false ? a
                     : b !== false ? b : false);
+  }
+
+  static replace = (nodeList: TreeNode[], target: TreeNode): TreeNode[] => {
+    if (nodeList.length === 0) { return []; }
+    return nodeList.map(n => target.id === n.id
+      ? target
+      : {...n, children: TreeUtil.replace(n.children, target)});
+  }
+
+  static find = (nodeList: TreeNode[], target: TreeNode): TreeNode | undefined => {
+    if (nodeList.length === 0) { return undefined; }
+    const findResult = nodeList.find(n => n.id === target.id);
+    if (findResult !== undefined) { return findResult; }
+    return nodeList
+    .map(n => TreeUtil.find(n.children, target))
+    .reduce((a, b) => a !== undefined ? a
+                    : b !== undefined ? b : undefined);
   }
 }
