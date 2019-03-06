@@ -1,13 +1,14 @@
 import * as React from 'react';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Theme, createStyles, WithStyles, withStyles } from '@material-ui/core';
 
-import Konva, { Node } from 'konva';
-import { Stage, Layer, Rect, Group, Text } from 'react-konva';
+import { Stage, Layer } from 'react-konva';
 
-import TreeNode from '../../../data-types/tree-node';
+import { TreeNode, TreeViewNode } from '../../../data-types/tree-node';
 import { toolbarHeight, toolbarMinHeight } from '../../../settings/layout';
-import TaskNode from '../../../components/konva-node/TaskNode';
+import StartNode from '../../../components/konva-node/start-node';
+import TreeViewUtil from '../../../func/tree-view';
+import TaskNodeChildren, { TaskNodeChildrenProps } from '../../../components/konva-node/task-node-children';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -24,69 +25,67 @@ interface Props extends WithStyles<typeof styles> {
 }
 
 const NodeViewer: React.FC<Props> = (props: Props) => {
+  var timeout: NodeJS.Timeout;
+  const { node: next, classes } = props;
+  const [node, setNode] = useState<TreeViewNode | null>(null);
+  const [nowLoading, setNowLoading] = useState(false);
+  const containerRef = useRef<any>(null);
+  const stageRef = useRef<any>(null);
 
-  const rectRef = useRef<Node>();
-
-  const [x, setX] = useState(0);
-
-  const handleDragStart = (e: any) => {
-    const target = e.target;
-    for(var n = 0; n < target.getChildren().length; n++) {
-      var shape = target.getChildren()[n];
-      new Konva.Tween({
-          node: shape,
-          shadowOffset: {
-            x: 15,
-            y: 15
-          },
-          scaleX: 1.1,
-          scaleY: 1.1
-      }).play();
+  const resize = () => {
+    const cref = containerRef.current, sref = stageRef.current;
+    if (cref === null || sref === null) { throw 'Cannot find elements.'; }
+    sref.width(cref.offsetWidth);
+    sref.height(cref.offsetHeight);
+    sref.draw();
   }
-  };
-  const handleDragEnd = (e: any) => {
-    e.target.to({
-      duration: 0.5,
-      easing: Konva.Easings.ElasticEaseOut,
-      scaleX: 1,
-      scaleY: 1,
-      shadowOffsetX: 5,
-      shadowOffsetY: 5
-    });
-    const {x, y} = e.target.getClientRect();
-    rectRef.current!.to({x, y, duration: 2});
-  };
-  // const onDragMove
 
-  const width = 200;
-  const height = 40;
+  const reLoad = () => {
+    setNowLoading(true);
+    timeout = setTimeout(() => setNowLoading(false), 1);
+  }
 
-  const { node, classes } = props;
+  if (node === null || node.id !== next.id) {
+    const newNode = TreeViewUtil.getViewNode('task', next);
+    console.log(newNode);
+    setNode(newNode);
+    reLoad();
+  }
+
+  const clear = () => {
+    clearTimeout(timeout);
+    window.removeEventListener('resize', resize);
+  }
+
+  useEffect(() => {
+    process.nextTick(resize);
+    window.addEventListener('resize', resize);
+    return clear;
+  });
+
+  const changeOpen = (id: string, open: boolean) => {
+    const newNode = TreeViewUtil.open('task', node!,id, open);
+    setNode(newNode);
+  }
+
+  if (node === null || nowLoading) {
+    return <p>Now Loading..</p>;
+  }
+  
+  const childrenProps: TaskNodeChildrenProps = {
+    parentType: 'task',
+    nodes: node.children,
+    x: 100,
+    y: 200,
+    changeOpen
+  };
+
   return (
-    <div className={classes.root}>
-      <Stage width={2000} height={1000} draggable>
+    <div className={classes.root} ref={containerRef}>
+      <Stage ref={stageRef} draggable>
         <Layer>
-          <TaskNode node={node} x={100} y={100}/>
-          
-          {/* {[...Array(10)].map((n, i) => (
-            <Star
-              key={i}
-              x={Math.random() * 2000}
-              y={Math.random() * 1000}
-              numPoints={5}
-              innerRadius={20}
-              outerRadius={40}
-              fill="#89b717"
-              opacity={0.8}
-              draggable
-              rotation={Math.random() * 180}
-              shadowColor="black"
-              shadowBlur={10}
-              shadowOpacity={0.6}
-              onDragStart={handleDragStart}
-              onDragEnd={handleDragEnd}
-            />
-          ))} */}
+          <StartNode x={100} y={100}/>
+          <TaskNodeChildren {...childrenProps}/>
         </Layer>
       </Stage>
     </div>

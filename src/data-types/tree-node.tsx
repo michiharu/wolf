@@ -1,4 +1,4 @@
-export default interface TreeNode {
+export interface TreeNode {
   id: string;
   type: Type;
   label: string;
@@ -7,5 +7,20 @@ export default interface TreeNode {
   output: string;
   children: TreeNode[];
 }
+
+export interface TreeViewNode {
+  id: string;
+  type: Type;
+  label: string;
+  ifState?: string;
+  input: string;
+  output: string;
+  children: TreeViewNode[];
+  open: boolean;
+  width: number;
+  height: number;
+}
+
+export default TreeNode;
 
 export type Type = 'task' | 'switch';

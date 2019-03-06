@@ -131,7 +131,7 @@ const DragDrop: React.SFC<Props> = (props: Props) => {
               color="primary"
               className={classes.addButton}
               onClick={() => add(0)}
-              onMouseDown={e => {e.stopPropagation();}}
+              onMouseDown={e => e.stopPropagation()}
             >
               <AddIcon />
             </IconButton>}

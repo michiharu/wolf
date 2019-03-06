@@ -1,4 +1,4 @@
-import TreeNode from "../data-types/tree-node";
+import TreeNode, { TreeViewNode } from "../data-types/tree-node";
 
 export default class TreeUtil {
 

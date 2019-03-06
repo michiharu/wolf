@@ -48,13 +48,60 @@ const getNode = (config: AxiosRequestConfig) => {
     children: [node111, node112, node113, node114]
   };
 
-  const node12: TreeNode = {
+  const node1211: TreeNode = {
     type: 'task',
+    id: '001-2-1-1',
+    label: 'マニュアル１−2−１-1',
+    input: '',
+    output: '',
+    children: []
+  };
+
+  const node1212: TreeNode = {
+    type: 'task',
+    id: '001-2-1-2',
+    label: 'マニュアル１−2−１-2',
+    input: '',
+    output: '',
+    children: []
+  };
+
+  const node121: TreeNode = {
+    type: 'task',
+    id: '001-2-1',
+    ifState: 'ケースその１',
+    label: 'マニュアル１−2−１',
+    input: '',
+    output: '',
+    children: [node1211, node1212]
+  };
+
+  const node122: TreeNode = {
+    type: 'task',
+    id: '001-2-2',
+    ifState: 'ケースその２',
+    label: 'マニュアル１-2−２',
+    input: '',
+    output: '',
+    children: []
+  };
+  const node123: TreeNode = {
+    type: 'task',
+    id: '001-2-3',
+    ifState: 'ケースその３',
+    label: 'マニュアル１−2−３',
+    input: '',
+    output: '',
+    children: []
+  };
+
+  const node12: TreeNode = {
+    type: 'switch',
     id: '001-2',
     label: 'マニュアル１-２',
     input: '',
     output: '',
-    children: []
+    children: [node121, node122, node123]
   };
 
   const node13: TreeNode = {
