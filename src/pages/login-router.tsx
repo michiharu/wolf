@@ -8,19 +8,27 @@ import TreeNode from '../data-types/tree-node';
 interface Props {
   user: User | null;
   login: (user: User) => void;
+  containerRef: HTMLDivElement | null;
 
   selectedNodeList: TreeNode[] | null;
   changeNode: (node: TreeNode) => void;
   loadNode: () => void;
+  selectNode: (node: TreeNode | null) => void;
 }
 
 const LoginRouter: React.SFC<Props> = (props: Props) => {
-  const {user, login, selectedNodeList, changeNode, loadNode} = props;
+  const {user, login, containerRef, selectedNodeList, changeNode, loadNode, selectNode} = props;
   return (
     <Switch>
       {(user === null) && <Route render={() => <Login login={login}/>}/>}
       <Route render={() => (
-        <PageRouter user={user!} selectedNodeList={selectedNodeList} changeNode={changeNode} loadNode={loadNode}/>
+        <PageRouter
+          containerRef={containerRef}
+          selectedNodeList={selectedNodeList}
+          changeNode={changeNode}
+          loadNode={loadNode}
+          selectNode={selectNode}
+        />
       )}/>
     </Switch>
   );

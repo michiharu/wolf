@@ -1,17 +1,16 @@
 import * as React from 'react';
 import { Route, Switch } from 'react-router-dom';
-import User from '../../data-types/user';
-import { nodeURL } from '../../data-types/api';
-import axios from '../../settings/axios';
 import TreeNode from '../../data-types/tree-node';
 import link from '../../settings/path-list';
-import NodeNullChecker from './node-editor/node-null-checker';
+import EditorNullChecker from './node-editor/node-null-checker';
+import ViewerNullChecker from './node-viewer/node-null-checker';
 
 interface Props {
-  user: User;
+  containerRef: HTMLDivElement | null;
   selectedNodeList: TreeNode[] | null;
   changeNode: (node: TreeNode) => void;
   loadNode: () => void;
+  selectNode: (node: TreeNode | null) => void;
 }
 
 interface State {
@@ -28,19 +27,30 @@ class PageRouter extends React.Component<Props, State> {
     this.props.loadNode();
   }
 
-  changeNode = (node: TreeNode[]) => {
-    this.setState({node});
-  }
-
   render () {
-    const { user, selectedNodeList, changeNode } = this.props;
+    const { containerRef, selectedNodeList, changeNode, selectNode } = this.props;
     return (
       <Switch>
         <Route
           exact
-          path={link.node}
+          path={link.edit}
           render={() => (
-            <NodeNullChecker selectedNodeList={selectedNodeList} changeNode={changeNode}/>
+            <EditorNullChecker
+              containerRef={containerRef}
+              selectedNodeList={selectedNodeList}
+              changeNode={changeNode}
+              selectNode={selectNode}
+            />
+          )}
+        />
+        <Route
+          exact
+          path={link.view}
+          render={() => (
+            <ViewerNullChecker
+              containerRef={containerRef}
+              node={selectedNodeList}
+            />
           )}
         />
       </Switch>

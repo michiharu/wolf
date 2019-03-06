@@ -6,6 +6,7 @@ const getNode = (config: AxiosRequestConfig) => {
   const { method, url } = config;
 
   const node111: TreeNode = {
+    type: 'task',
     id: '001-1-1',
     label: 'マニュアル１−１−１',
     input: '',
@@ -14,6 +15,7 @@ const getNode = (config: AxiosRequestConfig) => {
   };
 
   const node112: TreeNode = {
+    type: 'task',
     id: '001-1-2',
     label: 'マニュアル１-１−２',
     input: '',
@@ -21,6 +23,7 @@ const getNode = (config: AxiosRequestConfig) => {
     children: []
   };
   const node113: TreeNode = {
+    type: 'task',
     id: '001-1-3',
     label: 'マニュアル１−１−３',
     input: '',
@@ -28,6 +31,7 @@ const getNode = (config: AxiosRequestConfig) => {
     children: []
   };
   const node114: TreeNode = {
+    type: 'task',
     id: '001-1-4',
     label: 'マニュアル１−１−４',
     input: '',
@@ -36,6 +40,7 @@ const getNode = (config: AxiosRequestConfig) => {
   };
 
   const node11: TreeNode = {
+    type: 'task',
     id: '001-1',
     label: 'マニュアル１−１',
     input: '',
@@ -44,6 +49,7 @@ const getNode = (config: AxiosRequestConfig) => {
   };
 
   const node12: TreeNode = {
+    type: 'task',
     id: '001-2',
     label: 'マニュアル１-２',
     input: '',
@@ -52,6 +58,7 @@ const getNode = (config: AxiosRequestConfig) => {
   };
 
   const node13: TreeNode = {
+    type: 'task',
     id: '001-3',
     label: 'マニュアル１−３',
     input: '',
@@ -60,6 +67,7 @@ const getNode = (config: AxiosRequestConfig) => {
   };
 
   const node1: TreeNode = {
+    type: 'task',
     id: '001',
     label: 'マニュアル１',
     input: '',
@@ -68,6 +76,7 @@ const getNode = (config: AxiosRequestConfig) => {
   };
 
   const node21: TreeNode = {
+    type: 'task',
     id: '002-1',
     label: 'マニュアル２−１',
     input: '',
@@ -76,6 +85,7 @@ const getNode = (config: AxiosRequestConfig) => {
   };
 
   const node22: TreeNode = {
+    type: 'task',
     id: '002-2',
     label: 'マニュアル２-２',
     input: '',
@@ -84,6 +94,7 @@ const getNode = (config: AxiosRequestConfig) => {
   };
 
   const node23: TreeNode = {
+    type: 'task',
     id: '002-3',
     label: 'マニュアル２−３',
     input: '',
@@ -92,6 +103,7 @@ const getNode = (config: AxiosRequestConfig) => {
   };
 
   const node2: TreeNode = {
+    type: 'task',
     id: '002',
     label: 'マニュアル２',
     input: '',
@@ -100,6 +112,7 @@ const getNode = (config: AxiosRequestConfig) => {
   };
 
   const node3: TreeNode = {
+    type: 'task',
     id: '003',
     label: 'マニュアル３',
     input: '',

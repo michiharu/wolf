@@ -2,7 +2,7 @@ import * as React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@material-ui/core';
+import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText, Select } from '@material-ui/core';
 import { PopoverOrigin } from '@material-ui/core/Popover'
 import { Menu as MenuIcon, AccountCircle, Close } from '@material-ui/icons';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
@@ -10,9 +10,10 @@ import createStyles from '@material-ui/core/styles/createStyles';
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles';
 import { withRouter } from 'react-router-dom';
 import { RouteComponentProps } from "react-router";
-import { Link } from 'react-router-dom';
 import { drawerWidth } from '../../pages/layout';
 import User from '../../data-types/user';
+import { toolbarHeight, toolbarMinHeight } from '../../settings/layout';
+import link from '../../settings/path-list';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -21,10 +22,22 @@ const styles = (theme: Theme) => createStyles({
       width: `calc(100% - ${drawerWidth}px)`,
     },
   },
+  portalAnchor: {
+    position: 'relative',
+    overflow: 'visible',
+    width: 1,
+    height: toolbarHeight,
+    [theme.breakpoints.down('xs')]: { height: toolbarMinHeight },
+  },
+  selectMode: {
+    marginTop: 1,
+    marginLeft: theme.spacing.unit * 2,
+    fontSize: theme.typography.pxToRem(20),
+    color: '#fff',
+  },
   grow: {
     flexGrow: 1,
   },
-
   menuButton: {
     marginRight: 20,
     [theme.breakpoints.up('md')]: {
@@ -36,6 +49,7 @@ const styles = (theme: Theme) => createStyles({
 
 interface Props extends WithStyles<typeof styles>, RouteComponentProps {
   user: User | null;
+  getContainerRef: (el: HTMLDivElement) => void;
   handleDrawerToggle: () => void;
   logout: () => void;
 }
@@ -46,11 +60,15 @@ interface State {
 
 const CustomAppBar = withStyles(styles)(class extends React.Component<Props, State> {
 
+  container = React.createRef<HTMLDivElement>();
+
   constructor(props: Props) {
     super(props);
-    this.state = {
-      anchorEl: null,
-    };
+    this.state = { anchorEl: null };
+  }
+
+  componentDidMount() {
+    this.props.getContainerRef(this.container.current!);
   }
 
   handleMenu = (e: any) => {
@@ -61,29 +79,24 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
     this.setState({ anchorEl: null });
   };
 
-  linkToUnsentList = () => {
-    this.props.history.push('/unsent-list');
-    this.handleClose();
-  };
-
   handleLogout = () => {
     this.props.logout();
     this.handleClose();
   }
 
   render() {
-    const { user, handleDrawerToggle, classes } = this.props;
+    const { user, handleDrawerToggle, location, history, classes } = this.props;
     const { anchorEl } = this.state;
     const open = Boolean(anchorEl);
     const origin: PopoverOrigin = { vertical: 'top', horizontal: 'right' };
-
+    const path = location.pathname;
     return (
       <AppBar position="fixed" className={user !== null ? classes.root : undefined}>
         <Toolbar>
+          <div className={classes.portalAnchor}><div ref={this.container}/></div>
           {user !== null && (
             <IconButton
               color="inherit"
-              aria-label="Open drawer"
               onClick={handleDrawerToggle}
               className={classes.menuButton}
             >
@@ -93,6 +106,17 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
           <Typography variant="h6" color="inherit">
             Flow Like
           </Typography>
+          <Select
+            className={classes.selectMode}
+            value={path}
+            onChange={(e: any) => history.push(e.target.value)}
+            autoWidth
+            disableUnderline
+          >
+            <MenuItem value={link.edit}>編集モード</MenuItem>
+            <MenuItem value={link.view}>Viewモード</MenuItem>
+          </Select>
+
           <div className={classes.grow}/>
           
           {user !== null && (

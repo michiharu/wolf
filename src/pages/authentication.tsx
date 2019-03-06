@@ -47,7 +47,8 @@ class Authentication extends React.Component<{}, State> {
     this.setState({user: null});
   }
 
-  selectNode = (node: TreeNode) => {
+  selectNode = (node: TreeNode | null) => {
+    if (node === null) { return this.setState({selectedNodeList: []}); }
     const selectedNodeList = TreeUtil.getGenealogy(this.state.nodeList!, node);
     this.setState({selectedNodeList});
   }

@@ -1,5 +1,6 @@
 const link = {
-  node: '/',
+  view: '/view',
+  edit: '/edit',
 };
 
 export default link;
