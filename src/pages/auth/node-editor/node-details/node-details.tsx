@@ -5,9 +5,7 @@ import {
   Theme, createStyles, WithStyles, withStyles, TextField,
   Paper, InputAdornment, Grid, FormControl, InputLabel, Select, OutlinedInput, MenuItem
 } from '@material-ui/core';
-import { Task, Switch} from '../../../../settings/layout';
-
-import ReplyIcon from '@material-ui/icons/Reply';
+import { Task, Switch, Input, Output } from '../../../../settings/layout';
 import { Type } from '../../../../data-types/tree-node';
 import ReactDOM from 'react-dom';
 
@@ -24,14 +22,6 @@ const styles = (theme: Theme) => createStyles({
   },
   switchIcon: {
     transform: 'scale(1, -1)',
-  },
-  inputIcon: {
-    color: theme.palette.primary.main,
-    transform: 'rotate(-110deg) scale(1, -1)',
-  },
-  outputIcon: {
-    color: theme.palette.primary.main,
-    transform: 'rotate(160deg) scale(1, -1)',
   },
   textfield: {
     marginTop: theme.spacing.unit * 2,
@@ -62,11 +52,11 @@ const NodeDetails: React.FC<Props> = (props: Props) => {
   });
 
   const InputIcon = (
-    <InputAdornment position="start"><ReplyIcon className={classes.inputIcon}/></InputAdornment>
+    <InputAdornment position="start"><Input/></InputAdornment>
   );
 
   const OutputIcon = (
-    <InputAdornment position="start"><ReplyIcon className={classes.outputIcon}/></InputAdornment>
+    <InputAdornment position="start"><Output/></InputAdornment>
   );
 
   return (

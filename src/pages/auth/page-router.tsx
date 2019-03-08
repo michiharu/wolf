@@ -49,7 +49,7 @@ class PageRouter extends React.Component<Props, State> {
           render={() => (
             <ViewerNullChecker
               containerRef={containerRef}
-              node={selectedNodeList}
+              selectedNodeList={selectedNodeList}
             />
           )}
         />

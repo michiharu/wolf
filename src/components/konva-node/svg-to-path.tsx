@@ -1,32 +1,31 @@
 import * as React from 'react';
 
-import { Rect, Group, Text, Path } from 'react-konva';
-
-import TreeNode from '../../data-types/tree-node';
-import outlineFlag from '../../resource/svg-outline-flag';
+import { Group, Path } from 'react-konva';
 import { SvgPath } from '../../data-types/svg-path';
 
-interface Props {
+export interface SvgToPathProps {
   svg: SvgPath[];
   x: number;
   y: number;
   fill: string;
-  scale?: number;
+  scale?: {x: number, y: number};
+  rotate?: number;
 }
 
-const SvgToPath: React.FC<Props> = (props: Props) => {
-  const {svg, x, y, fill, scale} = props;
+const SvgToPath: React.FC<SvgToPathProps> = (props: SvgToPathProps) => {
+  const {svg, x, y, fill, scale, rotate} = props;
   const basePathProps = {x: 0, y: 0};
 
   return (
     <Group x={x} y={y}>
-      {svg.map((s, i) => (
+      {svg.map(s => (
         <Path
           key={`svg-to-path-${s.d}`}
           {...basePathProps}
           data={s.d}
           fill={s.fill ? fill : '#0000'}
-          scale={{x: scale || 1, y: scale || 1}}
+          scale={{x: scale ? scale.x : 1, y: scale ? scale.y : 1}}
+          rotate={rotate || 0}
         />
       ))}
     </Group>

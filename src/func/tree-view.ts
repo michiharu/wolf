@@ -1,5 +1,6 @@
 import TreeNode, { TreeViewNode, Type } from "../data-types/tree-node";
 import { viewItem } from "../settings/layout";
+import Util from "./util";
 
 export default class TreeViewUtil {
 
@@ -9,12 +10,21 @@ export default class TreeViewUtil {
       ...node,
       open: false,
       width: viewItem.rect.w,
-      height: parentType === 'task' ? viewItem.rect.h : viewItem.rectHasIf.h,
+      height: viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0),
+      rect: {
+        w: viewItem.rect.w,
+        h: viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0),
+      },
       children
     };
   }
 
   static equal = (a: TreeViewNode, b: TreeViewNode): boolean => a.id === b.id;
+
+  static calcTextlineHeight = (node: TreeViewNode): number => {
+    return (!Util.isEmpty(node.input)  ? viewItem.textline : 0)
+         + (!Util.isEmpty(node.output) ? viewItem.textline : 0);
+  }
 
   static calcLength = (parentType: Type, node: TreeViewNode, open: boolean, which: which) => {
 
@@ -26,7 +36,9 @@ export default class TreeViewUtil {
             + node.children.map(c => c.width).reduce((a, b) => Math.max(a, b));
         } else {
           // task, open, height
-          return (parentType === 'task' ? viewItem.rect.h : viewItem.rectHasIf.h) + viewItem.spr.h
+          return viewItem.rect.h + viewItem.spr.h
+            + (parentType === 'switch' ? viewItem.textline : 0)
+            + TreeViewUtil.calcTextlineHeight(node)
             + node.children.map(c => c.height + viewItem.spr.h).reduce((a, b) => a + b);
         }
       } else {
@@ -35,7 +47,7 @@ export default class TreeViewUtil {
           return viewItem.rect.w;
         } else {
           // task, close, height
-          return parentType === 'task' ? viewItem.rect.h : viewItem.rectHasIf.h;
+          return viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0);
         }
       }
     } else {
@@ -46,8 +58,10 @@ export default class TreeViewUtil {
           + node.children.map(c => c.width + viewItem.spr.w).reduce((a, b) => a + b);
         } else {
           // switch, open, height
-          return (parentType === 'task' ? viewItem.rect.h : viewItem.rectHasIf.h) + viewItem.spr.h * 2
-          + node.children.map(c => c.height).reduce((a, b) => Math.max(a, b));
+          return viewItem.rect.h + viewItem.spr.h * 2
+            + (parentType === 'switch' ? viewItem.textline : 0)
+            + TreeViewUtil.calcTextlineHeight(node)
+            + node.children.map(c => c.height).reduce((a, b) => Math.max(a, b));
         }
       } else {
         if (which === 'width') {
@@ -55,7 +69,7 @@ export default class TreeViewUtil {
           return viewItem.rect.w;
         } else {
           // task, close, height
-          return parentType === 'task' ? viewItem.rect.h : viewItem.rectHasIf.h;
+          return viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0);
         }
       }
     }
@@ -68,14 +82,26 @@ export default class TreeViewUtil {
         open,
         width:  TreeViewUtil.calcLength(parentType, node, open, 'width'),
         height: TreeViewUtil.calcLength(parentType, node, open, 'height'),
+        rect: {
+          w: viewItem.rect.w,
+          h: viewItem.rect.h
+            + (parentType === 'switch' ? viewItem.textline : 0)
+            + (open ? TreeViewUtil.calcTextlineHeight(node) : 0)
+        }
       };
     }
     const children = node.children.map(c => TreeViewUtil.open(node.type, c, id, open));
     const newNode = {...node, children};
     const width =  TreeViewUtil.calcLength(parentType, newNode, node.open, 'width');
     const height = TreeViewUtil.calcLength(parentType, newNode, node.open, 'height');
+    const rect = {
+      w: viewItem.rect.w,
+      h: viewItem.rect.h
+        + (parentType === 'switch' ? viewItem.textline : 0)
+        + (node.open ? TreeViewUtil.calcTextlineHeight(node) : 0)
+    };
 
-    return {...node, children, width, height};
+    return {...node, children, width, height, rect};
   }
 }
 

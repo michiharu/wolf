@@ -4,7 +4,7 @@ import { MuiThemeProvider, CssBaseline, createMuiTheme, Color } from '@material-
 import { pink, blue } from '@material-ui/core/colors';
 import Authentication from './pages/authentication';
 
-const theme = createMuiTheme({
+export const theme = createMuiTheme({
   palette: {
     primary: blue,
     secondary: pink,

@@ -1,20 +1,28 @@
 import * as React from 'react';
 import TreeNode from '../../../data-types/tree-node';
-import NodeViewer from './node-viewer';
+import NodeViewer, { NodeViewProps } from './node-viewer';
 
 interface Props {
   containerRef: HTMLDivElement | null;
-  node: TreeNode[] | null;
+  selectedNodeList: TreeNode[] | null;
 }
 
 const NodeNullChecker: React.SFC<Props> = (props: Props) => {
-  const { containerRef, node } = props;
-  if (containerRef === null || node === null) {
+  const { containerRef, selectedNodeList } = props;
+  if (containerRef === null || selectedNodeList === null) {
     return <p>Now Loading..</p>;
   }
-  if (node.length === 0) { return <p>マニュアルを選択してください。</p>; }
+  if (selectedNodeList.length === 0) { return <p>マニュアルを選択してください。</p>; }
+
+  const parent = selectedNodeList.length === 1 ? null : selectedNodeList[selectedNodeList.length - 2];
+
+  const viewerProps: NodeViewProps = {
+    containerRef,
+    parentType: parent === null ? 'task' : parent.type,
+    node: selectedNodeList[selectedNodeList.length - 1]
+  }
   
-  return <NodeViewer containerRef={containerRef} node={node[0]}/>;
+  return <NodeViewer {...viewerProps}/>;
 };
 
 export default NodeNullChecker;

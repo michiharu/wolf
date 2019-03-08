@@ -4,11 +4,12 @@ import { Theme, createStyles, WithStyles, withStyles } from '@material-ui/core';
 
 import { Stage, Layer } from 'react-konva';
 
-import { TreeNode, TreeViewNode } from '../../../data-types/tree-node';
-import { toolbarHeight, toolbarMinHeight } from '../../../settings/layout';
+import { TreeNode, TreeViewNode, Type } from '../../../data-types/tree-node';
+import { toolbarHeight, toolbarMinHeight, viewItem } from '../../../settings/layout';
 import StartNode from '../../../components/konva-node/start-node';
 import TreeViewUtil from '../../../func/tree-view';
-import TaskNodeChildren, { TaskNodeChildrenProps } from '../../../components/konva-node/task-node-children';
+import TaskNode, { TaskNodeProps } from '../../../components/konva-node/task-node';
+import SwitchNode from '../../../components/konva-node/switch-node';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -19,14 +20,17 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
-interface Props extends WithStyles<typeof styles> {
+export interface NodeViewProps {
   containerRef: HTMLDivElement;
+  parentType: Type;
   node: TreeNode;
 }
 
+interface Props extends NodeViewProps, WithStyles<typeof styles> {}
+
 const NodeViewer: React.FC<Props> = (props: Props) => {
-  var timeout: NodeJS.Timeout;
-  const { node: next, classes } = props;
+
+  const { parentType, node: next, classes } = props;
   const [node, setNode] = useState<TreeViewNode | null>(null);
   const [nowLoading, setNowLoading] = useState(false);
   const containerRef = useRef<any>(null);
@@ -40,20 +44,13 @@ const NodeViewer: React.FC<Props> = (props: Props) => {
     sref.draw();
   }
 
-  const reLoad = () => {
-    setNowLoading(true);
-    timeout = setTimeout(() => setNowLoading(false), 1);
-  }
-
   if (node === null || node.id !== next.id) {
-    const newNode = TreeViewUtil.getViewNode('task', next);
-    console.log(newNode);
-    setNode(newNode);
-    reLoad();
+    const newNode = TreeViewUtil.getViewNode(parentType, next);
+    const openNode = TreeViewUtil.open(parentType, newNode, newNode.id, true);
+    setNode(openNode);
   }
 
   const clear = () => {
-    clearTimeout(timeout);
     window.removeEventListener('resize', resize);
   }
 
@@ -64,7 +61,7 @@ const NodeViewer: React.FC<Props> = (props: Props) => {
   });
 
   const changeOpen = (id: string, open: boolean) => {
-    const newNode = TreeViewUtil.open('task', node!,id, open);
+    const newNode = TreeViewUtil.open(parentType, node!,id, open);
     setNode(newNode);
   }
 
@@ -72,11 +69,11 @@ const NodeViewer: React.FC<Props> = (props: Props) => {
     return <p>Now Loading..</p>;
   }
   
-  const childrenProps: TaskNodeChildrenProps = {
-    parentType: 'task',
-    nodes: node.children,
-    x: 100,
-    y: 200,
+  const nodeProps: TaskNodeProps = {
+    parentType,
+    node,
+    x: viewItem.spr.w * 2,
+    y: viewItem.spr.h * 2,
     changeOpen
   };
 
@@ -84,8 +81,7 @@ const NodeViewer: React.FC<Props> = (props: Props) => {
     <div className={classes.root} ref={containerRef}>
       <Stage ref={stageRef} draggable>
         <Layer>
-          <StartNode x={100} y={100}/>
-          <TaskNodeChildren {...childrenProps}/>
+          {node.type === 'task' ? <TaskNode {...nodeProps}/> : <SwitchNode {...nodeProps}/>}
         </Layer>
       </Stage>
     </div>

@@ -43,8 +43,8 @@ const getNode = (config: AxiosRequestConfig) => {
     type: 'task',
     id: '001-1',
     label: 'マニュアル１−１',
-    input: '',
-    output: '',
+    input: 'ファイルA',
+    output: 'ファイルB',
     children: [node111, node112, node113, node114]
   };
 

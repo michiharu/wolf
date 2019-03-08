@@ -19,6 +19,7 @@ export interface TreeViewNode {
   open: boolean;
   width: number;
   height: number;
+  rect: {w: number, h: number};
 }
 
 export default TreeNode;
