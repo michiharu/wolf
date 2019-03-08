@@ -33,7 +33,7 @@ interface Props extends WithStyles<typeof styles> {
   open: boolean;
   toggle: () => void;
 
-  nodeList: TreeNode[];
+  treeNodes: TreeNode[];
   selectedNodeList: TreeNode[];
   selectNode: (node: TreeNode) => void;
   changeNode: (node: TreeNode) => void;
@@ -42,13 +42,13 @@ interface Props extends WithStyles<typeof styles> {
 const time = 1000;
 
 const CustomDrawer: React.SFC<Props> = (props: Props) => {
-  const { open, toggle, nodeList, selectedNodeList, selectNode, classes } = props;
+  const { open, toggle, treeNodes, selectedNodeList, selectNode, classes } = props;
 
   const [listOpen, setListOpen] = useState(false);
 
   useEffect(() => { setListOpen(true); });
 
-  const spreadNodeList = selectedNodeList.length === 0 ? nodeList
+  const spreadNodeList = selectedNodeList.length === 0 ? treeNodes
                         : selectedNodeList[selectedNodeList.length - 1].children; 
 
   const content = (

@@ -16,7 +16,7 @@ const styles = (theme: Theme) => createStyles({
 
 interface State {
   user: User | null;
-  nodeList: TreeNode[] | null;
+  treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null; // 選択されたNodeを最初の要素の深さを０として保持する
 }
 
@@ -26,7 +26,7 @@ class Authentication extends React.Component<{}, State> {
     super(props);
     this.state = {
       user: null,
-      nodeList: null,
+      treeNodes: null,
       selectedNodeList: null,
     };
   }
@@ -49,30 +49,30 @@ class Authentication extends React.Component<{}, State> {
 
   selectNode = (node: TreeNode | null) => {
     if (node === null) { return this.setState({selectedNodeList: []}); }
-    const selectedNodeList = TreeUtil.getGenealogy(this.state.nodeList!, node);
+    const selectedNodeList = TreeUtil.getGenealogy(this.state.treeNodes!, node);
     this.setState({selectedNodeList});
   }
 
   changeNode = (target: TreeNode) => {
-    const {nodeList, selectedNodeList} = this.state;
+    const {treeNodes: nodeList, selectedNodeList} = this.state;
     const newNodeList = TreeUtil.replace(nodeList!, target);
-    this.setState({nodeList: newNodeList});
+    this.setState({treeNodes: newNodeList});
     const selectedNode = selectedNodeList![selectedNodeList!.length - 1];
     const newSelectedNode = TreeUtil.find(newNodeList, selectedNode)!;
     process.nextTick(() => this.selectNode(newSelectedNode));
   }
 
-  loadNode = () => axios.get(nodeURL).then(res => this.setState({nodeList: res.data, selectedNodeList: []}));
+  loadNode = () => axios.get(nodeURL).then(res => this.setState({treeNodes: res.data, selectedNodeList: []}));
 
   render () {
-    const { user, selectedNodeList, nodeList } = this.state;
+    const { user, selectedNodeList, treeNodes: nodeList } = this.state;
 
     return (
       <Layout
         user={user}
         login={this.login}
         logout={this.logout}
-        nodeList={nodeList}
+        treeNodes={nodeList}
         selectedNodeList={selectedNodeList}
         selectNode={this.selectNode}
         changeNode={this.changeNode}

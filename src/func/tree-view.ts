@@ -33,13 +33,15 @@ export default class TreeViewUtil {
         if (which === 'width') {
           // task, open, width
           return viewItem.indent + viewItem.spr.w
-            + node.children.map(c => c.width).reduce((a, b) => Math.max(a, b));
+            + (node.children.length !== 0 ?
+              node.children.map(c => c.width).reduce((a, b) => Math.max(a, b)) : 0);
         } else {
           // task, open, height
           return viewItem.rect.h + viewItem.spr.h
             + (parentType === 'switch' ? viewItem.textline : 0)
             + TreeViewUtil.calcTextlineHeight(node)
-            + node.children.map(c => c.height + viewItem.spr.h).reduce((a, b) => a + b);
+            + (node.children.length !== 0 ?
+               node.children.map(c => c.height + viewItem.spr.h).reduce((a, b) => a + b) : 0);
         }
       } else {
         if (which === 'width') {
@@ -55,13 +57,15 @@ export default class TreeViewUtil {
         if (which === 'width') {
           // switch, open, width
           return viewItem.indent
-          + node.children.map(c => c.width + viewItem.spr.w).reduce((a, b) => a + b);
+          + (node.children.length !== 0 ?
+             node.children.map(c => c.width + viewItem.spr.w).reduce((a, b) => a + b) : 0);
         } else {
           // switch, open, height
           return viewItem.rect.h + viewItem.spr.h * 2
             + (parentType === 'switch' ? viewItem.textline : 0)
             + TreeViewUtil.calcTextlineHeight(node)
-            + node.children.map(c => c.height).reduce((a, b) => Math.max(a, b));
+            + (node.children.length !== 0 ? 
+               node.children.map(c => c.height).reduce((a, b) => Math.max(a, b)) : 0);
         }
       } else {
         if (which === 'width') {

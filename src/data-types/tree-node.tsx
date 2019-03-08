@@ -8,6 +8,18 @@ export interface TreeNode {
   children: TreeNode[];
 }
 
+export interface TreeNodeWithParents {
+  parents: Parent[];
+  id: string;
+  type: Type;
+  label: string;
+  ifState?: string;
+  input: string;
+  output: string;
+  children: TreeNodeWithParents[];
+}
+export type Parent = {id: string, label: string};
+
 export interface TreeViewNode {
   id: string;
   type: Type;

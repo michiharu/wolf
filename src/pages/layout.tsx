@@ -22,7 +22,7 @@ interface Props extends WithStyles<typeof styles> {
   login: (user: User) => void;
   logout: () => void;
 
-  nodeList: TreeNode[] | null;
+  treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null;
   selectNode: (node: TreeNode | null) => void;
   changeNode: (node: TreeNode) => void;
@@ -46,10 +46,10 @@ class Layout extends React.Component<Props, State> {
   getContainerRef = (el: HTMLDivElement) => this.setState({containerRef: el});
   
   render() {
-    const { user, login, logout, nodeList, selectedNodeList, selectNode, changeNode, loadNode, classes } = this.props;
+    const { user, login, logout, treeNodes, selectedNodeList, selectNode, changeNode, loadNode, classes } = this.props;
     const { open, containerRef } = this.state;
     const drawerNullCheckerProps: DrawerNullCheckerProps = {
-      open, toggle: this.toggle, nodeList: nodeList, selectedNodeList, selectNode, changeNode
+      open, toggle: this.toggle, treeNodes, selectedNodeList, selectNode, changeNode
     };
 
     return (
@@ -71,6 +71,7 @@ class Layout extends React.Component<Props, State> {
                 user={user}
                 login={login}
                 containerRef={containerRef}
+                treeNodes={treeNodes}
                 selectedNodeList={selectedNodeList}
                 changeNode={changeNode}
                 loadNode={loadNode}

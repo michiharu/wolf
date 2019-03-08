@@ -95,7 +95,7 @@ const NodeDetails: React.FC<Props> = (props: Props) => {
       <TextField
         variant="outlined"
         className={classes.textfield}
-        placeholder="インプット"
+        label="インプット"
         value={input}
         onChange={changeInput}
         InputProps={{startAdornment: InputIcon}}
@@ -104,7 +104,7 @@ const NodeDetails: React.FC<Props> = (props: Props) => {
       <TextField
         variant="outlined"
         className={classes.textfield}
-        placeholder="アウトプット"
+        label="アウトプット"
         value={output}
         onChange={changeOutput}
         InputProps={{startAdornment: OutputIcon}}

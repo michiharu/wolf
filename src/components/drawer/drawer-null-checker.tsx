@@ -6,15 +6,15 @@ export interface DrawerNullCheckerProps {
   open: boolean;
   toggle: () => void;
 
-  nodeList: TreeNode[] | null;
+  treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null;
   selectNode: (node: TreeNode) => void;
   changeNode: (node: TreeNode) => void;
 }
 
 const DrawerNullChecker :React.SFC<DrawerNullCheckerProps> = (props: DrawerNullCheckerProps) => {
-  const { open, toggle, nodeList, selectedNodeList, selectNode, changeNode } = props;
-  if (nodeList === null || selectedNodeList === null) {
+  const { open, toggle, treeNodes, selectedNodeList, selectNode, changeNode } = props;
+  if (treeNodes === null || selectedNodeList === null) {
     return <p>Now Loading..</p>;
   }
   
@@ -22,7 +22,7 @@ const DrawerNullChecker :React.SFC<DrawerNullCheckerProps> = (props: DrawerNullC
     <Drawer
       open={open}
       toggle={toggle}
-      nodeList={nodeList}
+      treeNodes={treeNodes}
       selectedNodeList={selectedNodeList}
       selectNode={selectNode}
       changeNode={changeNode}/>

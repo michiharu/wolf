@@ -1,4 +1,5 @@
-import TreeNode, { TreeViewNode } from "../data-types/tree-node";
+import TreeNode, { TreeViewNode, TreeNodeWithParents, Parent } from "../data-types/tree-node";
+import { node } from "prop-types";
 
 export default class TreeUtil {
 
@@ -40,5 +41,44 @@ export default class TreeUtil {
     .map(n => TreeUtil.find(n.children, target))
     .reduce((a, b) => a !== undefined ? a
                     : b !== undefined ? b : undefined);
+  }
+
+  static toArray = (nodeList: TreeNode[]): TreeNode[] => {
+    const flatNodes: TreeNode[][] = nodeList.map(n => {
+      if (n.children.length === 0) return [n];
+      const children: TreeNode[] = n.children.map(c => ({...c, children: []}))
+      return [{...n, children}].concat(TreeUtil.toArray(n.children));
+    });
+
+    return flatNodes.reduce((a, b) => a.concat(b));
+  }
+
+  static toArrayWithParents = (parents: Parent[], nodeList: TreeNode[]): TreeNodeWithParents[] => {
+    const flatNodes: TreeNodeWithParents[][] = nodeList.map(n => {
+      if (n.children.length === 0) {
+        const emptyC: TreeNodeWithParents[] = [];
+        return [{...n, children: emptyC, parents}];
+      }
+      const parentsAddedSelf = parents.concat([{id: n.id, label: n.label}]);
+      const emptyP: Parent[] = [];
+      const children: TreeNodeWithParents[] = n.children.map(c => ({...c, children: [], parents: emptyP}))
+      return [{...n, children, parents}].concat(TreeUtil.toArrayWithParents(parentsAddedSelf, n.children));
+    });
+
+    return flatNodes.reduce((a, b) => a.concat(b));
+  }
+
+  static search = <T extends TreeNode>(text: string, nodes: T[]): T[] => {
+    const searchWords = text.split(/\s|　/).map(s => s.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&'));
+
+    return nodes.filter(n => searchWords.length === 0
+      ? true
+      : searchWords
+        .map(w => (
+          n.label .match(new RegExp(`${w}`)) !== null ||
+          n.input .match(new RegExp(`${w}`)) !== null ||
+          n.output.match(new RegExp(`${w}`)) !== null
+        ))
+        .reduce((a, b) => a === true && b === true))
   }
 }

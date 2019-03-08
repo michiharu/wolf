@@ -77,7 +77,7 @@ const TaskNode: React.FC<TaskNodeProps> = (props: TaskNodeProps) => {
   if (!Util.isEmpty(node.output)) { xputs.push(node.output); }
   var anchorY = labelProps.y + viewItem.fontHeight + viewItem.spr.h / 2;
   return (
-    <Group x={x} y={y}>
+    <Group x={x} y={y} draggable>
       {node.open && <Rect {...containerRectProps}/>}
       <Group x={0} y={0} onClick={clicked}>
         <Rect {...baseRectProps}/>

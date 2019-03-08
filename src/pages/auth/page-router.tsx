@@ -7,6 +7,7 @@ import ViewerNullChecker from './node-viewer/node-null-checker';
 
 interface Props {
   containerRef: HTMLDivElement | null;
+  treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null;
   changeNode: (node: TreeNode) => void;
   loadNode: () => void;
@@ -28,7 +29,7 @@ class PageRouter extends React.Component<Props, State> {
   }
 
   render () {
-    const { containerRef, selectedNodeList, changeNode, selectNode } = this.props;
+    const { containerRef, treeNodes, selectedNodeList, changeNode, selectNode } = this.props;
     return (
       <Switch>
         <Route
@@ -49,7 +50,9 @@ class PageRouter extends React.Component<Props, State> {
           render={() => (
             <ViewerNullChecker
               containerRef={containerRef}
+              treeNodes={treeNodes}
               selectedNodeList={selectedNodeList}
+              selectNode={selectNode}
             />
           )}
         />

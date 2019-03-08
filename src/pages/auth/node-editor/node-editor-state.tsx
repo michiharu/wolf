@@ -98,9 +98,9 @@ const NodeEditorState: React.SFC<Props> = (props: Props) => {
     const saveNode: TreeNode = {
       type,
       id: node.id,
-      label: label,
-      input: '',
-      output: '',
+      label,
+      input,
+      output,
       children: order.map(i => nodeChildren[i])
     };
     changeNode(saveNode);

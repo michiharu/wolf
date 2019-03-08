@@ -13,6 +13,7 @@ import { toolbarHeight, toolbarMinHeight } from '../../../settings/layout';
 import { useState, useRef } from 'react';
 import DragDrop from './drag-drop/drag-drop';
 import NodeDetails from './node-details/node-details';
+import ToolContainer from '../../../components/tool-container/tool-container';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -21,15 +22,6 @@ const styles = (theme: Theme) => createStyles({
       height: `calc(100vh - ${toolbarMinHeight}px)`,
     },
     paddingTop: theme.spacing.unit * 8,
-  },
-  portalContainer: {
-    position: 'absolute',
-    overflow: 'visible',
-    top: toolbarHeight,
-    left: -theme.spacing.unit,
-    paddingTop: theme.spacing.unit,
-    width: '100vw',
-    height: 10,
   },
   saveButton: {
     minWidth: 100,
@@ -84,22 +76,21 @@ const NodeEditor: React.FC<Props> = (props: Props) => {
 
   return (
     <div className={classes.root}>
-      <Portal container={containerRef}>
-        <div className={classes.portalContainer}>
-          <Grid container spacing={16}>
-            <Grid item>
-              <Fab color="primary" onClick={back} size="medium">
-                <ArrowBack/>
-              </Fab>
-            </Grid>
-            <Grid item>
-              <Fab className={classes.saveButton} variant="extended" color="primary" onClick={() => save(order!.current)}>
-                保存<CheckIcon className={classes.extendedIcon}/>
-              </Fab>
-            </Grid>
+    
+      <ToolContainer containerRef={containerRef}>
+        <Grid container spacing={16}>
+          <Grid item>
+            <Fab color="primary" onClick={back} size="medium">
+              <ArrowBack/>
+            </Fab>
           </Grid>
-        </div>
-      </Portal>
+          <Grid item>
+            <Fab className={classes.saveButton} variant="extended" color="primary" onClick={() => save(order!.current)}>
+              保存<CheckIcon className={classes.extendedIcon}/>
+            </Fab>
+          </Grid>
+        </Grid>
+      </ToolContainer>
 
       <Grid container justify="center">
         <Grid item md={12} lg={6}>

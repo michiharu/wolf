@@ -4,12 +4,13 @@ import Login from './login/login';
 import User from '../data-types/user';
 import PageRouter from './auth/page-router';
 import TreeNode from '../data-types/tree-node';
+import nodeList from './auth/node-viewer/node-list';
 
 interface Props {
   user: User | null;
   login: (user: User) => void;
   containerRef: HTMLDivElement | null;
-
+  treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null;
   changeNode: (node: TreeNode) => void;
   loadNode: () => void;
@@ -17,13 +18,16 @@ interface Props {
 }
 
 const LoginRouter: React.SFC<Props> = (props: Props) => {
-  const {user, login, containerRef, selectedNodeList, changeNode, loadNode, selectNode} = props;
+  const {
+    user, login, containerRef, treeNodes, selectedNodeList, changeNode, loadNode, selectNode
+  } = props;
   return (
     <Switch>
       {(user === null) && <Route render={() => <Login login={login}/>}/>}
       <Route render={() => (
         <PageRouter
           containerRef={containerRef}
+          treeNodes={treeNodes}
           selectedNodeList={selectedNodeList}
           changeNode={changeNode}
           loadNode={loadNode}
