@@ -4,7 +4,7 @@ import { Group, Rect } from 'react-konva';
 import { viewItem } from '../../settings/layout';
 import { SvgPath } from '../../data-types/svg-path';
 import SvgToPath from './svg-to-path';
-import { TreeViewNode } from '../../data-types/tree-node';
+import { TreeViewNode, FlatNode } from '../../data-types/tree-node';
 import Icon, { IconProps } from './icon';
 import { input, output, task, switchSvg} from '../../resource/svg-icon';
 import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
@@ -13,7 +13,7 @@ import Util from '../../func/util';
 export interface NodeIconBoxProps {
   x: number;
   y: number;
-  node: TreeViewNode;
+  node: TreeViewNode | FlatNode;
 }
 
 const NodeIconBox: React.FC<NodeIconBoxProps> = (props: NodeIconBoxProps) => {

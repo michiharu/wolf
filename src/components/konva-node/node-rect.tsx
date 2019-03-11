@@ -1,24 +1,21 @@
 import * as React from 'react';
-// import { useState } from 'react';
+
 import Konva from 'konva';
 import { Rect, Group, Text } from 'react-konva';
 
-import { TreeViewNode, Type } from '../../data-types/tree-node';
+import { TreeViewNode, Type, FlatNode } from '../../data-types/tree-node';
 import { viewItem } from '../../settings/layout';
-import TaskNodeChildren, { TaskNodeChildrenProps } from './task-node-children';
+
 import Util from '../../func/util';
 import NodeIconBox, { NodeIconBoxProps } from './icon-box';
 
-export interface TaskNodeProps {
-  parentType: Type;
-  node: TreeViewNode;
-  x: number;
-  y: number;
+export interface NodeRectProps {
+  node: FlatNode;
   changeOpen: (id: string, open: boolean) => void;
 }
 
-const TaskNode: React.FC<TaskNodeProps> = (props: TaskNodeProps) => {
-  const {parentType, node, x, y, changeOpen} = props;
+const NodeRect: React.FC<NodeRectProps> = (props: NodeRectProps) => {
+  const {node, changeOpen} = props;
 
   const clicked = (e: any) => {
     e.cancelBubble = true;
@@ -30,22 +27,15 @@ const TaskNode: React.FC<TaskNodeProps> = (props: TaskNodeProps) => {
   const strokeWidth = 2;
   const containerRectProps = {
     x: viewItem.spr.w, y: viewItem.spr.h,
-    width: node.width - viewItem.spr.w,
-    height: node.height - viewItem.spr.h,
+    width: node.self.w - viewItem.spr.w,
+    height: node.self.h - viewItem.spr.h,
     cornerRadius: viewItem.cornerRadius, stroke, strokeWidth,
   };
   const baseRectProps = {
     x: 0, y: 0,
     width: node.rect.w,
     height: node.rect.h,
-    cornerRadius: viewItem.cornerRadius, fill: '#89b7ff',
-  };
-  const childrenProps: TaskNodeChildrenProps = {
-    parentType: node.type,
-    nodes: node.children,
-    x: viewItem.indent,
-    y: node.rect.h + viewItem.spr.h,
-    changeOpen
+    cornerRadius: viewItem.cornerRadius, fill: node.type === 'task' ? '#89b7ff' : '#ffd700',
   };
 
   const ifStateRectProps = {
@@ -65,7 +55,7 @@ const TaskNode: React.FC<TaskNodeProps> = (props: TaskNodeProps) => {
     text: node.label,
     fontSize: viewItem.fontSize,
     x: viewItem.fontSize,
-    y: parentType === 'task'
+    y: node.parentType === 'task'
       ? (viewItem.rect.h - viewItem.fontHeight) / 2
       : (viewItem.rect.h + viewItem.textline + viewItem.fontHeight) / 2
   };
@@ -88,24 +78,22 @@ const TaskNode: React.FC<TaskNodeProps> = (props: TaskNodeProps) => {
   }
 
   return (
-    <Group x={x} y={y}>
+    <Group x={node.point.x} y={node.point.y} >
       {node.open && <Rect {...containerRectProps}/>}
       <Group x={0} y={0} onClick={clicked} draggable onDragStart={() => changeOpen(node.id, false)} onDragEnd={handleDragEnd}>
         <Rect {...baseRectProps}/>
-        {parentType === 'switch' && <Rect {...ifStateRectProps}/>}
-        {parentType === 'switch' && <Text {...ifStateProps}/>}
+        {node.parentType === 'switch' && <Rect {...ifStateRectProps}/>}
+        {node.parentType === 'switch' && <Text {...ifStateProps}/>}
         <NodeIconBox {...iconBoxProps}/>
         <Text {...labelProps}/>
-      </Group>
-      
-      {node.open && xputs.map(x => {
+        {node.open && xputs.map(x => {
         const el = <Text key={x} text={x} x={viewItem.fontSize} y={anchorY} fontSize={viewItem.fontSize}/>;
         anchorY += viewItem.fontHeight + viewItem.spr.h / 4;
         return el;
       })}
-      {node.open && <TaskNodeChildren {...childrenProps}/>}
+      </Group>
     </Group>
   );
 };
 
-export default TaskNode;
+export default NodeRect;

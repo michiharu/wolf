@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Group, Rect } from 'react-konva';
-import { viewItem } from '../../settings/layout';
+import { viewItem, unit } from '../../settings/layout';
 import { SvgPath } from '../../data-types/svg-path';
 import SvgToPath from './svg-to-path';
 import { number } from 'prop-types';
@@ -26,14 +26,16 @@ const Icon: React.FC<IconProps> = (props: IconProps) => {
     opacity: 0.2,
     cornerRadius: viewItem.rect.h / 2,
   };
-
+  const transRate = unit / 24;
   const svgProps = {
     x: (viewItem.rect.h - viewItem.icon) / 2,
     y: (viewItem.rect.h - viewItem.icon) / 2,
     svg,
     fill: color || 'black',
     rotate: rotate || 0,
-    scale
+    scale: scale
+      ? {x: scale.x * transRate, y: scale.y * transRate}
+      : {x: transRate, y: transRate}
   };
 
   return (

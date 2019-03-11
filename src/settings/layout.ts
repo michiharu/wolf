@@ -5,15 +5,16 @@ export { default as Switch } from '@material-ui/icons/CallSplit';
 export { default as Input } from '@material-ui/icons/GetApp';
 export { default as Output } from '@material-ui/icons/Publish';
 
+export const  unit = 16;
 export const viewItem = {
-  rect: {w: 360, h: 40},
-  spr: {w: 20, h: 20},
-  indent: 40,
-  fontSize: 17,
-  fontHeight: 15,
-  textline: 20,
-  icon: 24,
-  badgeFontSize: 11,
-  badgeFontHeight: 9.5,
-  cornerRadius: 8,
+  rect: {w: unit * 18, h: unit * 2},
+  spr: {w: unit, h: unit},
+  indent: unit * 2,
+  fontSize: unit * 17 / 20,
+  fontHeight: unit * 15 / 20,
+  textline: unit,
+  icon: unit * 24 /20,
+  badgeFontSize: unit * 11 / 20,
+  badgeFontHeight: unit * 9.5 / 20,
+  cornerRadius: unit * 8 / 20,
 };

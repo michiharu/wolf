@@ -36,4 +36,23 @@ export interface TreeViewNode {
 
 export default TreeNode;
 
+export interface FlatNode {
+  parentType: Type;
+  id: string;
+  type: Type;
+  label: string;
+  ifState?: string;
+  input: string;
+  output: string;
+  children: FlatNode[];
+
+  open: boolean;
+  point: Point;
+
+  self: Size;
+  rect: Size;
+}
+
 export type Type = 'task' | 'switch';
+export type Point = {x: number, y: number};
+export type Size = {w: number, h:number};

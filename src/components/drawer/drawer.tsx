@@ -22,6 +22,9 @@ const styles = (theme: Theme) => createStyles({
     marginLeft: theme.spacing.unit * 2,
     flex: 1,
   },
+  itemText: {
+    marginLeft: -theme.spacing.unit * 2
+  },
   switchIcon: {
     transform: 'scale(1, -1)',
   },
@@ -67,7 +70,11 @@ const CustomDrawer: React.SFC<Props> = (props: Props) => {
                   <ListItemIcon>
                     {n.type === 'task' ? <Task/> : <Switch className={classes.switchIcon}/>}
                   </ListItemIcon>
-                  <ListItemText primary={n.label} primaryTypographyProps={{color: isLast ? 'primary' : 'default'}}/>
+                  <ListItemText
+                    className={classes.itemText}
+                    primary={n.label}
+                    primaryTypographyProps={{color: isLast ? 'primary' : 'default'}}
+                  />
                 </ListItem>
               );
             })}
@@ -83,7 +90,7 @@ const CustomDrawer: React.SFC<Props> = (props: Props) => {
             <ListItemIcon>
               {n.type === 'task' ? <Task/> : <Switch className={classes.switchIcon}/>}
             </ListItemIcon>
-            <ListItemText primary={n.label}/>
+            <ListItemText className={classes.itemText} primary={n.label}/>
           </ListItem>))}
         </List>
       </Collapse>
