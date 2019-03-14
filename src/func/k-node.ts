@@ -12,8 +12,10 @@ export default class KNodeUtil {
       w: viewItem.rect.w,
       h: viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0),
     };
+    const open = false;
+    const focus = false;
 
-    return {...node, parentType, depth, point, open: false, children, self: rect, rect};
+    return {...node, parentType, depth, point, open, focus, children, self: rect, rect};
   }
 
   static equal = (a: TreeNode, b: TreeNode): boolean => a.id === b.id;
@@ -78,12 +80,31 @@ export default class KNodeUtil {
   }
   static open = (point: Point, node: KNode, id: string, open: boolean): KNode => {
     const openNode = KNodeUtil._open(node, id, open);
-    return KNodeUtil.setCalcProps(point, openNode);
+    const focusNode = KNodeUtil.focus(openNode, id);
+    return KNodeUtil.setCalcProps(point, focusNode);
   }
 
   static _open = (node: KNode, id: string, open: boolean): KNode => {
     if (node.id === id) { return {...node, open}; }
     const children = node.children.map(c => (KNodeUtil._open(c, id, open)));
+    return {...node, children};
+  }
+
+  static focus = (node: KNode, id: string): KNode => {
+    const deletedFocusNode = KNodeUtil._deleteFocus(node);
+    const focusNode = KNodeUtil._focus(deletedFocusNode, id);
+    return focusNode;
+  }
+
+  static _deleteFocus = (node: KNode): KNode => {
+    if (node.focus === true) { return {...node, focus: false}; }
+    const children = node.children.map(c => (KNodeUtil._deleteFocus(c)));
+    return {...node, children};
+  }
+
+  static _focus = (node: KNode, id: string): KNode => {
+    if (node.id === id) { return {...node, focus: true}; }
+    const children = node.children.map(c => (KNodeUtil._focus(c, id)));
     return {...node, children};
   }
 

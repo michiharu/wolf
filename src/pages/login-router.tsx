@@ -9,10 +9,10 @@ import nodeList from './auth/node-viewer/node-list';
 interface Props {
   user: User | null;
   login: (user: User) => void;
-  containerRef: HTMLDivElement | null;
+  toolRef: HTMLDivElement | null;
+  rightPaneRef: HTMLDivElement | null;
   treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null;
-  focusNode: TreeNode | null;
   changeNode: (node: TreeNode) => void;
   loadNode: () => void;
   selectNode: (node: TreeNode | null) => void;
@@ -20,17 +20,17 @@ interface Props {
 
 const LoginRouter: React.SFC<Props> = (props: Props) => {
   const {
-    user, login, containerRef, treeNodes, selectedNodeList, focusNode, changeNode, loadNode, selectNode
+    user, login, toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, loadNode, selectNode
   } = props;
   return (
     <Switch>
       {(user === null) && <Route render={() => <Login login={login}/>}/>}
       <Route render={() => (
         <PageRouter
-          containerRef={containerRef}
+          toolRef={toolRef}
+          rightPaneRef={rightPaneRef}
           treeNodes={treeNodes}
           selectedNodeList={selectedNodeList}
-          focusNode={focusNode}
           changeNode={changeNode}
           loadNode={loadNode}
           selectNode={selectNode}

@@ -47,6 +47,8 @@ export interface KNode {
   children: KNode[];
 
   open: boolean;
+  focus: boolean;
+  
   depth: {top: number, bottom: number};
 
   point: Point;
@@ -54,6 +56,7 @@ export interface KNode {
   self: Size;
   rect: Size;
 }
+
 // export const dummyId = '--';
 export type Type = 'task' | 'switch';
 export type Point = {x: number, y: number};

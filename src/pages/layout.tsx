@@ -23,7 +23,6 @@ interface Props extends WithStyles<typeof styles> {
 
   treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null;
-  focusNode: TreeNode | null;
 
   selectNode: (node: TreeNode | null) => void;
   changeNode: (node: TreeNode) => void;
@@ -32,25 +31,29 @@ interface Props extends WithStyles<typeof styles> {
 
 interface State {
   open: boolean;
-  containerRef: HTMLDivElement | null;
+  toolRef: HTMLDivElement | null;
+  rightPaneRef: HTMLDivElement | null;
 }
 
 class Layout extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = {open: false, containerRef: null};
+    this.state = {open: false, toolRef: null, rightPaneRef: null};
   }
 
   toggle = () => this.setState(state => ({ open: !state.open }));
 
-  getContainerRef = (el: HTMLDivElement) => this.setState({containerRef: el});
+  getToolRef = (el: HTMLDivElement) => this.setState({toolRef: el});
+
+  getRightPaneRef = (el: HTMLDivElement) => this.setState({rightPaneRef: el});
+
   
   render() {
     const {
-      user, login, logout, treeNodes, selectedNodeList, focusNode, selectNode, changeNode, loadNode, classes
+      user, login, logout, treeNodes, selectedNodeList, selectNode, changeNode, loadNode, classes
     } = this.props;
-    const { open, containerRef } = this.state;
+    const { open, toolRef, rightPaneRef } = this.state;
     const drawerNullCheckerProps: DrawerNullCheckerProps = {
       open, toggle: this.toggle, treeNodes, selectedNodeList, selectNode, changeNode
     };
@@ -61,9 +64,10 @@ class Layout extends React.Component<Props, State> {
           <div className={classes.root}>
             <AppBar
               user={user} 
-              getContainerRef={this.getContainerRef}
+              getToolRef={this.getToolRef}
+              getRightPaneRef={this.getRightPaneRef}
               handleDrawerToggle={this.toggle}
-              focusNode={focusNode}
+              selectedNodeList={selectedNodeList}
               logout={logout}
             />
             {user !== null && (
@@ -74,10 +78,10 @@ class Layout extends React.Component<Props, State> {
               <LoginRouter
                 user={user}
                 login={login}
-                containerRef={containerRef}
+                toolRef={toolRef}
+                rightPaneRef={rightPaneRef}
                 treeNodes={treeNodes}
                 selectedNodeList={selectedNodeList}
-                focusNode={focusNode}
                 changeNode={changeNode}
                 loadNode={loadNode}
                 selectNode={selectNode}

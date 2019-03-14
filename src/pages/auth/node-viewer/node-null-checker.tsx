@@ -4,19 +4,21 @@ import NodeList from './node-list';
 import NodeViewer, { NodeViewProps } from './node-viewer';
 
 interface Props {
-  containerRef: HTMLDivElement | null;
+  toolRef: HTMLDivElement | null;
+  rightPaneRef: HTMLDivElement | null;
   treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null;
+  changeNode: (node: TreeNode) => void;
   selectNode: (node: TreeNode | null) => void;
 }
 
 const NodeNullChecker: React.SFC<Props> = (props: Props) => {
-  const { containerRef, treeNodes, selectedNodeList, selectNode } = props;
-  if (containerRef === null || selectedNodeList === null || treeNodes === null) {
+  const { toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, selectNode } = props;
+  if (toolRef === null || selectedNodeList === null || treeNodes === null) {
     return <p>Now Loading..</p>;
   }
   if (selectedNodeList.length === 0) {
-    return <NodeList containerRef={containerRef} treeNodes={treeNodes} selectNode={selectNode}/>;
+    return <NodeList treeNodes={treeNodes} selectNode={selectNode}/>;
   }
 
   const parent = selectedNodeList.length === 1 ? null : selectedNodeList[selectedNodeList.length - 2];
@@ -27,10 +29,11 @@ const NodeNullChecker: React.SFC<Props> = (props: Props) => {
   }
 
   const viewerProps: NodeViewProps = {
-    containerRef,
+    toolRef, rightPaneRef: rightPaneRef!,
     parentType: parent === null ? 'task' : parent.type,
     node: selectedNodeList[selectedNodeList.length - 1],
-    back
+    back,
+    changeNode,
   }
   
   return <NodeViewer {...viewerProps}/>;

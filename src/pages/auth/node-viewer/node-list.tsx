@@ -51,7 +51,6 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export interface NodeListProps {
-  containerRef: HTMLDivElement;
   treeNodes: TreeNode[];
   selectNode: (node: TreeNode | null) => void;
 }

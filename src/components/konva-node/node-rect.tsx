@@ -12,27 +12,32 @@ import NodeIconBox, { NodeIconBoxProps } from './icon-box';
 export interface NodeRectProps {
   node: KNode;
   changeOpen: (id: string, open: boolean) => void;
+  deleteFocus: () => void;
   dragMove: (selfNode: KNode, point: Point) => void;
   dragEnd: () => void;
 }
 
 const NodeRect: React.FC<NodeRectProps> = (props: NodeRectProps) => {
-  const {node, changeOpen, dragMove, dragEnd} = props;
+  const {node, changeOpen, deleteFocus, dragMove, dragEnd} = props;
 
+  const fill = node.id === '--' ? '#ccc' : node.type === 'task'
+              ? node.focus ? '#99ccff' : '#89b7ff'
+              : node.focus ? '#ffe733' : '#ffd700';
   const baseRectProps = {
     x: 0, y: 0,
     width: node.rect.w * unit,
     height: node.rect.h * unit,
     cornerRadius: viewItem.cornerRadius * unit,
-    fill: node.id === '--' ? '#ccc' : node.type === 'task' ? '#89b7ff' : '#ffd700',
+    fill,
+    shadowColor: node.focus ? fill : 'black',
+    shadowBlur: node.focus ? 10 : 6,
+    shadowOffset: { x : 0, y : node.focus ? 0 : 3},
+    shadowOpacity: node.focus ? 1 : 0.2,
   };
 
   if (node.id === '--') {
-    return (
-      <Group x={node.point.x * unit} y={node.point.y * unit} >
-        <Rect {...baseRectProps}/>
-      </Group>
-    );
+    const point = {x: node.point.x * unit, y: node.point.y * unit};
+    return <Group {...point}><Rect {...baseRectProps}/></Group>;
   }
 
   const clicked = (e: any) => {
@@ -47,7 +52,10 @@ const NodeRect: React.FC<NodeRectProps> = (props: NodeRectProps) => {
     y: viewItem.spr.h * unit,
     width: (node.self.w - viewItem.spr.w) * unit,
     height: (node.self.h - viewItem.spr.h) * unit,
-    cornerRadius: viewItem.cornerRadius * unit, stroke, strokeWidth,
+    cornerRadius: viewItem.cornerRadius * unit,
+    stroke,
+    strokeWidth,
+    onClick: deleteFocus,
   };
 
   const ifStateRectProps = {
@@ -83,13 +91,17 @@ const NodeRect: React.FC<NodeRectProps> = (props: NodeRectProps) => {
   if (!Util.isEmpty(node.output)) { xputs.push(node.output); }
   var anchorY = labelProps.y + (viewItem.fontHeight + viewItem.spr.h / 2) * unit;
 
-  const handleDragMove = (selfNode: KNode) => (e: any) => {
+  const handleDragStart = (e: any) => {
+    changeOpen(node.id, false);
+  }
+
+  const handleDragMove = (e: any) => {
     const tr = e.target.getClientRect();
     const point = {
       x: Math.floor(tr.x / unit) + viewItem.rect.w / 2,
       y: Math.floor(tr.y / unit) + viewItem.rect.h / 2,
     };
-    dragMove(selfNode, point);
+    dragMove(node, point);
   }
 
   const handleDragEnd = (e: any) => {
@@ -105,8 +117,8 @@ const NodeRect: React.FC<NodeRectProps> = (props: NodeRectProps) => {
     x: 0, y:0,
     onClick: clicked,
     draggable: true,
-    onDragStart: () => changeOpen(node.id, false),
-    onDragMove: handleDragMove(node),
+    onDragStart: handleDragStart,
+    onDragMove: handleDragMove,
     onDragEnd: handleDragEnd,
   }
 

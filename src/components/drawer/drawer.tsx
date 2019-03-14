@@ -52,7 +52,11 @@ const CustomDrawer: React.SFC<Props> = (props: Props) => {
   useEffect(() => { setListOpen(true); });
 
   const spreadNodeList = selectedNodeList.length === 0 ? treeNodes
-                        : selectedNodeList[selectedNodeList.length - 1].children; 
+                        : selectedNodeList[selectedNodeList.length - 1].children;
+  const selectAndClose = (node: TreeNode) => {
+    if (open) { toggle(); }
+    selectNode(node);
+  } 
 
   const content = (
     <React.Fragment>
@@ -66,7 +70,7 @@ const CustomDrawer: React.SFC<Props> = (props: Props) => {
             {selectedNodeList.map((n, i, arry) => {
               const isLast = i === selectedNodeList.length - 1;
               return (
-                <ListItem button key={`selected-${n.id}`} onClick={() => selectNode(n)}>
+                <ListItem button key={`selected-${n.id}`} onClick={() => selectAndClose(n)}>
                   <ListItemIcon>
                     {n.type === 'task' ? <Task/> : <Switch className={classes.switchIcon}/>}
                   </ListItemIcon>
@@ -86,7 +90,7 @@ const CustomDrawer: React.SFC<Props> = (props: Props) => {
       <Collapse in={listOpen} timeout={{enter: time, exit: time}} unmountOnExit>
         <List dense>
           {spreadNodeList.map(n => (
-          <ListItem button key={`spread-${n.id}`} onClick={() => selectNode(n)}>
+          <ListItem button key={`spread-${n.id}`} onClick={() => selectAndClose(n)}>
             <ListItemIcon>
               {n.type === 'task' ? <Task/> : <Switch className={classes.switchIcon}/>}
             </ListItemIcon>

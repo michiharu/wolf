@@ -44,7 +44,6 @@ const styles = (theme: Theme) => createStyles({
   toggleContainer: {
     margin: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
     background: theme.palette.background.default,
-    borderRadius: theme.shape.borderRadius,
   },
   menuButton: {
     marginRight: 20,
@@ -63,13 +62,14 @@ const styles = (theme: Theme) => createStyles({
     position: 'absolute',
     overflow: 'visible',
     top: toolbarHeight,
+    height: `calc(100vh - ${toolbarHeight}px)`,
     [theme.breakpoints.down('xs')]: {
       top: toolbarMinHeight,
+      height: `calc(100vh - ${toolbarMinHeight}px)`
     },
     right: -24,
-    width: rightPainWidth,
-    height: `calc(100vh - ${toolbarHeight}px)`,
-    [theme.breakpoints.down('xs')]: { height: `calc(100vh - ${toolbarMinHeight}px)` },
+    width: '25vw',
+    minWidth: rightPainWidth,
   },
   rightPanePaper: {
     width: '100%',
@@ -81,15 +81,17 @@ const styles = (theme: Theme) => createStyles({
 
 interface Props extends WithStyles<typeof styles>, RouteComponentProps {
   user: User | null;
-  getContainerRef: (el: HTMLDivElement) => void;
+  getToolRef: (el: HTMLDivElement) => void;
+  getRightPaneRef: (el: HTMLDivElement) => void;
   handleDrawerToggle: () => void;
-  focusNode: TreeNode | null;
+  selectedNodeList: TreeNode[] | null;
   logout: () => void;
 }
 
 interface State {
   anchorEl: HTMLElement | null;
   toggles: string[];
+  setRightPaneRef: boolean;
 }
 
 const rightPane = 'rightPane'; 
@@ -101,11 +103,11 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
 
   constructor(props: Props) {
     super(props);
-    this.state = { anchorEl: null, toggles: [] };
+    this.state = { anchorEl: null, toggles: [], setRightPaneRef: false };
   }
 
   componentDidMount() {
-    this.props.getContainerRef(this.toolRef.current!);
+    this.props.getToolRef(this.toolRef.current!);
   }
 
   handleMenu = (e: any) => {
@@ -116,7 +118,14 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
     this.setState({ anchorEl: null });
   };
 
-  handleToggles = (_: any, toggles: string[]) => this.setState({toggles});
+  handleToggles = (_: any, toggles: string[]) => {
+    const { getRightPaneRef } = this.props;
+    const { setRightPaneRef } = this.state;
+    if (!setRightPaneRef) {
+      process.nextTick(() => getRightPaneRef(this.rightPaneRef.current!));
+    }
+    this.setState({toggles, setRightPaneRef: true});    
+  }
 
   handleLogout = () => {
     this.props.logout();
@@ -124,7 +133,7 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
   }
 
   render() {
-    const { user, handleDrawerToggle, focusNode, location, history, classes } = this.props;
+    const { user, handleDrawerToggle, selectedNodeList, location, history, classes } = this.props;
     const { anchorEl, toggles } = this.state;
     const open = Boolean(anchorEl);
     const origin: PopoverOrigin = { vertical: 'top', horizontal: 'right' };
@@ -156,7 +165,8 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
           </Select>
 
           <div className={classes.grow}/>
-          {focusNode !== null && (
+
+          {selectedNodeList !== null && selectedNodeList.length !== 0 && (
           <div className={classes.toggleContainer}>
             <ToggleButtonGroup value={toggles} onChange={this.handleToggles}>
               <ToggleButton value={rightPane}>
@@ -166,41 +176,39 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
           </div>)}
           
           {user !== null && (
-            <div>
-              <IconButton
-                aria-owns={open ? 'menu-appbar' : undefined}
-                aria-haspopup="true"
-                onClick={this.handleMenu}
-                color="inherit"
-              >
-                <AccountCircle />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={origin}
-                transformOrigin={origin}
-                open={open}
-                onClose={this.handleClose}
-                disableAutoFocusItem
-              >
-                <MenuItem onClick={this.handleLogout}>
-                  <ListItemIcon>
-                    <Close />
-                  </ListItemIcon>
-                  <ListItemText primary="ログアウト" />
-                </MenuItem>
-              </Menu>
-            </div>
-          )}
+          <>
+            <IconButton
+              aria-owns={open ? 'menu-appbar' : undefined}
+              aria-haspopup="true"
+              onClick={this.handleMenu}
+              color="inherit"
+            >
+              <AccountCircle />
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={origin}
+              transformOrigin={origin}
+              open={open}
+              onClose={this.handleClose}
+              disableAutoFocusItem
+            >
+              <MenuItem onClick={this.handleLogout}>
+                <ListItemIcon>
+                  <Close />
+                </ListItemIcon>
+                <ListItemText primary="ログアウト" />
+              </MenuItem>
+            </Menu>
+          </>)}
           <div className={classes.rightPaneAnchor}>
             <div className={classes.rightPaneWrapper}>
-            <Slide direction="left" in={toggles.indexOf(rightPane) !== -1} mountOnEnter>
-              <div className={classes.rightPanePaper}>
-                右ペイン
-                <div ref={this.rightPaneRef}/>
-              </div>
-            </Slide>
+              <Slide direction="left" in={toggles.indexOf(rightPane) !== -1} mountOnEnter>
+                <div className={classes.rightPanePaper}>
+                  <div ref={this.rightPaneRef}/>
+                </div>
+              </Slide>
             </div>
           </div>
         </Toolbar>

@@ -6,10 +6,11 @@ import EditorNullChecker from './node-editor/node-null-checker';
 import ViewerNullChecker from './node-viewer/node-null-checker';
 
 interface Props {
-  containerRef: HTMLDivElement | null;
+  toolRef: HTMLDivElement | null;
+  rightPaneRef: HTMLDivElement | null;
   treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null;
-  focusNode: TreeNode | null;
+
   changeNode: (node: TreeNode) => void;
   loadNode: () => void;
   selectNode: (node: TreeNode | null) => void;
@@ -30,7 +31,7 @@ class PageRouter extends React.Component<Props, State> {
   }
 
   render () {
-    const { containerRef, treeNodes, selectedNodeList, changeNode, selectNode } = this.props;
+    const { toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, selectNode } = this.props;
     return (
       <Switch>
         <Route
@@ -38,7 +39,7 @@ class PageRouter extends React.Component<Props, State> {
           path={link.edit}
           render={() => (
             <EditorNullChecker
-              containerRef={containerRef}
+              containerRef={toolRef}
               selectedNodeList={selectedNodeList}
               changeNode={changeNode}
               selectNode={selectNode}
@@ -50,9 +51,11 @@ class PageRouter extends React.Component<Props, State> {
           path={link.view}
           render={() => (
             <ViewerNullChecker
-              containerRef={containerRef}
+              toolRef={toolRef}
+              rightPaneRef={rightPaneRef}
               treeNodes={treeNodes}
               selectedNodeList={selectedNodeList}
+              changeNode={changeNode}
               selectNode={selectNode}
             />
           )}
