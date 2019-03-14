@@ -8,7 +8,6 @@ import DrawerNullChecker, { DrawerNullCheckerProps } from '../components/drawer/
 import LoginRouter from './login-router';
 import TreeNode from '../data-types/tree-node';
 
-export const drawerWidth = 300;
 const styles = (theme: Theme) => createStyles({
   root: { display: 'flex' },
   toolbar: theme.mixins.toolbar,
@@ -24,6 +23,8 @@ interface Props extends WithStyles<typeof styles> {
 
   treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null;
+  focusNode: TreeNode | null;
+
   selectNode: (node: TreeNode | null) => void;
   changeNode: (node: TreeNode) => void;
   loadNode: () => void;
@@ -46,7 +47,9 @@ class Layout extends React.Component<Props, State> {
   getContainerRef = (el: HTMLDivElement) => this.setState({containerRef: el});
   
   render() {
-    const { user, login, logout, treeNodes, selectedNodeList, selectNode, changeNode, loadNode, classes } = this.props;
+    const {
+      user, login, logout, treeNodes, selectedNodeList, focusNode, selectNode, changeNode, loadNode, classes
+    } = this.props;
     const { open, containerRef } = this.state;
     const drawerNullCheckerProps: DrawerNullCheckerProps = {
       open, toggle: this.toggle, treeNodes, selectedNodeList, selectNode, changeNode
@@ -60,6 +63,7 @@ class Layout extends React.Component<Props, State> {
               user={user} 
               getContainerRef={this.getContainerRef}
               handleDrawerToggle={this.toggle}
+              focusNode={focusNode}
               logout={logout}
             />
             {user !== null && (
@@ -73,6 +77,7 @@ class Layout extends React.Component<Props, State> {
                 containerRef={containerRef}
                 treeNodes={treeNodes}
                 selectedNodeList={selectedNodeList}
+                focusNode={focusNode}
                 changeNode={changeNode}
                 loadNode={loadNode}
                 selectNode={selectNode}

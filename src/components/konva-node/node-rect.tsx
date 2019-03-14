@@ -3,71 +3,94 @@ import * as React from 'react';
 import Konva from 'konva';
 import { Rect, Group, Text } from 'react-konva';
 
-import { TreeViewNode, Type, FlatNode } from '../../data-types/tree-node';
-import { viewItem } from '../../settings/layout';
+import { KNode, Point } from '../../data-types/tree-node';
+import { viewItem, unit } from '../../settings/layout';
 
 import Util from '../../func/util';
 import NodeIconBox, { NodeIconBoxProps } from './icon-box';
 
 export interface NodeRectProps {
-  node: FlatNode;
+  node: KNode;
   changeOpen: (id: string, open: boolean) => void;
+  dragMove: (selfNode: KNode, point: Point) => void;
+  dragEnd: () => void;
 }
 
 const NodeRect: React.FC<NodeRectProps> = (props: NodeRectProps) => {
-  const {node, changeOpen} = props;
+  const {node, changeOpen, dragMove, dragEnd} = props;
+
+  const baseRectProps = {
+    x: 0, y: 0,
+    width: node.rect.w * unit,
+    height: node.rect.h * unit,
+    cornerRadius: viewItem.cornerRadius * unit,
+    fill: node.id === '--' ? '#ccc' : node.type === 'task' ? '#89b7ff' : '#ffd700',
+  };
+
+  if (node.id === '--') {
+    return (
+      <Group x={node.point.x * unit} y={node.point.y * unit} >
+        <Rect {...baseRectProps}/>
+      </Group>
+    );
+  }
 
   const clicked = (e: any) => {
     e.cancelBubble = true;
-    if (node.children.length === 0) { return; }
     changeOpen(node.id, !node.open);
   }
 
   const stroke = '#dddd';
   const strokeWidth = 2;
   const containerRectProps = {
-    x: viewItem.spr.w, y: viewItem.spr.h,
-    width: node.self.w - viewItem.spr.w,
-    height: node.self.h - viewItem.spr.h,
-    cornerRadius: viewItem.cornerRadius, stroke, strokeWidth,
-  };
-  const baseRectProps = {
-    x: 0, y: 0,
-    width: node.rect.w,
-    height: node.rect.h,
-    cornerRadius: viewItem.cornerRadius, fill: node.type === 'task' ? '#89b7ff' : '#ffd700',
+    x: viewItem.spr.w * unit,
+    y: viewItem.spr.h * unit,
+    width: (node.self.w - viewItem.spr.w) * unit,
+    height: (node.self.h - viewItem.spr.h) * unit,
+    cornerRadius: viewItem.cornerRadius * unit, stroke, strokeWidth,
   };
 
   const ifStateRectProps = {
-    x: viewItem.spr.w / 2,
-    y: (viewItem.rect.h + viewItem.textline) / 2 - (viewItem.fontHeight + viewItem.spr.h / 2),
-    width: viewItem.rect.w - viewItem.spr.w,
-    height: viewItem.fontHeight + viewItem.spr.h / 2,
-    cornerRadius: viewItem.cornerRadius, fill: '#fff', opacity: 0.5
+    x: (viewItem.spr.w / 2) * unit,
+    y: (viewItem.rect.h + viewItem.textline - viewItem.fontHeight * 2 - viewItem.spr.h) / 2  * unit,
+    width: (viewItem.rect.w - viewItem.spr.w) * unit,
+    height: (viewItem.fontHeight + viewItem.spr.h / 2) * unit,
+    cornerRadius: viewItem.cornerRadius * unit, fill: '#fff', opacity: 0.5
   };
   const ifStateProps = {
     text: node.ifState!,
-    fontSize: viewItem.fontSize,
-    x: viewItem.fontSize,
-    y: (viewItem.rect.h + viewItem.textline) / 2 - (viewItem.fontHeight + viewItem.spr.h / 4),
+    fontSize: viewItem.fontSize * unit,
+    x: viewItem.fontSize * unit,
+    y: (viewItem.rect.h + viewItem.textline - viewItem.fontHeight * 2 - viewItem.spr.h / 2) / 2  * unit,
   };
   const labelProps = {
     text: node.label,
-    fontSize: viewItem.fontSize,
-    x: viewItem.fontSize,
+    fontSize: viewItem.fontSize * unit,
+    x: viewItem.fontSize * unit,
     y: node.parentType === 'task'
-      ? (viewItem.rect.h - viewItem.fontHeight) / 2
-      : (viewItem.rect.h + viewItem.textline + viewItem.fontHeight) / 2
+      ? (viewItem.rect.h - viewItem.fontHeight) / 2 * unit
+      : (viewItem.rect.h + viewItem.textline + viewItem.fontHeight) / 2 * unit
   };
 
   const iconBoxProps: NodeIconBoxProps = {
-    x: node.rect.w, y: labelProps.y - (viewItem.rect.h - viewItem.fontHeight) / 2, node
+    x: node.rect.w * unit,
+    y: labelProps.y - (viewItem.rect.h - viewItem.fontHeight) / 2 * unit,
+    node
   };
 
   const xputs = [];
   if (!Util.isEmpty(node.input)) { xputs.push(node.input); }
   if (!Util.isEmpty(node.output)) { xputs.push(node.output); }
-  var anchorY = labelProps.y + viewItem.fontHeight + viewItem.spr.h / 2;
+  var anchorY = labelProps.y + (viewItem.fontHeight + viewItem.spr.h / 2) * unit;
+
+  const handleDragMove = (selfNode: KNode) => (e: any) => {
+    const tr = e.target.getClientRect();
+    const point = {
+      x: Math.floor(tr.x / unit) + viewItem.rect.w / 2,
+      y: Math.floor(tr.y / unit) + viewItem.rect.h / 2,
+    };
+    dragMove(selfNode, point);
+  }
 
   const handleDragEnd = (e: any) => {
     e.target.to({
@@ -75,20 +98,31 @@ const NodeRect: React.FC<NodeRectProps> = (props: NodeRectProps) => {
       y: 0,
       easing: Konva.Easings.EaseInOut,
     });
+    dragEnd();
+  }
+
+  const rectGroupProps = {
+    x: 0, y:0,
+    onClick: clicked,
+    draggable: true,
+    onDragStart: () => changeOpen(node.id, false),
+    onDragMove: handleDragMove(node),
+    onDragEnd: handleDragEnd,
   }
 
   return (
-    <Group x={node.point.x} y={node.point.y} >
+    <Group x={node.point.x * unit} y={node.point.y * unit} >
       {node.open && <Rect {...containerRectProps}/>}
-      <Group x={0} y={0} onClick={clicked} draggable onDragStart={() => changeOpen(node.id, false)} onDragEnd={handleDragEnd}>
+      <Group {...rectGroupProps}>
         <Rect {...baseRectProps}/>
         {node.parentType === 'switch' && <Rect {...ifStateRectProps}/>}
         {node.parentType === 'switch' && <Text {...ifStateProps}/>}
         <NodeIconBox {...iconBoxProps}/>
         <Text {...labelProps}/>
+        <Text />
         {node.open && xputs.map(x => {
-        const el = <Text key={x} text={x} x={viewItem.fontSize} y={anchorY} fontSize={viewItem.fontSize}/>;
-        anchorY += viewItem.fontHeight + viewItem.spr.h / 4;
+        const el = <Text key={x} text={x} x={viewItem.fontSize * unit} y={anchorY} fontSize={viewItem.fontSize}/>;
+        anchorY += (viewItem.fontHeight + viewItem.spr.h / 4) * unit;
         return el;
       })}
       </Group>

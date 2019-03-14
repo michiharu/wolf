@@ -18,6 +18,7 @@ interface State {
   user: User | null;
   treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null; // 選択されたNodeを最初の要素の深さを０として保持する
+  focusNode: TreeNode | null;
 }
 
 class Authentication extends React.Component<{}, State> {
@@ -28,6 +29,7 @@ class Authentication extends React.Component<{}, State> {
       user: null,
       treeNodes: null,
       selectedNodeList: null,
+      focusNode: null,
     };
   }
 
@@ -65,15 +67,16 @@ class Authentication extends React.Component<{}, State> {
   loadNode = () => axios.get(nodeURL).then(res => this.setState({treeNodes: res.data, selectedNodeList: []}));
 
   render () {
-    const { user, selectedNodeList, treeNodes: nodeList } = this.state;
+    const { user, treeNodes, selectedNodeList, focusNode } = this.state;
 
     return (
       <Layout
         user={user}
         login={this.login}
         logout={this.logout}
-        treeNodes={nodeList}
+        treeNodes={treeNodes}
         selectedNodeList={selectedNodeList}
+        focusNode={focusNode}
         selectNode={this.selectNode}
         changeNode={this.changeNode}
         loadNode={this.loadNode}

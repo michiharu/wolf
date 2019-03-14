@@ -1,4 +1,4 @@
-import TreeNode, { TreeViewNode, TreeNodeWithParents, Parent, FlatNode } from "../data-types/tree-node";
+import TreeNode, { TreeViewNode, TreeNodeWithParents, Parent, KNode } from "../data-types/tree-node";
 import { node } from "prop-types";
 
 export default class TreeUtil {

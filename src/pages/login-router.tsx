@@ -12,6 +12,7 @@ interface Props {
   containerRef: HTMLDivElement | null;
   treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null;
+  focusNode: TreeNode | null;
   changeNode: (node: TreeNode) => void;
   loadNode: () => void;
   selectNode: (node: TreeNode | null) => void;
@@ -19,7 +20,7 @@ interface Props {
 
 const LoginRouter: React.SFC<Props> = (props: Props) => {
   const {
-    user, login, containerRef, treeNodes, selectedNodeList, changeNode, loadNode, selectNode
+    user, login, containerRef, treeNodes, selectedNodeList, focusNode, changeNode, loadNode, selectNode
   } = props;
   return (
     <Switch>
@@ -29,6 +30,7 @@ const LoginRouter: React.SFC<Props> = (props: Props) => {
           containerRef={containerRef}
           treeNodes={treeNodes}
           selectedNodeList={selectedNodeList}
+          focusNode={focusNode}
           changeNode={changeNode}
           loadNode={loadNode}
           selectNode={selectNode}

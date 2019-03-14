@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Theme, createStyles, WithStyles, withStyles, ListItemIcon } from '@material-ui/core';
 import { InputBase, Hidden, ListItem, ListItemText, Collapse } from '@material-ui/core';
 import { Drawer as MUIDrawer, List, Divider } from '@material-ui/core';
-import { drawerWidth } from '../../pages/layout';
+import { drawerWidth } from '../../settings/layout';
 import TreeNode from '../../data-types/tree-node';
 import { Task, Switch} from '../../settings/layout';
 

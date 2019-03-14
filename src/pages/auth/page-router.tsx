@@ -9,6 +9,7 @@ interface Props {
   containerRef: HTMLDivElement | null;
   treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null;
+  focusNode: TreeNode | null;
   changeNode: (node: TreeNode) => void;
   loadNode: () => void;
   selectNode: (node: TreeNode | null) => void;
