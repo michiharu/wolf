@@ -65,14 +65,14 @@ class Authentication extends React.Component<{}, State> {
   loadNode = () => axios.get(nodeURL).then(res => this.setState({treeNodes: res.data, selectedNodeList: []}));
 
   render () {
-    const { user, selectedNodeList, treeNodes: nodeList } = this.state;
+    const { user, treeNodes, selectedNodeList } = this.state;
 
     return (
       <Layout
         user={user}
         login={this.login}
         logout={this.logout}
-        treeNodes={nodeList}
+        treeNodes={treeNodes}
         selectedNodeList={selectedNodeList}
         selectNode={this.selectNode}
         changeNode={this.changeNode}

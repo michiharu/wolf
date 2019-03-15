@@ -6,7 +6,6 @@ import { TextField, Paper } from '@material-ui/core';
 import { TreeNode, TreeNodeWithParents } from '../../../data-types/tree-node';
 import { toolbarHeight, toolbarMinHeight, Task, Switch, Input, Output } from '../../../settings/layout';
 
-import TreeViewUtil from '../../../func/tree-view';
 import ToolContainer from '../../../components/tool-container/tool-container';
 import { theme } from '../../..';
 import TreeUtil from '../../../func/tree';
@@ -52,7 +51,6 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export interface NodeListProps {
-  containerRef: HTMLDivElement;
   treeNodes: TreeNode[];
   selectNode: (node: TreeNode | null) => void;
 }

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Theme, createStyles, WithStyles, withStyles, ListItemIcon } from '@material-ui/core';
 import { InputBase, Hidden, ListItem, ListItemText, Collapse } from '@material-ui/core';
 import { Drawer as MUIDrawer, List, Divider } from '@material-ui/core';
-import { drawerWidth } from '../../pages/layout';
+import { drawerWidth } from '../../settings/layout';
 import TreeNode from '../../data-types/tree-node';
 import { Task, Switch} from '../../settings/layout';
 
@@ -21,6 +21,9 @@ const styles = (theme: Theme) => createStyles({
   input: {
     marginLeft: theme.spacing.unit * 2,
     flex: 1,
+  },
+  itemText: {
+    marginLeft: -theme.spacing.unit * 2
   },
   switchIcon: {
     transform: 'scale(1, -1)',
@@ -49,7 +52,11 @@ const CustomDrawer: React.SFC<Props> = (props: Props) => {
   useEffect(() => { setListOpen(true); });
 
   const spreadNodeList = selectedNodeList.length === 0 ? treeNodes
-                        : selectedNodeList[selectedNodeList.length - 1].children; 
+                        : selectedNodeList[selectedNodeList.length - 1].children;
+  const selectAndClose = (node: TreeNode) => {
+    if (open) { toggle(); }
+    selectNode(node);
+  } 
 
   const content = (
     <React.Fragment>
@@ -63,11 +70,15 @@ const CustomDrawer: React.SFC<Props> = (props: Props) => {
             {selectedNodeList.map((n, i, arry) => {
               const isLast = i === selectedNodeList.length - 1;
               return (
-                <ListItem button key={`selected-${n.id}`} onClick={() => selectNode(n)}>
+                <ListItem button key={`selected-${n.id}`} onClick={() => selectAndClose(n)}>
                   <ListItemIcon>
                     {n.type === 'task' ? <Task/> : <Switch className={classes.switchIcon}/>}
                   </ListItemIcon>
-                  <ListItemText primary={n.label} primaryTypographyProps={{color: isLast ? 'primary' : 'default'}}/>
+                  <ListItemText
+                    className={classes.itemText}
+                    primary={n.label}
+                    primaryTypographyProps={{color: isLast ? 'primary' : 'default'}}
+                  />
                 </ListItem>
               );
             })}
@@ -79,11 +90,11 @@ const CustomDrawer: React.SFC<Props> = (props: Props) => {
       <Collapse in={listOpen} timeout={{enter: time, exit: time}} unmountOnExit>
         <List dense>
           {spreadNodeList.map(n => (
-          <ListItem button key={`spread-${n.id}`} onClick={() => selectNode(n)}>
+          <ListItem button key={`spread-${n.id}`} onClick={() => selectAndClose(n)}>
             <ListItemIcon>
               {n.type === 'task' ? <Task/> : <Switch className={classes.switchIcon}/>}
             </ListItemIcon>
-            <ListItemText primary={n.label}/>
+            <ListItemText className={classes.itemText} primary={n.label}/>
           </ListItem>))}
         </List>
       </Collapse>

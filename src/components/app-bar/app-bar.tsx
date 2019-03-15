@@ -10,10 +10,11 @@ import createStyles from '@material-ui/core/styles/createStyles';
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles';
 import { withRouter } from 'react-router-dom';
 import { RouteComponentProps } from "react-router";
-import { drawerWidth } from '../../pages/layout';
+import { drawerWidth } from '../../settings/layout';
 import User from '../../data-types/user';
 import { toolbarHeight, toolbarMinHeight } from '../../settings/layout';
 import link from '../../settings/path-list';
+import TreeNode from '../../data-types/tree-node';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -38,19 +39,31 @@ const styles = (theme: Theme) => createStyles({
   grow: {
     flexGrow: 1,
   },
+  toggleContainer: {
+    margin: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
+    background: theme.palette.background.default,
+  },
   menuButton: {
     marginRight: 20,
     [theme.breakpoints.up('md')]: {
       display: 'none',
     },
   },
-
+  rightPaneAnchor: {
+    position: 'relative',
+    overflow: 'visible',
+    width: 1,
+    height: toolbarHeight,
+    [theme.breakpoints.down('xs')]: { height: toolbarMinHeight },
+  },
 });
 
 interface Props extends WithStyles<typeof styles>, RouteComponentProps {
   user: User | null;
-  getContainerRef: (el: HTMLDivElement) => void;
+  getToolRef: (el: HTMLDivElement) => void;
+  getRightPaneRef: (el: HTMLDivElement) => void;
   handleDrawerToggle: () => void;
+  selectedNodeList: TreeNode[] | null;
   logout: () => void;
 }
 
@@ -58,9 +71,12 @@ interface State {
   anchorEl: HTMLElement | null;
 }
 
+// const rightPane = 'rightPane';
+
 const CustomAppBar = withStyles(styles)(class extends React.Component<Props, State> {
 
-  container = React.createRef<HTMLDivElement>();
+  toolRef = React.createRef<HTMLDivElement>();
+  rightPaneRef = React.createRef<HTMLDivElement>();
 
   constructor(props: Props) {
     super(props);
@@ -68,7 +84,8 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
   }
 
   componentDidMount() {
-    this.props.getContainerRef(this.container.current!);
+    this.props.getToolRef(this.toolRef.current!);
+    this.props.getRightPaneRef(this.rightPaneRef.current!);
   }
 
   handleMenu = (e: any) => {
@@ -85,7 +102,7 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
   }
 
   render() {
-    const { user, handleDrawerToggle, location, history, classes } = this.props;
+    const { user, handleDrawerToggle, selectedNodeList, location, history, classes } = this.props;
     const { anchorEl } = this.state;
     const open = Boolean(anchorEl);
     const origin: PopoverOrigin = { vertical: 'top', horizontal: 'right' };
@@ -93,16 +110,15 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
     return (
       <AppBar position="fixed" className={user !== null ? classes.root : undefined}>
         <Toolbar>
-          <div className={classes.portalAnchor}><div ref={this.container}/></div>
+          <div className={classes.portalAnchor}><div ref={this.toolRef}/></div>
           {user !== null && (
-            <IconButton
-              color="inherit"
-              onClick={handleDrawerToggle}
-              className={classes.menuButton}
-            >
-              <MenuIcon />
-            </IconButton>
-          )}
+          <IconButton
+            color="inherit"
+            onClick={handleDrawerToggle}
+            className={classes.menuButton}
+          >
+            <MenuIcon />
+          </IconButton>)}
           <Typography variant="h6" color="inherit">
             Flow Like
           </Typography>
@@ -118,35 +134,46 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
           </Select>
 
           <div className={classes.grow}/>
+
+          {/* {selectedNodeList !== null && selectedNodeList.length !== 0 && (
+          <div className={classes.toggleContainer}>
+            <ToggleButtonGroup value={toggles} onChange={this.handleToggles}>
+              <ToggleButton value={rightPane}>
+                <VerticalSplit />
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </div>)} */}
           
           {user !== null && (
-            <div>
-              <IconButton
-                aria-owns={open ? 'menu-appbar' : undefined}
-                aria-haspopup="true"
-                onClick={this.handleMenu}
-                color="inherit"
-              >
-                <AccountCircle />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorEl}
-                anchorOrigin={origin}
-                transformOrigin={origin}
-                open={open}
-                onClose={this.handleClose}
-                disableAutoFocusItem
-              >
-                <MenuItem onClick={this.handleLogout}>
-                  <ListItemIcon>
-                    <Close />
-                  </ListItemIcon>
-                  <ListItemText primary="ログアウト" />
-                </MenuItem>
-              </Menu>
-            </div>
-          )}
+          <>
+            <IconButton
+              aria-owns={open ? 'menu-appbar' : undefined}
+              aria-haspopup="true"
+              onClick={this.handleMenu}
+              color="inherit"
+            >
+              <AccountCircle />
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={origin}
+              transformOrigin={origin}
+              open={open}
+              onClose={this.handleClose}
+              disableAutoFocusItem
+            >
+              <MenuItem onClick={this.handleLogout}>
+                <ListItemIcon>
+                  <Close />
+                </ListItemIcon>
+                <ListItemText primary="ログアウト" />
+              </MenuItem>
+            </Menu>
+          </>)}
+          <div className={classes.rightPaneAnchor}>
+            <div ref={this.rightPaneRef}/>
+          </div>
         </Toolbar>
       </AppBar>
     );
