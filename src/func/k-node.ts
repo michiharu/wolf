@@ -56,9 +56,9 @@ export default class KNodeUtil {
       if (open) {
         if (which === 'width') {
           // switch, open, width
-          return viewItem.indent
-          + (node.children.length !== 0 ?
-             node.children.map(c => c.self.w + viewItem.spr.w).reduce((a, b) => a + b) : 0);
+          return viewItem.indent + (node.children.length !== 0
+            ? node.children.map(c => c.self.w + viewItem.spr.w).reduce((a, b) => a + b)
+            : viewItem.rect.w);
         } else {
           // switch, open, height
           return viewItem.rect.h + viewItem.spr.h * 2
@@ -80,8 +80,7 @@ export default class KNodeUtil {
   }
   static open = (point: Point, node: KNode, id: string, open: boolean): KNode => {
     const openNode = KNodeUtil._open(node, id, open);
-    const focusNode = KNodeUtil.focus(openNode, id);
-    return KNodeUtil.setCalcProps(point, focusNode);
+    return KNodeUtil.setCalcProps(point, openNode);
   }
 
   static _open = (node: KNode, id: string, open: boolean): KNode => {
@@ -192,6 +191,7 @@ export default class KNodeUtil {
 
       if (s.open) {
         for(var x = s.point.x + viewItem.spr.w; x < s.point.x + s.self.w; x++) {
+          if (x < 0) { continue; }
           for(var y = s.point.y + viewItem.spr.h; y < s.point.y + s.self.h; y++) {
             result[x][y] = { node: s, action: 'push' };
           }
@@ -202,30 +202,31 @@ export default class KNodeUtil {
 
       if (s.parentType !== 'switch') {
         for(var x = s.point.x; x < s.point.x + s.rect.w; x++) {
+          if (x < 0) { continue; }
           for(var y = s.point.y; y < s.point.y + s.rect.h; y++) {
-            result[x][y] = { node: s, action: !s.open ? 'open' : 'none'};
+            result[x][y] = { node: s, action: 'none'};
           }
         }
       } else {
         for(var x = s.point.x; x < s.point.x + s.rect.w - switchSpr; x++) {
+          if (x < 0) { continue; }
           for(var y = s.point.y; y < s.point.y + s.rect.h; y++) {
-            result[x][y] = { node: s, action: !s.open ? 'open' : 'none'};
+            result[x][y] = { node: s, action: 'none'};
           }
         }
       }
       
-      
       if (s.depth.top !== 0) {
         if (s.parentType !== 'switch') {
           for(var x = s.point.x; x < s.point.x + s.rect.w; x++) {
+            if (x < 0) { continue; }
             for(var y = s.point.y - viewItem.spr.h; y < s.point.y; y++) {
               result[x][y] = { node: s, action: 'move' };
             }
           }
         } else {
-          const xWithSpr = s.point.x - viewItem.spr.w - switchSpr;
-          const startX = xWithSpr < 0 ? 0 : xWithSpr;
-          for(var x = startX; x < s.point.x + switchSpr; x++) {
+          for(var x = s.point.x - viewItem.spr.w - switchSpr; x < s.point.x + switchSpr; x++) {
+            if (x < 0) { continue; }
             for(var y = s.point.y; y < s.point.y + s.rect.h; y++) {
               result[x][y] = { node: s, action: 'move' };
             }
@@ -235,6 +236,7 @@ export default class KNodeUtil {
       
       return result;
     }));
+
     return map.reduce((before, next) => before.map((_, x) => {
       return _.map((beforeCell, y) => {
         if (next.length - 1 < x) { return beforeCell; }
@@ -242,6 +244,12 @@ export default class KNodeUtil {
         return nextCell !== undefined ? nextCell : beforeCell;
       });
     }))
+  }
+  
+  static isEqualCell = (a: Cell, b: Cell): boolean => {
+    if (a === undefined && b === undefined) { return true; }
+    if (a === undefined || b === undefined) { return false; }
+    return a.action === b.action && a.node.id === b.node.id;
   }
 
   static move = (point: Point, node: KNode, from: KNode, to: KNode): KNode => {
@@ -275,10 +283,26 @@ export default class KNodeUtil {
     return result;
   }
 
+  static getNewNode = (parentType: Type): KNode => ({
+    parentType,
+    type: 'task',
+    id: 'rand:' + String(Math.random()).slice(2),
+    label: '新しい作業',
+    input: '',
+    output: '',
+    children: [],
+    open: false,
+    focus: false,
+    depth: {top: 0, bottom: 0},
+    point: {x: 0, y: 0},
+    self: {w: 0, h: 0},
+    rect: {w: 0, h: 0},
+  });
+
   static _insert = (node: KNode, target: KNode, to: KNode): KNode => {
     const index = node.children.map(c => c.id).indexOf(to.id);
     if (index !== -1) {
-      node.children.splice(index , 0, target);
+      node.children.splice(index, 0, target);
       return {...node};
     }
 
@@ -286,16 +310,68 @@ export default class KNodeUtil {
     return {...node, children};
   }
 
+  static _insertNext = (node: KNode, target: KNode, to: KNode): KNode => {
+    const index = node.children.map(c => c.id).indexOf(to.id);
+    if (index !== -1) {
+      node.children.splice(index + 1, 0, target);
+      return {...node};
+    }
+
+    const children = node.children.map(c => KNodeUtil._insertNext(c, target, to));
+    return {...node, children};
+  }
+
+  static addBefore = (point: Point, node: KNode, target: KNode): KNode => {
+    const newNode = KNodeUtil.getNewNode(target.parentType);
+    const insertedNode = KNodeUtil._insert(node, newNode, target);
+    return KNodeUtil.setCalcProps(point, insertedNode);
+  }
+
+  static addNext = (point: Point, node: KNode, target: KNode): KNode => {
+    const newNode = KNodeUtil.getNewNode(target.parentType);
+    const insertedNode = KNodeUtil._insertNext(node, newNode, target);
+    return KNodeUtil.setCalcProps(point, insertedNode);
+  }
+
+  static addDetails = (point: Point, node: KNode, parent: KNode): KNode => {
+    const newNode = KNodeUtil.getNewNode(parent.type);
+    const pushedNode = KNodeUtil._push(node, newNode, parent);
+    return KNodeUtil.setCalcProps(point, pushedNode);
+  }
+
   // Treeから指定した要素を返す
   static _find = (node: KNode, id: string): KNode | undefined => {
-    if (node.id === id) { return node }
+    if (node.id === id) { return node; }
     if (node.children.length === 0) {  return undefined; }
     return node.children.map(c => KNodeUtil._find(c, id))
     .reduce((a, b) => a !== undefined ? a
                     : b !== undefined ? b : undefined);
   }
 
-  // Treeから指定した要素を削除し、Tree全体を返す
+  static replaceOnlySelf = (point: Point, node: KNode, target: KNode): KNode => {
+    const replaceNode = KNodeUtil._replaceOnlySelf(node, target);
+    return KNodeUtil.setCalcProps(point, replaceNode);
+  }
+
+  static _replaceOnlySelf = (node: KNode, target: KNode): KNode => {
+    if (node.id === target.id) {
+      const children = node.type === target.type ? node.children :
+        target.type === 'task'
+          ? node.children.map(c => ({...c, parentType: target.type, ifState: undefined}))
+          : node.children.map(c => ({...c, parentType: target.type, ifState: ''}));
+
+      return {...target, children};
+    } else {
+      const children = node.children.map(c => KNodeUtil._replaceOnlySelf(c, target));
+      return {...node, children};
+    }
+  }
+
+  static deleteById = (point: Point, node: KNode, id: string): KNode => {
+    const deletedTree = KNodeUtil._deleteById(node, id);
+    return KNodeUtil.setCalcProps(point, deletedTree);
+  }
+
   static _deleteById = (node: KNode, id: string): KNode => {
     const findResult = node.children.find(c => c.id === id);
     if (findResult !== undefined) {

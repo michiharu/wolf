@@ -61,5 +61,5 @@ export interface KNode {
 export type Type = 'task' | 'switch';
 export type Point = {x: number, y: number};
 export type Size = {w: number, h:number};
-export type FlatAction = 'push' | 'move' | 'open' | 'none';
+export type FlatAction = 'push' | 'move' | 'none';
 export type Cell = {parent?: KNode, node: KNode, action: FlatAction, insertTo?: number} | undefined;

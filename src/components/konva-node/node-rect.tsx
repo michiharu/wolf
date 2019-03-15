@@ -11,14 +11,15 @@ import NodeIconBox, { NodeIconBoxProps } from './icon-box';
 
 export interface NodeRectProps {
   node: KNode;
-  changeOpen: (id: string, open: boolean) => void;
+  click: (node: KNode) => void;
   deleteFocus: () => void;
-  dragMove: (selfNode: KNode, point: Point) => void;
+  dragStart: (node: KNode) => void;
+  dragMove: (node: KNode, point: Point) => void;
   dragEnd: () => void;
 }
 
 const NodeRect: React.FC<NodeRectProps> = (props: NodeRectProps) => {
-  const {node, changeOpen, deleteFocus, dragMove, dragEnd} = props;
+  const {node, click, deleteFocus, dragStart, dragMove, dragEnd} = props;
 
   const fill = node.id === '--' ? '#ccc' : node.type === 'task'
               ? node.focus ? '#99ccff' : '#89b7ff'
@@ -40,9 +41,9 @@ const NodeRect: React.FC<NodeRectProps> = (props: NodeRectProps) => {
     return <Group {...point}><Rect {...baseRectProps}/></Group>;
   }
 
-  const clicked = (e: any) => {
+  const handleClick = (e: any) => {
     e.cancelBubble = true;
-    changeOpen(node.id, !node.open);
+    click(node);
   }
 
   const stroke = '#dddd';
@@ -92,7 +93,7 @@ const NodeRect: React.FC<NodeRectProps> = (props: NodeRectProps) => {
   var anchorY = labelProps.y + (viewItem.fontHeight + viewItem.spr.h / 2) * unit;
 
   const handleDragStart = (e: any) => {
-    changeOpen(node.id, false);
+    dragStart(node);
   }
 
   const handleDragMove = (e: any) => {
@@ -115,7 +116,7 @@ const NodeRect: React.FC<NodeRectProps> = (props: NodeRectProps) => {
 
   const rectGroupProps = {
     x: 0, y:0,
-    onClick: clicked,
+    onClick: handleClick,
     draggable: true,
     onDragStart: handleDragStart,
     onDragMove: handleDragMove,
@@ -133,10 +134,16 @@ const NodeRect: React.FC<NodeRectProps> = (props: NodeRectProps) => {
         <Text {...labelProps}/>
         <Text />
         {node.open && xputs.map(x => {
-        const el = <Text key={x} text={x} x={viewItem.fontSize * unit} y={anchorY} fontSize={viewItem.fontSize}/>;
-        anchorY += (viewItem.fontHeight + viewItem.spr.h / 4) * unit;
-        return el;
-      })}
+          const xProps = {
+            text: x,
+            x: viewItem.fontSize * unit,
+            y: anchorY,
+            fontSize: viewItem.subFontSize * unit
+          };
+          const el = <Text key={x} {...xProps}/>;
+          anchorY += (viewItem.subFontHeight + viewItem.spr.h / 4) * unit;
+          return el;
+        })}
       </Group>
     </Group>
   );

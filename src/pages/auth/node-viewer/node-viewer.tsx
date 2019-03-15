@@ -1,13 +1,12 @@
 import * as React from 'react';
-import { useRef, useEffect, useState } from 'react';
 import { Theme, createStyles, WithStyles, withStyles, Grid, Fab } from '@material-ui/core';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import CheckIcon from '@material-ui/icons/Check';
 
-import { Stage, Layer } from 'react-konva';
+import { Stage, Layer, Group, Rect } from 'react-konva';
 
 import { TreeNode, Type, KNode, Cell, Point } from '../../../data-types/tree-node';
-import { toolbarHeight, toolbarMinHeight, viewItem } from '../../../settings/layout';
+import { toolbarHeight, toolbarMinHeight, viewItem, unit } from '../../../settings/layout';
 
 import ToolContainer from '../../../components/tool-container/tool-container';
 import KNodeUtil from '../../../func/k-node';
@@ -40,128 +39,226 @@ export interface NodeViewProps {
 
 interface Props extends NodeViewProps, WithStyles<typeof styles> {}
 
-const NodeViewer: React.FC<Props> = (props: Props) => {
+interface State {
+  node: KNode;
+  map: Cell[][] | null;
+  beforeCell: Cell | null;
+  focusNode: KNode | null;
+}
 
-  const { toolRef, rightPaneRef, parentType, node: next, back, changeNode, classes } = props;
+const point = { x: viewItem.spr.w * 2, y: viewItem.spr.h * 5};
+
+class NodeViewer extends React.Component<Props, State> {
+
+  stageContainerRef = React.createRef<HTMLDivElement>();
+  stageRef = React.createRef<any>();
+
+  constructor(props: Props) {
+    super(props);
+    const { parentType, node } = props;
+    const newNode = KNodeUtil.getViewNode(parentType, node);
+    const openNode = KNodeUtil.open(point, newNode, newNode.id, true);
+    this.state = {
+      node: openNode,
+      map: KNodeUtil.makeMap(KNodeUtil.toFlat(openNode)),
+      beforeCell: null,
+      focusNode: null,
+    };
+  }
   
-  const stageContainerRef = useRef<any>(null);
-  const stageRef = useRef<any>(null);
+  componentDidMount() {
+    process.nextTick(this.resize);
+    window.addEventListener('resize', this.resize);
+  }
 
-  const resize = () => {
-    const cref = stageContainerRef.current, sref = stageRef.current;
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resize);
+  }
+
+  static getDerivedStateFromProps(nextProps: Props, prevState: State) {
+    if (prevState.node.id !== nextProps.node.id) {
+      const newNode = KNodeUtil.getViewNode(nextProps.parentType, nextProps.node);
+      const openNode = KNodeUtil.open(point, newNode, newNode.id, true);
+      return {
+        node: openNode,
+        map: KNodeUtil.makeMap(KNodeUtil.toFlat(openNode))
+      };
+    }
+    return null;
+  }
+
+  resize = () => {
+    const cref = this.stageContainerRef.current, sref = this.stageRef.current;
     if (cref === null || sref === null) { throw 'Cannot find elements.'; }
     sref.width(cref.offsetWidth);
     sref.height(cref.offsetHeight);
     sref.draw();
   }
 
-  const clear = () => {
-    window.removeEventListener('resize', resize);
+  saveNodeState = (node: KNode) => {
+    this.setState({node, map: KNodeUtil.makeMap(KNodeUtil.toFlat(node))});
   }
 
-  useEffect(() => {
-    process.nextTick(resize);
-    window.addEventListener('resize', resize);
-    return clear;
-  });
-
-  const [node, setNode] = useState<KNode | null>(null);
-  const [map, setMap] = useState<Cell[][] | null>(null);
-  const [beforePoint, setBeforePoint] = useState<Point | null>(null);
-  const [focusNode, setFocusNode] = useState<KNode | null>(null);
-
-  const saveNodeState = (node: KNode) => {
-    setNode(node);
-    setMap(KNodeUtil.makeMap(KNodeUtil.toFlat(node)));
+  setFocusState = (target: KNode, focus: boolean) => {
+    const {node: prevNode} = this.state;
+    const node = KNodeUtil.focus(prevNode, target.id);
+    const focusNode: KNode = {...target, focus};
+    this.setState({node, map: KNodeUtil.makeMap(KNodeUtil.toFlat(node)), focusNode});
   }
 
-  const point = {
-    x: viewItem.spr.w * 2,
-    y: viewItem.spr.h * 5,
-  };
-
-  if (node === null || node.id !== next.id) {
-    const newNode = KNodeUtil.getViewNode(parentType, next);
-    setFocusNode(newNode);
-    const openNode = KNodeUtil.open(point, newNode, newNode.id, true);
-    saveNodeState(openNode);
+  setOpenState = (target: KNode, open: boolean) => {
+    const {node: prevNode} = this.state;
+    const node = KNodeUtil.open(point, prevNode, target.id, open);
+    const focusNode: KNode = {...target, open};
+    this.setState({node, map: KNodeUtil.makeMap(KNodeUtil.toFlat(node)), focusNode});
   }
 
-  if (node === null) {
-    return <p>Now Loading..</p>;
+  click = (target: KNode) => {
+    // before: {focus: false, open: false}
+    // after:  {focus: true,  open: false}
+    // action => focus: true
+    if (!target.focus && !target.open) { this.setFocusState(target, true); }
+
+    // before: {focus: true, open: false}
+    // after:  {focus: true, open: true}
+    // action => open: true
+    if (target.focus && !target.open)  { this.setOpenState(target, true); }
+
+    // before: {focus: false, open: true}
+    // after:  {focus: true,  open: true}
+    // action => focus: true
+    if (!target.focus && target.open)  { this.setFocusState(target, true); }
+
+    // before: {focus: true, open: true}
+    // after:  {focus: true, open: false}
+    // action => open: false
+    if (target.focus && target.open)   { this.setOpenState(target, false); }
   }
 
-  const changeOpen = (id: string, open: boolean) => {
-    const newNode = KNodeUtil.open(point, node!, id, open);
-    saveNodeState(newNode);
+  deleteFocus = () => {
+    const {node: prevNode} = this.state;
+    const node = KNodeUtil._deleteFocus(prevNode);
+    this.setState({node, map: KNodeUtil.makeMap(KNodeUtil.toFlat(node)), focusNode: null});
   }
 
-  const deleteFocus = () => saveNodeState(KNodeUtil._deleteFocus(node));
+  dragStart = (target: KNode) => {
+    const {node: prevNode} = this.state;
+    const openNode = KNodeUtil.open(point, prevNode, target.id, false);
+    const node = KNodeUtil._deleteFocus(openNode);
+    this.setState({node, map: KNodeUtil.makeMap(KNodeUtil.toFlat(node)), focusNode: null});
+  }
 
-  const dragMove = (selfNode: KNode, p: Point) => {
+  dragMove = (target: KNode, p: Point) => {
+    const {node: prevNode, map, beforeCell} = this.state;
 
-    if (beforePoint === null || beforePoint.x !== p.x || beforePoint.y !== p.y) {
-      setBeforePoint(p);
-      if (map !== null && 0 <= p.x && p.x < map.length) {
-        const cell = map[p.x][p.y];
-        if (cell === undefined || cell.node.id === selfNode.id) { return; }
-        console.log(cell.action);
+    if (map !== null && 0 <= p.x && p.x < map.length) {
+      const cell = map[p.x][p.y];
+      if (cell === undefined || cell.node.id === target.id) { return; }
+      if (beforeCell === null || !KNodeUtil.isEqualCell(beforeCell, cell)) {
+        this.setState({beforeCell: cell});
 
         if (cell.action === 'move') {
-          const newNode = KNodeUtil.move(point, node!, selfNode, cell.node);
-          saveNodeState(newNode);
+          const newNode = KNodeUtil.move(point, prevNode, target, cell.node);
+          this.saveNodeState(newNode);
         }
 
         if (cell.action === 'push') {
-          const newNode = KNodeUtil.push(point, node!, selfNode, cell.node);
-          saveNodeState(newNode);
+          const newNode = KNodeUtil.push(point, prevNode, target, cell.node);
+          this.saveNodeState(newNode);
         }
       }
     }
   }
 
-  const dragEnd = () => {
-    const newNode = KNodeUtil.deleteDummy(point, node!);
-    saveNodeState(newNode);
+  dragEnd = () => {
+    const {node: prevNode} = this.state;
+    const newNode = KNodeUtil.deleteDummy(point, prevNode);
+    this.saveNodeState(newNode);
   }
 
-  const flatNodes = KNodeUtil.toFlat(node);
+  changeFocusNode = (target: KNode) => {
+    const {node: prevNode} = this.state;
+    const node = KNodeUtil.replaceOnlySelf(point, prevNode, target)
+    this.setState({node, map: KNodeUtil.makeMap(KNodeUtil.toFlat(node)), focusNode: target});
+  }
 
-  const nodeActionProps = { changeOpen, dragMove, dragEnd, deleteFocus };
+  addBefore = () => {
+    const {node: prevNode, focusNode} = this.state;
+    const newNode = KNodeUtil.addBefore(point, prevNode, focusNode!);
+    this.saveNodeState(newNode);
+  }
 
-  return (
-    <div className={classes.root} ref={stageContainerRef}>
-      <ToolContainer containerRef={toolRef}>
-        <Grid container spacing={16}>
-          <Grid item>
-            <Fab color="primary" onClick={back} size="medium"><ArrowBack/></Fab>
+  addNext = () => {
+    const {node: prevNode, focusNode} = this.state;
+    const newNode = KNodeUtil.addNext(point, prevNode, focusNode!);
+    this.saveNodeState(newNode);
+  }
+  addDetails = () => {
+    const {node: prevNode, focusNode} = this.state;
+    const newNode = KNodeUtil.addDetails(point, prevNode, focusNode!);
+    this.saveNodeState(newNode);
+  }
+  deleteSelf = () => {
+    const {node: prevNode, focusNode} = this.state;
+    const newNode = KNodeUtil.deleteById(point, prevNode, focusNode!.id);
+    this.saveNodeState(newNode);
+  }
+
+  render() {
+    const { toolRef, rightPaneRef, changeNode, back, classes } = this.props;
+    const { node, focusNode } = this.state;
+    const flatNodes = KNodeUtil.toFlat(node);
+
+    const nodeActionProps = {
+      click: this.click,
+      dragStart: this.dragStart,
+      dragMove: this.dragMove,
+      dragEnd: this.dragEnd,
+      deleteFocus: this.deleteFocus
+    };
+    const rightPaneProps = {
+      rightPaneRef,
+      node: focusNode,
+      changeNode: this.changeFocusNode,
+      addBefore: this.addBefore,
+      addNext: this.addNext,
+      addDetails: this.addDetails,
+      deleteSelf: this.deleteSelf,
+    };
+
+    return (
+      <div className={classes.root} ref={this.stageContainerRef}>
+        <ToolContainer containerRef={toolRef}>
+          <Grid container spacing={16}>
+            <Grid item>
+              <Fab color="primary" onClick={back} size="medium"><ArrowBack/></Fab>
+            </Grid>
+            <Grid item>
+              <Fab className={classes.saveButton} variant="extended" color="primary" onClick={() => changeNode(node)}>
+                保存<CheckIcon className={classes.extendedIcon}/>
+              </Fab>
+            </Grid>
           </Grid>
-          <Grid item>
-            <Fab className={classes.saveButton} variant="extended" color="primary" onClick={() => changeNode(node)}>
-              保存<CheckIcon className={classes.extendedIcon}/>
-            </Fab>
-          </Grid>
-        </Grid>
-      </ToolContainer>
-      <Stage ref={stageRef} onClick={deleteFocus} draggable>
-        <Layer>
-          {/* {map !== null && map.map((_, x) => (
-          <Group key={`group-${x}`}>
-            {_.map((__, y) => {
-              const cell = map[x][y];
-              if (cell === undefined) { return <Rect key={`${x}-${y}`}/>; }
-              const fill = cell.action === 'push' ? 'yellow' :
-                          cell.action === 'move' ? 'blue'   :
-                          cell.action === 'open' ? 'green'  : 'grey';
-              return <Rect key={`${x}-${y}`} x={x * unit} y={y * unit + 300} width={unit} height={unit} fill={fill}/>;
-              })}
-          </Group>))} */}
-          {flatNodes.map(n => <NodeRect key={n.id} node={n} {...nodeActionProps}/>)}
-        </Layer>
-      </Stage>
-      <RightPane rightPaneRef={rightPaneRef}/>
-    </div>
-  );
-};
+        </ToolContainer>
+        <Stage ref={this.stageRef} onClick={this.deleteFocus} draggable>
+          <Layer>
+            {/* {map !== null && map.map((_, x) => (
+            <Group key={`group-${x}`}>
+              {_.map((__, y) => {
+                const cell = map[x][y];
+                if (cell === undefined) { return <Rect key={`${x}-${y}`}/>; }
+                const fill = cell.action === 'push' ? 'yellow' :
+                            cell.action === 'move' ? 'blue'   : 'grey';
+                return <Rect key={`${x}-${y}`} x={x * unit} y={y * unit + 300} width={unit} height={unit} fill={fill}/>;
+                })}
+            </Group>))} */}
+            {flatNodes.map(n => <NodeRect key={n.id} node={n} {...nodeActionProps}/>)}
+          </Layer>
+        </Stage>
+        <RightPane {...rightPaneProps}/>
+      </div>
+    );
+  }
+}
 
 export default withStyles(styles)(NodeViewer);
