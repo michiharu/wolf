@@ -1,17 +1,17 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Theme, createStyles, WithStyles, withStyles, Divider, Avatar, Grid, Typography, Hidden, Button } from '@material-ui/core';
 import { TextField, Paper } from '@material-ui/core';
 
 import FileUpload from '@material-ui/icons/NoteAdd';
 
-import { TreeNode, TreeNodeWithParents } from '../../../data-types/tree-node';
+import { TreeNode, TreeNodeWithParents, NodeWithoutId } from '../../../data-types/tree-node';
 import { toolbarHeight, toolbarMinHeight, Task, Switch, Input, Output } from '../../../settings/layout';
 
-import { theme } from '../../..';
 import TreeUtil from '../../../func/tree';
 import Util from '../../../func/util';
 import WithIcon from '../../../components/with-icon/with-icon';
+import KNodeUtil from '../../../func/k-node';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -64,21 +64,31 @@ interface Props extends NodeListProps, WithStyles<typeof styles> {}
 
 const NodeList: React.FC<Props> = (props: Props) => {
   var fileReader: FileReader;
+  const formEl = useRef<HTMLFormElement>(null);
 
   const { treeNodes, selectNode, addNode, classes } = props;
   const [searchText, setSearchText] = useState('');
   const nodeArray = TreeUtil.toArrayWithParents([], treeNodes);
   const filteredNodes = TreeUtil.search(searchText, nodeArray);
 
-  const handleFileRead = (e: any) => {
+  const handleFileRead = () => {
+    // console.log('Read');
     const content = fileReader.result as string;
-    addNode(JSON.parse(content));
+    const nodeWithoutId: NodeWithoutId = JSON.parse(content);
+    addNode(KNodeUtil._setId(nodeWithoutId));
+    // fileReader.abort();
+    fileReader = new FileReader();
+    
   }
 
-  const handleFileChosen = (file: any) => {
+  const handleFileChosen = (e: any) => {
+    // console.log('Chosen');
+    const file = e.target.files[0];
     fileReader = new FileReader();
     fileReader.onload = handleFileRead;
+    // fileReader.onloadend = () => fileReader.abort();
     fileReader.readAsText(file);
+
   } 
   
   return (
@@ -95,19 +105,12 @@ const NodeList: React.FC<Props> = (props: Props) => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Button
-              component="label"
-              color="primary"
-              // disabled={this.state.loading}
-              // onClick={this.handleButtonClick}
-            >
+            <Button component="label" color="primary">
               {'ファイルからインポート'}
               <FileUpload className={classes.rightIcon} />
-              <input
-                onChange={(e: any) => handleFileChosen(e.target.files[0])}
-                style={{ display: 'none' }}
-                type="file"
-              />
+              <form ref={formEl}>
+                <input type="file" style={{ display: 'none' }} accept=".json" onChange={handleFileChosen}/>
+              </form>
             </Button>
           </Grid>
         </Grid>

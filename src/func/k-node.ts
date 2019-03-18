@@ -1,4 +1,4 @@
-import TreeNode, { Type, KNode, Point, Cell } from "../data-types/tree-node";
+import TreeNode, { Type, KNode, Point, Cell, NodeWithoutId } from "../data-types/tree-node";
 import { viewItem } from "../settings/layout";
 import Util from "./util";
 
@@ -344,7 +344,7 @@ export default class KNodeUtil {
   // Treeから指定した要素を返す
   static _find = (node: KNode, id: string): KNode | undefined => {
     if (node.id === id) { return node; }
-    if (node.children.length === 0) {  return undefined; }
+    if (node.children.length === 0) { return undefined; }
     return node.children.map(c => KNodeUtil._find(c, id))
     .reduce((a, b) => a !== undefined ? a
                     : b !== undefined ? b : undefined);
@@ -405,6 +405,24 @@ export default class KNodeUtil {
   static deleteDummy = (point: Point, node: KNode): KNode => {
     const deletedNode = KNodeUtil._deleteById(node, '--');
     return KNodeUtil.setCalcProps(point, deletedNode);
+  }
+
+  static _removeId = (node: TreeNode): NodeWithoutId => {
+    const children = node.children.map(c => KNodeUtil._removeId(c));
+    return {
+      type: node.type,
+      label: node.label,
+      ifState: node.ifState,
+      input: node.input,
+      output: node.output,
+      children
+    };
+  }
+
+  static _setId = (node: NodeWithoutId): TreeNode => {
+    const id = 'rand:' + String(Math.random()).slice(2);
+    const children = node.children.map(c => KNodeUtil._setId(c));
+    return {...node, id, children};
   }
 }
 

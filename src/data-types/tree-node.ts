@@ -8,6 +8,15 @@ export interface TreeNode {
   children: TreeNode[];
 }
 
+export interface NodeWithoutId {
+  type: Type;
+  label: string;
+  ifState?: string;
+  input: string;
+  output: string;
+  children: NodeWithoutId[];
+}
+
 export interface TreeNodeWithParents {
   parents: Parent[];
   id: string;

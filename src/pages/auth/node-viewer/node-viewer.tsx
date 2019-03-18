@@ -102,7 +102,8 @@ class NodeViewer extends React.Component<Props, State> {
   download = () => {
     const {node} = this.props;
     const filename = `${node.label}.json`;
-    fileDownload(JSON.stringify(node), filename);
+    const nodeWithoutId = KNodeUtil._removeId(node);
+    fileDownload(JSON.stringify(nodeWithoutId), filename);
   }
 
   saveNodeState = (node: KNode) => {
