@@ -130,7 +130,7 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
             disableUnderline
           >
             <MenuItem value={link.edit}>編集モード</MenuItem>
-            <MenuItem value={link.view}>Viewモード</MenuItem>
+            <MenuItem value={link.check}>チェックモード</MenuItem>
           </Select>
 
           <div className={classes.grow}/>

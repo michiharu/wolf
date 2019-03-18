@@ -29,20 +29,6 @@ export interface TreeNodeWithParents {
 }
 export type Parent = {id: string, label: string};
 
-export interface TreeViewNode {
-  id: string;
-  type: Type;
-  label: string;
-  ifState?: string;
-  input: string;
-  output: string;
-  children: TreeViewNode[];
-  open: boolean;
-  width: number;
-  height: number;
-  rect: {w: number, h: number};
-}
-
 export default TreeNode;
 
 export interface KNode {
@@ -72,4 +58,4 @@ export type Type = 'task' | 'switch';
 export type Point = {x: number, y: number};
 export type Size = {w: number, h:number};
 export type FlatAction = 'push' | 'move' | 'none';
-export type Cell = {parent?: KNode, node: KNode, action: FlatAction, insertTo?: number} | undefined;
+export type Cell = {parent?: KNode, node: KNode, action: FlatAction} | undefined;

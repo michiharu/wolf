@@ -406,24 +406,6 @@ export default class KNodeUtil {
     const deletedNode = KNodeUtil._deleteById(node, '--');
     return KNodeUtil.setCalcProps(point, deletedNode);
   }
-
-  static _removeId = (node: TreeNode): NodeWithoutId => {
-    const children = node.children.map(c => KNodeUtil._removeId(c));
-    return {
-      type: node.type,
-      label: node.label,
-      ifState: node.ifState,
-      input: node.input,
-      output: node.output,
-      children
-    };
-  }
-
-  static _setId = (node: NodeWithoutId): TreeNode => {
-    const id = 'rand:' + String(Math.random()).slice(2);
-    const children = node.children.map(c => KNodeUtil._setId(c));
-    return {...node, id, children};
-  }
 }
 
 export type which = 'width' | 'height';

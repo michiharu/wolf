@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import classnames from 'classnames';
 
@@ -67,16 +67,6 @@ const RightPane: React.FC<Props> = (props: Props) => {
   const {
     rightPaneRef, node, changeNode, addBefore, addNext, addDetails, deleteSelf, classes
   } = props;
-
-  // const [node, setNode] = useState<KNode | null>(null);
-
-  // if (
-  //   (node === null && next !== null) ||
-  //   (node !== null && next === null) ||
-  //   (node !== null && next !== null && node.id !== next.id)
-  // ) {
-  //   setNode(next);
-  // }
 
   const cahngeType = (e: any) => {
     if (node === null) { return; }

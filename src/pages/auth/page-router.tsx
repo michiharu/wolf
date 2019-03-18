@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import TreeNode from '../../data-types/tree-node';
 import link from '../../settings/path-list';
-import EditorNullChecker from './node-editor/node-null-checker';
-import ViewerNullChecker from './node-viewer/node-null-checker';
+import EditorNullChecker from './node-editor/editor-null-checker';
 
 interface Props {
   toolRef: HTMLDivElement | null;
@@ -39,21 +38,9 @@ class PageRouter extends React.Component<Props, State> {
       <Switch>
         <Route
           exact
-          path={link.edit}
+          path={link.check}
           render={() => (
             <EditorNullChecker
-              containerRef={toolRef}
-              selectedNodeList={selectedNodeList}
-              changeNode={changeNode}
-              selectNode={selectNode}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={link.view}
-          render={() => (
-            <ViewerNullChecker
               toolRef={toolRef}
               rightPaneRef={rightPaneRef}
               treeNodes={treeNodes}
@@ -64,6 +51,22 @@ class PageRouter extends React.Component<Props, State> {
             />
           )}
         />
+        <Route
+          exact
+          path={link.edit}
+          render={() => (
+            <EditorNullChecker
+              toolRef={toolRef}
+              rightPaneRef={rightPaneRef}
+              treeNodes={treeNodes}
+              selectedNodeList={selectedNodeList}
+              changeNode={changeNode}
+              addNode={addNode}
+              selectNode={selectNode}
+            />
+          )}
+        />
+        <Redirect to={link.check}/>
       </Switch>
   );
   }

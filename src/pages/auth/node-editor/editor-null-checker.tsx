@@ -1,7 +1,7 @@
 import * as React from 'react';
 import TreeNode from '../../../data-types/tree-node';
 import NodeList from './node-list';
-import NodeViewer, { NodeViewProps } from './node-viewer';
+import NodeEditor, { EditorProps } from './node-editor';
 
 interface Props {
   toolRef: HTMLDivElement | null;
@@ -13,7 +13,7 @@ interface Props {
   selectNode: (node: TreeNode | null) => void;
 }
 
-const NodeNullChecker: React.SFC<Props> = (props: Props) => {
+const EditorNullChecker: React.SFC<Props> = (props: Props) => {
   const { toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, selectNode, addNode } = props;
   if (toolRef === null || selectedNodeList === null || treeNodes === null) {
     return <p>Now Loading..</p>;
@@ -29,7 +29,7 @@ const NodeNullChecker: React.SFC<Props> = (props: Props) => {
     selectNode(node);
   }
 
-  const viewerProps: NodeViewProps = {
+  const viewerProps: EditorProps = {
     toolRef, rightPaneRef: rightPaneRef!,
     parent,
     node: selectedNodeList[selectedNodeList.length - 1],
@@ -37,7 +37,7 @@ const NodeNullChecker: React.SFC<Props> = (props: Props) => {
     changeNode,
   }
   
-  return <NodeViewer {...viewerProps}/>;
+  return <NodeEditor {...viewerProps}/>;
 };
 
-export default NodeNullChecker;
+export default EditorNullChecker;

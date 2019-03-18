@@ -1,5 +1,4 @@
-import TreeNode, { TreeViewNode, TreeNodeWithParents, Parent, KNode } from "../data-types/tree-node";
-import { node } from "prop-types";
+import TreeNode, { TreeNodeWithParents, Parent, NodeWithoutId } from "../data-types/tree-node";
 
 export default class TreeUtil {
 
@@ -80,5 +79,23 @@ export default class TreeUtil {
           n.output.match(new RegExp(`${w}`)) !== null
         ))
         .reduce((a, b) => a === true && b === true))
+  }
+
+  static _removeId = (node: TreeNode): NodeWithoutId => {
+    const children = node.children.map(c => TreeUtil._removeId(c));
+    return {
+      type: node.type,
+      label: node.label,
+      ifState: node.ifState,
+      input: node.input,
+      output: node.output,
+      children
+    };
+  }
+
+  static _setId = (node: NodeWithoutId): TreeNode => {
+    const id = 'rand:' + String(Math.random()).slice(2);
+    const children = node.children.map(c => TreeUtil._setId(c));
+    return {...node, id, children};
   }
 }

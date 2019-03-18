@@ -1,10 +1,8 @@
 import * as React from 'react';
 
-import { Group, Rect } from 'react-konva';
+import { Group } from 'react-konva';
 import { viewItem, unit } from '../../settings/layout';
-import { SvgPath } from '../../data-types/svg-path';
-import SvgToPath from './svg-to-path';
-import { TreeViewNode, KNode } from '../../data-types/tree-node';
+import { KNode } from '../../data-types/tree-node';
 import Icon, { IconProps } from './icon';
 import { input, output, task, switchSvg} from '../../resource/svg-icon';
 import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
@@ -13,7 +11,7 @@ import Util from '../../func/util';
 export interface NodeIconBoxProps {
   x: number;
   y: number;
-  node: TreeViewNode | KNode;
+  node: KNode;
 }
 
 const NodeIconBox: React.FC<NodeIconBoxProps> = (props: NodeIconBoxProps) => {

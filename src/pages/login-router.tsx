@@ -4,7 +4,7 @@ import Login from './login/login';
 import User from '../data-types/user';
 import PageRouter from './auth/page-router';
 import TreeNode from '../data-types/tree-node';
-import nodeList from './auth/node-viewer/node-list';
+import nodeList from './auth/node-editor/node-list';
 
 interface Props {
   user: User | null;

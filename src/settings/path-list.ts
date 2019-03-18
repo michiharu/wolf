@@ -1,5 +1,5 @@
 const link = {
-  view: '/',
+  check: '/',
   edit: '/edit',
 };
 
