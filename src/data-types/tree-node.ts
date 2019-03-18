@@ -49,6 +49,7 @@ export interface KNode {
   open: boolean;
   focus: boolean;
   
+  index: number;
   depth: {top: number, bottom: number};
 
   point: Point;

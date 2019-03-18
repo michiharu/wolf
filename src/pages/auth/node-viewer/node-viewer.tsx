@@ -206,7 +206,7 @@ class NodeViewer extends React.Component<Props, State> {
 
   render() {
     const { toolRef, rightPaneRef, changeNode, back, classes } = this.props;
-    const { node, focusNode } = this.state;
+    const { node, focusNode, map } = this.state;
     const flatNodes = KNodeUtil.toFlat(node);
 
     const nodeActionProps = {

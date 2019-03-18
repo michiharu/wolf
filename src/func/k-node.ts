@@ -5,6 +5,7 @@ import Util from "./util";
 export default class KNodeUtil {
 
   static getViewNode = (parentType: Type, node: TreeNode): KNode => {
+    const index = 0;
     const depth = {top: 0, bottom: 0};
     const point = {x: 0, y: 0};
     const children = node.children.map(c => KNodeUtil.getViewNode(node.type, c));
@@ -15,7 +16,7 @@ export default class KNodeUtil {
     const open = false;
     const focus = false;
 
-    return {...node, parentType, depth, point, open, focus, children, self: rect, rect};
+    return {...node, parentType, index, depth, point, open, focus, children, self: rect, rect};
   }
 
   static equal = (a: TreeNode, b: TreeNode): boolean => a.id === b.id;
@@ -143,24 +144,24 @@ export default class KNodeUtil {
     return {...node, point, children};
   }
 
-  static _setDepth = (top: number, node: KNode): KNode=> {
+  static _setIndexAndDepth = (index: number, top: number, node: KNode): KNode=> {
 
     if (!node.open || node.children.length === 0) {
       const depth = {top, bottom: 0};
-      return {...node, depth};
+      return {...node, index, depth};
     }
 
-    const children = node.children.map(c => (KNodeUtil._setDepth(top + 1, c)));
+    const children = node.children.map((c, i) => (KNodeUtil._setIndexAndDepth(i, top + 1, c)));
     const bottom = children.map(c => c.depth.bottom).reduce((a, b) => a > b ? a : b) + 1;
     const depth = {top, bottom};
 
-    return {...node, children, depth};
+    return {...node, children, index, depth};
   }
 
   static setCalcProps = (point: Point, node: KNode) => {
     const setSizeNode = KNodeUtil._setSize(node);
     const setPointNode = KNodeUtil._setPoint(point, setSizeNode);
-    const setDepthNode = KNodeUtil._setDepth(0, setPointNode);
+    const setDepthNode = KNodeUtil._setIndexAndDepth(0, 0, setPointNode);
     return setDepthNode;
   }
 
@@ -198,7 +199,7 @@ export default class KNodeUtil {
         }
       }
 
-      const switchSpr = viewItem.spr.w * 6;
+      const switchSpr = s.index === 0 ? viewItem.spr.w * 4 : 0;
 
       if (s.parentType !== 'switch') {
         for(var x = s.point.x; x < s.point.x + s.rect.w; x++) {
@@ -227,7 +228,7 @@ export default class KNodeUtil {
         } else {
           for(var x = s.point.x - viewItem.spr.w - switchSpr; x < s.point.x + switchSpr; x++) {
             if (x < 0) { continue; }
-            for(var y = s.point.y; y < s.point.y + s.rect.h; y++) {
+            for(var y = s.point.y - 1; y < s.point.y + s.rect.h + 1; y++) {
               result[x][y] = { node: s, action: 'move' };
             }
           }
@@ -293,6 +294,7 @@ export default class KNodeUtil {
     children: [],
     open: false,
     focus: false,
+    index: 0,
     depth: {top: 0, bottom: 0},
     point: {x: 0, y: 0},
     self: {w: 0, h: 0},
