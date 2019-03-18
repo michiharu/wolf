@@ -1,16 +1,17 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Theme, createStyles, WithStyles, withStyles, Divider, Avatar, Grid, Typography, Hidden } from '@material-ui/core';
+import { Theme, createStyles, WithStyles, withStyles, Divider, Avatar, Grid, Typography, Hidden, Button } from '@material-ui/core';
 import { TextField, Paper } from '@material-ui/core';
+
+import FileUpload from '@material-ui/icons/NoteAdd';
 
 import { TreeNode, TreeNodeWithParents } from '../../../data-types/tree-node';
 import { toolbarHeight, toolbarMinHeight, Task, Switch, Input, Output } from '../../../settings/layout';
 
-import ToolContainer from '../../../components/tool-container/tool-container';
 import { theme } from '../../..';
 import TreeUtil from '../../../func/tree';
 import Util from '../../../func/util';
-import WithIcon from '../../../components/with-icon.tsx/with-icon';
+import WithIcon from '../../../components/with-icon/with-icon';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -23,6 +24,9 @@ const styles = (theme: Theme) => createStyles({
   searchContainer: {
     padding: theme.spacing.unit * 2,
     maxWidth: 800, 
+  },
+  rightIcon: {
+    marginLeft: theme.spacing.unit,
   },
   card: {
     margin: theme.spacing.unit * 2,
@@ -53,26 +57,61 @@ const styles = (theme: Theme) => createStyles({
 export interface NodeListProps {
   treeNodes: TreeNode[];
   selectNode: (node: TreeNode | null) => void;
+  addNode: (node: TreeNode) => void;
 }
 
 interface Props extends NodeListProps, WithStyles<typeof styles> {}
 
 const NodeList: React.FC<Props> = (props: Props) => {
-  const { treeNodes, selectNode, classes } = props;
+  var fileReader: FileReader;
+
+  const { treeNodes, selectNode, addNode, classes } = props;
   const [searchText, setSearchText] = useState('');
   const nodeArray = TreeUtil.toArrayWithParents([], treeNodes);
   const filteredNodes = TreeUtil.search(searchText, nodeArray);
+
+  const handleFileRead = (e: any) => {
+    const content = fileReader.result as string;
+    addNode(JSON.parse(content));
+  }
+
+  const handleFileChosen = (file: any) => {
+    fileReader = new FileReader();
+    fileReader.onload = handleFileRead;
+    fileReader.readAsText(file);
+  } 
   
   return (
     <div className={classes.root}>
       <div className={classes.searchContainer}>
-        <TextField
-          label="Search field"
-          type="search"
-          onChange={e => setSearchText(e.target.value)}
-          margin="normal"
-          fullWidth
-        />
+        <Grid container alignItems="flex-end" spacing={16}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              label="Search field"
+              type="search"
+              onChange={e => setSearchText(e.target.value)}
+              margin="none"
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Button
+              component="label"
+              color="primary"
+              // disabled={this.state.loading}
+              // onClick={this.handleButtonClick}
+            >
+              {'ファイルからインポート'}
+              <FileUpload className={classes.rightIcon} />
+              <input
+                onChange={(e: any) => handleFileChosen(e.target.files[0])}
+                style={{ display: 'none' }}
+                type="file"
+              />
+            </Button>
+          </Grid>
+        </Grid>
+        
       </div>
       <Divider/>
       {filteredNodes.map(n => {

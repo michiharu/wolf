@@ -9,16 +9,17 @@ interface Props {
   treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null;
   changeNode: (node: TreeNode) => void;
+  addNode: (node: TreeNode) => void;
   selectNode: (node: TreeNode | null) => void;
 }
 
 const NodeNullChecker: React.SFC<Props> = (props: Props) => {
-  const { toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, selectNode } = props;
+  const { toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, selectNode, addNode } = props;
   if (toolRef === null || selectedNodeList === null || treeNodes === null) {
     return <p>Now Loading..</p>;
   }
   if (selectedNodeList.length === 0) {
-    return <NodeList treeNodes={treeNodes} selectNode={selectNode}/>;
+    return <NodeList treeNodes={treeNodes} selectNode={selectNode} addNode={addNode}/>;
   }
 
   const parent = selectedNodeList.length === 1 ? null : selectedNodeList[selectedNodeList.length - 2];
@@ -30,7 +31,7 @@ const NodeNullChecker: React.SFC<Props> = (props: Props) => {
 
   const viewerProps: NodeViewProps = {
     toolRef, rightPaneRef: rightPaneRef!,
-    parentType: parent === null ? 'task' : parent.type,
+    parent,
     node: selectedNodeList[selectedNodeList.length - 1],
     back,
     changeNode,

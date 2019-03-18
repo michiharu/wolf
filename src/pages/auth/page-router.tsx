@@ -13,6 +13,7 @@ interface Props {
 
   changeNode: (node: TreeNode) => void;
   loadNode: () => void;
+  addNode: (node: TreeNode) => void;
   selectNode: (node: TreeNode | null) => void;
 }
 
@@ -31,7 +32,9 @@ class PageRouter extends React.Component<Props, State> {
   }
 
   render () {
-    const { toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, selectNode } = this.props;
+    const {
+      toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, addNode, selectNode
+    } = this.props;
     return (
       <Switch>
         <Route
@@ -56,6 +59,7 @@ class PageRouter extends React.Component<Props, State> {
               treeNodes={treeNodes}
               selectedNodeList={selectedNodeList}
               changeNode={changeNode}
+              addNode={addNode}
               selectNode={selectNode}
             />
           )}

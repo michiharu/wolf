@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Theme, createStyles, WithStyles, withStyles, Grid, Fab } from '@material-ui/core';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import CheckIcon from '@material-ui/icons/Check';
+import Download from '@material-ui/icons/SaveAlt';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
@@ -12,6 +13,7 @@ import ToolContainer from '../../../components/tool-container/tool-container';
 import KNodeUtil from '../../../func/k-node';
 import NodeRect from '../../../components/konva-node/node-rect';
 import RightPane from './right-pane';
+import { fileDownload } from '../../../func/file-download';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -31,7 +33,7 @@ const styles = (theme: Theme) => createStyles({
 export interface NodeViewProps {
   toolRef: HTMLDivElement;
   rightPaneRef: HTMLDivElement;
-  parentType: Type;
+  parent: TreeNode | null;
   node: TreeNode;
   back: () => void;
   changeNode: (node: TreeNode) => void;
@@ -55,7 +57,8 @@ class NodeViewer extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    const { parentType, node } = props;
+    const { parent, node } = props;
+    const parentType: Type = parent !== null ? parent.type : 'task';
     const newNode = KNodeUtil.getViewNode(parentType, node);
     const openNode = KNodeUtil.open(point, newNode, newNode.id, true);
     this.state = {
@@ -77,7 +80,8 @@ class NodeViewer extends React.Component<Props, State> {
 
   static getDerivedStateFromProps(nextProps: Props, prevState: State) {
     if (prevState.node.id !== nextProps.node.id) {
-      const newNode = KNodeUtil.getViewNode(nextProps.parentType, nextProps.node);
+      const parentType: Type = nextProps.parent !== null ? nextProps.parent.type : 'task';
+      const newNode = KNodeUtil.getViewNode(parentType, nextProps.node);
       const openNode = KNodeUtil.open(point, newNode, newNode.id, true);
       return {
         node: openNode,
@@ -93,6 +97,12 @@ class NodeViewer extends React.Component<Props, State> {
     sref.width(cref.offsetWidth);
     sref.height(cref.offsetHeight);
     sref.draw();
+  }
+
+  download = () => {
+    const {node} = this.props;
+    const filename = `${node.label}.json`;
+    fileDownload(JSON.stringify(node), filename);
   }
 
   saveNodeState = (node: KNode) => {
@@ -205,7 +215,7 @@ class NodeViewer extends React.Component<Props, State> {
   }
 
   render() {
-    const { toolRef, rightPaneRef, changeNode, back, classes } = this.props;
+    const { toolRef, rightPaneRef, parent, changeNode, back, classes } = this.props;
     const { node, focusNode, map } = this.state;
     const flatNodes = KNodeUtil.toFlat(node);
 
@@ -238,6 +248,12 @@ class NodeViewer extends React.Component<Props, State> {
                 保存<CheckIcon className={classes.extendedIcon}/>
               </Fab>
             </Grid>
+            {parent === null && (
+            <Grid item>
+              <Fab color="primary" onClick={this.download} size="medium">
+                <Download/>
+              </Fab>
+            </Grid>)}
           </Grid>
         </ToolContainer>
         <Stage ref={this.stageRef} onClick={this.deleteFocus} draggable>

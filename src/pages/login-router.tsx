@@ -15,12 +15,13 @@ interface Props {
   selectedNodeList: TreeNode[] | null;
   changeNode: (node: TreeNode) => void;
   loadNode: () => void;
+  addNode: (node: TreeNode) => void;
   selectNode: (node: TreeNode | null) => void;
 }
 
 const LoginRouter: React.SFC<Props> = (props: Props) => {
   const {
-    user, login, toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, loadNode, selectNode
+    user, login, toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, loadNode, addNode, selectNode
   } = props;
   return (
     <Switch>
@@ -33,6 +34,7 @@ const LoginRouter: React.SFC<Props> = (props: Props) => {
           selectedNodeList={selectedNodeList}
           changeNode={changeNode}
           loadNode={loadNode}
+          addNode={addNode}
           selectNode={selectNode}
         />
       )}/>

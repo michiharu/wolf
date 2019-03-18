@@ -27,6 +27,7 @@ interface Props extends WithStyles<typeof styles> {
   selectNode: (node: TreeNode | null) => void;
   changeNode: (node: TreeNode) => void;
   loadNode: () => void;
+  addNode: (node: TreeNode) => void;
 }
 
 interface State {
@@ -51,7 +52,7 @@ class Layout extends React.Component<Props, State> {
   
   render() {
     const {
-      user, login, logout, treeNodes, selectedNodeList, selectNode, changeNode, loadNode, classes
+      user, login, logout, treeNodes, selectedNodeList, selectNode, changeNode, loadNode, addNode, classes
     } = this.props;
     const { open, toolRef, rightPaneRef } = this.state;
     const drawerNullCheckerProps: DrawerNullCheckerProps = {
@@ -84,6 +85,7 @@ class Layout extends React.Component<Props, State> {
                 selectedNodeList={selectedNodeList}
                 changeNode={changeNode}
                 loadNode={loadNode}
+                addNode={addNode}
                 selectNode={selectNode}
               />
             </main>

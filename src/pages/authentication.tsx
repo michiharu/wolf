@@ -63,6 +63,11 @@ class Authentication extends React.Component<{}, State> {
   }
 
   loadNode = () => axios.get(nodeURL).then(res => this.setState({treeNodes: res.data, selectedNodeList: []}));
+  addNode = (node: TreeNode) => {
+    const { treeNodes } = this.state;
+    treeNodes!.push(node);
+    this.setState({treeNodes}); 
+  }
 
   render () {
     const { user, treeNodes, selectedNodeList } = this.state;
@@ -77,6 +82,7 @@ class Authentication extends React.Component<{}, State> {
         selectNode={this.selectNode}
         changeNode={this.changeNode}
         loadNode={this.loadNode}
+        addNode={this.addNode}
       />
     );
   }
