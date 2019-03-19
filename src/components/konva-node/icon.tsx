@@ -14,10 +14,11 @@ export interface IconProps {
   backgroundColor?: string;
   rotate?: number;
   scale?: {x: number, y: number};
+  onClick?: (e: any) => void;
 }
 
 const Icon: React.FC<IconProps> = (props: IconProps) => {
-  const {x, y, svg, color, backgroundColor, rotate, scale} = props;
+  const {x, y, svg, color, backgroundColor, rotate, scale, onClick} = props;
   const baseRectProps = {
     x: 0, y: 0,
     width: viewItem.rect.h * unit,
@@ -39,7 +40,7 @@ const Icon: React.FC<IconProps> = (props: IconProps) => {
   };
 
   return (
-    <Group x={x} y={scale ? y + viewItem.icon * unit : y}>
+    <Group x={x} y={scale ? y + viewItem.icon * unit : y} onClick={onClick}>
       <Rect {...baseRectProps}/>
       <SvgToPath {...svgProps}/>
     </Group>

@@ -31,7 +31,7 @@ export type Parent = {id: string, label: string};
 
 export default TreeNode;
 
-export interface KNode {
+export interface EditableNode {
   parentType: Type;
   id: string;
   type: Type;
@@ -39,10 +39,33 @@ export interface KNode {
   ifState?: string;
   input: string;
   output: string;
-  children: KNode[];
+  children: EditableNode[];
 
   open: boolean;
   focus: boolean;
+  
+  index: number;
+  depth: {top: number, bottom: number};
+
+  point: Point;
+
+  self: Size;
+  rect: Size;
+}
+
+export interface CheckNode {
+  parentType: Type;
+  id: string;
+  type: Type;
+  label: string;
+  ifState?: string;
+  input: string;
+  output: string;
+  children: CheckNode[];
+
+  open: boolean;
+  focus: boolean;
+  checked: boolean;
   
   index: number;
   depth: {top: number, bottom: number};
@@ -58,4 +81,4 @@ export type Type = 'task' | 'switch';
 export type Point = {x: number, y: number};
 export type Size = {w: number, h:number};
 export type FlatAction = 'push' | 'move' | 'none';
-export type Cell = {parent?: KNode, node: KNode, action: FlatAction} | undefined;
+export type Cell = {parent?: EditableNode, node: EditableNode, action: FlatAction} | undefined;

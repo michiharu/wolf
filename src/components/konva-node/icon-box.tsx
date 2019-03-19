@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Group } from 'react-konva';
 import { viewItem, unit } from '../../settings/layout';
-import { KNode } from '../../data-types/tree-node';
+import { EditableNode } from '../../data-types/tree-node';
 import Icon, { IconProps } from './icon';
 import { input, output, task, switchSvg} from '../../resource/svg-icon';
 import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
@@ -11,11 +11,12 @@ import Util from '../../func/util';
 export interface NodeIconBoxProps {
   x: number;
   y: number;
-  node: KNode;
+  node: EditableNode;
+  forCheck?: boolean;
 }
 
 const NodeIconBox: React.FC<NodeIconBoxProps> = (props: NodeIconBoxProps) => {
-  const {x, y, node} = props;
+  const {x, y, node, forCheck} = props;
   const backgroundColor = '#0000';
   const inputIconProps: IconProps = { x: 0, y: 0, svg: input, backgroundColor, };
   const outputIconProps: IconProps = { x: 0, y: 0, svg: output, backgroundColor, };
@@ -29,7 +30,7 @@ const NodeIconBox: React.FC<NodeIconBoxProps> = (props: NodeIconBoxProps) => {
   var count = 0;
   if (!Util.isEmpty(node.input))  { count++; }
   if (!Util.isEmpty(node.output)) { count++; }
-  if (node.children.length !== 0) { count++; }
+  if (node.children.length !== 0 && !forCheck) { count++; }
   var anchorX = -(count * iconWidth + viewItem.rect.h * 0.28 * unit);
 
   if (!Util.isEmpty(node.input))  {
@@ -48,7 +49,7 @@ const NodeIconBox: React.FC<NodeIconBoxProps> = (props: NodeIconBoxProps) => {
     <Group x={x} y={y}>
       {!Util.isEmpty(node.input)  && <Icon {...inputIconProps}/>}
       {!Util.isEmpty(node.output) && <Icon {...outputIconProps}/>}
-      {node.children.length !== 0 && <IconWithBadge {...selfIconProps}/>}
+      {node.children.length !== 0 && !forCheck && <IconWithBadge {...selfIconProps}/>}
     </Group>
   );
 };

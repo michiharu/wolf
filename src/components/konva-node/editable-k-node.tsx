@@ -3,22 +3,22 @@ import * as React from 'react';
 import Konva from 'konva';
 import { Rect, Group, Text } from 'react-konva';
 
-import { KNode, Point } from '../../data-types/tree-node';
+import { EditableNode, Point } from '../../data-types/tree-node';
 import { viewItem, unit } from '../../settings/layout';
 
 import Util from '../../func/util';
 import NodeIconBox, { NodeIconBoxProps } from './icon-box';
 
-export interface NodeRectProps {
-  node: KNode;
-  click: (node: KNode) => void;
+export interface EditableKNodeProps {
+  node: EditableNode;
+  click: (node: EditableNode) => void;
   deleteFocus: () => void;
-  dragStart: (node: KNode) => void;
-  dragMove: (node: KNode, point: Point) => void;
+  dragStart: (node: EditableNode) => void;
+  dragMove: (node: EditableNode, point: Point) => void;
   dragEnd: () => void;
 }
 
-const NodeRect: React.FC<NodeRectProps> = (props: NodeRectProps) => {
+const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) => {
   const {node, click, deleteFocus, dragStart, dragMove, dragEnd} = props;
 
   const fill = node.id === '--' ? '#ccc' : node.type === 'task'
@@ -149,4 +149,4 @@ const NodeRect: React.FC<NodeRectProps> = (props: NodeRectProps) => {
   );
 };
 
-export default NodeRect;
+export default EditableKNode;

@@ -1,8 +1,8 @@
 import * as React from 'react';
 
 import Icon, { IconProps } from './icon';
-import checkedIcon from '../../resource/svg-icon/checked';
-import checkBlank from '../../resource/svg-icon/check-blank';
+import radioChecked from '../../resource/svg-icon/radio-button-checked';
+import radioUnchecked from '../../resource/svg-icon/radio-button-unchecked';
 
 export interface CheckBoxProps {
   x: number;
@@ -13,11 +13,11 @@ export interface CheckBoxProps {
   onClick?: (e: any) => void;
 }
 
-const CheckBox: React.FC<CheckBoxProps> = (props: CheckBoxProps) => {
+const RadioButton: React.FC<CheckBoxProps> = (props: CheckBoxProps) => {
   const {x, y, checked, color, backgroundColor, onClick} = props;
   const iconButtonProps: IconProps = {
     x, y,
-    svg: checked ? checkedIcon : checkBlank,
+    svg: checked ? radioChecked : radioUnchecked,
     color,
     backgroundColor,
     onClick
@@ -26,4 +26,4 @@ const CheckBox: React.FC<CheckBoxProps> = (props: CheckBoxProps) => {
   return <Icon {...iconButtonProps}/>;
 };
 
-export default CheckBox;
+export default RadioButton;

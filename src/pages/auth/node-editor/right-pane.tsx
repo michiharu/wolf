@@ -9,7 +9,7 @@ import {
   InputAdornment, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Divider, Button, Slide
 } from '@material-ui/core';
 import { Task, Switch, Input, Output, toolbarHeight, toolbarMinHeight, rightPainWidth } from '../../../settings/layout';
-import { Type, KNode } from '../../../data-types/tree-node';
+import { Type, EditableNode } from '../../../data-types/tree-node';
 import { ButtonProps } from '@material-ui/core/Button';
 
 const styles = (theme: Theme) => createStyles({
@@ -54,8 +54,8 @@ const styles = (theme: Theme) => createStyles({
 
 interface Props extends WithStyles<typeof styles> {
   rightPaneRef: HTMLDivElement;
-  node: KNode | null;
-  changeNode: (node: KNode) => void;
+  node: EditableNode | null;
+  changeNode: (node: EditableNode) => void;
   addBefore: () => void;
   addNext: () => void;
   addDetails: () => void;
@@ -71,7 +71,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
   const cahngeType = (e: any) => {
     if (node === null) { return; }
     const newType = e.target.value === 'task' ? 'task' : 'switch';
-    const newNode: KNode = {...node, type: newType};
+    const newNode: EditableNode = {...node, type: newType};
     changeNode(newNode);
   };
   const changeLabel = (e: any) => {

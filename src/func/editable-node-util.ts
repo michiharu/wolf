@@ -1,14 +1,14 @@
-import TreeNode, { Type, KNode, Point, Cell, NodeWithoutId } from "../data-types/tree-node";
+import TreeNode, { Type, EditableNode, Point, Cell, NodeWithoutId } from "../data-types/tree-node";
 import { viewItem } from "../settings/layout";
 import Util from "./util";
 
-export default class KNodeUtil {
+export default class EditableNodeUtil {
 
-  static getViewNode = (parentType: Type, node: TreeNode): KNode => {
+  static get = (parentType: Type, node: TreeNode): EditableNode => {
     const index = 0;
     const depth = {top: 0, bottom: 0};
     const point = {x: 0, y: 0};
-    const children = node.children.map(c => KNodeUtil.getViewNode(node.type, c));
+    const children = node.children.map(c => EditableNodeUtil.get(node.type, c));
     const rect = {
       w: viewItem.rect.w,
       h: viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0),
@@ -21,12 +21,12 @@ export default class KNodeUtil {
 
   static equal = (a: TreeNode, b: TreeNode): boolean => a.id === b.id;
 
-  static calcTextlineHeight = (node: KNode): number => {
+  static calcTextlineHeight = (node: EditableNode): number => {
     return (!Util.isEmpty(node.input)  ? viewItem.textline : 0)
          + (!Util.isEmpty(node.output) ? viewItem.textline : 0);
   }
 
-  static calcLength = (parentType: Type, node: KNode, open: boolean, which: which) => {
+  static calcSelfLength = (parentType: Type, node: EditableNode, open: boolean, which: which) => {
 
     if (node.type !== 'switch') {
       if (open) {
@@ -40,7 +40,7 @@ export default class KNodeUtil {
           // task, open, height
           return viewItem.rect.h + viewItem.spr.h
             + (parentType === 'switch' ? viewItem.textline : 0)
-            + KNodeUtil.calcTextlineHeight(node)
+            + EditableNodeUtil.calcTextlineHeight(node)
             + (node.children.length !== 0 ?
                node.children.map(c => c.self.h + viewItem.spr.h).reduce((a, b) => a + b) : 0);
         }
@@ -64,7 +64,7 @@ export default class KNodeUtil {
           // switch, open, height
           return viewItem.rect.h + viewItem.spr.h * 2
             + (parentType === 'switch' ? viewItem.textline : 0)
-            + KNodeUtil.calcTextlineHeight(node)
+            + EditableNodeUtil.calcTextlineHeight(node)
             + (node.children.length !== 0 ? 
                node.children.map(c => c.self.h).reduce((a, b) => Math.max(a, b)) : 0);
         }
@@ -79,56 +79,56 @@ export default class KNodeUtil {
       }
     }
   }
-  static open = (point: Point, node: KNode, id: string, open: boolean): KNode => {
-    const openNode = KNodeUtil._open(node, id, open);
-    return KNodeUtil.setCalcProps(point, openNode);
+  static open = (point: Point, node: EditableNode, id: string, open: boolean): EditableNode => {
+    const openNode = EditableNodeUtil._open(node, id, open);
+    return EditableNodeUtil.setCalcProps(point, openNode);
   }
 
-  static _open = (node: KNode, id: string, open: boolean): KNode => {
+  static _open = (node: EditableNode, id: string, open: boolean): EditableNode => {
     if (node.id === id) { return {...node, open}; }
-    const children = node.children.map(c => (KNodeUtil._open(c, id, open)));
+    const children = node.children.map(c => (EditableNodeUtil._open(c, id, open)));
     return {...node, children};
   }
 
-  static focus = (node: KNode, id: string): KNode => {
-    const deletedFocusNode = KNodeUtil._deleteFocus(node);
-    const focusNode = KNodeUtil._focus(deletedFocusNode, id);
+  static focus = (node: EditableNode, id: string): EditableNode => {
+    const deletedFocusNode = EditableNodeUtil._deleteFocus(node);
+    const focusNode = EditableNodeUtil._focus(deletedFocusNode, id);
     return focusNode;
   }
 
-  static _deleteFocus = (node: KNode): KNode => {
+  static _deleteFocus = (node: EditableNode): EditableNode => {
     if (node.focus === true) { return {...node, focus: false}; }
-    const children = node.children.map(c => (KNodeUtil._deleteFocus(c)));
+    const children = node.children.map(c => (EditableNodeUtil._deleteFocus(c)));
     return {...node, children};
   }
 
-  static _focus = (node: KNode, id: string): KNode => {
+  static _focus = (node: EditableNode, id: string): EditableNode => {
     if (node.id === id) { return {...node, focus: true}; }
-    const children = node.children.map(c => (KNodeUtil._focus(c, id)));
+    const children = node.children.map(c => (EditableNodeUtil._focus(c, id)));
     return {...node, children};
   }
 
-  static _setSize = (node: KNode): KNode => {
+  static _setSize = (node: EditableNode): EditableNode => {
 
     const rect = {
       w: viewItem.rect.w,
       h: viewItem.rect.h
         + (node.parentType === 'switch' ? viewItem.textline : 0)
-        + (node.open ? KNodeUtil.calcTextlineHeight(node) : 0)
+        + (node.open ? EditableNodeUtil.calcTextlineHeight(node) : 0)
     };
 
-    const children = node.children.map(c => (KNodeUtil._setSize(c)));
+    const children = node.children.map(c => (EditableNodeUtil._setSize(c)));
     const newNode = {...node, children};
 
     const self = {
-      w: KNodeUtil.calcLength(node.parentType, newNode, node.open, 'width'),
-      h: KNodeUtil.calcLength(node.parentType, newNode, node.open, 'height')
+      w: EditableNodeUtil.calcSelfLength(node.parentType, newNode, node.open, 'width'),
+      h: EditableNodeUtil.calcSelfLength(node.parentType, newNode, node.open, 'height')
     };
 
     return {...node, children, self, rect};
   }
 
-  static _setPoint = (point: Point, node: KNode): KNode => {
+  static _setPoint = (point: Point, node: EditableNode): EditableNode => {
 
     var anchor = 0;
     const children = node.children.map(c => {
@@ -136,7 +136,7 @@ export default class KNodeUtil {
         x: point.x + viewItem.indent + (node.type !== 'switch' ? 0 : anchor),
         y: point.y + node.rect.h + viewItem.spr.h + (node.type === 'switch' ? 0 : anchor)
       };
-      const child = KNodeUtil._setPoint(p, c);
+      const child = EditableNodeUtil._setPoint(p, c);
       anchor += node.type !== 'switch' ? c.self.h + viewItem.spr.h : c.self.w + viewItem.spr.w;
       return child;
     });
@@ -144,33 +144,33 @@ export default class KNodeUtil {
     return {...node, point, children};
   }
 
-  static _setIndexAndDepth = (index: number, top: number, node: KNode): KNode=> {
+  static _setIndexAndDepth = (index: number, top: number, node: EditableNode): EditableNode=> {
 
     if (!node.open || node.children.length === 0) {
       const depth = {top, bottom: 0};
       return {...node, index, depth};
     }
 
-    const children = node.children.map((c, i) => (KNodeUtil._setIndexAndDepth(i, top + 1, c)));
+    const children = node.children.map((c, i) => (EditableNodeUtil._setIndexAndDepth(i, top + 1, c)));
     const bottom = children.map(c => c.depth.bottom).reduce((a, b) => a > b ? a : b) + 1;
     const depth = {top, bottom};
 
     return {...node, children, index, depth};
   }
 
-  static setCalcProps = (point: Point, node: KNode) => {
-    const setSizeNode = KNodeUtil._setSize(node);
-    const setPointNode = KNodeUtil._setPoint(point, setSizeNode);
-    const setDepthNode = KNodeUtil._setIndexAndDepth(0, 0, setPointNode);
+  static setCalcProps = (point: Point, node: EditableNode) => {
+    const setSizeNode = EditableNodeUtil._setSize(node);
+    const setPointNode = EditableNodeUtil._setPoint(point, setSizeNode);
+    const setDepthNode = EditableNodeUtil._setIndexAndDepth(0, 0, setPointNode);
     return setDepthNode;
   }
 
-  static toFlat = (node: KNode): KNode[] => {
+  static toFlat = (node: EditableNode): EditableNode[] => {
     if (node.children.length === 0 || !node.open) { return [node]; }
-    return [node].concat(node.children.map(c => KNodeUtil.toFlat(c)).reduce((a, b) => a.concat(b)));
+    return [node].concat(node.children.map(c => EditableNodeUtil.toFlat(c)).reduce((a, b) => a.concat(b)));
   }
 
-  static makeBaseMap = (node: KNode): Cell[][] => {
+  static makeBaseMap = (node: EditableNode): Cell[][] => {
     const base: Cell[][] = [];
     for(var x = 0; x < node.point.x + node.self.w; x++) {
       base[x] = [];
@@ -181,14 +181,14 @@ export default class KNodeUtil {
     return base;
   }
 
-  static makeMap = (nodes: KNode[]): Cell[][] => {
+  static makeMap = (nodes: EditableNode[]): Cell[][] => {
     const root = nodes[0];
     const sorted = nodes.sort((a, b) => a.depth.bottom < b.depth.bottom ? 1 : -1);
 
-    const selfBase = KNodeUtil.makeBaseMap(root);
+    const selfBase = EditableNodeUtil.makeBaseMap(root);
 
     const map: Cell[][][] = [selfBase].concat(sorted.map(s => {
-      const result = KNodeUtil.makeBaseMap(s);
+      const result = EditableNodeUtil.makeBaseMap(s);
 
       if (s.open) {
         for(var x = s.point.x + viewItem.spr.w; x < s.point.x + s.self.w; x++) {
@@ -253,38 +253,38 @@ export default class KNodeUtil {
     return a.action === b.action && a.node.id === b.node.id;
   }
 
-  static move = (point: Point, node: KNode, from: KNode, to: KNode): KNode => {
-    const setDummyNode = KNodeUtil.changeAsDummyById(node, from.id);
-    const deletedTree = KNodeUtil._deleteById(setDummyNode, from.id);
-    const setParentTypeNode = KNodeUtil.setParentType(from, to.parentType);
-    const insertedNode = KNodeUtil._insert(deletedTree, setParentTypeNode, to);
-    return KNodeUtil.setCalcProps(point, insertedNode);
+  static move = (point: Point, node: EditableNode, from: EditableNode, to: EditableNode): EditableNode => {
+    const setDummyNode = EditableNodeUtil.changeAsDummyById(node, from.id);
+    const deletedTree = EditableNodeUtil._deleteById(setDummyNode, from.id);
+    const setParentTypeNode = EditableNodeUtil.setParentType(from, to.parentType);
+    const insertedNode = EditableNodeUtil._insert(deletedTree, setParentTypeNode, to);
+    return EditableNodeUtil.setCalcProps(point, insertedNode);
   }
 
-  static push = (point: Point, node: KNode, child: KNode, parent: KNode): KNode => {
-    const setDummyNode = KNodeUtil.changeAsDummyById(node, child.id);
-    const deletedTree = KNodeUtil._deleteById(setDummyNode, child.id);
-    const setParentTypeChild = KNodeUtil.setParentType(child, parent.type);
-    const pushedNode = KNodeUtil._push(deletedTree, setParentTypeChild, parent);
-    return KNodeUtil.setCalcProps(point, pushedNode);
+  static push = (point: Point, node: EditableNode, child: EditableNode, parent: EditableNode): EditableNode => {
+    const setDummyNode = EditableNodeUtil.changeAsDummyById(node, child.id);
+    const deletedTree = EditableNodeUtil._deleteById(setDummyNode, child.id);
+    const setParentTypeChild = EditableNodeUtil.setParentType(child, parent.type);
+    const pushedNode = EditableNodeUtil._push(deletedTree, setParentTypeChild, parent);
+    return EditableNodeUtil.setCalcProps(point, pushedNode);
   }
 
-  static _push = (node: KNode, child: KNode, parent: KNode): KNode => {
+  static _push = (node: EditableNode, child: EditableNode, parent: EditableNode): EditableNode => {
     if (node.id === parent.id) {
       node.children.push(child);
       return {...node};
     }
-    const children = node.children.map(c => KNodeUtil._push(c, child, parent));
+    const children = node.children.map(c => EditableNodeUtil._push(c, child, parent));
     return {...node, children};
   }
   
-  static setParentType = (node: KNode, parentType: Type): KNode => {
+  static setParentType = (node: EditableNode, parentType: Type): EditableNode => {
     const result = {...node, parentType};
     if (node.parentType === 'switch') { result.ifState = undefined; }
     return result;
   }
 
-  static getNewNode = (parentType: Type): KNode => ({
+  static getNewNode = (parentType: Type): EditableNode => ({
     parentType,
     type: 'task',
     id: 'rand:' + String(Math.random()).slice(2),
@@ -301,61 +301,61 @@ export default class KNodeUtil {
     rect: {w: 0, h: 0},
   });
 
-  static _insert = (node: KNode, target: KNode, to: KNode): KNode => {
+  static _insert = (node: EditableNode, target: EditableNode, to: EditableNode): EditableNode => {
     const index = node.children.map(c => c.id).indexOf(to.id);
     if (index !== -1) {
       node.children.splice(index, 0, target);
       return {...node};
     }
 
-    const children = node.children.map(c => KNodeUtil._insert(c, target, to));
+    const children = node.children.map(c => EditableNodeUtil._insert(c, target, to));
     return {...node, children};
   }
 
-  static _insertNext = (node: KNode, target: KNode, to: KNode): KNode => {
+  static _insertNext = (node: EditableNode, target: EditableNode, to: EditableNode): EditableNode => {
     const index = node.children.map(c => c.id).indexOf(to.id);
     if (index !== -1) {
       node.children.splice(index + 1, 0, target);
       return {...node};
     }
 
-    const children = node.children.map(c => KNodeUtil._insertNext(c, target, to));
+    const children = node.children.map(c => EditableNodeUtil._insertNext(c, target, to));
     return {...node, children};
   }
 
-  static addBefore = (point: Point, node: KNode, target: KNode): KNode => {
-    const newNode = KNodeUtil.getNewNode(target.parentType);
-    const insertedNode = KNodeUtil._insert(node, newNode, target);
-    return KNodeUtil.setCalcProps(point, insertedNode);
+  static addBefore = (point: Point, node: EditableNode, target: EditableNode): EditableNode => {
+    const newNode = EditableNodeUtil.getNewNode(target.parentType);
+    const insertedNode = EditableNodeUtil._insert(node, newNode, target);
+    return EditableNodeUtil.setCalcProps(point, insertedNode);
   }
 
-  static addNext = (point: Point, node: KNode, target: KNode): KNode => {
-    const newNode = KNodeUtil.getNewNode(target.parentType);
-    const insertedNode = KNodeUtil._insertNext(node, newNode, target);
-    return KNodeUtil.setCalcProps(point, insertedNode);
+  static addNext = (point: Point, node: EditableNode, target: EditableNode): EditableNode => {
+    const newNode = EditableNodeUtil.getNewNode(target.parentType);
+    const insertedNode = EditableNodeUtil._insertNext(node, newNode, target);
+    return EditableNodeUtil.setCalcProps(point, insertedNode);
   }
 
-  static addDetails = (point: Point, node: KNode, parent: KNode): KNode => {
-    const newNode = KNodeUtil.getNewNode(parent.type);
-    const pushedNode = KNodeUtil._push(node, newNode, parent);
-    return KNodeUtil.setCalcProps(point, pushedNode);
+  static addDetails = (point: Point, node: EditableNode, parent: EditableNode): EditableNode => {
+    const newNode = EditableNodeUtil.getNewNode(parent.type);
+    const pushedNode = EditableNodeUtil._push(node, newNode, parent);
+    return EditableNodeUtil.setCalcProps(point, pushedNode);
   }
 
   // Treeから指定した要素を返す
-  static _find = (node: KNode, id: string): KNode | undefined => {
+  static _find = (node: EditableNode, id: string): EditableNode | undefined => {
     if (node.id === id) { return node; }
     if (node.children.length === 0) { return undefined; }
-    return node.children.map(c => KNodeUtil._find(c, id))
+    return node.children.map(c => EditableNodeUtil._find(c, id))
     .reduce((a, b) => a !== undefined ? a
                     : b !== undefined ? b : undefined);
   }
 
-  static replaceOnlySelf = (point: Point, node: KNode, target: KNode): KNode => {
-    const replaceNode = KNodeUtil._replaceOnlySelf(node, target);
-    return KNodeUtil.setCalcProps(point, replaceNode);
+  static replaceOnlySelf = (point: Point, node: EditableNode, target: EditableNode): EditableNode => {
+    const replaceNode = EditableNodeUtil._replaceOnlySelf(node, target);
+    return EditableNodeUtil.setCalcProps(point, replaceNode);
   }
 
-  static _replaceOnlySelf = (node: KNode, target: KNode): KNode => {
+  static _replaceOnlySelf = (node: EditableNode, target: EditableNode): EditableNode => {
     if (node.id === target.id) {
       const children = node.type === target.type ? node.children :
         target.type === 'task'
@@ -364,27 +364,27 @@ export default class KNodeUtil {
 
       return {...target, children};
     } else {
-      const children = node.children.map(c => KNodeUtil._replaceOnlySelf(c, target));
+      const children = node.children.map(c => EditableNodeUtil._replaceOnlySelf(c, target));
       return {...node, children};
     }
   }
 
-  static deleteById = (point: Point, node: KNode, id: string): KNode => {
-    const deletedTree = KNodeUtil._deleteById(node, id);
-    return KNodeUtil.setCalcProps(point, deletedTree);
+  static deleteById = (point: Point, node: EditableNode, id: string): EditableNode => {
+    const deletedTree = EditableNodeUtil._deleteById(node, id);
+    return EditableNodeUtil.setCalcProps(point, deletedTree);
   }
 
-  static _deleteById = (node: KNode, id: string): KNode => {
+  static _deleteById = (node: EditableNode, id: string): EditableNode => {
     const findResult = node.children.find(c => c.id === id);
     if (findResult !== undefined) {
       return {...node, children: node.children.filter(c => c.id !== id)};
     }
 
-    const children = node.children.map(c => KNodeUtil._deleteById(c, id));
+    const children = node.children.map(c => EditableNodeUtil._deleteById(c, id));
     return {...node, children};
   }
 
-  static _changeAsDummyById = (node: KNode, id: string): KNode => {
+  static _changeAsDummyById = (node: EditableNode, id: string): EditableNode => {
     const findResult = node.children.find(c => c.id === id);
     
     if (findResult !== undefined) {
@@ -392,19 +392,19 @@ export default class KNodeUtil {
       return {...node, children: node.children.map(c => c.id === id ? {...c, id: '--'} : c)};
     }
 
-    const children = node.children.map(c => KNodeUtil._changeAsDummyById(c, id));
+    const children = node.children.map(c => EditableNodeUtil._changeAsDummyById(c, id));
     return {...node, children};
   }
 
-  static changeAsDummyById = (node: KNode, id: string): KNode => {
-    const findResult = KNodeUtil._find(node, '--');
+  static changeAsDummyById = (node: EditableNode, id: string): EditableNode => {
+    const findResult = EditableNodeUtil._find(node, '--');
     if (findResult !== undefined) { return node; }
-    return KNodeUtil._changeAsDummyById(node, id);
+    return EditableNodeUtil._changeAsDummyById(node, id);
   }
 
-  static deleteDummy = (point: Point, node: KNode): KNode => {
-    const deletedNode = KNodeUtil._deleteById(node, '--');
-    return KNodeUtil.setCalcProps(point, deletedNode);
+  static deleteDummy = (point: Point, node: EditableNode): EditableNode => {
+    const deletedNode = EditableNodeUtil._deleteById(node, '--');
+    return EditableNodeUtil.setCalcProps(point, deletedNode);
   }
 }
 

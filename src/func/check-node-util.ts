@@ -1,0 +1,274 @@
+import TreeNode, { Type, CheckNode, Point } from "../data-types/tree-node";
+import { viewItem } from "../settings/layout";
+import Util from "./util";
+
+export default class CheckNodeUtil {
+
+  static get = (parentType: Type, node: TreeNode): CheckNode => {
+    const index = 0;
+    const depth = {top: 0, bottom: 0};
+    const point = {x: 0, y: 0};
+    const children = node.children.map(c => CheckNodeUtil.get(node.type, c));
+    const rect = {
+      w: viewItem.rect.w,
+      h: viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0),
+    };
+    const open = false;
+    const focus = false;
+    const checked = false;
+
+    return {...node, parentType, index, depth, point, open, focus, checked, children, self: rect, rect};
+  }
+
+  static openFirst = (point: Point, node: CheckNode): CheckNode => {
+    const initNode = CheckNodeUtil._openFirst(node);
+    return CheckNodeUtil.setCalcProps(point, initNode);
+  }
+
+  static _openFirst = (node: CheckNode): CheckNode => {
+    if (node.children.length === 0) { return {...node, open: true, focus: true}; }
+    if (node.type === 'task') {
+      const children = node.children.map((c, i) => i === 0 ? CheckNodeUtil._openFirst(c) : c);
+      return {...node, open: true, children};
+    } else {
+      const children = node.children.map(c => ({...c, focus: true}));
+      return {...node, open: true, children};
+    }
+  }
+
+
+  static equal = (a: TreeNode, b: TreeNode): boolean => a.id === b.id;
+
+  static calcTextlineHeight = (node: CheckNode): number => {
+    return (!Util.isEmpty(node.input)  ? viewItem.textline : 0)
+         + (!Util.isEmpty(node.output) ? viewItem.textline : 0);
+  }
+
+  static calcSelfLength = (parentType: Type, node: CheckNode, open: boolean, which: which) => {
+
+    if (node.type !== 'switch') {
+      if (open) {
+        if (which === 'width') {
+          // task, open, width
+          if (node.children.length !== 0) {
+            const childrenLength = node.children.map(c => c.self.w).reduce((a, b) => Math.max(a, b));
+            return viewItem.indent + viewItem.spr.w + childrenLength;
+          } else {
+            return viewItem.rect.w;
+          }
+        } else {
+          // task, open, height
+          if (node.children.length !== 0) {
+            return viewItem.rect.h + viewItem.spr.h
+              + (parentType === 'switch' ? viewItem.textline : 0)
+              + CheckNodeUtil.calcTextlineHeight(node)
+              + node.children.map(c => c.self.h + viewItem.spr.h).reduce((a, b) => a + b);
+          } else {
+            return viewItem.rect.h
+              + (parentType === 'switch' ? viewItem.textline : 0)
+              + CheckNodeUtil.calcTextlineHeight(node);
+          }
+        }
+      } else {
+        if (which === 'width') {
+          // task, close, width
+          return viewItem.rect.w;
+        } else {
+          // task, close, height
+          return viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0);
+        }
+      }
+    } else {
+      if (open) {
+        if (which === 'width') {
+          // switch, open, width
+          if (node.children.length !== 0) {
+            return viewItem.indent + node.children.map(c => c.self.w + viewItem.spr.w).reduce((a, b) => a + b);
+          } else {
+            return viewItem.rect.w;
+          }
+        } else {
+          // switch, open, height
+          if (node.children.length !== 0) {
+            return viewItem.rect.h + viewItem.spr.h * 2
+              + (parentType === 'switch' ? viewItem.textline : 0)
+              + CheckNodeUtil.calcTextlineHeight(node)
+              + node.children.map(c => c.self.h).reduce((a, b) => Math.max(a, b));
+          } else {
+            return viewItem.rect.h
+              + (parentType === 'switch' ? viewItem.textline : 0)
+              + CheckNodeUtil.calcTextlineHeight(node);
+          }
+        }
+      } else {
+        if (which === 'width') {
+          // task, close, width
+          return viewItem.rect.w;
+        } else {
+          // task, close, height
+          return viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0);
+        }
+      }
+    }
+  }
+  static open = (point: Point, node: CheckNode, id: string, open: boolean): CheckNode => {
+    const openNode = CheckNodeUtil._open(node, id, open);
+    return CheckNodeUtil.setCalcProps(point, openNode);
+  }
+
+  static _open = (node: CheckNode, id: string, open: boolean): CheckNode => {
+    if (node.id === id) { return {...node, open}; }
+    const children = node.children.map(c => (CheckNodeUtil._open(c, id, open)));
+    return {...node, children};
+  }
+
+  static focus = (node: CheckNode, id: string): CheckNode => {
+    const deletedFocusNode = CheckNodeUtil._deleteFocus(node);
+    const focusNode = CheckNodeUtil._focus(deletedFocusNode, id);
+    return focusNode;
+  }
+
+  static _deleteFocus = (node: CheckNode): CheckNode => {
+    if (node.focus === true) { return {...node, focus: false}; }
+    const children = node.children.map(c => (CheckNodeUtil._deleteFocus(c)));
+    return {...node, children};
+  }
+
+  static _focus = (node: CheckNode, id: string): CheckNode => {
+    if (node.id === id) { return {...node, focus: true}; }
+    const children = node.children.map(c => (CheckNodeUtil._focus(c, id)));
+    return {...node, children};
+  }
+
+  static check = (point: Point, node: CheckNode): CheckNode => {
+    const checkNode = CheckNodeUtil._check(node);
+    return CheckNodeUtil.setCalcProps(point, checkNode);
+  }
+
+  static _check = (node: CheckNode): CheckNode => {
+    if (node.checked || node.children.length === 0) { return node; }
+    if (node.children.find(c => c.focus) === undefined) {
+      const children = node.children.map(c => CheckNodeUtil._check(c));
+      const hasFocus = children.map(c => CheckNodeUtil._hasFocus(c)).reduce((a, b) => a || b);
+      if (hasFocus) { return {...node, children}; }
+
+      const setFocusChildren = children.map(
+        (c, i, _children) =>
+          i !== 0 && _children[i - 1].checked && !c.checked ? CheckNodeUtil._openFirst(c): c
+      );
+      return {...node, children: setFocusChildren};
+    }
+
+    const children: CheckNode[] = node.children.map(
+      (c, i, _children) =>
+      _children[i]    .focus ? {...c, focus: false, checked: true} : 
+      i !== 0 && _children[i - 1].focus ? CheckNodeUtil._openFirst(c) : c
+    );
+    const hasFocus = children.map(c => CheckNodeUtil._hasFocus(c)).reduce((a, b) => a || b);
+    if (hasFocus) { return {...node, children}; }
+    return {...node, children, checked: true, open: false};
+  }
+
+  // static select = (point: Point, node: CheckNode, target: CheckNode): CheckNode => {
+  //   const checkNode = CheckNodeUtil._select(node, target);
+  //   return CheckNodeUtil.setCalcProps(point, checkNode);
+  // }
+
+  // static _select = (node: CheckNode, target: CheckNode): CheckNode => {
+  //   if (node.checked || node.children.length === 0) { return node; }
+
+  //   if (node.children.find(c => c.id === target.id) === undefined) {
+  //     const children = node.children.map(c => CheckNodeUtil._select(c, target));
+  //     return {...node, children};
+  //   }
+
+  //   const children: CheckNode[] = node.children.map(
+  //     (c, i, _children) =>
+  //     _children[i]    .focus ? {...c, focus: false, checked: true} : 
+  //     i !== 0 && _children[i - 1].focus ? CheckNodeUtil._openFirst(c) : c
+  //   );
+  //   const hasFocus = children.map(c => CheckNodeUtil._hasFocus(c)).reduce((a, b) => a || b);
+  //   if (hasFocus) { return {...node, children}; }
+  //   return {...node, children, checked: true, open: false};
+  // }
+
+  static _hasFocus = (node: CheckNode): boolean => {
+    if (node.focus) { return true; }
+    if (node.children.length === 0) { return false; }
+    return node.children.map(c => CheckNodeUtil._hasFocus(c))
+    .reduce((a, b) => a || b);
+  }
+
+  static _setSize = (node: CheckNode): CheckNode => {
+
+    const rect = {
+      w: viewItem.rect.w,
+      h: viewItem.rect.h
+        + (node.parentType === 'switch' ? viewItem.textline : 0)
+        + (node.open ? CheckNodeUtil.calcTextlineHeight(node) : 0)
+    };
+
+    const children = node.children.map(c => (CheckNodeUtil._setSize(c)));
+    const newNode = {...node, children};
+
+    const self = {
+      w: CheckNodeUtil.calcSelfLength(node.parentType, newNode, node.open, 'width'),
+      h: CheckNodeUtil.calcSelfLength(node.parentType, newNode, node.open, 'height')
+    };
+
+    return {...node, children, self, rect};
+  }
+
+  static _setPoint = (point: Point, node: CheckNode): CheckNode => {
+
+    var anchor = 0;
+    const children = node.children.map(c => {
+      const p: Point = {
+        x: point.x + viewItem.indent + (node.type !== 'switch' ? 0 : anchor),
+        y: point.y + node.rect.h + viewItem.spr.h + (node.type === 'switch' ? 0 : anchor)
+      };
+      const child = CheckNodeUtil._setPoint(p, c);
+      anchor += node.type !== 'switch' ? c.self.h + viewItem.spr.h : c.self.w + viewItem.spr.w;
+      return child;
+    });
+
+    return {...node, point, children};
+  }
+
+  static _setIndexAndDepth = (index: number, top: number, node: CheckNode): CheckNode=> {
+
+    if (!node.open || node.children.length === 0) {
+      const depth = {top, bottom: 0};
+      return {...node, index, depth};
+    }
+
+    const children = node.children.map((c, i) => (CheckNodeUtil._setIndexAndDepth(i, top + 1, c)));
+    const bottom = children.map(c => c.depth.bottom).reduce((a, b) => a > b ? a : b) + 1;
+    const depth = {top, bottom};
+
+    return {...node, children, index, depth};
+  }
+
+  static setCalcProps = (point: Point, node: CheckNode) => {
+    const setSizeNode = CheckNodeUtil._setSize(node);
+    const setPointNode = CheckNodeUtil._setPoint(point, setSizeNode);
+    const setDepthNode = CheckNodeUtil._setIndexAndDepth(0, 0, setPointNode);
+    return setDepthNode;
+  }
+
+  static toFlat = (node: CheckNode): CheckNode[] => {
+    if (node.children.length === 0 || !node.open) { return [node]; }
+    return [node].concat(node.children.map(c => CheckNodeUtil.toFlat(c)).reduce((a, b) => a.concat(b)));
+  }
+
+  // Treeから指定した要素を返す
+  static _find = (node: CheckNode, id: string): CheckNode | undefined => {
+    if (node.id === id) { return node; }
+    if (node.children.length === 0) { return undefined; }
+    return node.children.map(c => CheckNodeUtil._find(c, id))
+    .reduce((a, b) => a !== undefined ? a
+                    : b !== undefined ? b : undefined);
+  }
+}
+
+export type which = 'width' | 'height';

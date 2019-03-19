@@ -3,6 +3,7 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import TreeNode from '../../data-types/tree-node';
 import link from '../../settings/path-list';
 import EditorNullChecker from './node-editor/editor-null-checker';
+import CheckListNullChecker from './check-list/check-list-null-checker';
 
 interface Props {
   toolRef: HTMLDivElement | null;
@@ -40,13 +41,10 @@ class PageRouter extends React.Component<Props, State> {
           exact
           path={link.check}
           render={() => (
-            <EditorNullChecker
+            <CheckListNullChecker
               toolRef={toolRef}
-              rightPaneRef={rightPaneRef}
               treeNodes={treeNodes}
               selectedNodeList={selectedNodeList}
-              changeNode={changeNode}
-              addNode={addNode}
               selectNode={selectNode}
             />
           )}
@@ -68,7 +66,7 @@ class PageRouter extends React.Component<Props, State> {
         />
         <Redirect to={link.check}/>
       </Switch>
-  );
+    );
   }
 } 
 

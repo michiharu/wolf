@@ -6,12 +6,12 @@ import Download from '@material-ui/icons/SaveAlt';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
-import { TreeNode, Type, KNode, Cell, Point } from '../../../data-types/tree-node';
+import { TreeNode, Type, EditableNode, Cell, Point } from '../../../data-types/tree-node';
 import { toolbarHeight, toolbarMinHeight, viewItem } from '../../../settings/layout';
 
 import ToolContainer from '../../../components/tool-container/tool-container';
-import KNodeUtil from '../../../func/k-node';
-import NodeRect from '../../../components/konva-node/node-rect';
+import EditableNodeUtil from '../../../func/editable-node-util';
+import EditableKNode from '../../../components/konva-node/editable-k-node';
 import RightPane from './right-pane';
 import { fileDownload } from '../../../func/file-download';
 import TreeUtil from '../../../func/tree';
@@ -43,10 +43,10 @@ export interface EditorProps {
 interface Props extends EditorProps, WithStyles<typeof styles> {}
 
 interface State {
-  node: KNode;
+  node: EditableNode;
   map: Cell[][] | null;
   beforeCell: Cell | null;
-  focusNode: KNode | null;
+  focusNode: EditableNode | null;
 }
 
 const point = { x: viewItem.spr.w * 2, y: viewItem.spr.h * 5};
@@ -60,11 +60,11 @@ class NodeEditor extends React.Component<Props, State> {
     super(props);
     const { parent, node } = props;
     const parentType: Type = parent !== null ? parent.type : 'task';
-    const newNode = KNodeUtil.getViewNode(parentType, node);
-    const openNode = KNodeUtil.open(point, newNode, newNode.id, true);
+    const newNode = EditableNodeUtil.get(parentType, node);
+    const openNode = EditableNodeUtil.open(point, newNode, newNode.id, true);
     this.state = {
       node: openNode,
-      map: KNodeUtil.makeMap(KNodeUtil.toFlat(openNode)),
+      map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(openNode)),
       beforeCell: null,
       focusNode: null,
     };
@@ -82,11 +82,11 @@ class NodeEditor extends React.Component<Props, State> {
   static getDerivedStateFromProps(nextProps: Props, prevState: State) {
     if (prevState.node.id !== nextProps.node.id) {
       const parentType: Type = nextProps.parent !== null ? nextProps.parent.type : 'task';
-      const newNode = KNodeUtil.getViewNode(parentType, nextProps.node);
-      const openNode = KNodeUtil.open(point, newNode, newNode.id, true);
+      const newNode = EditableNodeUtil.get(parentType, nextProps.node);
+      const openNode = EditableNodeUtil.open(point, newNode, newNode.id, true);
       return {
         node: openNode,
-        map: KNodeUtil.makeMap(KNodeUtil.toFlat(openNode))
+        map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(openNode))
       };
     }
     return null;
@@ -107,25 +107,25 @@ class NodeEditor extends React.Component<Props, State> {
     fileDownload(JSON.stringify(nodeWithoutId), filename);
   }
 
-  saveNodeState = (node: KNode) => {
-    this.setState({node, map: KNodeUtil.makeMap(KNodeUtil.toFlat(node))});
+  saveNodeState = (node: EditableNode) => {
+    this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node))});
   }
 
-  setFocusState = (target: KNode, focus: boolean) => {
+  setFocusState = (target: EditableNode, focus: boolean) => {
     const {node: prevNode} = this.state;
-    const node = KNodeUtil.focus(prevNode, target.id);
-    const focusNode: KNode = {...target, focus};
-    this.setState({node, map: KNodeUtil.makeMap(KNodeUtil.toFlat(node)), focusNode});
+    const node = EditableNodeUtil.focus(prevNode, target.id);
+    const focusNode: EditableNode = {...target, focus};
+    this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode});
   }
 
-  setOpenState = (target: KNode, open: boolean) => {
+  setOpenState = (target: EditableNode, open: boolean) => {
     const {node: prevNode} = this.state;
-    const node = KNodeUtil.open(point, prevNode, target.id, open);
-    const focusNode: KNode = {...target, open};
-    this.setState({node, map: KNodeUtil.makeMap(KNodeUtil.toFlat(node)), focusNode});
+    const node = EditableNodeUtil.open(point, prevNode, target.id, open);
+    const focusNode: EditableNode = {...target, open};
+    this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode});
   }
 
-  click = (target: KNode) => {
+  click = (target: EditableNode) => {
     // before: {focus: false, open: false}
     // after:  {focus: true,  open: false}
     // action => focus: true
@@ -149,33 +149,33 @@ class NodeEditor extends React.Component<Props, State> {
 
   deleteFocus = () => {
     const {node: prevNode} = this.state;
-    const node = KNodeUtil._deleteFocus(prevNode);
-    this.setState({node, map: KNodeUtil.makeMap(KNodeUtil.toFlat(node)), focusNode: null});
+    const node = EditableNodeUtil._deleteFocus(prevNode);
+    this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode: null});
   }
 
-  dragStart = (target: KNode) => {
+  dragStart = (target: EditableNode) => {
     const {node: prevNode} = this.state;
-    const openNode = KNodeUtil.open(point, prevNode, target.id, false);
-    const node = KNodeUtil._deleteFocus(openNode);
-    this.setState({node, map: KNodeUtil.makeMap(KNodeUtil.toFlat(node)), focusNode: null});
+    const openNode = EditableNodeUtil.open(point, prevNode, target.id, false);
+    const node = EditableNodeUtil._deleteFocus(openNode);
+    this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode: null});
   }
 
-  dragMove = (target: KNode, p: Point) => {
+  dragMove = (target: EditableNode, p: Point) => {
     const {node: prevNode, map, beforeCell} = this.state;
 
     if (map !== null && 0 <= p.x && p.x < map.length) {
       const cell = map[p.x][p.y];
       if (cell === undefined || cell.node.id === target.id) { return; }
-      if (beforeCell === null || !KNodeUtil.isEqualCell(beforeCell, cell)) {
+      if (beforeCell === null || !EditableNodeUtil.isEqualCell(beforeCell, cell)) {
         this.setState({beforeCell: cell});
 
         if (cell.action === 'move') {
-          const newNode = KNodeUtil.move(point, prevNode, target, cell.node);
+          const newNode = EditableNodeUtil.move(point, prevNode, target, cell.node);
           this.saveNodeState(newNode);
         }
 
         if (cell.action === 'push') {
-          const newNode = KNodeUtil.push(point, prevNode, target, cell.node);
+          const newNode = EditableNodeUtil.push(point, prevNode, target, cell.node);
           this.saveNodeState(newNode);
         }
       }
@@ -184,42 +184,42 @@ class NodeEditor extends React.Component<Props, State> {
 
   dragEnd = () => {
     const {node: prevNode} = this.state;
-    const newNode = KNodeUtil.deleteDummy(point, prevNode);
+    const newNode = EditableNodeUtil.deleteDummy(point, prevNode);
     this.saveNodeState(newNode);
   }
 
-  changeFocusNode = (target: KNode) => {
+  changeFocusNode = (target: EditableNode) => {
     const {node: prevNode} = this.state;
-    const node = KNodeUtil.replaceOnlySelf(point, prevNode, target)
-    this.setState({node, map: KNodeUtil.makeMap(KNodeUtil.toFlat(node)), focusNode: target});
+    const node = EditableNodeUtil.replaceOnlySelf(point, prevNode, target)
+    this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode: target});
   }
 
   addBefore = () => {
     const {node: prevNode, focusNode} = this.state;
-    const newNode = KNodeUtil.addBefore(point, prevNode, focusNode!);
+    const newNode = EditableNodeUtil.addBefore(point, prevNode, focusNode!);
     this.saveNodeState(newNode);
   }
 
   addNext = () => {
     const {node: prevNode, focusNode} = this.state;
-    const newNode = KNodeUtil.addNext(point, prevNode, focusNode!);
+    const newNode = EditableNodeUtil.addNext(point, prevNode, focusNode!);
     this.saveNodeState(newNode);
   }
   addDetails = () => {
     const {node: prevNode, focusNode} = this.state;
-    const newNode = KNodeUtil.addDetails(point, prevNode, focusNode!);
+    const newNode = EditableNodeUtil.addDetails(point, prevNode, focusNode!);
     this.saveNodeState(newNode);
   }
   deleteSelf = () => {
     const {node: prevNode, focusNode} = this.state;
-    const newNode = KNodeUtil.deleteById(point, prevNode, focusNode!.id);
+    const newNode = EditableNodeUtil.deleteById(point, prevNode, focusNode!.id);
     this.saveNodeState(newNode);
   }
 
   render() {
     const { toolRef, rightPaneRef, parent, changeNode, back, classes } = this.props;
     const { node, focusNode, map } = this.state;
-    const flatNodes = KNodeUtil.toFlat(node);
+    const flatNodes = EditableNodeUtil.toFlat(node);
 
     const nodeActionProps = {
       click: this.click,
@@ -270,7 +270,7 @@ class NodeEditor extends React.Component<Props, State> {
                 return <Rect key={`${x}-${y}`} x={x * unit} y={y * unit + 300} width={unit} height={unit} fill={fill}/>;
                 })}
             </Group>))} */}
-            {flatNodes.map(n => <NodeRect key={n.id} node={n} {...nodeActionProps}/>)}
+            {flatNodes.map(n => <EditableKNode key={n.id} node={n} {...nodeActionProps}/>)}
           </Layer>
         </Stage>
         <RightPane {...rightPaneProps}/>
