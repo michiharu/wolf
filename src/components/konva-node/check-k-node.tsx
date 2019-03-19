@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { lightBlue, amber, yellow } from '@material-ui/core/colors';
 
 import Konva from 'konva';
 import { Rect, Group, Text } from 'react-konva';
@@ -20,9 +21,10 @@ export interface CheckKNodeProps {
 const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
   const {node, click, check} = props;
 
-  const fill = node.type === 'task'
-              ? node.focus ? '#99ccff' : '#89b7ff'
-              : node.focus ? '#ffe733' : '#ffd700';
+  const fill = node.id === '--' ? '#ccc' :
+               node.type === 'task' ?   node.focus ? lightBlue[200] : lightBlue[300] :
+               node.type === 'switch' ? node.focus ? amber[400] : amber[300] :
+                                        node.focus ? yellow[400] : yellow[300];
   const baseRectProps = {
     x: 0, y: 0,
     width: node.rect.w * unit,
@@ -34,11 +36,6 @@ const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
     shadowOffset: { x : 0, y : node.focus ? 0 : 3},
     shadowOpacity: node.focus ? 1 : 0.2,
   };
-
-  if (node.id === '--') {
-    const point = {x: node.point.x * unit, y: node.point.y * unit};
-    return <Group {...point}><Rect {...baseRectProps}/></Group>;
-  }
 
   const handleClick = (e: any) => {
     e.cancelBubble = true;
@@ -62,20 +59,6 @@ const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
     strokeWidth,
   };
 
-  const ifStateRectProps = {
-    x: (viewItem.spr.w / 2 + viewItem.icon) * unit,
-    y: (viewItem.rect.h + viewItem.textline - viewItem.fontHeight * 2 - viewItem.spr.h) / 2  * unit,
-    width: (viewItem.rect.w - viewItem.spr.w - viewItem.icon) * unit,
-    height: (viewItem.fontHeight + viewItem.spr.h / 2) * unit,
-    cornerRadius: viewItem.cornerRadius * unit, fill: '#fff', opacity: 0.5
-  };
-  const ifStateProps = {
-    text: node.ifState!,
-    fontSize: viewItem.fontSize * unit,
-    x: (viewItem.fontSize + viewItem.icon) * unit,
-    y: (viewItem.rect.h + viewItem.textline - viewItem.fontHeight * 2 - viewItem.spr.h / 2) / 2  * unit,
-  };
-
   const checkProps = {
     x: 0,
     y: 0,
@@ -89,9 +72,7 @@ const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
     text: node.label,
     fontSize: viewItem.fontSize * unit,
     x: (viewItem.fontSize + viewItem.icon) * unit,
-    y: node.parentType === 'task'
-      ? (viewItem.rect.h - viewItem.fontHeight) / 2 * unit
-      : (viewItem.rect.h + viewItem.textline + viewItem.fontHeight) / 2 * unit
+    y: (viewItem.rect.h - viewItem.fontHeight) / 2 * unit
   };
 
   const iconBoxProps: NodeIconBoxProps = {
@@ -113,9 +94,7 @@ const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
       {node.open && node.children.length !== 0 && <Rect {...containerRectProps}/>}
       <Group {...rectGroupProps}>
         <Rect {...baseRectProps}/>
-        {node.parentType === 'switch' && <Rect {...ifStateRectProps}/>}
-        {node.parentType === 'switch' && <Text {...ifStateProps}/>}
-        {node.parentType === 'task' ? <CheckBox {...checkProps}/> : <RadioButton {...checkProps}/>}
+        {node.type !== 'case' ? <CheckBox {...checkProps}/> : <RadioButton {...checkProps}/>}
         <Text {...labelProps}/>
         <NodeIconBox {...iconBoxProps}/>
         {node.open && xputs.map(x => {

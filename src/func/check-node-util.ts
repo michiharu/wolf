@@ -1,6 +1,7 @@
 import TreeNode, { Type, CheckNode, Point } from "../data-types/tree-node";
 import { viewItem } from "../settings/layout";
 import Util from "./util";
+import { checked } from "../resource/svg-icon";
 
 export default class CheckNodeUtil {
 
@@ -60,12 +61,10 @@ export default class CheckNodeUtil {
           // task, open, height
           if (node.children.length !== 0) {
             return viewItem.rect.h + viewItem.spr.h
-              + (parentType === 'switch' ? viewItem.textline : 0)
               + CheckNodeUtil.calcTextlineHeight(node)
               + node.children.map(c => c.self.h + viewItem.spr.h).reduce((a, b) => a + b);
           } else {
             return viewItem.rect.h
-              + (parentType === 'switch' ? viewItem.textline : 0)
               + CheckNodeUtil.calcTextlineHeight(node);
           }
         }
@@ -75,7 +74,7 @@ export default class CheckNodeUtil {
           return viewItem.rect.w;
         } else {
           // task, close, height
-          return viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0);
+          return viewItem.rect.h;
         }
       }
     } else {
@@ -91,12 +90,10 @@ export default class CheckNodeUtil {
           // switch, open, height
           if (node.children.length !== 0) {
             return viewItem.rect.h + viewItem.spr.h * 2
-              + (parentType === 'switch' ? viewItem.textline : 0)
               + CheckNodeUtil.calcTextlineHeight(node)
               + node.children.map(c => c.self.h).reduce((a, b) => Math.max(a, b));
           } else {
             return viewItem.rect.h
-              + (parentType === 'switch' ? viewItem.textline : 0)
               + CheckNodeUtil.calcTextlineHeight(node);
           }
         }
@@ -145,41 +142,18 @@ export default class CheckNodeUtil {
     return CheckNodeUtil.setCalcProps(point, checkNode);
   }
 
-  static _check = (node: CheckNode): CheckNode => {
-    if (node.checked || node.children.length === 0) { return node; }
-    if (node.children.find(c => c.focus) === undefined) {
-      const children = node.children.map(c => CheckNodeUtil._check(c));
-      const hasFocus = children.map(c => CheckNodeUtil._hasFocus(c)).reduce((a, b) => a || b);
-      if (hasFocus) { return {...node, children}; }
+  // static _check = (node: CheckNode): CheckNode => {
+  //   if ((node.type !== 'case' && node.checked) || node.children.length === 0) { return node; }
+  //   if (node.children.find(c => c.focus) === undefined) {
+  //     const children = node.children.map(c => CheckNodeUtil._check(c));
+  //     const hasFocus = children.map(c => CheckNodeUtil._hasFocus(c)).reduce((a, b) => a || b);
+  //     if (hasFocus) { return {...node, children}; }
 
-      const setFocusChildren = children.map(
-        (c, i, _children) =>
-          i !== 0 && _children[i - 1].checked && !c.checked ? CheckNodeUtil._openFirst(c): c
-      );
-      return {...node, children: setFocusChildren};
-    }
-
-    const children: CheckNode[] = node.children.map(
-      (c, i, _children) =>
-      _children[i]    .focus ? {...c, focus: false, checked: true} : 
-      i !== 0 && _children[i - 1].focus ? CheckNodeUtil._openFirst(c) : c
-    );
-    const hasFocus = children.map(c => CheckNodeUtil._hasFocus(c)).reduce((a, b) => a || b);
-    if (hasFocus) { return {...node, children}; }
-    return {...node, children, checked: true, open: false};
-  }
-
-  // static select = (point: Point, node: CheckNode, target: CheckNode): CheckNode => {
-  //   const checkNode = CheckNodeUtil._select(node, target);
-  //   return CheckNodeUtil.setCalcProps(point, checkNode);
-  // }
-
-  // static _select = (node: CheckNode, target: CheckNode): CheckNode => {
-  //   if (node.checked || node.children.length === 0) { return node; }
-
-  //   if (node.children.find(c => c.id === target.id) === undefined) {
-  //     const children = node.children.map(c => CheckNodeUtil._select(c, target));
-  //     return {...node, children};
+  //     const setFocusChildren = children.map(
+  //       (c, i, _children) =>
+  //         i !== 0 && _children[i - 1].checked && !c.checked ? CheckNodeUtil._openFirst(c): c
+  //     );
+  //     return {...node, children: setFocusChildren};
   //   }
 
   //   const children: CheckNode[] = node.children.map(
@@ -191,6 +165,32 @@ export default class CheckNodeUtil {
   //   if (hasFocus) { return {...node, children}; }
   //   return {...node, children, checked: true, open: false};
   // }
+
+  static select = (point: Point, node: CheckNode, target: CheckNode): CheckNode => {
+    const checkNode = CheckNodeUtil._select(node, target);
+    return CheckNodeUtil.setCalcProps(point, checkNode);
+  }
+
+  static _select = (node: CheckNode, target: CheckNode): CheckNode => {
+    if (node.checked) { return node; }
+
+    if (node.children.find(c => c.id === target.id) === undefined) {
+      const children = node.children.map(c => CheckNodeUtil._select(c, target));
+      return {...node, children};
+    }
+
+    const children: CheckNode[] = node.children.map(
+      c => {
+        const _children: CheckNode[] = c.children
+        .map((_c, i) => i === 0 ? CheckNodeUtil._openFirst(_c) : _c);
+
+        return c.id === target.id
+          ? {...c, focus: false, checked: true, open: true, children: _children}
+          : {...c, focus: false};
+      }
+    );
+    return {...node, children};
+  }
 
   static _hasFocus = (node: CheckNode): boolean => {
     if (node.focus) { return true; }
@@ -204,7 +204,6 @@ export default class CheckNodeUtil {
     const rect = {
       w: viewItem.rect.w,
       h: viewItem.rect.h
-        + (node.parentType === 'switch' ? viewItem.textline : 0)
         + (node.open ? CheckNodeUtil.calcTextlineHeight(node) : 0)
     };
 

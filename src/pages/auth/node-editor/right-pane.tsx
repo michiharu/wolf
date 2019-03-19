@@ -8,7 +8,9 @@ import {
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
   InputAdornment, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Divider, Button, Slide
 } from '@material-ui/core';
-import { Task, Switch, Input, Output, toolbarHeight, toolbarMinHeight, rightPainWidth } from '../../../settings/layout';
+import {
+  Task, Switch, Case, Input, Output, toolbarHeight, toolbarMinHeight, rightPainWidth
+} from '../../../settings/layout';
 import { Type, EditableNode } from '../../../data-types/tree-node';
 import { ButtonProps } from '@material-ui/core/Button';
 
@@ -131,17 +133,22 @@ const RightPane: React.FC<Props> = (props: Props) => {
           <InputLabel ref={labelRef}>タイプ</InputLabel>
           <Select
             classes={{
-              icon: focusType === 'task' ? classes.selectType : classnames(classes.selectType, classes.switchIcon),
+              icon: focusType !== 'switch' ? classes.selectType : classnames(classes.selectType, classes.switchIcon),
               select: classes.select
             }}
             input={<OutlinedInput labelWidth={labelWidth}/>}
             value={node !== null ? node.type : 'task'}
             onChange={cahngeType}
-            IconComponent={p => focusType === 'task' ? <Task {...p}/> : <Switch {...p}/>}
+            IconComponent={
+              p => focusType === 'task' ? <Task {...p}/> :
+                   focusType === 'switch' ? <Switch {...p}/> :
+                                            <Case {...p}/>}
             fullWidth
+            disabled={node !== null && node.type === 'case'}
           >
             <MenuItem value="task">作業</MenuItem>
             {node !== null && <MenuItem value="switch">分岐</MenuItem>}
+            {node !== null && <MenuItem value="case">条件</MenuItem>}
           </Select>
         </FormControl>
         <TextField

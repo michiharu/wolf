@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Rect, Group, Text } from 'react-konva';
 
-import outlineFlag from '../../resource/svg-icon/outline-flag';
+import outlineFlag from '../../resource/svg-icon/flag/outline-flag';
 import SvgToPath, { SvgToPathProps } from './svg-to-path';
 import { viewItem } from '../../settings/layout';
 

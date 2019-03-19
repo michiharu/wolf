@@ -7,6 +7,7 @@ import Icon, { IconProps } from './icon';
 import { input, output, task, switchSvg} from '../../resource/svg-icon';
 import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
 import Util from '../../func/util';
+import check from '../../resource/svg-icon/check';
 
 export interface NodeIconBoxProps {
   x: number;
@@ -21,10 +22,12 @@ const NodeIconBox: React.FC<NodeIconBoxProps> = (props: NodeIconBoxProps) => {
   const inputIconProps: IconProps = { x: 0, y: 0, svg: input, backgroundColor, };
   const outputIconProps: IconProps = { x: 0, y: 0, svg: output, backgroundColor, };
   const badgeContent = String(node.children.length);
-  const isTask = node.type === 'task';
+
   const selfIconProps: IconWithBadgeProps = {
-    x: 0, y: 0, svg: isTask ? task : switchSvg, backgroundColor, badgeContent,
-    scale: node.type === 'task' ? undefined : {x: 1, y: -1},
+    x: 0, y: 0,
+    svg: node.type === 'task' ? task : node.type === 'switch' ? switchSvg : check,
+    backgroundColor, badgeContent,
+    scale: node.type !== 'switch' ? undefined : {x: 1, y: -1},
   };
   const iconWidth = viewItem.rect.h * 0.7 * unit;
   var count = 0;

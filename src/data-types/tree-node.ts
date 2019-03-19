@@ -2,7 +2,6 @@ export interface TreeNode {
   id: string;
   type: Type;
   label: string;
-  ifState?: string;
   input: string;
   output: string;
   children: TreeNode[];
@@ -11,7 +10,6 @@ export interface TreeNode {
 export interface NodeWithoutId {
   type: Type;
   label: string;
-  ifState?: string;
   input: string;
   output: string;
   children: NodeWithoutId[];
@@ -22,7 +20,6 @@ export interface TreeNodeWithParents {
   id: string;
   type: Type;
   label: string;
-  ifState?: string;
   input: string;
   output: string;
   children: TreeNodeWithParents[];
@@ -36,7 +33,6 @@ export interface EditableNode {
   id: string;
   type: Type;
   label: string;
-  ifState?: string;
   input: string;
   output: string;
   children: EditableNode[];
@@ -58,7 +54,6 @@ export interface CheckNode {
   id: string;
   type: Type;
   label: string;
-  ifState?: string;
   input: string;
   output: string;
   children: CheckNode[];
@@ -77,7 +72,7 @@ export interface CheckNode {
 }
 
 // export const dummyId = '--';
-export type Type = 'task' | 'switch';
+export type Type = 'task' | 'switch' | 'case';
 export type Point = {x: number, y: number};
 export type Size = {w: number, h:number};
 export type FlatAction = 'push' | 'move' | 'none';

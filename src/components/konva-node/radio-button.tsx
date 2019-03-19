@@ -1,8 +1,8 @@
 import * as React from 'react';
 
 import Icon, { IconProps } from './icon';
-import radioChecked from '../../resource/svg-icon/radio-button-checked';
-import radioUnchecked from '../../resource/svg-icon/radio-button-unchecked';
+import radioChecked from '../../resource/svg-icon/radio-button/radio-button-checked';
+import radioUnchecked from '../../resource/svg-icon/radio-button/radio-button-unchecked';
 
 export interface CheckBoxProps {
   x: number;

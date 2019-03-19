@@ -1,8 +1,8 @@
 import * as React from 'react';
 
 import Icon, { IconProps } from './icon';
-import checkedIcon from '../../resource/svg-icon/checked';
-import checkBlank from '../../resource/svg-icon/check-blank';
+import checkedIcon from '../../resource/svg-icon/check-box/checked';
+import checkBlank from '../../resource/svg-icon/check-box/check-blank';
 
 export interface CheckBoxProps {
   x: number;

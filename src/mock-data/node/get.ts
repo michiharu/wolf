@@ -64,9 +64,8 @@ const node1212: TreeNode = {
 };
 
 const node121: TreeNode = {
-  type: 'task',
+  type: 'case',
   id: '1-2-1',
-  ifState: 'ケースその１',
   label: 'マニュアル１−2−１',
   input: '',
   output: '',
@@ -74,18 +73,16 @@ const node121: TreeNode = {
 };
 
 const node122: TreeNode = {
-  type: 'task',
+  type: 'case',
   id: '1-2-2',
-  ifState: 'ケースその２',
   label: 'マニュアル１-2−２',
   input: '',
   output: '',
   children: []
 };
 const node123: TreeNode = {
-  type: 'task',
+  type: 'case',
   id: '1-2-3',
-  ifState: 'ケースその３',
   label: 'マニュアル１−2−３',
   input: '',
   output: '',

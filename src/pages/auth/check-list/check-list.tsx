@@ -103,12 +103,15 @@ class CheckList extends React.Component<Props, State> {
 
   check = (target: CheckNode) => {
     if (!target.focus) { return; }
-    if (target.parentType === 'task') {
+    if (target.type === 'task') {
       const {node: prevNode} = this.state;
       const node = CheckNodeUtil.check(point, prevNode);
       this.setState({node});
-    } else {
-
+    }
+    if (target.type === 'case') {
+      const {node: prevNode} = this.state;
+      const node = CheckNodeUtil.select(point, prevNode, target);
+      this.setState({node});
     }
   }
 

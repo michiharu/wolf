@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { lightBlue, amber, yellow } from '@material-ui/core/colors';
 
 import Konva from 'konva';
 import { Rect, Group, Text } from 'react-konva';
@@ -21,9 +22,10 @@ export interface EditableKNodeProps {
 const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) => {
   const {node, click, deleteFocus, dragStart, dragMove, dragEnd} = props;
 
-  const fill = node.id === '--' ? '#ccc' : node.type === 'task'
-              ? node.focus ? '#99ccff' : '#89b7ff'
-              : node.focus ? '#ffe733' : '#ffd700';
+  const fill = node.id === '--' ? '#ccc' :
+               node.type === 'task' ?   node.focus ? lightBlue[200] : lightBlue[300] :
+               node.type === 'switch' ? node.focus ? amber[400] : amber[300] :
+                                        node.focus ? yellow[400] : yellow[300];
   const baseRectProps = {
     x: 0, y: 0,
     width: node.rect.w * unit,
@@ -59,26 +61,11 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
     onClick: deleteFocus,
   };
 
-  const ifStateRectProps = {
-    x: (viewItem.spr.w / 2) * unit,
-    y: (viewItem.rect.h + viewItem.textline - viewItem.fontHeight * 2 - viewItem.spr.h) / 2  * unit,
-    width: (viewItem.rect.w - viewItem.spr.w) * unit,
-    height: (viewItem.fontHeight + viewItem.spr.h / 2) * unit,
-    cornerRadius: viewItem.cornerRadius * unit, fill: '#fff', opacity: 0.5
-  };
-  const ifStateProps = {
-    text: node.ifState!,
-    fontSize: viewItem.fontSize * unit,
-    x: viewItem.fontSize * unit,
-    y: (viewItem.rect.h + viewItem.textline - viewItem.fontHeight * 2 - viewItem.spr.h / 2) / 2  * unit,
-  };
   const labelProps = {
     text: node.label,
     fontSize: viewItem.fontSize * unit,
     x: viewItem.fontSize * unit,
-    y: node.parentType === 'task'
-      ? (viewItem.rect.h - viewItem.fontHeight) / 2 * unit
-      : (viewItem.rect.h + viewItem.textline + viewItem.fontHeight) / 2 * unit
+    y: (viewItem.rect.h - viewItem.fontHeight) / 2 * unit
   };
 
   const iconBoxProps: NodeIconBoxProps = {
@@ -128,8 +115,6 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
       {node.open && <Rect {...containerRectProps}/>}
       <Group {...rectGroupProps}>
         <Rect {...baseRectProps}/>
-        {node.parentType === 'switch' && <Rect {...ifStateRectProps}/>}
-        {node.parentType === 'switch' && <Text {...ifStateProps}/>}
         <NodeIconBox {...iconBoxProps}/>
         <Text {...labelProps}/>
         <Text />

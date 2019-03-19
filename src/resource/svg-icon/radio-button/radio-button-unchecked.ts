@@ -1,4 +1,4 @@
-import { SvgPath } from "../../data-types/svg-path";
+import { SvgPath } from "../../../data-types/svg-path";
 
 export const radioUnchecked: SvgPath[] = [
   {d: 'M0 0h24v24H0z', fill: false},

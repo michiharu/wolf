@@ -39,7 +39,6 @@ export default class EditableNodeUtil {
         } else {
           // task, open, height
           return viewItem.rect.h + viewItem.spr.h
-            + (parentType === 'switch' ? viewItem.textline : 0)
             + EditableNodeUtil.calcTextlineHeight(node)
             + (node.children.length !== 0 ?
                node.children.map(c => c.self.h + viewItem.spr.h).reduce((a, b) => a + b) : 0);
@@ -50,7 +49,7 @@ export default class EditableNodeUtil {
           return viewItem.rect.w;
         } else {
           // task, close, height
-          return viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0);
+          return viewItem.rect.h;
         }
       }
     } else {
@@ -63,7 +62,6 @@ export default class EditableNodeUtil {
         } else {
           // switch, open, height
           return viewItem.rect.h + viewItem.spr.h * 2
-            + (parentType === 'switch' ? viewItem.textline : 0)
             + EditableNodeUtil.calcTextlineHeight(node)
             + (node.children.length !== 0 ? 
                node.children.map(c => c.self.h).reduce((a, b) => Math.max(a, b)) : 0);
@@ -74,7 +72,7 @@ export default class EditableNodeUtil {
           return viewItem.rect.w;
         } else {
           // task, close, height
-          return viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0);
+          return viewItem.rect.h;
         }
       }
     }
@@ -112,9 +110,7 @@ export default class EditableNodeUtil {
 
     const rect = {
       w: viewItem.rect.w,
-      h: viewItem.rect.h
-        + (node.parentType === 'switch' ? viewItem.textline : 0)
-        + (node.open ? EditableNodeUtil.calcTextlineHeight(node) : 0)
+      h: viewItem.rect.h + (node.open ? EditableNodeUtil.calcTextlineHeight(node) : 0)
     };
 
     const children = node.children.map(c => (EditableNodeUtil._setSize(c)));
@@ -280,15 +276,14 @@ export default class EditableNodeUtil {
   
   static setParentType = (node: EditableNode, parentType: Type): EditableNode => {
     const result = {...node, parentType};
-    if (node.parentType === 'switch') { result.ifState = undefined; }
     return result;
   }
 
   static getNewNode = (parentType: Type): EditableNode => ({
     parentType,
-    type: 'task',
+    type: parentType !== 'switch' ? 'task' : 'case',
     id: 'rand:' + String(Math.random()).slice(2),
-    label: '新しい作業',
+    label: parentType !== 'switch' ? '新しい作業' : '新しい条件',
     input: '',
     output: '',
     children: [],
@@ -338,7 +333,8 @@ export default class EditableNodeUtil {
   static addDetails = (point: Point, node: EditableNode, parent: EditableNode): EditableNode => {
     const newNode = EditableNodeUtil.getNewNode(parent.type);
     const pushedNode = EditableNodeUtil._push(node, newNode, parent);
-    return EditableNodeUtil.setCalcProps(point, pushedNode);
+    const openNode = EditableNodeUtil._open(pushedNode, parent.id, true);
+    return EditableNodeUtil.setCalcProps(point, openNode);
   }
 
   // Treeから指定した要素を返す

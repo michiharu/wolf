@@ -4,6 +4,7 @@ export const drawerWidth = 260;
 export const rightPainWidth = 300;
 export { default as Task } from '@material-ui/icons/Assignment';
 export { default as Switch } from '@material-ui/icons/CallSplit';
+export { default as Case } from '@material-ui/icons/Check';
 export { default as Input } from '@material-ui/icons/GetApp';
 export { default as Output } from '@material-ui/icons/Publish';
 

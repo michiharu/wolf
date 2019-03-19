@@ -86,7 +86,6 @@ export default class TreeUtil {
     return {
       type: node.type,
       label: node.label,
-      ifState: node.ifState,
       input: node.input,
       output: node.output,
       children
