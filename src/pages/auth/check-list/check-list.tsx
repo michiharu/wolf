@@ -8,11 +8,12 @@ import ArrowBack from '@material-ui/icons/ArrowBack';
 import Skip from '@material-ui/icons/SkipNext';
 import Download from '@material-ui/icons/SaveAlt';
 import PrintIcon from '@material-ui/icons/Print';
+import Undo from '@material-ui/icons/Undo';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
 import { TreeNode, Type, CheckNode } from '../../../data-types/tree-node';
-import { toolbarHeight, toolbarMinHeight, viewItem } from '../../../settings/layout';
+import { toolbarHeight, toolbarMinHeight, viewItem, unit } from '../../../settings/layout';
 
 import ToolContainer from '../../../components/tool-container/tool-container';
 import CheckNodeUtil from '../../../func/check-node-util';
@@ -27,15 +28,12 @@ const styles = (theme: Theme) => createStyles({
   },
   printContainerWrapper: {
     position: 'relative',
-    width: 1,
-    height: 1,
+    width: 0,
+    height: 0,
     overflow: 'hidden'
   },
   printContainer: {
     position: 'absolute',
-    width: 2000,
-    height: 2000,
-    top: 0,
   },
   saveButton: {
     minWidth: 100,
@@ -56,6 +54,7 @@ interface Props extends CheckListProps, WithStyles<typeof styles> {}
 
 interface State {
   node: CheckNode;
+  nodeHistory: CheckNode[];
   focusNode: CheckNode | null;
   skipFlag: boolean;
 }
@@ -115,30 +114,41 @@ class CheckList extends React.Component<Props, State> {
   check = (target: CheckNode) => {
     if (!target.focus) { return; }
     if (target.type === 'task') {
-      const {node: prevNode} = this.state;
+      const {node: prevNode, nodeHistory: history} = this.state;
       const node = CheckNodeUtil.check(point, prevNode);
+      history.push(node);
       const focusNode = CheckNodeUtil._getFocusNode(node);
-      this.setState({node, focusNode});
+      this.setState({node, nodeHistory: history, focusNode});
     }
     if (target.type === 'case') {
-      const {node: prevNode} = this.state;
+      const {node: prevNode, nodeHistory: history} = this.state;
       const node = CheckNodeUtil.select(point, prevNode, target);
+      history.push(node);
       const focusNode = CheckNodeUtil._getFocusNode(node);
-      this.setState({node, focusNode});
+      this.setState({node, nodeHistory: history, focusNode});
     }
   }
 
   skip = () => {
-    const {node: prevNode} = this.state;
+    const {node: prevNode, nodeHistory: history} = this.state;
     const node = CheckNodeUtil.skip(point, prevNode);
+    history.push(node);
     const focusNode = CheckNodeUtil._getFocusNode(node);
-    this.setState({node, focusNode, skipFlag: false});
+    this.setState({node, nodeHistory: history, focusNode, skipFlag: false});
+  }
+
+  undo = () => {
+    const { nodeHistory } = this.state;
+    nodeHistory.pop();
+    const node = nodeHistory[nodeHistory.length - 1];
+    const focusNode = CheckNodeUtil._getFocusNode(node);
+    this.setState({node, nodeHistory, focusNode});
   }
 
 
   render() {
     const { toolRef,  back, classes } = this.props;
-    const { node, focusNode, skipFlag } = this.state;
+    const { node, nodeHistory, focusNode, skipFlag } = this.state;
     const flatNodes = CheckNodeUtil.toFlat(node);
 
     const nodeActionProps = {
@@ -178,27 +188,26 @@ class CheckList extends React.Component<Props, State> {
                 <Skip/>
               </Fab>
             </Grid>)}
+
+            {nodeHistory.length !== 1 && <Grid item>
+              <Fab color="primary" size="medium" onClick={this.undo}>
+                <Undo/>
+              </Fab>
+            </Grid>}
             
           </Grid>
         </ToolContainer>
         <Stage ref={this.stageRef} draggable>
           <Layer>
-            {/* {map !== null && map.map((_, x) => (
-            <Group key={`group-${x}`}>
-              {_.map((__, y) => {
-                const cell = map[x][y];
-                if (cell === undefined) { return <Rect key={`${x}-${y}`}/>; }
-                const fill = cell.action === 'push' ? 'yellow' :
-                            cell.action === 'move' ? 'blue'   : 'grey';
-                return <Rect key={`${x}-${y}`} x={x * unit} y={y * unit + 300} width={unit} height={unit} fill={fill}/>;
-                })}
-            </Group>))} */}
             {flatNodes.map(n => <CheckKNode key={n.id} node={n} {...nodeActionProps}/>)}
           </Layer>
         </Stage>
         <div className={classes.printContainerWrapper}>
-          <div className={classes.printContainer} ref={this.printContainerRef}>
-            <Stage width={2000} height={2000}>
+          <div
+            className={classes.printContainer}
+            ref={this.printContainerRef}
+          >
+            <Stage width={(flatNodes[0].self.w + point.x) * unit} height={(flatNodes[0].self.h + point.y) * unit}>
               <Layer>
                 {flatNodes.map(n => <CheckKNode key={n.id} node={n} {...nodeActionProps}/>)}
               </Layer>

@@ -173,19 +173,24 @@ class NodeEditor extends React.Component<Props, State> {
       if (beforeCell === null || !EditableNodeUtil.isEqualCell(beforeCell, cell)) {
         this.setState({beforeCell: cell});
 
-        if (target.type === 'case' &&
-            dragParent!.id !== cell.node.id &&
-            dragParent!.children.find(c => c.id === cell.node.id) === undefined) {
+        if (target.type === 'case') {
+          if (cell.action === 'move' && dragParent!.children.find(c => c.id === cell.node.id) !== undefined) {
+            const newNode = EditableNodeUtil.move(point, prevNode, target, cell.node);
+            this.saveNodeState(newNode);
+          }
+          if (cell.action === 'push' && dragParent!.id === cell.node.id) {
+            const newNode = EditableNodeUtil.push(point, prevNode, target, cell.node);
+            this.saveNodeState(newNode);
+          }
           return;
         }
-        
-        console.log(cell.action);
-        if (cell.action === 'move') {
+
+        if (cell.action === 'move' && cell.node.type !== 'case') {
           const newNode = EditableNodeUtil.move(point, prevNode, target, cell.node);
           this.saveNodeState(newNode);
         }
 
-        if (cell.action === 'push') {
+        if (cell.action === 'push' && cell.node.type !== 'switch') {
           const newNode = EditableNodeUtil.push(point, prevNode, target, cell.node);
           this.saveNodeState(newNode);
         }

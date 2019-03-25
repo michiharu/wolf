@@ -195,7 +195,7 @@ export default class EditableNodeUtil {
         }
       }
 
-      const switchSpr = s.index === 0 ? viewItem.spr.w * 4 : 0;
+      const switchSpr = viewItem.spr.w * s.index === 0 ? 4 : 2;
 
       if (s.parentType !== 'switch') {
         for(var x = s.point.x; x < s.point.x + s.rect.w; x++) {

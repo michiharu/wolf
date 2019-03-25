@@ -33,6 +33,7 @@ export default class CheckNodeUtil {
     const focusNode = CheckNodeUtil._getFocusNode(initNode);
     return {
       node: initNode,
+      nodeHistory: [initNode],
       focusNode,
       skipFlag: false,
     };
