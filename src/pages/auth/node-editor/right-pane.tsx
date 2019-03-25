@@ -133,7 +133,9 @@ const RightPane: React.FC<Props> = (props: Props) => {
           <InputLabel ref={labelRef}>タイプ</InputLabel>
           <Select
             classes={{
-              icon: focusType !== 'switch' ? classes.selectType : classnames(classes.selectType, classes.switchIcon),
+              icon: focusType !== 'switch'
+                ? classes.selectType
+                : classnames(classes.selectType, classes.switchIcon),
               select: classes.select
             }}
             input={<OutlinedInput labelWidth={labelWidth}/>}

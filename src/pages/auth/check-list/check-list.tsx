@@ -1,8 +1,13 @@
 import * as React from 'react';
-import { Theme, createStyles, WithStyles, withStyles, Grid, Fab } from '@material-ui/core';
+import ReactToPrint from 'react-to-print';
+import {
+  Theme, createStyles, WithStyles, withStyles, Grid, Fab,
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button,
+} from '@material-ui/core';
 import ArrowBack from '@material-ui/icons/ArrowBack';
-import CheckIcon from '@material-ui/icons/Check';
+import Skip from '@material-ui/icons/SkipNext';
 import Download from '@material-ui/icons/SaveAlt';
+import PrintIcon from '@material-ui/icons/Print';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
@@ -19,6 +24,18 @@ const styles = (theme: Theme) => createStyles({
     [theme.breakpoints.down('xs')]: {
       height: `calc(100vh - ${toolbarMinHeight}px)`,
     },
+  },
+  printContainerWrapper: {
+    position: 'relative',
+    width: 1,
+    height: 1,
+    overflow: 'hidden'
+  },
+  printContainer: {
+    position: 'absolute',
+    width: 2000,
+    height: 2000,
+    top: 0,
   },
   saveButton: {
     minWidth: 100,
@@ -40,6 +57,7 @@ interface Props extends CheckListProps, WithStyles<typeof styles> {}
 interface State {
   node: CheckNode;
   focusNode: CheckNode | null;
+  skipFlag: boolean;
 }
 
 const point = { x: viewItem.spr.w * 2, y: viewItem.spr.h * 5};
@@ -48,17 +66,13 @@ class CheckList extends React.Component<Props, State> {
 
   stageContainerRef = React.createRef<HTMLDivElement>();
   stageRef = React.createRef<any>();
+  printContainerRef = React.createRef<HTMLDivElement>();
 
   constructor(props: Props) {
     super(props);
     const { parent, node } = props;
-    const parentType: Type = parent !== null ? parent.type : 'task';
-    const newNode = CheckNodeUtil.get(parentType, node);
-    const initNode = CheckNodeUtil.openFirst(point, newNode);
-    this.state = {
-      node: initNode,
-      focusNode: null,
-    };
+    const newState = CheckNodeUtil.getInitialState(point, parent, node);
+    this.state = newState;
   }
   
   componentDidMount() {
@@ -72,12 +86,7 @@ class CheckList extends React.Component<Props, State> {
 
   static getDerivedStateFromProps(nextProps: Props, prevState: State) {
     if (prevState.node.id !== nextProps.node.id) {
-      const parentType: Type = nextProps.parent !== null ? nextProps.parent.type : 'task';
-      const newNode = CheckNodeUtil.get(parentType, nextProps.node);
-      const openNode = CheckNodeUtil.open(point, newNode, newNode.id, true);
-      return {
-        node: openNode,
-      };
+      return CheckNodeUtil.getInitialState(point, nextProps.parent, nextProps.node);
     }
     return null;
   }
@@ -90,15 +99,17 @@ class CheckList extends React.Component<Props, State> {
     sref.draw();
   }
 
-  setOpenState = (target: CheckNode, open: boolean) => {
-    const {node: prevNode} = this.state;
-    const node = CheckNodeUtil.open(point, prevNode, target.id, open);
-    const focusNode: CheckNode = {...target, open};
-    this.setState({node, focusNode});
+  download = () => {
+    // const {node} = this.props;
+    // const filename = `${node.label}.json`;
+    // const nodeWithoutId = TreeUtil._removeId(node);
+    // fileDownload(JSON.stringify(nodeWithoutId), filename);
   }
 
   click = (target: CheckNode) => {
-    this.setOpenState(target, !target.open);
+    const {node: prevNode} = this.state;
+    const node = CheckNodeUtil.open(point, prevNode, target.id, !target.open);
+    this.setState({node});
   }
 
   check = (target: CheckNode) => {
@@ -106,19 +117,28 @@ class CheckList extends React.Component<Props, State> {
     if (target.type === 'task') {
       const {node: prevNode} = this.state;
       const node = CheckNodeUtil.check(point, prevNode);
-      this.setState({node});
+      const focusNode = CheckNodeUtil._getFocusNode(node);
+      this.setState({node, focusNode});
     }
     if (target.type === 'case') {
       const {node: prevNode} = this.state;
       const node = CheckNodeUtil.select(point, prevNode, target);
-      this.setState({node});
+      const focusNode = CheckNodeUtil._getFocusNode(node);
+      this.setState({node, focusNode});
     }
+  }
+
+  skip = () => {
+    const {node: prevNode} = this.state;
+    const node = CheckNodeUtil.skip(point, prevNode);
+    const focusNode = CheckNodeUtil._getFocusNode(node);
+    this.setState({node, focusNode, skipFlag: false});
   }
 
 
   render() {
     const { toolRef,  back, classes } = this.props;
-    const { node, focusNode } = this.state;
+    const { node, focusNode, skipFlag } = this.state;
     const flatNodes = CheckNodeUtil.toFlat(node);
 
     const nodeActionProps = {
@@ -137,12 +157,28 @@ class CheckList extends React.Component<Props, State> {
                 保存<CheckIcon className={classes.extendedIcon}/>
               </Fab>
             </Grid> */}
-            {/* {parent === null && (
+
             <Grid item>
-              <Fab color="primary" onClick={this.download} size="medium">
-                <Download/>
+              <Fab color="primary" variant="extended" onClick={this.download}>
+                記録のダウンロード<Download　className={classes.extendedIcon}/>
               </Fab>
-            </Grid>)} */}
+            </Grid>
+
+            <Grid item>
+              <Fab color="primary" size="medium" onClick={this.download}>
+                <ReactToPrint
+                  trigger={() => <PrintIcon/>}
+                  content={() => this.printContainerRef.current}
+                />
+              </Fab>
+            </Grid>
+            {focusNode !== null && (
+            <Grid item>
+              <Fab color="primary" size="medium" onClick={() => this.setState({skipFlag: true})}>
+                <Skip/>
+              </Fab>
+            </Grid>)}
+            
           </Grid>
         </ToolContainer>
         <Stage ref={this.stageRef} draggable>
@@ -160,6 +196,34 @@ class CheckList extends React.Component<Props, State> {
             {flatNodes.map(n => <CheckKNode key={n.id} node={n} {...nodeActionProps}/>)}
           </Layer>
         </Stage>
+        <div className={classes.printContainerWrapper}>
+          <div className={classes.printContainer} ref={this.printContainerRef}>
+            <Stage width={2000} height={2000}>
+              <Layer>
+                {flatNodes.map(n => <CheckKNode key={n.id} node={n} {...nodeActionProps}/>)}
+              </Layer>
+            </Stage>
+          </div>
+        </div>
+        {focusNode !== null && (
+        <Dialog open={skipFlag} onClose={() => this.setState({skipFlag: false})}>
+          <DialogTitle>次の項目をスキップしてもよろしいですか？</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {`「${focusNode!.label}」`}
+              {focusNode!.children.length !== 0 && (
+                <>
+                  <br/>{`詳細項目の数：${focusNode!.children.length}」`}
+                </>
+              )}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => this.setState({skipFlag: false})}>Cancel</Button>
+            <Button onClick={this.skip} color="primary" autoFocus>Skip</Button>
+          </DialogActions>
+        </Dialog>)}
+        
       </div>
     );
   }

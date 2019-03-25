@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { lightBlue, amber, yellow } from '@material-ui/core/colors';
+import { lightBlue, amber, yellow, grey } from '@material-ui/core/colors';
 
 import Konva from 'konva';
 import { Rect, Group, Text } from 'react-konva';
@@ -21,10 +21,11 @@ export interface CheckKNodeProps {
 const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
   const {node, click, check} = props;
 
-  const fill = node.id === '--' ? '#ccc' :
-               node.type === 'task' ?   node.focus ? lightBlue[200] : lightBlue[300] :
-               node.type === 'switch' ? node.focus ? amber[400] : amber[300] :
-                                        node.focus ? yellow[400] : yellow[300];
+  const fill =
+    node.id === '--' || node.skipped ? grey[400] :
+    node.type === 'task' ?   node.focus ? lightBlue[200] : lightBlue[300] :
+    node.type === 'switch' ? node.focus ? amber[400]     : amber[300] :
+                             node.focus ? yellow[400]    : yellow[300];
   const baseRectProps = {
     x: 0, y: 0,
     width: node.rect.w * unit,

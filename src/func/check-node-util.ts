@@ -6,19 +6,36 @@ import { checked } from "../resource/svg-icon";
 export default class CheckNodeUtil {
 
   static get = (parentType: Type, node: TreeNode): CheckNode => {
-    const index = 0;
-    const depth = {top: 0, bottom: 0};
-    const point = {x: 0, y: 0};
-    const children = node.children.map(c => CheckNodeUtil.get(node.type, c));
     const rect = {
       w: viewItem.rect.w,
       h: viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0),
     };
-    const open = false;
-    const focus = false;
-    const checked = false;
 
-    return {...node, parentType, index, depth, point, open, focus, checked, children, self: rect, rect};
+    return {
+      ...node, parentType,
+      index: 0,
+      depth: {top: 0, bottom: 0},
+      point: {x: 0, y: 0},
+      open: false,
+      focus: false,
+      checked: false,
+      skipped: false,
+      children: node.children.map(c => CheckNodeUtil.get(node.type, c)),
+      self: rect,
+      rect
+    };
+  }
+
+  static getInitialState = (point: Point, parent: TreeNode | null, node: TreeNode) => {
+    const parentType: Type = parent !== null ? parent.type : 'task';
+    const newNode = CheckNodeUtil.get(parentType, node);
+    const initNode = CheckNodeUtil.openFirst(point, newNode);
+    const focusNode = CheckNodeUtil._getFocusNode(initNode);
+    return {
+      node: initNode,
+      focusNode,
+      skipFlag: false,
+    };
   }
 
   static openFirst = (point: Point, node: CheckNode): CheckNode => {
@@ -32,7 +49,7 @@ export default class CheckNodeUtil {
       const children = node.children.map((c, i) => i === 0 ? CheckNodeUtil._openFirst(c) : c);
       return {...node, open: true, children};
     } else {
-      const children = node.children.map(c => ({...c, focus: true}));
+      const children = node.children.map(c => ({...c, focus: true, open: true}));
       return {...node, open: true, children};
     }
   }
@@ -82,7 +99,8 @@ export default class CheckNodeUtil {
         if (which === 'width') {
           // switch, open, width
           if (node.children.length !== 0) {
-            return viewItem.indent + node.children.map(c => c.self.w + viewItem.spr.w).reduce((a, b) => a + b);
+            return viewItem.indent
+              + node.children.map(c => c.self.w + viewItem.spr.w).reduce((a, b) => a + b);
           } else {
             return viewItem.rect.w;
           }
@@ -100,10 +118,14 @@ export default class CheckNodeUtil {
       } else {
         if (which === 'width') {
           // task, close, width
-          return viewItem.rect.w;
+          const checkedChild = node.children.find(c => c.checked);
+          if (checkedChild === undefined) { return viewItem.rect.w; }
+          return viewItem.indent + viewItem.spr.w + checkedChild.self.w;
         } else {
           // task, close, height
-          return viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0);
+          const checkedChild = node.children.find(c => c.checked);
+          if (checkedChild === undefined) { return viewItem.rect.h; }
+          return viewItem.rect.h + viewItem.spr.h * 2 + checkedChild.self.h;
         }
       }
     }
@@ -142,29 +164,101 @@ export default class CheckNodeUtil {
     return CheckNodeUtil.setCalcProps(point, checkNode);
   }
 
-  // static _check = (node: CheckNode): CheckNode => {
-  //   if ((node.type !== 'case' && node.checked) || node.children.length === 0) { return node; }
-  //   if (node.children.find(c => c.focus) === undefined) {
-  //     const children = node.children.map(c => CheckNodeUtil._check(c));
-  //     const hasFocus = children.map(c => CheckNodeUtil._hasFocus(c)).reduce((a, b) => a || b);
-  //     if (hasFocus) { return {...node, children}; }
+  static _check = (node: CheckNode): CheckNode => {
+    if ((node.type !== 'case' && (node.checked || node.skipped)) || node.children.length === 0) {
+      return node;
+    }
 
-  //     const setFocusChildren = children.map(
-  //       (c, i, _children) =>
-  //         i !== 0 && _children[i - 1].checked && !c.checked ? CheckNodeUtil._openFirst(c): c
-  //     );
-  //     return {...node, children: setFocusChildren};
-  //   }
+    if (node.children.find(c => c.focus) === undefined) {
+      const children = node.children.map(c => CheckNodeUtil._check(c));
+      const hasFocus = children.map(c => CheckNodeUtil._hasFocus(c)).reduce((a, b) => a || b);
+      if (hasFocus) { return {...node, children}; }
+      if (node.type === 'switch') {
+        const hasCheck = children.map(c => c.checked).reduce((a, b) => a || b);
+        if (hasCheck) { return {...node, children, checked: true, open: false}; }
+      }
+      const isAllChecked = children.map(c => c.checked || c.skipped).reduce((a, b) => a && b);
+      if (isAllChecked) {
+        return {...node, children, checked: true};
+      }
+      
+      const setFocusChildren = children.map(
+        (c, i, _children) =>
+          i !== 0 &&
+          (_children[i - 1].checked || _children[i - 1].skipped) &&
+          (!c.checked && !c.skipped)
+            ? CheckNodeUtil._openFirst(c)
+            : c
+      );
+      return {...node, children: setFocusChildren};
+    }
 
-  //   const children: CheckNode[] = node.children.map(
-  //     (c, i, _children) =>
-  //     _children[i]    .focus ? {...c, focus: false, checked: true} : 
-  //     i !== 0 && _children[i - 1].focus ? CheckNodeUtil._openFirst(c) : c
-  //   );
-  //   const hasFocus = children.map(c => CheckNodeUtil._hasFocus(c)).reduce((a, b) => a || b);
-  //   if (hasFocus) { return {...node, children}; }
-  //   return {...node, children, checked: true, open: false};
-  // }
+    const children: CheckNode[] = node.children.map(
+      (c, i, _children) =>
+      c.focus ? {...c, focus: false, checked: true} : 
+      i !== 0 && _children[i - 1].focus ? CheckNodeUtil._openFirst(c) : c
+    );
+    const hasFocus = children.map(c => CheckNodeUtil._hasFocus(c)).reduce((a, b) => a || b);
+    if (hasFocus) { return {...node, children}; }
+    return {...node, children, checked: true};
+  }
+
+  static skip = (point: Point, node: CheckNode): CheckNode => {
+    const checkNode = CheckNodeUtil._skip(node);
+    return CheckNodeUtil.setCalcProps(point, checkNode);
+  }
+
+  static _skip = (node: CheckNode): CheckNode => {
+    if ((node.type !== 'case' && (node.checked || node.skipped)) || node.children.length === 0) {
+      return node;
+    }
+
+    if (node.children.find(c => c.focus) === undefined) {
+      const children = node.children.map(c => CheckNodeUtil._skip(c));
+      const hasFocus = children.map(c => CheckNodeUtil._hasFocus(c)).reduce((a, b) => a || b);
+      if (hasFocus) { return {...node, children}; }
+      if (node.type === 'switch') {
+        const hasCheck = children.map(c => c.checked).reduce((a, b) => a || b);
+        if (hasCheck) {
+          const caseChildren = children.find(c => c.checked)!.children;
+          const isAllSkipped = caseChildren.map(c => c.skipped).reduce((a, b) => a && b);
+          if (isAllSkipped) {
+            const clearCheckChildren = children.map(c => ({...c, checked: false, skipped: true}))
+            return {...node, children: clearCheckChildren, skipped: true, open: false};
+          } else {
+            return {...node, children, checked: true, open: false};
+          }
+        }
+      }
+      const setFocusChildren = children.map(
+        (c, i, _children) =>
+          i !== 0 &&
+          (_children[i - 1].checked || _children[i - 1].skipped) &&
+          (!c.checked && !c.skipped)
+            ? CheckNodeUtil._openFirst(c)
+            : c
+      );
+      return {...node, children: setFocusChildren};
+    }
+    if (node.type === 'switch') {
+      const children = node.children.map(c => ({...c, focus: false, skipped: true}));
+      return {...node, children, skipped: true, open: false};
+    }
+
+    const children: CheckNode[] = node.children.map(
+      (c, i, _children) =>
+        c.focus ? {...c, focus: false, skipped: true} : 
+        i !== 0 && _children[i - 1].focus ? CheckNodeUtil._openFirst(c) : c
+    );
+    const hasFocus = children.map(c => CheckNodeUtil._hasFocus(c)).reduce((a, b) => a || b);
+    if (hasFocus) { return {...node, children}; }
+    const isAllSkipped = children.map(c => c.skipped).reduce((a, b) => a && b);
+    if (isAllSkipped) {
+      return {...node, children, skipped: true, open: false};
+    } else {
+      return {...node, children, checked: true};
+    }
+  }
 
   static select = (point: Point, node: CheckNode, target: CheckNode): CheckNode => {
     const checkNode = CheckNodeUtil._select(node, target);
@@ -189,7 +283,7 @@ export default class CheckNodeUtil {
           : {...c, focus: false};
       }
     );
-    return {...node, children};
+    return {...node, children, open: false};
   }
 
   static _hasFocus = (node: CheckNode): boolean => {
@@ -222,7 +316,11 @@ export default class CheckNodeUtil {
 
     var anchor = 0;
     const children = node.children.map(c => {
-      const p: Point = {
+      const p: Point = (node.type === 'switch' && c.checked)
+      ? {
+        x: point.x + viewItem.indent,
+        y: point.y + node.rect.h + viewItem.spr.h
+      } : {
         x: point.x + viewItem.indent + (node.type !== 'switch' ? 0 : anchor),
         y: point.y + node.rect.h + viewItem.spr.h + (node.type === 'switch' ? 0 : anchor)
       };
@@ -256,7 +354,15 @@ export default class CheckNodeUtil {
   }
 
   static toFlat = (node: CheckNode): CheckNode[] => {
-    if (node.children.length === 0 || !node.open) { return [node]; }
+    if (node.children.length === 0 || !node.open) {
+      if (node.type !== 'switch') {
+        return [node];
+      } else {
+        const checkedCase = node.children.find(c => c.checked);
+        if (checkedCase === undefined) { return [node]; }
+        return [node].concat(CheckNodeUtil.toFlat(checkedCase));
+      }
+    }
     return [node].concat(node.children.map(c => CheckNodeUtil.toFlat(c)).reduce((a, b) => a.concat(b)));
   }
 
@@ -267,6 +373,14 @@ export default class CheckNodeUtil {
     return node.children.map(c => CheckNodeUtil._find(c, id))
     .reduce((a, b) => a !== undefined ? a
                     : b !== undefined ? b : undefined);
+  }
+
+  static _getFocusNode = (node: CheckNode): CheckNode | null => {
+    if (node.focus) { return node; }
+    if (node.children.length === 0) { return null; }
+    return node.children.map(c => CheckNodeUtil._getFocusNode(c))
+    .reduce((a, b) => a !== null ? a
+                    : b !== null ? b : null);
   }
 }
 

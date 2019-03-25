@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Theme, createStyles, WithStyles, withStyles, Portal } from '@material-ui/core';
-import { toolbarHeight, toolbarMinHeight } from '../../settings/layout';
+import { toolbarHeight, toolbarMinHeight, drawerWidth } from '../../settings/layout';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -10,10 +10,10 @@ const styles = (theme: Theme) => createStyles({
     [theme.breakpoints.down('xs')]: {
       top: toolbarMinHeight,
     },
-    left: -theme.spacing.unit * 2,
+    left: -theme.spacing.unit * 3,
     paddingTop: theme.spacing.unit,
     paddingLeft: theme.spacing.unit,
-    width: '100vw',
+    width: `calc(100vw - ${drawerWidth}px)`,
     height: 10,
   }
 });

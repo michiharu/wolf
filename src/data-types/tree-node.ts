@@ -61,6 +61,7 @@ export interface CheckNode {
   open: boolean;
   focus: boolean;
   checked: boolean;
+  skipped: boolean;
   
   index: number;
   depth: {top: number, bottom: number};
@@ -76,4 +77,4 @@ export type Type = 'task' | 'switch' | 'case';
 export type Point = {x: number, y: number};
 export type Size = {w: number, h:number};
 export type FlatAction = 'push' | 'move' | 'none';
-export type Cell = {parent?: EditableNode, node: EditableNode, action: FlatAction} | undefined;
+export type Cell = {node: EditableNode, action: FlatAction} | undefined;

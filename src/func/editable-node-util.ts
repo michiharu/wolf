@@ -56,15 +56,15 @@ export default class EditableNodeUtil {
       if (open) {
         if (which === 'width') {
           // switch, open, width
-          return viewItem.indent + (node.children.length !== 0
+          return viewItem.indent+ (node.children.length !== 0
             ? node.children.map(c => c.self.w + viewItem.spr.w).reduce((a, b) => a + b)
-            : viewItem.rect.w);
+            : viewItem.rect.w + viewItem.spr.w );
         } else {
           // switch, open, height
-          return viewItem.rect.h + viewItem.spr.h * 2
+          return viewItem.rect.h + viewItem.spr.h
             + EditableNodeUtil.calcTextlineHeight(node)
             + (node.children.length !== 0 ? 
-               node.children.map(c => c.self.h).reduce((a, b) => Math.max(a, b)) : 0);
+               node.children.map(c => c.self.h).reduce((a, b) => Math.max(a, b)) + viewItem.spr.h : 0);
         }
       } else {
         if (which === 'width') {
@@ -344,6 +344,14 @@ export default class EditableNodeUtil {
     return node.children.map(c => EditableNodeUtil._find(c, id))
     .reduce((a, b) => a !== undefined ? a
                     : b !== undefined ? b : undefined);
+  }
+
+  static _getPrent = (node: EditableNode, target: EditableNode): EditableNode | null => {
+    if (node.children.length === 0) { return null; }
+    if (node.children.find(c => c.id === target.id) !== undefined) { return node; }
+    return node.children
+      .map(c => EditableNodeUtil._getPrent(c, target))
+      .reduce((a, b) => a || b || null);
   }
 
   static replaceOnlySelf = (point: Point, node: EditableNode, target: EditableNode): EditableNode => {

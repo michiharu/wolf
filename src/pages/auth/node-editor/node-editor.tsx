@@ -7,7 +7,7 @@ import Download from '@material-ui/icons/SaveAlt';
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
 import { TreeNode, Type, EditableNode, Cell, Point } from '../../../data-types/tree-node';
-import { toolbarHeight, toolbarMinHeight, viewItem } from '../../../settings/layout';
+import { toolbarHeight, toolbarMinHeight, viewItem, unit } from '../../../settings/layout';
 
 import ToolContainer from '../../../components/tool-container/tool-container';
 import EditableNodeUtil from '../../../func/editable-node-util';
@@ -46,6 +46,7 @@ interface State {
   node: EditableNode;
   map: Cell[][] | null;
   beforeCell: Cell | null;
+  dragParent: EditableNode | null;
   focusNode: EditableNode | null;
 }
 
@@ -66,6 +67,7 @@ class NodeEditor extends React.Component<Props, State> {
       node: openNode,
       map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(openNode)),
       beforeCell: null,
+      dragParent: null,
       focusNode: null,
     };
   }
@@ -155,13 +157,15 @@ class NodeEditor extends React.Component<Props, State> {
 
   dragStart = (target: EditableNode) => {
     const {node: prevNode} = this.state;
+    const dragParent = EditableNodeUtil._getPrent(prevNode, target);
     const openNode = EditableNodeUtil.open(point, prevNode, target.id, false);
     const node = EditableNodeUtil._deleteFocus(openNode);
-    this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode: null});
+    const map = EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node));
+    this.setState({node, dragParent, map, focusNode: null});
   }
 
   dragMove = (target: EditableNode, p: Point) => {
-    const {node: prevNode, map, beforeCell} = this.state;
+    const {node: prevNode, dragParent, map, beforeCell} = this.state;
 
     if (map !== null && 0 <= p.x && p.x < map.length) {
       const cell = map[p.x][p.y];
@@ -169,6 +173,13 @@ class NodeEditor extends React.Component<Props, State> {
       if (beforeCell === null || !EditableNodeUtil.isEqualCell(beforeCell, cell)) {
         this.setState({beforeCell: cell});
 
+        if (target.type === 'case' &&
+            dragParent!.id !== cell.node.id &&
+            dragParent!.children.find(c => c.id === cell.node.id) === undefined) {
+          return;
+        }
+        
+        console.log(cell.action);
         if (cell.action === 'move') {
           const newNode = EditableNodeUtil.move(point, prevNode, target, cell.node);
           this.saveNodeState(newNode);
@@ -186,6 +197,7 @@ class NodeEditor extends React.Component<Props, State> {
     const {node: prevNode} = this.state;
     const newNode = EditableNodeUtil.deleteDummy(point, prevNode);
     this.saveNodeState(newNode);
+    this.setState({dragParent: null});
   }
 
   changeFocusNode = (target: EditableNode) => {
