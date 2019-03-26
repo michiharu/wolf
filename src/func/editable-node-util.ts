@@ -26,7 +26,7 @@ export default class EditableNodeUtil {
          + (!Util.isEmpty(node.output) ? viewItem.textline : 0);
   }
 
-  static calcSelfLength = (parentType: Type, node: EditableNode, open: boolean, which: which) => {
+  static calcSelfLength = (node: EditableNode, open: boolean, which: which) => {
 
     if (node.type !== 'switch') {
       if (open) {
@@ -117,8 +117,8 @@ export default class EditableNodeUtil {
     const newNode = {...node, children};
 
     const self = {
-      w: EditableNodeUtil.calcSelfLength(node.parentType, newNode, node.open, 'width'),
-      h: EditableNodeUtil.calcSelfLength(node.parentType, newNode, node.open, 'height')
+      w: EditableNodeUtil.calcSelfLength(newNode, node.open, 'width'),
+      h: EditableNodeUtil.calcSelfLength(newNode, node.open, 'height')
     };
 
     return {...node, children, self, rect};
@@ -250,16 +250,14 @@ export default class EditableNodeUtil {
   }
 
   static move = (point: Point, node: EditableNode, from: EditableNode, to: EditableNode): EditableNode => {
-    const setDummyNode = EditableNodeUtil.changeAsDummyById(node, from.id);
-    const deletedTree = EditableNodeUtil._deleteById(setDummyNode, from.id);
+    const deletedTree = EditableNodeUtil._deleteById(node, from.id);
     const setParentTypeNode = EditableNodeUtil.setParentType(from, to.parentType);
     const insertedNode = EditableNodeUtil._insert(deletedTree, setParentTypeNode, to);
     return EditableNodeUtil.setCalcProps(point, insertedNode);
   }
 
   static push = (point: Point, node: EditableNode, child: EditableNode, parent: EditableNode): EditableNode => {
-    const setDummyNode = EditableNodeUtil.changeAsDummyById(node, child.id);
-    const deletedTree = EditableNodeUtil._deleteById(setDummyNode, child.id);
+    const deletedTree = EditableNodeUtil._deleteById(node, child.id);
     const setParentTypeChild = EditableNodeUtil.setParentType(child, parent.type);
     const pushedNode = EditableNodeUtil._push(deletedTree, setParentTypeChild, parent);
     return EditableNodeUtil.setCalcProps(point, pushedNode);
@@ -388,27 +386,20 @@ export default class EditableNodeUtil {
     return {...node, children};
   }
 
-  static _changeAsDummyById = (node: EditableNode, id: string): EditableNode => {
-    const findResult = node.children.find(c => c.id === id);
-    
-    if (findResult !== undefined) {
-      if (findResult.id === '--') { return node; }
-      return {...node, children: node.children.map(c => c.id === id ? {...c, id: '--'} : c)};
+  static _isAllSwitchHasCase = (node: EditableNode): boolean => {
+    if (node.children.length === 0) {
+      if (node.type === 'switch') { return false; }
+      return true;
     }
-
-    const children = node.children.map(c => EditableNodeUtil._changeAsDummyById(c, id));
-    return {...node, children};
+    return node.children.map(c => EditableNodeUtil._isAllSwitchHasCase(c)).reduce((a, b) => a && b);
   }
 
-  static changeAsDummyById = (node: EditableNode, id: string): EditableNode => {
-    const findResult = EditableNodeUtil._find(node, '--');
-    if (findResult !== undefined) { return node; }
-    return EditableNodeUtil._changeAsDummyById(node, id);
-  }
-
-  static deleteDummy = (point: Point, node: EditableNode): EditableNode => {
-    const deletedNode = EditableNodeUtil._deleteById(node, '--');
-    return EditableNodeUtil.setCalcProps(point, deletedNode);
+  static _isAllCaseHasItem = (node: EditableNode): boolean => {
+    if (node.children.length === 0) {
+      if (node.type === 'case') { return false; }
+      return true;
+    }
+    return node.children.map(c => EditableNodeUtil._isAllCaseHasItem(c)).reduce((a, b) => a && b);
   }
 }
 

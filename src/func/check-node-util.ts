@@ -2,6 +2,7 @@ import TreeNode, { Type, CheckNode, Point } from "../data-types/tree-node";
 import { viewItem } from "../settings/layout";
 import Util from "./util";
 import { checked } from "../resource/svg-icon";
+import { CheckListState } from "../pages/auth/check-list/check-list";
 
 export default class CheckNodeUtil {
 
@@ -16,7 +17,7 @@ export default class CheckNodeUtil {
       index: 0,
       depth: {top: 0, bottom: 0},
       point: {x: 0, y: 0},
-      open: false,
+      open: true,
       focus: false,
       checked: false,
       skipped: false,
@@ -26,16 +27,17 @@ export default class CheckNodeUtil {
     };
   }
 
-  static getInitialState = (point: Point, parent: TreeNode | null, node: TreeNode) => {
+  static getInitialState = (point: Point, parent: TreeNode | null, node: TreeNode): CheckListState => {
     const parentType: Type = parent !== null ? parent.type : 'task';
     const newNode = CheckNodeUtil.get(parentType, node);
-    const initNode = CheckNodeUtil.openFirst(point, newNode);
-    const focusNode = CheckNodeUtil._getFocusNode(initNode);
+    const initNode = CheckNodeUtil.setCalcProps(point, newNode);
+
     return {
       node: initNode,
       nodeHistory: [initNode],
-      focusNode,
+      focusNode: null,
       skipFlag: false,
+      checkRecords: [],
     };
   }
 
@@ -63,7 +65,7 @@ export default class CheckNodeUtil {
          + (!Util.isEmpty(node.output) ? viewItem.textline : 0);
   }
 
-  static calcSelfLength = (parentType: Type, node: CheckNode, open: boolean, which: which) => {
+  static calcSelfLength = (node: CheckNode, open: boolean, which: which) => {
 
     if (node.type !== 'switch') {
       if (open) {
@@ -306,8 +308,8 @@ export default class CheckNodeUtil {
     const newNode = {...node, children};
 
     const self = {
-      w: CheckNodeUtil.calcSelfLength(node.parentType, newNode, node.open, 'width'),
-      h: CheckNodeUtil.calcSelfLength(node.parentType, newNode, node.open, 'height')
+      w: CheckNodeUtil.calcSelfLength(newNode, node.open, 'width'),
+      h: CheckNodeUtil.calcSelfLength(newNode, node.open, 'height')
     };
 
     return {...node, children, self, rect};

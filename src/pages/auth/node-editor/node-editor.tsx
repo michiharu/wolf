@@ -1,8 +1,12 @@
 import * as React from 'react';
-import { Theme, createStyles, WithStyles, withStyles, Grid, Fab } from '@material-ui/core';
+import {
+  Theme, createStyles, WithStyles, withStyles, Grid, Fab, Snackbar, IconButton,
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button,
+} from '@material-ui/core';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import CheckIcon from '@material-ui/icons/Check';
 import Download from '@material-ui/icons/SaveAlt';
+import CloseIcon from '@material-ui/icons/Close';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
@@ -29,6 +33,9 @@ const styles = (theme: Theme) => createStyles({
   extendedIcon: {
     marginLeft: theme.spacing.unit,
   },
+  close: {
+    padding: theme.spacing.unit * 0.5,
+  },
 });
 
 export interface EditorProps {
@@ -48,7 +55,11 @@ interface State {
   beforeCell: Cell | null;
   dragParent: EditableNode | null;
   focusNode: EditableNode | null;
+  cannotSaveReason: CannotSaveReason;
+  saved: boolean;
 }
+
+type CannotSaveReason = 'switch' | 'case' | null;
 
 const point = { x: viewItem.spr.w * 2, y: viewItem.spr.h * 5};
 
@@ -69,6 +80,8 @@ class NodeEditor extends React.Component<Props, State> {
       beforeCell: null,
       dragParent: null,
       focusNode: null,
+      cannotSaveReason: null,
+      saved: false,
     };
   }
   
@@ -100,6 +113,20 @@ class NodeEditor extends React.Component<Props, State> {
     sref.width(cref.offsetWidth);
     sref.height(cref.offsetHeight);
     sref.draw();
+  }
+
+  save = () => {
+    const {node} = this.state;
+    const isAllSwitchHasCase = EditableNodeUtil._isAllSwitchHasCase(node);
+    const isAllCaseHasItem = EditableNodeUtil._isAllCaseHasItem(node);
+    const cannotSaveReason: CannotSaveReason = !isAllSwitchHasCase ? 'switch' :
+                                               !isAllCaseHasItem   ? 'case'   : null;
+    if (cannotSaveReason === null) {
+      this.props.changeNode(node);
+      this.setState({saved: true});
+    } else {
+      this.setState({cannotSaveReason});
+    }
   }
 
   download = () => {
@@ -199,9 +226,9 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   dragEnd = () => {
-    const {node: prevNode} = this.state;
-    const newNode = EditableNodeUtil.deleteDummy(point, prevNode);
-    this.saveNodeState(newNode);
+    // const {node: prevNode} = this.state;
+    // const newNode = EditableNodeUtil.deleteDummy(point, prevNode);
+    // this.saveNodeState(newNode);
     this.setState({dragParent: null});
   }
 
@@ -234,8 +261,8 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const { toolRef, rightPaneRef, parent, changeNode, back, classes } = this.props;
-    const { node, focusNode, map } = this.state;
+    const { toolRef, rightPaneRef, parent, back, classes } = this.props;
+    const { node, focusNode, map, cannotSaveReason, saved } = this.state;
     const flatNodes = EditableNodeUtil.toFlat(node);
 
     const nodeActionProps = {
@@ -263,7 +290,7 @@ class NodeEditor extends React.Component<Props, State> {
               <Fab color="primary" onClick={back} size="medium"><ArrowBack/></Fab>
             </Grid>
             <Grid item>
-              <Fab className={classes.saveButton} variant="extended" color="primary" onClick={() => changeNode(node)}>
+              <Fab className={classes.saveButton} variant="extended" color="primary" onClick={this.save}>
                 保存<CheckIcon className={classes.extendedIcon}/>
               </Fab>
             </Grid>
@@ -275,6 +302,7 @@ class NodeEditor extends React.Component<Props, State> {
             </Grid>)}
           </Grid>
         </ToolContainer>
+
         <Stage ref={this.stageRef} onClick={this.deleteFocus} draggable>
           <Layer>
             {/* {map !== null && map.map((_, x) => (
@@ -291,6 +319,38 @@ class NodeEditor extends React.Component<Props, State> {
           </Layer>
         </Stage>
         <RightPane {...rightPaneProps}/>
+
+        <Dialog open={cannotSaveReason !== null} onClose={() => this.setState({cannotSaveReason: null})}>
+          <DialogTitle>このデータは保存できません</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {cannotSaveReason === 'switch' && 'すべての分岐には、１つ以上の条件を設定して下さい。'}
+              {cannotSaveReason === 'case'   && 'すべての条件には、１つ以上の詳細項目を設定して下さい。'}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => this.setState({cannotSaveReason: null})} color="primary" autoFocus>OK</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Snackbar
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          open={saved}
+          autoHideDuration={3000}
+          onClose={() => this.setState({saved: false})}
+          message={<span>保存しました</span>}
+          action={[
+            <IconButton
+              key="close"
+              aria-label="Close"
+              color="inherit"
+              className={classes.close}
+              onClick={() => this.setState({saved: false})}
+            >
+              <CloseIcon />
+            </IconButton>,
+          ]}
+        />
       </div>
     );
   }

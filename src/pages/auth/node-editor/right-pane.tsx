@@ -150,7 +150,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
           >
             <MenuItem value="task">作業</MenuItem>
             {node !== null && <MenuItem value="switch">分岐</MenuItem>}
-            {node !== null && <MenuItem value="case">条件</MenuItem>}
+            {node !== null && node.type === 'case' && <MenuItem value="case">条件</MenuItem>}
           </Select>
         </FormControl>
         <TextField

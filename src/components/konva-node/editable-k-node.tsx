@@ -22,8 +22,7 @@ export interface EditableKNodeProps {
 const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) => {
   const {node, click, deleteFocus, dragStart, dragMove, dragEnd} = props;
 
-  const fill = node.id === '--' ? '#ccc' :
-               node.type === 'task' ?   node.focus ? lightBlue[200] : lightBlue[300] :
+  const fill = node.type === 'task' ?   node.focus ? lightBlue[200] : lightBlue[300] :
                node.type === 'switch' ? node.focus ? amber[400] : amber[300] :
                                         node.focus ? yellow[400] : yellow[300];
   const baseRectProps = {
@@ -37,11 +36,6 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
     shadowOffset: { x : 0, y : node.focus ? 0 : 3},
     shadowOpacity: node.focus ? 1 : 0.2,
   };
-
-  if (node.id === '--') {
-    const point = {x: node.point.x * unit, y: node.point.y * unit};
-    return <Group {...point}><Rect {...baseRectProps}/></Group>;
-  }
 
   const handleClick = (e: any) => {
     e.cancelBubble = true;

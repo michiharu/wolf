@@ -5,6 +5,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button,
 } from '@material-ui/core';
 import ArrowBack from '@material-ui/icons/ArrowBack';
+import Start from '@material-ui/icons/PlayArrow';
 import Skip from '@material-ui/icons/SkipNext';
 import Download from '@material-ui/icons/SaveAlt';
 import PrintIcon from '@material-ui/icons/Print';
@@ -12,12 +13,13 @@ import Undo from '@material-ui/icons/Undo';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
-import { TreeNode, Type, CheckNode } from '../../../data-types/tree-node';
+import { TreeNode, Type, CheckNode, CheckRecord } from '../../../data-types/tree-node';
 import { toolbarHeight, toolbarMinHeight, viewItem, unit } from '../../../settings/layout';
 
 import ToolContainer from '../../../components/tool-container/tool-container';
 import CheckNodeUtil from '../../../func/check-node-util';
 import CheckKNode from '../../../components/konva-node/check-k-node';
+import { fileDownload } from '../../../func/file-download';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -52,20 +54,22 @@ export interface CheckListProps {
 
 interface Props extends CheckListProps, WithStyles<typeof styles> {}
 
-interface State {
+export interface CheckListState {
   node: CheckNode;
   nodeHistory: CheckNode[];
   focusNode: CheckNode | null;
   skipFlag: boolean;
+  checkRecords: CheckRecord[];
 }
 
 const point = { x: viewItem.spr.w * 2, y: viewItem.spr.h * 5};
 
-class CheckList extends React.Component<Props, State> {
+class CheckList extends React.Component<Props, CheckListState> {
 
   stageContainerRef = React.createRef<HTMLDivElement>();
   stageRef = React.createRef<any>();
   printContainerRef = React.createRef<HTMLDivElement>();
+  timer = -1;
 
   constructor(props: Props) {
     super(props);
@@ -83,7 +87,7 @@ class CheckList extends React.Component<Props, State> {
     window.removeEventListener('resize', this.resize);
   }
 
-  static getDerivedStateFromProps(nextProps: Props, prevState: State) {
+  static getDerivedStateFromProps(nextProps: Props, prevState: CheckListState) {
     if (prevState.node.id !== nextProps.node.id) {
       return CheckNodeUtil.getInitialState(point, nextProps.parent, nextProps.node);
     }
@@ -99,10 +103,19 @@ class CheckList extends React.Component<Props, State> {
   }
 
   download = () => {
-    // const {node} = this.props;
-    // const filename = `${node.label}.json`;
-    // const nodeWithoutId = TreeUtil._removeId(node);
-    // fileDownload(JSON.stringify(nodeWithoutId), filename);
+    const {node} = this.props;
+    const {checkRecords} = this.state;
+    const filename = `${node.label}-${new Date().toString}.json`;
+    fileDownload(JSON.stringify(checkRecords), filename);
+  }
+
+  start = () => {
+    this.timer = new Date().getTime();
+    const {node: prevNode, nodeHistory: history} = this.state;
+    const node = CheckNodeUtil.openFirst(point, prevNode);
+    history.push(node);
+    const focusNode = CheckNodeUtil._getFocusNode(node);
+    this.setState({node, nodeHistory: history, focusNode});
   }
 
   click = (target: CheckNode) => {
@@ -113,20 +126,22 @@ class CheckList extends React.Component<Props, State> {
 
   check = (target: CheckNode) => {
     if (!target.focus) { return; }
-    if (target.type === 'task') {
-      const {node: prevNode, nodeHistory: history} = this.state;
-      const node = CheckNodeUtil.check(point, prevNode);
-      history.push(node);
-      const focusNode = CheckNodeUtil._getFocusNode(node);
-      this.setState({node, nodeHistory: history, focusNode});
-    }
-    if (target.type === 'case') {
-      const {node: prevNode, nodeHistory: history} = this.state;
-      const node = CheckNodeUtil.select(point, prevNode, target);
-      history.push(node);
-      const focusNode = CheckNodeUtil._getFocusNode(node);
-      this.setState({node, nodeHistory: history, focusNode});
-    }
+    const {node: prevNode, nodeHistory: history, checkRecords} = this.state;
+    const node = target.type === 'task'
+      ? CheckNodeUtil.check(point, prevNode)
+      : CheckNodeUtil.select(point, prevNode, target);
+    history.push(node);
+    const focusNode = CheckNodeUtil._getFocusNode(node);
+    const now = new Date().getTime();
+    const newRecord: CheckRecord = {
+      at: now,
+      from: now - this.timer,
+      time: now - this.timer - (checkRecords.length === 0 ? 0 : checkRecords[checkRecords.length - 1].from),
+      node: target
+    };
+    console.log(newRecord.time);
+    checkRecords.push(newRecord);
+    this.setState({node, nodeHistory: history, focusNode, checkRecords});
   }
 
   skip = () => {
@@ -168,11 +183,19 @@ class CheckList extends React.Component<Props, State> {
               </Fab>
             </Grid> */}
 
+            {focusNode === null && nodeHistory.length === 1 &&
+            <Grid item>
+              <Fab color="primary" variant="extended" onClick={this.start}>
+                スタート<Start className={classes.extendedIcon}/>
+              </Fab>
+            </Grid>}
+
+            {focusNode === null && nodeHistory.length !== 1 && 
             <Grid item>
               <Fab color="primary" variant="extended" onClick={this.download}>
                 記録のダウンロード<Download　className={classes.extendedIcon}/>
               </Fab>
-            </Grid>
+            </Grid>}
 
             <Grid item>
               <Fab color="primary" size="medium" onClick={this.download}>
@@ -197,11 +220,13 @@ class CheckList extends React.Component<Props, State> {
             
           </Grid>
         </ToolContainer>
+
         <Stage ref={this.stageRef} draggable>
           <Layer>
             {flatNodes.map(n => <CheckKNode key={n.id} node={n} {...nodeActionProps}/>)}
           </Layer>
         </Stage>
+
         <div className={classes.printContainerWrapper}>
           <div
             className={classes.printContainer}
@@ -214,6 +239,7 @@ class CheckList extends React.Component<Props, State> {
             </Stage>
           </div>
         </div>
+
         {focusNode !== null && (
         <Dialog open={skipFlag} onClose={() => this.setState({skipFlag: false})}>
           <DialogTitle>次の項目をスキップしてもよろしいですか？</DialogTitle>

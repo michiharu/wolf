@@ -72,6 +72,13 @@ export interface CheckNode {
   rect: Size;
 }
 
+export interface CheckRecord {
+  at: number;
+  from: number;
+  time: number;
+  node: CheckNode;
+}
+
 // export const dummyId = '--';
 export type Type = 'task' | 'switch' | 'case';
 export type Point = {x: number, y: number};
