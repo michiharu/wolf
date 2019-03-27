@@ -1,8 +1,9 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { MuiThemeProvider, CssBaseline, createMuiTheme, Color } from '@material-ui/core';
+import { MuiThemeProvider, CssBaseline, createMuiTheme } from '@material-ui/core';
 import { pink, blue } from '@material-ui/core/colors';
 import Authentication from './pages/authentication';
+import * as serviceWorker from './serviceWorker';
 
 export const theme = createMuiTheme({
   palette: {
@@ -22,3 +23,4 @@ const ThemeProvider: React.SFC<{}> = () => (
 );
 
 ReactDOM.render(<ThemeProvider/>, document.querySelector('#root'));
+serviceWorker.register({});
