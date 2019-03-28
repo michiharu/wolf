@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { lightBlue, amber, yellow, grey } from '@material-ui/core/colors';
 
-import Konva from 'konva';
 import { Rect, Group, Text } from 'react-konva';
 
 import { CheckNode } from '../../data-types/tree-node';

@@ -9,7 +9,7 @@ import { Task, Switch, Case} from '../../settings/layout';
 const styles = (theme: Theme) => createStyles({
   row: {
     '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.background.paper,
+      backgroundColor: theme.palette.background.default,
     }
   },
   expand: { paddingLeft: theme.spacing.unit * 2 },

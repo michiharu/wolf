@@ -2,8 +2,9 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { useState, useRef } from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles, Divider, Grid, Button, TextField,
-  Table, TableHead, TableBody, TableRow, TableCell, IconButton, Paper,
+  Theme, createStyles, WithStyles, withStyles, Paper, Grid, TextField,
+  Table, TableHead, TableBody, TableRow, TableCell, IconButton,
+  FormControl, InputLabel, Select, MenuItem,
 } from '@material-ui/core';
 
 import FileUpload from '@material-ui/icons/NoteAdd';
@@ -20,38 +21,34 @@ import Util from '../../../func/util';
 const styles = (theme: Theme) => createStyles({
   root: {
     margin: 'auto',
-    paddingLeft: theme.spacing.unit * 2,
-    paddingRight: theme.spacing.unit * 2,
+    padding: theme.spacing.unit * 2,
     width: theme.breakpoints.width('lg'),
-    height: `calc(100vh - ${toolbarHeight}px)`,
 
     [theme.breakpoints.down('md')]: {
       width: '100%',
     },
-    
-    [theme.breakpoints.down('xs')]: {
-      height: `calc(100vh - ${toolbarMinHeight}px)`,
-    },
+
   },
   searchContainer: {
-    padding: theme.spacing.unit * 2,
-    maxWidth: 800, 
+    padding: theme.spacing.unit,
+    marginBottom: theme.spacing.unit,
   },
   rightIcon: {
     marginLeft: theme.spacing.unit,
   },
   tableToolsContainer: {
-    width: '100%',
+    padding: theme.spacing.unit,
+    marginBottom: theme.spacing.unit,
   },
-  createFormCell: {
-    paddingLeft: theme.spacing.unit * 2,
+  textFieldGrid: {
+    paddingLeft: theme.spacing.unit,
   },
   addButtonCell: {
     textAlign: 'right',
   },
   row: {
     '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.background.paper,
+      backgroundColor: theme.palette.background.default,
     }
   },
 });
@@ -71,7 +68,10 @@ const Dashboard: React.FC<Props> = (props: Props) => {
   const [searchText, setSearchText] = useState('');
   const [newLabel, setNewLabel] = useState('');
 
-  const handleAdd = () => !Util.isEmpty(newLabel) && addNode(TreeUtil.getNewNode(newLabel));
+  const handleAdd = () => {
+    if (!Util.isEmpty(newLabel)) { addNode(TreeUtil.getNewNode(newLabel)); }
+    setNewLabel('');
+  }
 
   const handleFileRead = () => {
     const content = fileReader.result as string;
@@ -95,42 +95,80 @@ const Dashboard: React.FC<Props> = (props: Props) => {
   
   return (
     <div className={classes.root}>
-      <div className={classes.searchContainer}>
-        <TextField
-          label="Search field"
-          type="search"
-          onChange={e => setSearchText(e.target.value)}
-          margin="none"
-          fullWidth
-        />
-      </div>
+
+      <Grid container className={classes.searchContainer} justify="space-between">
+        <Grid item xs={12} sm={8}>
+          <Grid container spacing={16}>
+            <Grid item xs={12} sm={9}>
+              <TextField
+                label="Search field"
+                type="search"
+                onChange={e => setSearchText(e.target.value)}
+                margin="none"
+                fullWidth
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item>
+          <Grid container justify="flex-end" alignItems="flex-end" spacing={16}>
+            <Grid item>
+              <FormControl className={classes.formControl}>
+                <InputLabel htmlFor="age-simple">Age</InputLabel>
+                <Select
+                  value={values.age}
+                  onChange={handleChange}
+                  inputProps={{
+                    name: 'age',
+                    id: 'age-simple',
+                  }}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  <MenuItem value={10}>Ten</MenuItem>
+                  <MenuItem value={20}>Twenty</MenuItem>
+                  <MenuItem value={30}>Thirty</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
 
       <Paper>
-        <Grid container className={classes.tableToolsContainer} justify="flex-end" alignItems="flex-end" spacing={16}>
+        <Grid container className={classes.tableToolsContainer} justify="space-between">
+          <Grid item xs={12} sm={8}>
+            <Grid container spacing={16}>
+              <Grid item xs={9}>
+                <TextField
+                  label="新しいマニュアル"
+                  value={newLabel}
+                  onChange={e => setNewLabel(e.target.value)}
+                  // margin="none"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item>
+                <IconButton onClick={handleAdd}><Add/></IconButton>
+              </Grid>
+            </Grid>
+          </Grid>
           <Grid item>
-            <Button component="label" color="primary">
-              {'ファイルからインポート'}
-              <FileUpload className={classes.rightIcon} />
-              <form>
-                <input type="file" style={{ display: 'none' }} accept=".json" onChange={handleFileChosen}/>
-              </form>
-            </Button>
+            <Grid container justify="flex-end" alignItems="flex-end" spacing={16}>
+              <Grid item>
+                <IconButton component="label">
+                  <FileUpload/>
+                  <form>
+                    <input type="file" style={{ display: 'none' }} accept=".json" onChange={handleFileChosen}/>
+                  </form>
+                </IconButton>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
         <Table>
           <TableBody>
-            <TableRow className={classes.row}>
-              <TableCell className={classes.createFormCell}>
-                <TextField
-                  variant="outlined"
-                  label="新しいマニュアル"
-                  onChange={e => setNewLabel(e.target.value)}
-                  fullWidth/>
-              </TableCell>
-              <TableCell className={classes.addButtonCell}>
-                <IconButton onClick={handleAdd}><Add/></IconButton>
-              </TableCell>
-            </TableRow>
             {treeNodes.map((e, i) => <Tree key={`tree-0-${i}`} node={e} depth={0} selectNode={selectNode}/>)}
           </TableBody>
         </Table>
