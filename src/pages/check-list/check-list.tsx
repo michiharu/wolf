@@ -13,13 +13,13 @@ import Undo from '@material-ui/icons/Undo';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
-import { TreeNode, Type, CheckNode, CheckRecord } from '../../../data-types/tree-node';
-import { toolbarHeight, toolbarMinHeight, viewItem, unit } from '../../../settings/layout';
+import { TreeNode, Type, CheckNode, CheckRecord } from '../../data-types/tree-node';
+import { toolbarHeight, toolbarMinHeight, viewItem, unit } from '../../settings/layout';
 
-import ToolContainer from '../../../components/tool-container/tool-container';
-import CheckNodeUtil from '../../../func/check-node-util';
-import CheckKNode from '../../../components/konva-node/check-k-node';
-import { fileDownload } from '../../../func/file-download';
+import ToolContainer from '../../components/tool-container/tool-container';
+import CheckNodeUtil from '../../func/check-node-util';
+import CheckKNode from '../../components/konva-node/check-k-node';
+import { fileDownload } from '../../func/file-download';
 
 const styles = (theme: Theme) => createStyles({
   root: {

@@ -1,12 +1,10 @@
 import * as React from 'react';
 import { Theme, createStyles, WithStyles, withStyles } from '@material-ui/core';
 import { BrowserRouter, Route } from 'react-router-dom';
-import Login from './login/login';
-import User from '../data-types/user';
 import AppBar from '../components/app-bar/app-bar';
 import Drawer, { DrawerProps } from '../components/drawer/drawer';
 import TreeNode from '../data-types/tree-node';
-import PageRouter from './auth/page-router';
+import PageRouter from './page-router';
 import link from '../settings/path-list';
 
 const styles = (theme: Theme) => createStyles({

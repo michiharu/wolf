@@ -10,15 +10,15 @@ import CloseIcon from '@material-ui/icons/Close';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
-import { TreeNode, Type, EditableNode, Cell, Point } from '../../../data-types/tree-node';
-import { toolbarHeight, toolbarMinHeight, viewItem, unit } from '../../../settings/layout';
+import { TreeNode, Type, EditableNode, Cell, Point } from '../../data-types/tree-node';
+import { toolbarHeight, toolbarMinHeight, viewItem, unit } from '../../settings/layout';
 
-import ToolContainer from '../../../components/tool-container/tool-container';
-import EditableNodeUtil from '../../../func/editable-node-util';
-import EditableKNode from '../../../components/konva-node/editable-k-node';
+import ToolContainer from '../../components/tool-container/tool-container';
+import EditableNodeUtil from '../../func/editable-node-util';
+import EditableKNode from '../../components/konva-node/editable-k-node';
 import RightPane from './right-pane';
-import { fileDownload } from '../../../func/file-download';
-import TreeUtil from '../../../func/tree';
+import { fileDownload } from '../../func/file-download';
+import TreeUtil from '../../func/tree';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -234,17 +234,6 @@ class NodeEditor extends React.Component<Props, State> {
     this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode: target});
   }
 
-  addBefore = () => {
-    const {node: prevNode, focusNode} = this.state;
-    const newNode = EditableNodeUtil.addBefore(point, prevNode, focusNode!);
-    this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
-  }
-
-  addNext = () => {
-    const {node: prevNode, focusNode} = this.state;
-    const newNode = EditableNodeUtil.addNext(point, prevNode, focusNode!);
-    this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
-  }
   addDetails = () => {
     const {node: prevNode, focusNode} = this.state;
     const newNode = EditableNodeUtil.addDetails(point, prevNode, focusNode!);
@@ -274,9 +263,8 @@ class NodeEditor extends React.Component<Props, State> {
     const rightPaneProps = {
       rightPaneRef,
       node: focusNode,
+      isRoot: focusNode === null ? false : focusNode.id === node.id,
       changeNode: this.changeFocusNode,
-      addBefore: this.addBefore,
-      addNext: this.addNext,
       addDetails: this.addDetails,
       deleteSelf: this.deleteSelf,
     };

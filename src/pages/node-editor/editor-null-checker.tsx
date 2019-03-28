@@ -1,9 +1,9 @@
 import * as React from 'react';
-import TreeNode from '../../../data-types/tree-node';
+import TreeNode from '../../data-types/tree-node';
 import NodeList from './node-list';
 import NodeEditor, { EditorProps } from './node-editor';
 import { RouteComponentProps } from 'react-router';
-import link from '../../../settings/path-list';
+import link from '../../settings/path-list';
 
 interface Props extends RouteComponentProps {
   toolRef: HTMLDivElement | null;

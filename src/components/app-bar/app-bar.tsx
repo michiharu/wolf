@@ -112,8 +112,8 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
     const origin: PopoverOrigin = { vertical: 'top', horizontal: 'right' };
     const path = location.pathname;
     return (
-      <AppBar position="fixed" className={path !== link.dashboard ? classes.root : classes.rootNoDrawer}>
-        <Toolbar className={classes.toolbar}>
+      <AppBar position="fixed" className={path === link.dashboard ? classes.rootNoDrawer : classes.root}>
+        <Toolbar className={path === link.dashboard ? classes.toolbar : undefined}>
           <div className={classes.portalAnchor}><div ref={this.toolRef}/></div>
 
           {path !== link.dashboard && (

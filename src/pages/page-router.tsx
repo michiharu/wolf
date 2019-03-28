@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
-import TreeNode from '../../data-types/tree-node';
-import link from '../../settings/path-list';
+import TreeNode from '../data-types/tree-node';
+import link from '../settings/path-list';
 import EditorNullChecker from './node-editor/editor-null-checker';
 import CheckListNullChecker from './check-list/check-list-null-checker';
 import Dashboard from './dashboard/dashboard';

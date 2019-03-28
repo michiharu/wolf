@@ -10,10 +10,10 @@ import {
 } from '@material-ui/core';
 import {
   Task, Switch, Case, Input, Output, toolbarHeight, toolbarMinHeight, rightPainWidth
-} from '../../../settings/layout';
-import { Type, EditableNode } from '../../../data-types/tree-node';
+} from '../../settings/layout';
+import { Type, EditableNode } from '../../data-types/tree-node';
 import { ButtonProps } from '@material-ui/core/Button';
-import EditableNodeUtil from '../../../func/editable-node-util';
+import EditableNodeUtil from '../../func/editable-node-util';
 
 const styles = (theme: Theme) => createStyles({
   rightPaneWrapper: {
@@ -58,9 +58,8 @@ const styles = (theme: Theme) => createStyles({
 interface Props extends WithStyles<typeof styles> {
   rightPaneRef: HTMLDivElement;
   node: EditableNode | null;
+  isRoot: boolean;
   changeNode: (node: EditableNode) => void;
-  addBefore: () => void;
-  addNext: () => void;
   addDetails: () => void;
   deleteSelf: () => void;
 }
@@ -68,7 +67,7 @@ interface Props extends WithStyles<typeof styles> {
 const RightPane: React.FC<Props> = (props: Props) => {
 
   const {
-    rightPaneRef, node, changeNode, addBefore, addNext, addDetails, deleteSelf, classes
+    rightPaneRef, node, isRoot, changeNode, addDetails, deleteSelf, classes
   } = props;
 
   const cahngeType = (e: any) => {
@@ -162,7 +161,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
             value={node !== null ? node.type : 'task'}
             onChange={cahngeType}
             IconComponent={
-              p => focusType === 'task' ? <Task {...p}/> :
+              p => focusType === 'task' ?   <Task {...p}/> :
                    focusType === 'switch' ? <Switch {...p}/> :
                                             <Case {...p}/>}
             fullWidth
@@ -191,15 +190,14 @@ const RightPane: React.FC<Props> = (props: Props) => {
           InputProps={{startAdornment: OutputIcon}}
           fullWidth
         />
-        <Divider className={classes.marginTop}/>
-        <Button {...buttonProps} onClick={addBefore}>前に項目を追加する</Button>
-        <Button {...buttonProps} onClick={addNext}>次に項目を追加する</Button>
 
         <Divider className={classes.marginTop}/>
         <Button {...buttonProps} onClick={addDetails}>詳細項目を追加する</Button>
         
         <Divider className={classes.marginTop}/>
-        <Button {...buttonProps} color="default" onClick={handleClickDelete}>この項目を削除する</Button>
+        {!isRoot && (
+        <Button {...buttonProps} color="default" onClick={handleClickDelete}>この項目を削除する</Button>)}
+        
       </div>
       </div>
       </div>

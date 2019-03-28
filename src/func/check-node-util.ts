@@ -2,7 +2,7 @@ import TreeNode, { Type, CheckNode, Point } from "../data-types/tree-node";
 import { viewItem } from "../settings/layout";
 import Util from "./util";
 import { checked } from "../resource/svg-icon";
-import { CheckListState } from "../pages/auth/check-list/check-list";
+import { CheckListState } from "../pages/check-list/check-list";
 
 export default class CheckNodeUtil {
 

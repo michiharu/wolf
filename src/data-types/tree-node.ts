@@ -7,6 +7,15 @@ export interface TreeNode {
   children: TreeNode[];
 }
 
+export interface TreeNode {
+  id: string;
+  type: Type;
+  label: string;
+  input: string;
+  output: string;
+  children: TreeNode[];
+}
+
 export interface NodeWithoutId {
   type: Type;
   label: string;
@@ -24,6 +33,7 @@ export interface TreeNodeWithParents {
   output: string;
   children: TreeNodeWithParents[];
 }
+
 export type Parent = {id: string, label: string};
 
 export default TreeNode;

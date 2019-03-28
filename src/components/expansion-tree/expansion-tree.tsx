@@ -18,28 +18,46 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
-interface Props extends WithStyles<typeof styles> {
+export interface ExpansionTreeProps {
   node: TreeNode;
   depth: number;
+  openDepth: string;
   selectNode: (node: TreeNode) => void;
 }
+
+interface Props extends ExpansionTreeProps, WithStyles<typeof styles> {}
+
 interface State {
+  openDepth: string;
   open: boolean;
 }
 
 const paddingLeft = 32;
 
-const Tree = withStyles(styles)(class extends React.Component<Props, State> {
+const ExpansionTree = withStyles(styles)(class extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = { open: true };
+    this.state = {
+      openDepth: props.openDepth,
+      open: props.openDepth === 'all' || props.depth < Number(props.openDepth)
+    };
   }
 
-  handleToggle = () => this.setState({open: !this.state.open})
+  static getDerivedStateFromProps(nextProps: Props, prevState: State) {
+    if (prevState.openDepth !== nextProps.openDepth) {
+      return {
+        openDepth: nextProps.openDepth,
+        open: nextProps.openDepth === 'all' || nextProps.depth < Number(nextProps.openDepth)
+      };
+    }
+    return null;
+  }
+
+  handleToggle = () => this.setState({open: !this.state.open});
 
   render() {
-    const { node, depth, selectNode, classes } = this.props;
+    const { node, depth, openDepth, selectNode, classes } = this.props;
     const { open } = this.state;
 
     return (
@@ -65,10 +83,11 @@ const Tree = withStyles(styles)(class extends React.Component<Props, State> {
         </TableRow>
 
         {open && node.children.map((c, i) => (
-          <Tree
+          <ExpansionTree
             key={`tree-${depth}-${i}`}
             node={c}
             depth={depth + 1}
+            openDepth={openDepth}
             selectNode={selectNode}
           />
         ))}
@@ -77,4 +96,4 @@ const Tree = withStyles(styles)(class extends React.Component<Props, State> {
   }
 });
 
-export default Tree;
+export default ExpansionTree;

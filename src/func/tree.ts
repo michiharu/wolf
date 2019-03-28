@@ -106,4 +106,24 @@ export default class TreeUtil {
     output: '',
     children: [],
   });
+
+  static getSearchWords = (text: string) => text.split(/\s|　/).map(s => s.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&'));
+
+  static match = (node: TreeNode, words: string[]): boolean => {
+    if (words.length === 0) { return true; }
+    return words
+    .map(w => (
+      node.label .match(new RegExp(`${w}`)) !== null ||
+      node.input .match(new RegExp(`${w}`)) !== null ||
+      node.output.match(new RegExp(`${w}`)) !== null
+    ))
+    .reduce((a, b) => a === true && b === true);
+  }
+
+  static _searchAndFilter = <T extends TreeNode>(words: string[], nodes: T[]): T[] => {
+    return nodes
+    .map(n => ({node: n, children: TreeUtil._searchAndFilter(words, n.children)}))
+    .filter(obj => TreeUtil.match(obj.node, words) || obj.children.length !== 0)
+    .map(obj => ({...obj.node, children: obj.children}));
+  }
 }

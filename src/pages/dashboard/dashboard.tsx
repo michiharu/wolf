@@ -10,13 +10,13 @@ import {
 import FileUpload from '@material-ui/icons/NoteAdd';
 import Add from '@material-ui/icons/Add';
 
-import { TreeNode, NodeWithoutId } from '../../../data-types/tree-node';
-import { toolbarHeight, toolbarMinHeight } from '../../../settings/layout';
+import { TreeNode, NodeWithoutId } from '../../data-types/tree-node';
+import { toolbarHeight, toolbarMinHeight } from '../../settings/layout';
 
-import TreeUtil from '../../../func/tree';
-import Tree from '../../../components/expansion-tree/expansion-tree';
-import link from '../../../settings/path-list';
-import Util from '../../../func/util';
+import TreeUtil from '../../func/tree';
+import ExpansionTree, { ExpansionTreeProps } from '../../components/expansion-tree/expansion-tree';
+import link from '../../settings/path-list';
+import Util from '../../func/util';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -44,7 +44,6 @@ const styles = (theme: Theme) => createStyles({
   },
   tableToolsContainer: {
     padding: theme.spacing.unit,
-    marginBottom: theme.spacing.unit,
   },
   textFieldGrid: {
     paddingLeft: theme.spacing.unit,
@@ -99,6 +98,9 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     history.push(link.edit);
     select(node);
   }
+
+  const words = TreeUtil.getSearchWords(searchText);
+  const filteredNode = TreeUtil._searchAndFilter(words, treeNodes);
   
   return (
     <div className={classes.root}>
@@ -174,7 +176,12 @@ const Dashboard: React.FC<Props> = (props: Props) => {
         </Grid>
         <Table>
           <TableBody>
-            {treeNodes.map((e, i) => <Tree key={`tree-0-${i}`} node={e} depth={0} selectNode={selectNode}/>)}
+            {filteredNode.map((node, i) => {
+                const treeProps: ExpansionTreeProps = {
+                  node, depth: 0, openDepth, selectNode
+                }
+              return <ExpansionTree key={`tree-0-${i}`} {...treeProps}/>;
+            })}
           </TableBody>
         </Table>
       </Paper>

@@ -6,11 +6,11 @@ import {
 
 import FileUpload from '@material-ui/icons/NoteAdd';
 
-import { TreeNode, NodeWithoutId } from '../../../data-types/tree-node';
-import { toolbarHeight, toolbarMinHeight } from '../../../settings/layout';
+import { TreeNode, NodeWithoutId } from '../../data-types/tree-node';
+import { toolbarHeight, toolbarMinHeight } from '../../settings/layout';
 
-import TreeUtil from '../../../func/tree';
-import NodeCard, { NodeCardProps } from '../../../components/node-card/node-card';
+import TreeUtil from '../../func/tree';
+import NodeCard, { NodeCardProps } from '../../components/node-card/node-card';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -31,6 +31,7 @@ const styles = (theme: Theme) => createStyles({
 export interface NodeListProps {
   treeNodes: TreeNode[];
   selectNode: (node: TreeNode | null) => void;
+  addNode: (node: TreeNode) => void;
 }
 
 interface Props extends NodeListProps, WithStyles<typeof styles> {}
@@ -39,10 +40,25 @@ const NodeList: React.FC<Props> = (props: Props) => {
   var fileReader: FileReader;
   const formEl = useRef<HTMLFormElement>(null);
 
-  const { treeNodes, selectNode, classes } = props;
+  const { treeNodes, selectNode, addNode, classes } = props;
   const [searchText, setSearchText] = useState('');
   const nodeArray = TreeUtil.toArrayWithParents([], treeNodes);
   const filteredNodes = TreeUtil.search(searchText, nodeArray);
+
+  const handleFileRead = () => {
+    const content = fileReader.result as string;
+    const nodeWithoutId: NodeWithoutId = JSON.parse(content);
+    addNode(TreeUtil._setId(nodeWithoutId));
+    
+  }
+
+  const handleFileChosen = (e: any) => {
+    const file = e.target.files[0];
+    fileReader = new FileReader();
+    fileReader.onload = handleFileRead;
+    fileReader.readAsText(file);
+
+  } 
   
   return (
     <div className={classes.root}>
@@ -56,6 +72,15 @@ const NodeList: React.FC<Props> = (props: Props) => {
               margin="none"
               fullWidth
             />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Button component="label" color="primary">
+              {'ファイルからインポート'}
+              <FileUpload className={classes.rightIcon} />
+              <form ref={formEl}>
+                <input type="file" style={{ display: 'none' }} accept=".json" onChange={handleFileChosen}/>
+              </form>
+            </Button>
           </Grid>
         </Grid>
         
