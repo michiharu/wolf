@@ -101,13 +101,18 @@ const RightPane: React.FC<Props> = (props: Props) => {
     changeNode({...node!, output: e.target.value});
   };
 
-  const labelRef = useRef(null);
-  const [labelWidth, setLabelWidth] = useState(0);
+  const selectLabelRef = useRef(null);
+  const [selectLabelWidth, setSelectLabelWidth] = useState(0);
+  const inputLabelRef = useRef(null);
+  const [inputLabelWidth, setInputLabelWidth] = useState(0);
 
   if (node !== null) {
     process.nextTick(() => {
-      const el = ReactDOM.findDOMNode(labelRef.current) as HTMLElement | null;
-      if (el !== null) { setLabelWidth(el.offsetWidth); }
+      const selectEl = ReactDOM.findDOMNode(selectLabelRef.current) as HTMLElement | null;
+      if (selectEl !== null) { setSelectLabelWidth(selectEl.offsetWidth); }
+
+      const inputEl = ReactDOM.findDOMNode(inputLabelRef.current) as HTMLElement | null;
+      if (inputEl !== null) { setSelectLabelWidth(inputEl.offsetWidth); }
     });      
   }
 
@@ -149,7 +154,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
           fullWidth
         />
         <FormControl variant="outlined" className={classes.marginTop}>
-          <InputLabel ref={labelRef}>タイプ</InputLabel>
+          <InputLabel ref={selectLabelRef}>タイプ</InputLabel>
           <Select
             classes={{
               icon: focusType !== 'switch'
@@ -157,7 +162,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
                 : classnames(classes.selectType, classes.switchIcon),
               select: classes.select
             }}
-            input={<OutlinedInput labelWidth={labelWidth}/>}
+            input={<OutlinedInput labelWidth={selectLabelWidth}/>}
             value={node !== null ? node.type : 'task'}
             onChange={cahngeType}
             IconComponent={
@@ -172,15 +177,17 @@ const RightPane: React.FC<Props> = (props: Props) => {
             {node !== null && node.type === 'case' && <MenuItem value="case">条件</MenuItem>}
           </Select>
         </FormControl>
-        <TextField
-          variant="outlined"
-          className={classes.marginTop}
-          label="インプット"
-          value={node !== null ? node.input : ''}
-          onChange={changeInput}
-          InputProps={{startAdornment: InputIcon}}
-          fullWidth
-        />
+        <FormControl variant="outlined" className={classes.marginTop}>
+          <InputLabel ref={selectLabelRef}>タイプ</InputLabel>
+          <TextField
+            className={classes.marginTop}
+            value={node !== null ? node.input : ''}
+            onChange={changeInput}
+            InputProps={{startAdornment: InputIcon}}
+            fullWidth
+          />
+        </FormControl>
+        
         <TextField
           variant="outlined"
           className={classes.marginTop}
