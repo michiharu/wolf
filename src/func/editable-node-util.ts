@@ -352,6 +352,20 @@ export default class EditableNodeUtil {
       .reduce((a, b) => a || b || null);
   }
 
+  static replace = (point: Point, node: EditableNode, target: EditableNode): EditableNode => {
+    const replaceNode = EditableNodeUtil._replace(node, target);
+    return EditableNodeUtil.setCalcProps(point, replaceNode);
+  }
+
+  static _replace = (node: EditableNode, target: EditableNode): EditableNode => {
+    if (node.id === target.id) {
+      return target;
+    } else {
+      const children = node.children.map(c => EditableNodeUtil._replace(c, target));
+      return {...node, children};
+    }
+  }
+
   static replaceOnlySelf = (point: Point, node: EditableNode, target: EditableNode): EditableNode => {
     const replaceNode = EditableNodeUtil._replaceOnlySelf(node, target);
     return EditableNodeUtil.setCalcProps(point, replaceNode);

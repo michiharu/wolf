@@ -23,6 +23,17 @@ const styles = (theme: Theme) => createStyles({
       width: `calc(100% - ${drawerWidth}px)`,
     },
   },
+  rootNoDrawer: {
+
+  },
+  toolbar: {
+    margin: 'auto',
+    width: theme.breakpoints.width('lg'),
+
+    [theme.breakpoints.down('md')]: {
+      width: '100%',
+    },
+  },
   portalAnchor: {
     position: 'relative',
     overflow: 'visible',
@@ -59,12 +70,10 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface Props extends WithStyles<typeof styles>, RouteComponentProps {
-  user: User | null;
   getToolRef: (el: HTMLDivElement) => void;
   getRightPaneRef: (el: HTMLDivElement) => void;
   handleDrawerToggle: () => void;
   selectedNodeList: TreeNode[] | null;
-  logout: () => void;
 }
 
 interface State {
@@ -96,55 +105,27 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
     this.setState({ anchorEl: null });
   };
 
-  handleLogout = () => {
-    this.props.logout();
-    this.handleClose();
-  }
-
   render() {
-    const { user, handleDrawerToggle, selectedNodeList, location, history, classes } = this.props;
+    const { handleDrawerToggle, selectedNodeList, location, classes } = this.props;
     const { anchorEl } = this.state;
     const open = Boolean(anchorEl);
     const origin: PopoverOrigin = { vertical: 'top', horizontal: 'right' };
     const path = location.pathname;
     return (
-      <AppBar position="fixed" className={user !== null ? classes.root : undefined}>
-        <Toolbar>
+      <AppBar position="fixed" className={path !== link.dashboard ? classes.root : classes.rootNoDrawer}>
+        <Toolbar className={classes.toolbar}>
           <div className={classes.portalAnchor}><div ref={this.toolRef}/></div>
-          {user !== null && (
-          <IconButton
-            color="inherit"
-            onClick={handleDrawerToggle}
-            className={classes.menuButton}
-          >
+
+          {path !== link.dashboard && (
+          <IconButton color="inherit" onClick={handleDrawerToggle} className={classes.menuButton}>
             <MenuIcon />
           </IconButton>)}
-          <Typography variant="h6" color="inherit">
-            Flow Like
-          </Typography>
-          <Select
-            className={classes.selectMode}
-            value={path}
-            onChange={(e: any) => history.push(e.target.value)}
-            autoWidth
-            disableUnderline
-          >
-            <MenuItem value={link.edit}>編集モード</MenuItem>
-            <MenuItem value={link.check}>チェックモード</MenuItem>
-          </Select>
+          
+
+          <Typography variant="h6" color="inherit">Flow Like</Typography>
 
           <div className={classes.grow}/>
 
-          {/* {selectedNodeList !== null && selectedNodeList.length !== 0 && (
-          <div className={classes.toggleContainer}>
-            <ToggleButtonGroup value={toggles} onChange={this.handleToggles}>
-              <ToggleButton value={rightPane}>
-                <VerticalSplit />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </div>)} */}
-          
-          {user !== null && (
           <>
             <IconButton
               aria-owns={open ? 'menu-appbar' : undefined}
@@ -163,14 +144,14 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
               onClose={this.handleClose}
               disableAutoFocusItem
             >
-              <MenuItem onClick={this.handleLogout}>
+              <MenuItem>
                 <ListItemIcon>
                   <Close />
                 </ListItemIcon>
-                <ListItemText primary="ログアウト" />
+                <ListItemText primary="スタブ" />
               </MenuItem>
             </Menu>
-          </>)}
+          </>
           <div className={classes.rightPaneAnchor}>
             <div ref={this.rightPaneRef}/>
           </div>
@@ -180,4 +161,4 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
   }
 });
 
-export default withRouter(CustomAppBar);
+export default CustomAppBar;

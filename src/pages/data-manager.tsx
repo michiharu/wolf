@@ -15,36 +15,18 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface State {
-  user: User | null;
-  treeNodes: TreeNode[] | null;
+  treeNodes: TreeNode[];
   selectedNodeList: TreeNode[] | null; // 選択されたNodeを最初の要素の深さを０として保持する
 }
 
-class Authentication extends React.Component<{}, State> {
+class DataManager extends React.Component<{}, State> {
 
   constructor(props: {}) {
     super(props);
     this.state = {
-      user: null,
-      treeNodes: null,
+      treeNodes: [],
       selectedNodeList: null,
     };
-  }
-
-  componentDidMount() {
-    axios.post(loginURL, {id: 'test-id', password: 'test-password'})
-    .then(res => {
-      const user = {...res.data.user};
-      this.setState({user});
-    });  
-  }
-
-  login = (user: User) => {
-    this.setState({user});
-  }
-
-  logout = () => {
-    this.setState({user: null});
   }
 
   selectNode = (node: TreeNode | null) => {
@@ -62,7 +44,6 @@ class Authentication extends React.Component<{}, State> {
     process.nextTick(() => this.selectNode(newSelectedNode));
   }
 
-  loadNode = () => axios.get(nodeURL).then(res => this.setState({treeNodes: res.data, selectedNodeList: []}));
   addNode = (node: TreeNode) => {
     const { treeNodes } = this.state;
     treeNodes!.unshift(node);
@@ -70,22 +51,18 @@ class Authentication extends React.Component<{}, State> {
   }
 
   render () {
-    const { user, treeNodes, selectedNodeList } = this.state;
+    const { treeNodes, selectedNodeList } = this.state;
 
     return (
       <Layout
-        user={user}
-        login={this.login}
-        logout={this.logout}
         treeNodes={treeNodes}
         selectedNodeList={selectedNodeList}
         selectNode={this.selectNode}
         changeNode={this.changeNode}
-        loadNode={this.loadNode}
         addNode={this.addNode}
       />
     );
   }
 } 
 
-export default withStyles(styles)(Authentication);
+export default withStyles(styles)(DataManager);

@@ -4,9 +4,10 @@ import { BrowserRouter, Route } from 'react-router-dom';
 import Login from './login/login';
 import User from '../data-types/user';
 import AppBar from '../components/app-bar/app-bar';
-import DrawerNullChecker, { DrawerNullCheckerProps } from '../components/drawer/drawer-null-checker';
-import LoginRouter from './login-router';
+import Drawer, { DrawerProps } from '../components/drawer/drawer';
 import TreeNode from '../data-types/tree-node';
+import PageRouter from './auth/page-router';
+import link from '../settings/path-list';
 
 const styles = (theme: Theme) => createStyles({
   root: { display: 'flex' },
@@ -17,16 +18,11 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface Props extends WithStyles<typeof styles> {
-  user: User | null;
-  login: (user: User) => void;
-  logout: () => void;
-
-  treeNodes: TreeNode[] | null;
+  treeNodes: TreeNode[];
   selectedNodeList: TreeNode[] | null;
 
   selectNode: (node: TreeNode | null) => void;
   changeNode: (node: TreeNode) => void;
-  loadNode: () => void;
   addNode: (node: TreeNode) => void;
 }
 
@@ -52,39 +48,36 @@ class Layout extends React.Component<Props, State> {
   
   render() {
     const {
-      user, login, logout, treeNodes, selectedNodeList, selectNode, changeNode, loadNode, addNode, classes
+      treeNodes, selectedNodeList, selectNode, changeNode, addNode, classes
     } = this.props;
     const { open, toolRef, rightPaneRef } = this.state;
-    const drawerNullCheckerProps: DrawerNullCheckerProps = {
+    const drawerNullCheckerProps: DrawerProps = {
       open, toggle: this.toggle, treeNodes, selectedNodeList, selectNode, changeNode
     };
 
     return (
       <BrowserRouter>
-        <Route render={() => (
+        <Route render={props => (
           <div className={classes.root}>
+
             <AppBar
-              user={user} 
+              {...props}
               getToolRef={this.getToolRef}
               getRightPaneRef={this.getRightPaneRef}
               handleDrawerToggle={this.toggle}
               selectedNodeList={selectedNodeList}
-              logout={logout}
             />
-            {user !== null && (
-            <DrawerNullChecker {...drawerNullCheckerProps} />)}
+            {props.location.pathname !== link.dashboard && <Drawer {...drawerNullCheckerProps} />}
+            
 
             <main className={classes.content}>
               <div className={classes.toolbar}/>
-              <LoginRouter
-                user={user}
-                login={login}
+              <PageRouter
                 toolRef={toolRef}
                 rightPaneRef={rightPaneRef}
                 treeNodes={treeNodes}
                 selectedNodeList={selectedNodeList}
                 changeNode={changeNode}
-                loadNode={loadNode}
                 addNode={addNode}
                 selectNode={selectNode}
               />

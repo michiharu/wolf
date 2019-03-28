@@ -2,8 +2,10 @@ import * as React from 'react';
 import TreeNode from '../../../data-types/tree-node';
 import NodeList from './node-list';
 import NodeEditor, { EditorProps } from './node-editor';
+import { RouteComponentProps } from 'react-router';
+import link from '../../../settings/path-list';
 
-interface Props {
+interface Props extends RouteComponentProps {
   toolRef: HTMLDivElement | null;
   rightPaneRef: HTMLDivElement | null;
   treeNodes: TreeNode[] | null;
@@ -14,7 +16,9 @@ interface Props {
 }
 
 const EditorNullChecker: React.SFC<Props> = (props: Props) => {
-  const { toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, selectNode, addNode } = props;
+  const {
+    toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, selectNode, addNode, history
+  } = props;
   if (toolRef === null || selectedNodeList === null || treeNodes === null) {
     return <p>Now Loading..</p>;
   }
@@ -27,6 +31,7 @@ const EditorNullChecker: React.SFC<Props> = (props: Props) => {
   const back = () => {
     const node = selectedNodeList.length !== 1 ? selectedNodeList[selectedNodeList.length - 2] : null;
     selectNode(node);
+    if (node === null) { history.push(link.dashboard) }
   }
 
   const viewerProps: EditorProps = {

@@ -136,10 +136,6 @@ class NodeEditor extends React.Component<Props, State> {
     fileDownload(JSON.stringify(nodeWithoutId), filename);
   }
 
-  saveNodeState = (node: EditableNode) => {
-    this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node))});
-  }
-
   setFocusState = (target: EditableNode, focus: boolean) => {
     const {node: prevNode} = this.state;
     const node = EditableNodeUtil.focus(prevNode, target.id);
@@ -203,23 +199,23 @@ class NodeEditor extends React.Component<Props, State> {
         if (target.type === 'case') {
           if (cell.action === 'move' && dragParent!.children.find(c => c.id === cell.node.id) !== undefined) {
             const newNode = EditableNodeUtil.move(point, prevNode, target, cell.node);
-            this.saveNodeState(newNode);
+            this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
           }
           if (cell.action === 'push' && dragParent!.id === cell.node.id) {
             const newNode = EditableNodeUtil.push(point, prevNode, target, cell.node);
-            this.saveNodeState(newNode);
+            this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
           }
           return;
         }
 
         if (cell.action === 'move' && cell.node.type !== 'case') {
           const newNode = EditableNodeUtil.move(point, prevNode, target, cell.node);
-          this.saveNodeState(newNode);
+          this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
         }
 
         if (cell.action === 'push' && cell.node.type !== 'switch') {
           const newNode = EditableNodeUtil.push(point, prevNode, target, cell.node);
-          this.saveNodeState(newNode);
+          this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
         }
       }
     }
@@ -234,30 +230,33 @@ class NodeEditor extends React.Component<Props, State> {
 
   changeFocusNode = (target: EditableNode) => {
     const {node: prevNode} = this.state;
-    const node = EditableNodeUtil.replaceOnlySelf(point, prevNode, target)
+    const node = EditableNodeUtil.replace(point, prevNode, target)
     this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode: target});
   }
 
   addBefore = () => {
     const {node: prevNode, focusNode} = this.state;
     const newNode = EditableNodeUtil.addBefore(point, prevNode, focusNode!);
-    this.saveNodeState(newNode);
+    this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
   }
 
   addNext = () => {
     const {node: prevNode, focusNode} = this.state;
     const newNode = EditableNodeUtil.addNext(point, prevNode, focusNode!);
-    this.saveNodeState(newNode);
+    this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
   }
   addDetails = () => {
     const {node: prevNode, focusNode} = this.state;
     const newNode = EditableNodeUtil.addDetails(point, prevNode, focusNode!);
-    this.saveNodeState(newNode);
+    this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
   }
   deleteSelf = () => {
     const {node: prevNode, focusNode} = this.state;
     const newNode = EditableNodeUtil.deleteById(point, prevNode, focusNode!.id);
-    this.saveNodeState(newNode);
+    this.setState({
+      node: newNode,
+      map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode)),
+      focusNode: null});
   }
 
   render() {

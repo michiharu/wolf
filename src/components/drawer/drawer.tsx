@@ -32,26 +32,37 @@ const styles = (theme: Theme) => createStyles({
   selected: {color: theme.palette.primary.main},
 });
 
-interface Props extends WithStyles<typeof styles> {
+export interface DrawerProps {
   open: boolean;
   toggle: () => void;
 
-  treeNodes: TreeNode[];
-  selectedNodeList: TreeNode[];
+  treeNodes: TreeNode[] | null;
+  selectedNodeList: TreeNode[] | null;
   selectNode: (node: TreeNode) => void;
   changeNode: (node: TreeNode) => void;
 }
 
+interface Props extends DrawerProps, WithStyles<typeof styles> {
+  open: boolean;
+  toggle: () => void;
+
+  treeNodes: TreeNode[] | null;
+  selectedNodeList: TreeNode[] | null;
+  selectNode: (node: TreeNode) => void;
+  changeNode: (node: TreeNode) => void;
+}
+
+
 const time = 1000;
 
-const CustomDrawer: React.SFC<Props> = (props: Props) => {
+const Drawer: React.SFC<Props> = (props: Props) => {
   const { open, toggle, treeNodes, selectedNodeList, selectNode, classes } = props;
 
   const [listOpen, setListOpen] = useState(false);
 
   useEffect(() => { setListOpen(true); });
 
-  const spreadNodeList = selectedNodeList.length === 0 ? treeNodes
+  const spreadNodeList = selectedNodeList === null ? null : selectedNodeList.length === 0 ? treeNodes
                         : selectedNodeList[selectedNodeList.length - 1].children;
   const selectAndClose = (node: TreeNode) => {
     if (open) { toggle(); }
@@ -63,7 +74,7 @@ const CustomDrawer: React.SFC<Props> = (props: Props) => {
       <div className={classes.toolbar}>
         <InputBase className={classes.input} placeholder="Search" />
       </div>
-      {selectedNodeList.length !== 0 && (
+      {selectedNodeList !== null && selectedNodeList.length !== 0 && (
         <React.Fragment>
           <Divider />
           <List dense>
@@ -89,7 +100,9 @@ const CustomDrawer: React.SFC<Props> = (props: Props) => {
       <Divider />
       <Collapse in={listOpen} timeout={{enter: time, exit: time}} unmountOnExit>
         <List dense>
-          {spreadNodeList.map(n => (
+          {spreadNodeList === null ? <p>表示するデータがありません。</p> :
+            
+            spreadNodeList.map(n => (
           <ListItem button key={`spread-${n.id}`} onClick={() => selectAndClose(n)}>
             <ListItemIcon>
               {n.type === 'task' ? <Task/> : <Switch className={classes.switchIcon}/>}
@@ -127,4 +140,4 @@ const CustomDrawer: React.SFC<Props> = (props: Props) => {
   );
 }
 
-export default withStyles(styles)(CustomDrawer);
+export default withStyles(styles)(Drawer);

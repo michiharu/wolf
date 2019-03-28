@@ -97,4 +97,13 @@ export default class TreeUtil {
     const children = node.children.map(c => TreeUtil._setId(c));
     return {...node, id, children};
   }
+
+  static getNewNode = (label: string): TreeNode => ({
+    type: 'task',
+    id: 'rand:' + String(Math.random()).slice(2),
+    label,
+    input: '',
+    output: '',
+    children: [],
+  });
 }

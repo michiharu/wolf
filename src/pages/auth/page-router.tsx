@@ -4,15 +4,15 @@ import TreeNode from '../../data-types/tree-node';
 import link from '../../settings/path-list';
 import EditorNullChecker from './node-editor/editor-null-checker';
 import CheckListNullChecker from './check-list/check-list-null-checker';
+import Dashboard from './dashboard/dashboard';
 
 interface Props {
   toolRef: HTMLDivElement | null;
   rightPaneRef: HTMLDivElement | null;
-  treeNodes: TreeNode[] | null;
+  treeNodes: TreeNode[];
   selectedNodeList: TreeNode[] | null;
 
   changeNode: (node: TreeNode) => void;
-  loadNode: () => void;
   addNode: (node: TreeNode) => void;
   selectNode: (node: TreeNode | null) => void;
 }
@@ -27,10 +27,6 @@ class PageRouter extends React.Component<Props, State> {
     this.state = {node: null};
   }
 
-  componentDidMount() {
-    this.props.loadNode();
-  }
-
   render () {
     const {
       toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, addNode, selectNode
@@ -39,21 +35,22 @@ class PageRouter extends React.Component<Props, State> {
       <Switch>
         <Route
           exact
-          path={link.check}
-          render={() => (
-            <CheckListNullChecker
-              toolRef={toolRef}
+          path={link.dashboard}
+          render={props => (
+            <Dashboard
+              {...props}
               treeNodes={treeNodes}
-              selectedNodeList={selectedNodeList}
               selectNode={selectNode}
+              addNode={addNode}
             />
           )}
         />
         <Route
           exact
           path={link.edit}
-          render={() => (
+          render={props => (
             <EditorNullChecker
+              {...props}
               toolRef={toolRef}
               rightPaneRef={rightPaneRef}
               treeNodes={treeNodes}
@@ -64,7 +61,7 @@ class PageRouter extends React.Component<Props, State> {
             />
           )}
         />
-        <Redirect to={link.check}/>
+        <Redirect to={link.dashboard}/>
       </Switch>
     );
   }

@@ -13,6 +13,7 @@ import {
 } from '../../../settings/layout';
 import { Type, EditableNode } from '../../../data-types/tree-node';
 import { ButtonProps } from '@material-ui/core/Button';
+import EditableNodeUtil from '../../../func/editable-node-util';
 
 const styles = (theme: Theme) => createStyles({
   rightPaneWrapper: {
@@ -73,8 +74,23 @@ const RightPane: React.FC<Props> = (props: Props) => {
   const cahngeType = (e: any) => {
     if (node === null) { return; }
     const newType = e.target.value === 'task' ? 'task' : 'switch';
-    const newNode: EditableNode = {...node, type: newType};
-    changeNode(newNode);
+    if (node.type === newType) { return; }
+
+    if (node.children.length === 0) {
+      const newNode: EditableNode = {...node, type: newType};
+      changeNode(newNode);
+    }
+
+    if (newType === 'task') {
+      const children: EditableNode[] = node.children.map(c => c.children).reduce((a, b) => a.concat(b));
+      const newNode: EditableNode = {...node, type: newType, children};
+      changeNode(newNode);
+    } else {
+      const newCase = EditableNodeUtil.getNewNode('switch');
+      const children: EditableNode[] = [{...newCase, children: node.children}];
+      const newNode: EditableNode = {...node, type: newType, children};
+      changeNode(newNode);
+    }
   };
   const changeLabel = (e: any) => {
     changeNode({...node!, label: e.target.value});
@@ -90,7 +106,10 @@ const RightPane: React.FC<Props> = (props: Props) => {
   const [labelWidth, setLabelWidth] = useState(0);
 
   if (node !== null) {
-    process.nextTick(() => setLabelWidth((ReactDOM.findDOMNode(labelRef.current)! as HTMLElement).offsetWidth));      
+    process.nextTick(() => {
+      const el = ReactDOM.findDOMNode(labelRef.current) as HTMLElement | null;
+      if (el !== null) { setLabelWidth(el.offsetWidth); }
+    });      
   }
 
   const InputIcon = (
@@ -111,6 +130,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
       setDeleteFlag(true);
     } else {
       deleteSelf();
+      
     }
   }
 
