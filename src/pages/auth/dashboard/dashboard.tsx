@@ -33,6 +33,12 @@ const styles = (theme: Theme) => createStyles({
     padding: theme.spacing.unit,
     marginBottom: theme.spacing.unit,
   },
+  formControl: {
+    minWidth: 100,
+  },
+  select: {
+    textAlign: 'right',
+  },
   rightIcon: {
     marginLeft: theme.spacing.unit,
   },
@@ -66,6 +72,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
 
   const { treeNodes, selectNode: select, addNode, history, classes } = props;
   const [searchText, setSearchText] = useState('');
+  const [openDepth, setOpenDepth] = useState<string>('all');
   const [newLabel, setNewLabel] = useState('');
 
   const handleAdd = () => {
@@ -113,22 +120,20 @@ const Dashboard: React.FC<Props> = (props: Props) => {
         <Grid item>
           <Grid container justify="flex-end" alignItems="flex-end" spacing={16}>
             <Grid item>
-              <FormControl className={classes.formControl}>
-                <InputLabel htmlFor="age-simple">Age</InputLabel>
+              <FormControl>
+                <InputLabel>展開する深さ</InputLabel>
                 <Select
-                  value={values.age}
-                  onChange={handleChange}
-                  inputProps={{
-                    name: 'age',
-                    id: 'age-simple',
+                  className={classes.formControl}
+                  classes={{
+                    select: classes.select
                   }}
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
+                  value={openDepth}
+                  onChange={e => setOpenDepth(e.target.value)}>
+                  <MenuItem value="0">すべてを閉じる</MenuItem>
+                  <MenuItem value="1">1</MenuItem>
+                  <MenuItem value="2">2</MenuItem>
+                  <MenuItem value="3">3</MenuItem>
+                  <MenuItem value="all">すべてを展開</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
