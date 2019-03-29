@@ -45,6 +45,7 @@ class PageRouter extends React.Component<Props, State> {
             />
           )}
         />
+        {treeNodes.length === 0 && <Redirect to={link.dashboard}/>}
         <Route
           exact
           path={link.edit}

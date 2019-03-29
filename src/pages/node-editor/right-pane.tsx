@@ -177,16 +177,18 @@ const RightPane: React.FC<Props> = (props: Props) => {
             {node !== null && node.type === 'case' && <MenuItem value="case">条件</MenuItem>}
           </Select>
         </FormControl>
-        <FormControl variant="outlined" className={classes.marginTop}>
-          <InputLabel ref={selectLabelRef}>タイプ</InputLabel>
-          <TextField
-            className={classes.marginTop}
-            value={node !== null ? node.input : ''}
-            onChange={changeInput}
-            InputProps={{startAdornment: InputIcon}}
-            fullWidth
-          />
-        </FormControl>
+        <Divider className={classes.marginTop}/>
+
+        <TextField
+          variant="outlined"
+          className={classes.marginTop}
+          label="インプット"
+          value={node !== null ? node.input : ''}
+          onChange={changeInput}
+          InputProps={{startAdornment: InputIcon}}
+          fullWidth
+          multiline
+        />
         
         <TextField
           variant="outlined"
