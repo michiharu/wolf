@@ -19,6 +19,7 @@ import EditableKNode from '../../components/konva-node/editable-k-node';
 import RightPane from './right-pane';
 import { fileDownload } from '../../func/file-download';
 import TreeUtil from '../../func/tree';
+import { node } from 'prop-types';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -108,10 +109,11 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   resize = () => {
+    const {node} = this.state;
     const cref = this.stageContainerRef.current, sref = this.stageRef.current;
     if (cref === null || sref === null) { throw 'Cannot find elements.'; }
-    sref.width(cref.offsetWidth);
-    sref.height(cref.offsetHeight);
+    sref.width(Math.max((point.x + node.self.w) * unit, cref.offsetWidth));
+    sref.height(Math.max((point.y + node.self.h) * unit, cref.offsetHeight));
     sref.draw();
   }
 
@@ -148,6 +150,7 @@ class NodeEditor extends React.Component<Props, State> {
     const node = EditableNodeUtil.open(point, prevNode, target.id, open);
     const focusNode: EditableNode = {...target, open};
     this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode});
+    process.nextTick(() => this.resize());
   }
 
   click = (target: EditableNode) => {
@@ -200,10 +203,12 @@ class NodeEditor extends React.Component<Props, State> {
           if (cell.action === 'move' && dragParent!.children.find(c => c.id === cell.node.id) !== undefined) {
             const newNode = EditableNodeUtil.move(point, prevNode, target, cell.node);
             this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
+            process.nextTick(() => this.resize());
           }
           if (cell.action === 'push' && dragParent!.id === cell.node.id) {
             const newNode = EditableNodeUtil.push(point, prevNode, target, cell.node);
             this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
+            process.nextTick(() => this.resize());
           }
           return;
         }
@@ -211,11 +216,13 @@ class NodeEditor extends React.Component<Props, State> {
         if (cell.action === 'move' && cell.node.type !== 'case') {
           const newNode = EditableNodeUtil.move(point, prevNode, target, cell.node);
           this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
+          process.nextTick(() => this.resize());
         }
 
         if (cell.action === 'push' && cell.node.type !== 'switch') {
           const newNode = EditableNodeUtil.push(point, prevNode, target, cell.node);
           this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
+          process.nextTick(() => this.resize());
         }
       }
     }
@@ -238,6 +245,7 @@ class NodeEditor extends React.Component<Props, State> {
     const {node: prevNode, focusNode} = this.state;
     const newNode = EditableNodeUtil.addDetails(point, prevNode, focusNode!);
     this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
+    process.nextTick(() => this.resize());
   }
   deleteSelf = () => {
     const {node: prevNode, focusNode} = this.state;
@@ -246,6 +254,7 @@ class NodeEditor extends React.Component<Props, State> {
       node: newNode,
       map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode)),
       focusNode: null});
+    process.nextTick(() => this.resize());
   }
 
   render() {
@@ -290,7 +299,7 @@ class NodeEditor extends React.Component<Props, State> {
           </Grid>
         </ToolContainer>
 
-        <Stage ref={this.stageRef} onClick={this.deleteFocus} draggable>
+        <Stage ref={this.stageRef} onClick={this.deleteFocus}>
           <Layer>
             {/* {map !== null && map.map((_, x) => (
             <Group key={`group-${x}`}>
