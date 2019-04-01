@@ -11,7 +11,7 @@ export { default as Output } from '@material-ui/icons/Publish';
 
 export const  unit = 16;
 export const viewItem = {
-  rect: {w: 18, h: 2},
+  rect: {w: 24, h: 2},
   spr: {w: 1, h: 1},
   indent: 2,
   fontSize: 0.9,

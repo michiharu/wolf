@@ -11,7 +11,7 @@ import {
 import {
   Task, Switch, Case, Input, Output, toolbarHeight, toolbarMinHeight, rightPainWidth
 } from '../../settings/layout';
-import { Type, EditableNode } from '../../data-types/tree-node';
+import TreeNode, { Type, EditableNode } from '../../data-types/tree-node';
 import { ButtonProps } from '@material-ui/core/Button';
 import EditableNodeUtil from '../../func/editable-node-util';
 
@@ -26,7 +26,7 @@ const styles = (theme: Theme) => createStyles({
       height: `calc(100vh - ${toolbarMinHeight}px)`
     },
     right: -24,
-    width: '25vw',
+    width: '30vw',
     minWidth: rightPainWidth,
   },
   rightPanePaper: {
@@ -41,6 +41,10 @@ const styles = (theme: Theme) => createStyles({
       padding: theme.spacing.unit,
     },
   },
+  commonSelectForm: {
+    marginTop: theme.spacing.unit * 2,
+    minWidth: 120,
+  },
   select: {
     marginRight: theme.spacing.unit,
   },
@@ -53,21 +57,32 @@ const styles = (theme: Theme) => createStyles({
   marginTop: {
     marginTop: theme.spacing.unit * 2,
   },
+  formControl: {
+    marginTop: theme.spacing.unit,
+    width: '100%',
+  },
 });
 
-interface Props extends WithStyles<typeof styles> {
+export interface RightPaneProps {
   rightPaneRef: HTMLDivElement;
   node: EditableNode | null;
+  commonNodes: TreeNode[];
   isRoot: boolean;
+  isCommon: string;
+  changeIsCommon: (e: any) => void;
   changeNode: (node: EditableNode) => void;
   addDetails: () => void;
+  addFromCommon: (e: any) => void;
   deleteSelf: () => void;
 }
+
+interface Props extends RightPaneProps, WithStyles<typeof styles> {}
 
 const RightPane: React.FC<Props> = (props: Props) => {
 
   const {
-    rightPaneRef, node, isRoot, changeNode, addDetails, deleteSelf, classes
+    rightPaneRef, node, commonNodes, isRoot, isCommon,
+    changeIsCommon, changeNode, addDetails, addFromCommon, deleteSelf, classes
   } = props;
 
   const cahngeType = (e: any) => {
@@ -101,18 +116,17 @@ const RightPane: React.FC<Props> = (props: Props) => {
     changeNode({...node!, output: e.target.value});
   };
 
-  const selectLabelRef = useRef(null);
-  const [selectLabelWidth, setSelectLabelWidth] = useState(0);
-  const inputLabelRef = useRef(null);
-  const [inputLabelWidth, setInputLabelWidth] = useState(0);
+  const selectIsCommonRef = useRef(null);
+  const [selectIsCommonWidth, setSelectIsCommonWidth] = useState(0);
+  const selectTypeRef = useRef(null);
+  const [selectTypeWidth, setSelectTypeWidth] = useState(0);
 
   if (node !== null) {
     process.nextTick(() => {
-      const selectEl = ReactDOM.findDOMNode(selectLabelRef.current) as HTMLElement | null;
-      if (selectEl !== null) { setSelectLabelWidth(selectEl.offsetWidth); }
-
-      const inputEl = ReactDOM.findDOMNode(inputLabelRef.current) as HTMLElement | null;
-      if (inputEl !== null) { setSelectLabelWidth(inputEl.offsetWidth); }
+      const commonEl = ReactDOM.findDOMNode(selectIsCommonRef.current) as HTMLElement | null;
+      if (commonEl !== null) { setSelectIsCommonWidth(commonEl.offsetWidth); }
+      const typeEl = ReactDOM.findDOMNode(selectTypeRef.current) as HTMLElement | null;
+      if (typeEl !== null) { setSelectTypeWidth(typeEl.offsetWidth); }
     });      
   }
 
@@ -134,7 +148,6 @@ const RightPane: React.FC<Props> = (props: Props) => {
       setDeleteFlag(true);
     } else {
       deleteSelf();
-      
     }
   }
 
@@ -145,6 +158,18 @@ const RightPane: React.FC<Props> = (props: Props) => {
     <div className={classes.rightPaneWrapper}>
     <div className={classes.rightPanePaper}>
       <div className={classes.root}>
+        {isRoot &&
+        <FormControl variant="outlined" className={classes.commonSelectForm}>
+          <InputLabel ref={selectIsCommonRef}>マニュアル用途</InputLabel>
+          <Select
+            input={<OutlinedInput labelWidth={selectIsCommonWidth}/>}
+            value={isCommon}
+            onChange={changeIsCommon}
+          >
+            <MenuItem value="false">オリジナル</MenuItem>
+            <MenuItem value="true">共通</MenuItem>
+          </Select>
+        </FormControl>}
         <TextField
           variant="outlined"
           className={classes.marginTop}
@@ -154,7 +179,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
           fullWidth
         />
         <FormControl variant="outlined" className={classes.marginTop}>
-          <InputLabel ref={selectLabelRef}>タイプ</InputLabel>
+          <InputLabel ref={selectTypeRef}>タイプ</InputLabel>
           <Select
             classes={{
               icon: focusType !== 'switch'
@@ -162,14 +187,13 @@ const RightPane: React.FC<Props> = (props: Props) => {
                 : classnames(classes.selectType, classes.switchIcon),
               select: classes.select
             }}
-            input={<OutlinedInput labelWidth={selectLabelWidth}/>}
+            input={<OutlinedInput labelWidth={selectTypeWidth}/>}
             value={node !== null ? node.type : 'task'}
             onChange={cahngeType}
             IconComponent={
               p => focusType === 'task' ?   <Task {...p}/> :
                    focusType === 'switch' ? <Switch {...p}/> :
                                             <Case {...p}/>}
-            fullWidth
             disabled={node !== null && node.type === 'case'}
           >
             <MenuItem value="task">作業</MenuItem>
@@ -201,7 +225,18 @@ const RightPane: React.FC<Props> = (props: Props) => {
         />
 
         <Divider className={classes.marginTop}/>
-        <Button {...buttonProps} onClick={addDetails}>詳細項目を追加する</Button>
+        <Button {...buttonProps} onClick={addDetails}>項目を追加</Button>
+        {commonNodes.length !== 0 &&
+        <FormControl className={classes.formControl}>
+          <InputLabel>共通マニュアルから項目を追加</InputLabel>
+          <Select
+            value=""
+            onChange={addFromCommon}
+          >
+            <MenuItem value=""><em>追加をキャンセル</em></MenuItem>
+            {commonNodes.map(c => <MenuItem key={c.id} value={c.id}>{c.label}</MenuItem>)}
+          </Select>
+        </FormControl>}
         
         <Divider className={classes.marginTop}/>
         {!isRoot && (

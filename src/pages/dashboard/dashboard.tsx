@@ -1,22 +1,17 @@
 import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles, Paper, Grid, TextField,
-  Table, TableHead, TableBody, TableRow, TableCell, IconButton,
+  Theme, createStyles, WithStyles, withStyles, Grid, TextField,
   FormControl, InputLabel, Select, MenuItem,
 } from '@material-ui/core';
 
-import FileUpload from '@material-ui/icons/NoteAdd';
-import Add from '@material-ui/icons/Add';
 
-import { TreeNode, NodeWithoutId } from '../../data-types/tree-node';
-import { toolbarHeight, toolbarMinHeight } from '../../settings/layout';
+import { TreeNode } from '../../data-types/tree-node';
 
 import TreeUtil from '../../func/tree';
-import ExpansionTree, { ExpansionTreeProps } from '../../components/expansion-tree/expansion-tree';
+import DashboardList, { DashboardListProps } from './dashboard-list';
 import link from '../../settings/path-list';
-import Util from '../../func/util';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -39,68 +34,58 @@ const styles = (theme: Theme) => createStyles({
   select: {
     textAlign: 'right',
   },
-  rightIcon: {
-    marginLeft: theme.spacing.unit,
-  },
-  tableToolsContainer: {
-    padding: theme.spacing.unit,
-  },
-  textFieldGrid: {
-    paddingLeft: theme.spacing.unit,
-  },
-  addButtonCell: {
-    textAlign: 'right',
-  },
-  row: {
-    '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.background.default,
-    }
-  },
+  listContainer: {
+    marginBottom: theme.spacing.unit * 2,
+  }
 });
 
-export interface NodeListProps {
+export interface DashboardProps {
   treeNodes: TreeNode[];
+  commonNodes: TreeNode[];
   selectNode: (node: TreeNode | null) => void;
   addNode: (node: TreeNode) => void;
+  addCommonList: (node: TreeNode) => void;
+  deleteCommonList: (node: TreeNode) => void;
 }
 
-interface Props extends NodeListProps, WithStyles<typeof styles>, RouteComponentProps {}
+interface Props extends DashboardProps, WithStyles<typeof styles>, RouteComponentProps {}
 
 const Dashboard: React.FC<Props> = (props: Props) => {
-  var fileReader: FileReader;
-
-  const { treeNodes, selectNode: select, addNode, history, classes } = props;
+  const {
+    treeNodes, commonNodes, selectNode: select,
+    addNode, addCommonList, deleteCommonList, history, classes
+  } = props;
   const [searchText, setSearchText] = useState('');
   const [openDepth, setOpenDepth] = useState<string>('all');
-  const [newLabel, setNewLabel] = useState('');
 
-  const handleAdd = () => {
-    if (!Util.isEmpty(newLabel)) { addNode(TreeUtil.getNewNode(newLabel)); }
-    setNewLabel('');
-  }
-
-  const handleFileRead = () => {
-    const content = fileReader.result as string;
-    const nodeWithoutId: NodeWithoutId = JSON.parse(content);
-    addNode(TreeUtil._setId(nodeWithoutId));
-  }
-
-  const handleFileChosen = (e: any) => {
-    const file = e.target.files[0];
-    if (file === undefined) { return; }
-    fileReader = new FileReader();
-    fileReader.onload = handleFileRead;
-    fileReader.readAsText(file);
-    e.target.value = '';
-  }
+  const words = TreeUtil.getSearchWords(searchText);
+  const filteredNode = TreeUtil._searchAndFilter(words, treeNodes);
 
   const selectNode = (node: TreeNode | null) => {
     history.push(link.edit);
     select(node);
   }
 
-  const words = TreeUtil.getSearchWords(searchText);
-  const filteredNode = TreeUtil._searchAndFilter(words, treeNodes);
+  const originProps: DashboardListProps = {
+    label: 'オリジナルマニュアル',
+    nodes: filteredNode.filter(n => commonNodes.find(c => c.id === n.id) === undefined),
+    openDepth,
+    selectNode,
+    addNode: (node: TreeNode) => {
+      addNode(node);
+    },
+  };
+
+  const commonProps: DashboardListProps = {
+    label: '共通マニュアル',
+    nodes: filteredNode.filter(n => commonNodes.find(c => c.id === n.id) !== undefined),
+    openDepth,
+    selectNode,
+    addNode: (node: TreeNode) => {
+      addNode(node);
+      addCommonList(node);
+    },
+  };
   
   return (
     <div className={classes.root}>
@@ -126,9 +111,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
                 <InputLabel>展開する深さ</InputLabel>
                 <Select
                   className={classes.formControl}
-                  classes={{
-                    select: classes.select
-                  }}
+                  classes={{ select: classes.select}}
                   value={openDepth}
                   onChange={e => setOpenDepth(e.target.value)}>
                   <MenuItem value="0">すべてを閉じる</MenuItem>
@@ -142,49 +125,12 @@ const Dashboard: React.FC<Props> = (props: Props) => {
           </Grid>
         </Grid>
       </Grid>
-
-      <Paper>
-        <Grid container className={classes.tableToolsContainer} justify="space-between">
-          <Grid item xs={12} sm={8}>
-            <Grid container spacing={16}>
-              <Grid item xs={9}>
-                <TextField
-                  label="新しいマニュアル"
-                  value={newLabel}
-                  onChange={e => setNewLabel(e.target.value)}
-                  // margin="none"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item>
-                <IconButton onClick={handleAdd}><Add/></IconButton>
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid item>
-            <Grid container justify="flex-end" alignItems="flex-end" spacing={16}>
-              <Grid item>
-                <IconButton component="label">
-                  <FileUpload/>
-                  <form>
-                    <input type="file" style={{ display: 'none' }} accept=".json" onChange={handleFileChosen}/>
-                  </form>
-                </IconButton>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Table>
-          <TableBody>
-            {filteredNode.map((node, i) => {
-                const treeProps: ExpansionTreeProps = {
-                  node, depth: 0, openDepth, selectNode
-                }
-              return <ExpansionTree key={`tree-0-${i}`} {...treeProps}/>;
-            })}
-          </TableBody>
-        </Table>
-      </Paper>
+      <div className={classes.listContainer}>
+        <DashboardList key={0} {...originProps}/>
+      </div>
+      <div className={classes.listContainer}>
+        <DashboardList key={1} {...commonProps}/>
+      </div>
     </div>  
   );
 };

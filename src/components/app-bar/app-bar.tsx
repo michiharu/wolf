@@ -2,28 +2,19 @@ import * as React from 'react';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText, Select } from '@material-ui/core';
+import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@material-ui/core';
 import { PopoverOrigin } from '@material-ui/core/Popover'
-import { Menu as MenuIcon, AccountCircle, Close } from '@material-ui/icons';
+import { AccountCircle, Close } from '@material-ui/icons';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
 import createStyles from '@material-ui/core/styles/createStyles';
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles';
-import { withRouter } from 'react-router-dom';
 import { RouteComponentProps } from "react-router";
-import { drawerWidth } from '../../settings/layout';
-import User from '../../data-types/user';
 import { toolbarHeight, toolbarMinHeight } from '../../settings/layout';
 import link from '../../settings/path-list';
 import TreeNode from '../../data-types/tree-node';
 
 const styles = (theme: Theme) => createStyles({
   root: {
-    marginLeft: drawerWidth,
-    [theme.breakpoints.up('md')]: {
-      width: `calc(100% - ${drawerWidth}px)`,
-    },
-  },
-  rootNoDrawer: {
 
   },
   toolbar: {
@@ -72,15 +63,11 @@ const styles = (theme: Theme) => createStyles({
 interface Props extends WithStyles<typeof styles>, RouteComponentProps {
   getToolRef: (el: HTMLDivElement) => void;
   getRightPaneRef: (el: HTMLDivElement) => void;
-  handleDrawerToggle: () => void;
-  selectedNodeList: TreeNode[] | null;
 }
 
 interface State {
   anchorEl: HTMLElement | null;
 }
-
-// const rightPane = 'rightPane';
 
 const CustomAppBar = withStyles(styles)(class extends React.Component<Props, State> {
 
@@ -106,21 +93,15 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
   };
 
   render() {
-    const { handleDrawerToggle, selectedNodeList, location, classes } = this.props;
+    const {location, classes } = this.props;
     const { anchorEl } = this.state;
     const open = Boolean(anchorEl);
     const origin: PopoverOrigin = { vertical: 'top', horizontal: 'right' };
     const path = location.pathname;
     return (
-      <AppBar position="fixed" className={path === link.dashboard ? classes.rootNoDrawer : classes.root}>
-        <Toolbar className={path === link.dashboard ? classes.toolbar : undefined}>
+      <AppBar className={classes.root}>
+        <Toolbar variant="dense" className={path === link.dashboard ? classes.toolbar : undefined}>
           <div className={classes.portalAnchor}><div ref={this.toolRef}/></div>
-
-          {path !== link.dashboard && (
-          <IconButton color="inherit" onClick={handleDrawerToggle} className={classes.menuButton}>
-            <MenuIcon />
-          </IconButton>)}
-          
 
           <Typography variant="h6" color="inherit">Flow Like</Typography>
 
@@ -136,7 +117,6 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
               <AccountCircle />
             </IconButton>
             <Menu
-              id="menu-appbar"
               anchorEl={anchorEl}
               anchorOrigin={origin}
               transformOrigin={origin}
@@ -152,6 +132,7 @@ const CustomAppBar = withStyles(styles)(class extends React.Component<Props, Sta
               </MenuItem>
             </Menu>
           </>
+
           <div className={classes.rightPaneAnchor}>
             <div ref={this.rightPaneRef}/>
           </div>

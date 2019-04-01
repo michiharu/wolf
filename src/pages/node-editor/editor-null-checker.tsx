@@ -10,36 +10,35 @@ interface Props extends RouteComponentProps {
   rightPaneRef: HTMLDivElement | null;
   treeNodes: TreeNode[] | null;
   selectedNodeList: TreeNode[] | null;
+  commonNodes: TreeNode[];
   changeNode: (node: TreeNode) => void;
   addNode: (node: TreeNode) => void;
-  selectNode: (node: TreeNode | null) => void;
+  addCommonList: (node: TreeNode) => void;
+  deleteCommonList: (node: TreeNode) => void;
 }
 
 const EditorNullChecker: React.SFC<Props> = (props: Props) => {
   const {
-    toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, selectNode, addNode, history
+    toolRef, rightPaneRef, treeNodes, selectedNodeList, commonNodes,
+    changeNode, addCommonList, deleteCommonList, history
   } = props;
   if (toolRef === null || selectedNodeList === null || treeNodes === null) {
     return <p>Now Loading..</p>;
   }
-  if (selectedNodeList.length === 0) {
-    return <NodeList treeNodes={treeNodes} selectNode={selectNode} addNode={addNode}/>;
-  }
 
   const parent = selectedNodeList.length === 1 ? null : selectedNodeList[selectedNodeList.length - 2];
 
-  const back = () => {
-    const node = selectedNodeList.length !== 1 ? selectedNodeList[selectedNodeList.length - 2] : null;
-    selectNode(node);
-    if (node === null) { history.push(link.dashboard) }
-  }
+  const back = () => history.push(link.dashboard);
 
   const viewerProps: EditorProps = {
     toolRef, rightPaneRef: rightPaneRef!,
     parent,
+    commonNodes,
     node: selectedNodeList[selectedNodeList.length - 1],
     back,
     changeNode,
+    addCommonList,
+    deleteCommonList,
   }
   
   return <NodeEditor {...viewerProps}/>;

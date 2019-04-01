@@ -2,13 +2,13 @@ import * as React from 'react';
 import { lightBlue, amber, yellow } from '@material-ui/core/colors';
 
 import Konva from 'konva';
-import { Rect, Group, Text } from 'react-konva';
+import { Rect, Text, Group } from 'react-konva';
 
 import { EditableNode, Point } from '../../data-types/tree-node';
 import { viewItem, unit } from '../../settings/layout';
 
-import Util from '../../func/util';
 import NodeIconBox, { NodeIconBoxProps } from './icon-box';
+import { Stage } from 'konva/types/Stage';
 
 export interface EditableKNodeProps {
   node: EditableNode;
@@ -20,7 +20,7 @@ export interface EditableKNodeProps {
 }
 
 const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) => {
-  const {node, click, deleteFocus, dragStart, dragMove, dragEnd} = props;
+  const { node, click, deleteFocus, dragStart, dragMove, dragEnd} = props;
 
   const fill = node.type === 'task' ?   node.focus ? lightBlue[200] : lightBlue[300] :
                node.type === 'switch' ? node.focus ? amber[400] : amber[300] :
@@ -68,13 +68,9 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
     node
   };
 
-  const xputs = [];
-  if (!Util.isEmpty(node.input)) { xputs.push(node.input); }
-  if (!Util.isEmpty(node.output)) { xputs.push(node.output); }
-  var anchorY = labelProps.y + (viewItem.fontHeight + viewItem.spr.h / 2) * unit;
-
   const handleDragStart = (e: any) => {
     dragStart(node);
+    stageRef.container().style.cursor = 'grabbing';
   }
 
   const handleDragMove = (e: any) => {
@@ -93,6 +89,7 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
       easing: Konva.Easings.EaseInOut,
     });
     dragEnd();
+    stageRef.container().style.cursor = 'grab'
   }
 
   const rectGroupProps = {
@@ -102,6 +99,8 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
     onDragStart: handleDragStart,
     onDragMove: handleDragMove,
     onDragEnd: handleDragEnd,
+    onMouseEnter: () => stageRef.container().style.cursor = 'grab',
+    onMouseLeave: () => stageRef.container().style.cursor = 'default',
   }
 
   return (
@@ -111,18 +110,6 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
         <Rect {...baseRectProps}/>
         <NodeIconBox {...iconBoxProps}/>
         <Text {...labelProps}/>
-        <Text />
-        {node.open && xputs.map(x => {
-          const xProps = {
-            text: x,
-            x: viewItem.fontSize * unit,
-            y: anchorY,
-            fontSize: viewItem.subFontSize * unit
-          };
-          const el = <Text key={x} {...xProps}/>;
-          anchorY += (viewItem.subFontHeight + viewItem.spr.h / 4) * unit;
-          return el;
-        })}
       </Group>
     </Group>
   );

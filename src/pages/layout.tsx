@@ -2,10 +2,8 @@ import * as React from 'react';
 import { Theme, createStyles, WithStyles, withStyles } from '@material-ui/core';
 import { BrowserRouter, Route } from 'react-router-dom';
 import AppBar from '../components/app-bar/app-bar';
-import Drawer, { DrawerProps } from '../components/drawer/drawer';
 import TreeNode from '../data-types/tree-node';
 import PageRouter from './page-router';
-import link from '../settings/path-list';
 
 const styles = (theme: Theme) => createStyles({
   root: { display: 'flex' },
@@ -18,14 +16,16 @@ const styles = (theme: Theme) => createStyles({
 interface Props extends WithStyles<typeof styles> {
   treeNodes: TreeNode[];
   selectedNodeList: TreeNode[] | null;
+  commonNodes: TreeNode[];
 
   selectNode: (node: TreeNode | null) => void;
   changeNode: (node: TreeNode) => void;
   addNode: (node: TreeNode) => void;
+  addCommonList: (node: TreeNode) => void;
+  deleteCommonList: (node: TreeNode) => void;
 }
 
 interface State {
-  open: boolean;
   toolRef: HTMLDivElement | null;
   rightPaneRef: HTMLDivElement | null;
 }
@@ -34,10 +34,8 @@ class Layout extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = {open: false, toolRef: null, rightPaneRef: null};
+    this.state = {toolRef: null, rightPaneRef: null};
   }
-
-  toggle = () => this.setState(state => ({ open: !state.open }));
 
   getToolRef = (el: HTMLDivElement) => this.setState({toolRef: el});
 
@@ -46,12 +44,10 @@ class Layout extends React.Component<Props, State> {
   
   render() {
     const {
-      treeNodes, selectedNodeList, selectNode, changeNode, addNode, classes
+      treeNodes, selectedNodeList, commonNodes,
+      selectNode, changeNode, addNode, addCommonList, deleteCommonList, classes
     } = this.props;
-    const { open, toolRef, rightPaneRef } = this.state;
-    const drawerNullCheckerProps: DrawerProps = {
-      open, toggle: this.toggle, treeNodes, selectedNodeList, selectNode, changeNode
-    };
+    const { toolRef, rightPaneRef } = this.state;
 
     return (
       <BrowserRouter>
@@ -62,11 +58,7 @@ class Layout extends React.Component<Props, State> {
               {...props}
               getToolRef={this.getToolRef}
               getRightPaneRef={this.getRightPaneRef}
-              handleDrawerToggle={this.toggle}
-              selectedNodeList={selectedNodeList}
             />
-            {props.location.pathname !== link.dashboard && <Drawer {...drawerNullCheckerProps} />}
-            
 
             <main className={classes.content}>
               <div className={classes.toolbar}/>
@@ -75,9 +67,12 @@ class Layout extends React.Component<Props, State> {
                 rightPaneRef={rightPaneRef}
                 treeNodes={treeNodes}
                 selectedNodeList={selectedNodeList}
+                commonNodes={commonNodes}
+                selectNode={selectNode}
                 changeNode={changeNode}
                 addNode={addNode}
-                selectNode={selectNode}
+                addCommonList={addCommonList}
+                deleteCommonList={deleteCommonList}
               />
             </main>
             

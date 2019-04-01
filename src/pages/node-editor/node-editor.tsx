@@ -16,10 +16,10 @@ import { toolbarHeight, toolbarMinHeight, viewItem, unit } from '../../settings/
 import ToolContainer from '../../components/tool-container/tool-container';
 import EditableNodeUtil from '../../func/editable-node-util';
 import EditableKNode from '../../components/konva-node/editable-k-node';
-import RightPane from './right-pane';
+import RightPane, { RightPaneProps } from './right-pane';
 import { fileDownload } from '../../func/file-download';
 import TreeUtil from '../../func/tree';
-import { node } from 'prop-types';
+import EditableNodeViewUtil from '../../func/editable-node-view-util';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -43,19 +43,24 @@ export interface EditorProps {
   toolRef: HTMLDivElement;
   rightPaneRef: HTMLDivElement;
   parent: TreeNode | null;
+  commonNodes: TreeNode[];
   node: TreeNode;
   back: () => void;
   changeNode: (node: TreeNode) => void;
+  addCommonList: (node: TreeNode) => void;
+  deleteCommonList: (node: TreeNode) => void;
 }
 
 interface Props extends EditorProps, WithStyles<typeof styles> {}
 
 interface State {
+  isCommon: string;
   node: EditableNode;
   map: Cell[][] | null;
   beforeCell: Cell | null;
   dragParent: EditableNode | null;
   focusNode: EditableNode | null;
+  hasDifference: boolean;
   cannotSaveReason: CannotSaveReason;
   saved: boolean;
 }
@@ -71,16 +76,22 @@ class NodeEditor extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    const { parent, node } = props;
+    const { parent, commonNodes, node } = props;
+
+    this.state = NodeEditor.getInitialState(commonNodes, point, parent, node);
+  }
+
+  static getInitialState = (commonList: TreeNode[], point: Point, parent: TreeNode | null, node: TreeNode): State => {
     const parentType: Type = parent !== null ? parent.type : 'task';
-    const newNode = EditableNodeUtil.get(parentType, node);
-    const openNode = EditableNodeUtil.open(point, newNode, newNode.id, true);
-    this.state = {
-      node: openNode,
-      map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(openNode)),
+    const newNode = EditableNodeUtil.get(point, parentType, node);
+    return {
+      isCommon: commonList.find(c => c.id === node.id) !== undefined ? 'true' : 'false',
+      node: newNode,
+      map: EditableNodeViewUtil.makeMap(EditableNodeUtil.toFlat(newNode)),
       beforeCell: null,
       dragParent: null,
       focusNode: null,
+      hasDifference: false,
       cannotSaveReason: null,
       saved: false,
     };
@@ -97,13 +108,8 @@ class NodeEditor extends React.Component<Props, State> {
 
   static getDerivedStateFromProps(nextProps: Props, prevState: State) {
     if (prevState.node.id !== nextProps.node.id) {
-      const parentType: Type = nextProps.parent !== null ? nextProps.parent.type : 'task';
-      const newNode = EditableNodeUtil.get(parentType, nextProps.node);
-      const openNode = EditableNodeUtil.open(point, newNode, newNode.id, true);
-      return {
-        node: openNode,
-        map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(openNode))
-      };
+      const { parent, commonNodes, node } = nextProps;
+      return NodeEditor.getInitialState(commonNodes, point, parent, node);
     }
     return null;
   }
@@ -112,19 +118,37 @@ class NodeEditor extends React.Component<Props, State> {
     const {node} = this.state;
     const cref = this.stageContainerRef.current, sref = this.stageRef.current;
     if (cref === null || sref === null) { throw 'Cannot find elements.'; }
-    sref.width(Math.max((point.x + node.self.w) * unit, cref.offsetWidth));
-    sref.height(Math.max((point.y + node.self.h) * unit, cref.offsetHeight));
+    sref.width(Math.max((point.x + node.self.w + viewItem.spr.w) * unit, cref.offsetWidth));
+    sref.height(Math.max((point.y + node.self.h + viewItem.spr.h) * unit, cref.offsetHeight));
     sref.draw();
+    sref.container = 'container';
+  }
+
+  differenceCheck = () => {
+    if (EditableNodeUtil._hasDifference(this.props.node, this.state.node)) {
+      this.setState({hasDifference: true});
+    } else {
+      this.props.back();
+    }
   }
 
   save = () => {
-    const {node} = this.state;
+    const { parent, commonNodes, changeNode, addCommonList, deleteCommonList } = this.props;
+    const {isCommon, node} = this.state;
     const isAllSwitchHasCase = EditableNodeUtil._isAllSwitchHasCase(node);
     const isAllCaseHasItem = EditableNodeUtil._isAllCaseHasItem(node);
     const cannotSaveReason: CannotSaveReason = !isAllSwitchHasCase ? 'switch' :
                                                !isAllCaseHasItem   ? 'case'   : null;
     if (cannotSaveReason === null) {
-      this.props.changeNode(node);
+      changeNode(node);
+      if (parent === null) {
+        if (isCommon === 'true' && commonNodes.find(c => c.id === node.id) === undefined) {
+          addCommonList(node);
+        }
+        if (isCommon === 'false' && commonNodes.find(c => c.id === node.id) !== undefined) {
+          deleteCommonList(node);
+        }
+      }
       this.setState({saved: true});
     } else {
       this.setState({cannotSaveReason});
@@ -142,14 +166,14 @@ class NodeEditor extends React.Component<Props, State> {
     const {node: prevNode} = this.state;
     const node = EditableNodeUtil.focus(prevNode, target.id);
     const focusNode: EditableNode = {...target, focus};
-    this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode});
+    this.setState({node, map: EditableNodeViewUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode});
   }
 
   setOpenState = (target: EditableNode, open: boolean) => {
     const {node: prevNode} = this.state;
     const node = EditableNodeUtil.open(point, prevNode, target.id, open);
     const focusNode: EditableNode = {...target, open};
-    this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode});
+    this.setState({node, map: EditableNodeViewUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode});
     process.nextTick(() => this.resize());
   }
 
@@ -178,7 +202,7 @@ class NodeEditor extends React.Component<Props, State> {
   deleteFocus = () => {
     const {node: prevNode} = this.state;
     const node = EditableNodeUtil._deleteFocus(prevNode);
-    this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode: null});
+    this.setState({node, map: EditableNodeViewUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode: null});
   }
 
   dragStart = (target: EditableNode) => {
@@ -186,7 +210,7 @@ class NodeEditor extends React.Component<Props, State> {
     const dragParent = EditableNodeUtil._getPrent(prevNode, target);
     const openNode = EditableNodeUtil.open(point, prevNode, target.id, false);
     const node = EditableNodeUtil._deleteFocus(openNode);
-    const map = EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node));
+    const map = EditableNodeViewUtil.makeMap(EditableNodeUtil.toFlat(node));
     this.setState({node, dragParent, map, focusNode: null});
   }
 
@@ -202,12 +226,12 @@ class NodeEditor extends React.Component<Props, State> {
         if (target.type === 'case') {
           if (cell.action === 'move' && dragParent!.children.find(c => c.id === cell.node.id) !== undefined) {
             const newNode = EditableNodeUtil.move(point, prevNode, target, cell.node);
-            this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
+            this.setState({node: newNode, map: EditableNodeViewUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
             process.nextTick(() => this.resize());
           }
           if (cell.action === 'push' && dragParent!.id === cell.node.id) {
             const newNode = EditableNodeUtil.push(point, prevNode, target, cell.node);
-            this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
+            this.setState({node: newNode, map: EditableNodeViewUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
             process.nextTick(() => this.resize());
           }
           return;
@@ -215,13 +239,13 @@ class NodeEditor extends React.Component<Props, State> {
 
         if (cell.action === 'move' && cell.node.type !== 'case') {
           const newNode = EditableNodeUtil.move(point, prevNode, target, cell.node);
-          this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
+          this.setState({node: newNode, map: EditableNodeViewUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
           process.nextTick(() => this.resize());
         }
 
         if (cell.action === 'push' && cell.node.type !== 'switch') {
           const newNode = EditableNodeUtil.push(point, prevNode, target, cell.node);
-          this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
+          this.setState({node: newNode, map: EditableNodeViewUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
           process.nextTick(() => this.resize());
         }
       }
@@ -238,28 +262,41 @@ class NodeEditor extends React.Component<Props, State> {
   changeFocusNode = (target: EditableNode) => {
     const {node: prevNode} = this.state;
     const node = EditableNodeUtil.replace(point, prevNode, target)
-    this.setState({node, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode: target});
+    this.setState({node, map: EditableNodeViewUtil.makeMap(EditableNodeUtil.toFlat(node)), focusNode: target});
   }
 
   addDetails = () => {
     const {node: prevNode, focusNode} = this.state;
     const newNode = EditableNodeUtil.addDetails(point, prevNode, focusNode!);
-    this.setState({node: newNode, map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
+    this.setState({node: newNode, map: EditableNodeViewUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
     process.nextTick(() => this.resize());
   }
+
+  addFromCommon = (e: any) => {
+    const { commonNodes } = this.props;
+    const common = commonNodes.find(c => c.id === e.target.value);
+    if (common === undefined) { return; }
+    
+    const setIdCommon = TreeUtil._setId(common);
+    const {node: prevNode, focusNode} = this.state;
+    const newNode = EditableNodeUtil.addFromCommon(point, prevNode, focusNode!, setIdCommon);
+    this.setState({node: newNode, map: EditableNodeViewUtil.makeMap(EditableNodeUtil.toFlat(newNode))});
+    process.nextTick(() => this.resize());
+  }
+
   deleteSelf = () => {
     const {node: prevNode, focusNode} = this.state;
     const newNode = EditableNodeUtil.deleteById(point, prevNode, focusNode!.id);
     this.setState({
       node: newNode,
-      map: EditableNodeUtil.makeMap(EditableNodeUtil.toFlat(newNode)),
+      map: EditableNodeViewUtil.makeMap(EditableNodeUtil.toFlat(newNode)),
       focusNode: null});
     process.nextTick(() => this.resize());
   }
 
   render() {
-    const { toolRef, rightPaneRef, parent, back, classes } = this.props;
-    const { node, focusNode, map, cannotSaveReason, saved } = this.state;
+    const { toolRef, rightPaneRef, parent, commonNodes, back, classes } = this.props;
+    const { isCommon, node, focusNode, map, hasDifference, cannotSaveReason, saved } = this.state;
     const flatNodes = EditableNodeUtil.toFlat(node);
 
     const nodeActionProps = {
@@ -269,12 +306,17 @@ class NodeEditor extends React.Component<Props, State> {
       dragEnd: this.dragEnd,
       deleteFocus: this.deleteFocus
     };
-    const rightPaneProps = {
+
+    const rightPaneProps: RightPaneProps = {
       rightPaneRef,
       node: focusNode,
-      isRoot: focusNode === null ? false : focusNode.id === node.id,
+      commonNodes,
+      isRoot: focusNode === null ? false : parent === null && focusNode.id === node.id,
+      isCommon,
+      changeIsCommon: (e: any) => this.setState({isCommon: e.target.value}),
       changeNode: this.changeFocusNode,
       addDetails: this.addDetails,
+      addFromCommon: this.addFromCommon,
       deleteSelf: this.deleteSelf,
     };
 
@@ -283,7 +325,7 @@ class NodeEditor extends React.Component<Props, State> {
         <ToolContainer containerRef={toolRef}>
           <Grid container spacing={16}>
             <Grid item>
-              <Fab color="primary" onClick={back} size="medium"><ArrowBack/></Fab>
+              <Fab color="primary" onClick={this.differenceCheck} size="medium"><ArrowBack/></Fab>
             </Grid>
             <Grid item>
               <Fab className={classes.saveButton} variant="extended" color="primary" onClick={this.save}>
@@ -315,6 +357,19 @@ class NodeEditor extends React.Component<Props, State> {
           </Layer>
         </Stage>
         <RightPane {...rightPaneProps}/>
+
+        <Dialog open={hasDifference} onClose={() => this.setState({hasDifference: false})}>
+          <DialogTitle>マニュアルは編集されています。</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              保存せずに画面を移動してもよろしいですか？
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => this.setState({hasDifference: false})}>Cancel</Button>
+            <Button onClick={back} color="primary" autoFocus>OK</Button>
+          </DialogActions>
+        </Dialog>
 
         <Dialog open={cannotSaveReason !== null} onClose={() => this.setState({cannotSaveReason: null})}>
           <DialogTitle>このデータは保存できません</DialogTitle>

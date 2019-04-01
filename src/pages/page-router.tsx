@@ -3,7 +3,6 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import TreeNode from '../data-types/tree-node';
 import link from '../settings/path-list';
 import EditorNullChecker from './node-editor/editor-null-checker';
-import CheckListNullChecker from './check-list/check-list-null-checker';
 import Dashboard from './dashboard/dashboard';
 
 interface Props {
@@ -11,10 +10,13 @@ interface Props {
   rightPaneRef: HTMLDivElement | null;
   treeNodes: TreeNode[];
   selectedNodeList: TreeNode[] | null;
+  commonNodes: TreeNode[];
 
   changeNode: (node: TreeNode) => void;
   addNode: (node: TreeNode) => void;
   selectNode: (node: TreeNode | null) => void;
+  addCommonList: (node: TreeNode) => void;
+  deleteCommonList: (node: TreeNode) => void;
 }
 
 interface State {
@@ -29,7 +31,8 @@ class PageRouter extends React.Component<Props, State> {
 
   render () {
     const {
-      toolRef, rightPaneRef, treeNodes, selectedNodeList, changeNode, addNode, selectNode
+      toolRef, rightPaneRef, treeNodes, selectedNodeList, commonNodes,
+      selectNode, changeNode, addNode, addCommonList, deleteCommonList,
     } = this.props;
     return (
       <Switch>
@@ -41,7 +44,10 @@ class PageRouter extends React.Component<Props, State> {
               {...props}
               treeNodes={treeNodes}
               selectNode={selectNode}
+              commonNodes={commonNodes}
               addNode={addNode}
+              addCommonList={addCommonList}
+              deleteCommonList={deleteCommonList}
             />
           )}
         />
@@ -56,9 +62,11 @@ class PageRouter extends React.Component<Props, State> {
               rightPaneRef={rightPaneRef}
               treeNodes={treeNodes}
               selectedNodeList={selectedNodeList}
+              commonNodes={commonNodes}
               changeNode={changeNode}
               addNode={addNode}
-              selectNode={selectNode}
+              addCommonList={addCommonList}
+              deleteCommonList={deleteCommonList}
             />
           )}
         />

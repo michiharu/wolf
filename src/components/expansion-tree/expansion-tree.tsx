@@ -75,7 +75,7 @@ const ExpansionTree = withStyles(styles)(class extends React.Component<Props, St
                  node.type === 'switch' ? <Switch className={classes.switchIcon}/> : <Case/>}
               </Grid>
               <Grid item>
-                <Button size="small" onClick={() => selectNode(node)} color="primary">{node.label}</Button>
+                <Button size="small" onClick={() => selectNode(node)}>{node.label}</Button>
               </Grid>
             </Grid>
           </TableCell>
