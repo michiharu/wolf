@@ -8,7 +8,6 @@ import { EditableNode, Point } from '../../data-types/tree-node';
 import { viewItem, unit } from '../../settings/layout';
 
 import NodeIconBox, { NodeIconBoxProps } from './icon-box';
-import { Stage } from 'konva/types/Stage';
 
 export interface EditableKNodeProps {
   node: EditableNode;
@@ -70,7 +69,6 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
 
   const handleDragStart = (e: any) => {
     dragStart(node);
-    stageRef.container().style.cursor = 'grabbing';
   }
 
   const handleDragMove = (e: any) => {
@@ -89,7 +87,6 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
       easing: Konva.Easings.EaseInOut,
     });
     dragEnd();
-    stageRef.container().style.cursor = 'grab'
   }
 
   const rectGroupProps = {
@@ -99,9 +96,7 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
     onDragStart: handleDragStart,
     onDragMove: handleDragMove,
     onDragEnd: handleDragEnd,
-    onMouseEnter: () => stageRef.container().style.cursor = 'grab',
-    onMouseLeave: () => stageRef.container().style.cursor = 'default',
-  }
+  };
 
   return (
     <Group x={node.point.x * unit} y={node.point.y * unit} >

@@ -73,6 +73,7 @@ export interface RightPaneProps {
   changeNode: (node: EditableNode) => void;
   addDetails: () => void;
   addFromCommon: (e: any) => void;
+  registAsCommon: (node: EditableNode) => void;
   deleteSelf: () => void;
 }
 
@@ -82,7 +83,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
 
   const {
     rightPaneRef, node, commonNodes, isRoot, isCommon,
-    changeIsCommon, changeNode, addDetails, addFromCommon, deleteSelf, classes
+    changeIsCommon, changeNode, addDetails, addFromCommon, registAsCommon, deleteSelf, classes
   } = props;
 
   const cahngeType = (e: any) => {
@@ -240,8 +241,9 @@ const RightPane: React.FC<Props> = (props: Props) => {
         
         <Divider className={classes.marginTop}/>
         {!isRoot && (
-        <Button {...buttonProps} color="default" onClick={handleClickDelete}>この項目を削除する</Button>)}
-        
+        <Button {...buttonProps} color="default" onClick={handleClickDelete}>この項目を削除</Button>)}
+        {node !== null &&
+        <Button {...buttonProps} color="default" onClick={() => registAsCommon(node)}>共通マニュアルとして登録</Button>}        
       </div>
       </div>
       </div>
@@ -255,7 +257,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteFlag(false)}>Cancel</Button>
-          <Button onClick={deleteSelf} color="primary" autoFocus>Delete</Button>
+          <Button onClick={() => { deleteSelf(); setDeleteFlag(false)}} color="primary" autoFocus>Delete</Button>
         </DialogActions>
       </Dialog>
     </>

@@ -20,7 +20,7 @@ interface Props extends RouteComponentProps {
 const EditorNullChecker: React.SFC<Props> = (props: Props) => {
   const {
     toolRef, rightPaneRef, treeNodes, selectedNodeList, commonNodes,
-    changeNode, addCommonList, deleteCommonList, history
+    changeNode, addCommonList, deleteCommonList, addNode, history
   } = props;
   if (toolRef === null || selectedNodeList === null || treeNodes === null) {
     return <p>Now Loading..</p>;
@@ -39,6 +39,7 @@ const EditorNullChecker: React.SFC<Props> = (props: Props) => {
     changeNode,
     addCommonList,
     deleteCommonList,
+    addNode,
   }
   
   return <NodeEditor {...viewerProps}/>;

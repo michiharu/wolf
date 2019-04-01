@@ -20,6 +20,7 @@ import RightPane, { RightPaneProps } from './right-pane';
 import { fileDownload } from '../../func/file-download';
 import TreeUtil from '../../func/tree';
 import EditableNodeViewUtil from '../../func/editable-node-view-util';
+import { common } from '@material-ui/core/colors';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -49,6 +50,7 @@ export interface EditorProps {
   changeNode: (node: TreeNode) => void;
   addCommonList: (node: TreeNode) => void;
   deleteCommonList: (node: TreeNode) => void;
+  addNode: (node: TreeNode) => void;
 }
 
 interface Props extends EditorProps, WithStyles<typeof styles> {}
@@ -121,7 +123,6 @@ class NodeEditor extends React.Component<Props, State> {
     sref.width(Math.max((point.x + node.self.w + viewItem.spr.w) * unit, cref.offsetWidth));
     sref.height(Math.max((point.y + node.self.h + viewItem.spr.h) * unit, cref.offsetHeight));
     sref.draw();
-    sref.container = 'container';
   }
 
   differenceCheck = () => {
@@ -253,9 +254,6 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   dragEnd = () => {
-    // const {node: prevNode} = this.state;
-    // const newNode = EditableNodeUtil.deleteDummy(point, prevNode);
-    // this.saveNodeState(newNode);
     this.setState({dragParent: null});
   }
 
@@ -284,6 +282,13 @@ class NodeEditor extends React.Component<Props, State> {
     process.nextTick(() => this.resize());
   }
 
+  registAsCommon = (target: EditableNode) => {
+    const { addNode, addCommonList } = this.props;
+    const newNode = TreeUtil._setId(target);
+    addNode(newNode);
+    addCommonList(newNode);
+  }
+
   deleteSelf = () => {
     const {node: prevNode, focusNode} = this.state;
     const newNode = EditableNodeUtil.deleteById(point, prevNode, focusNode!.id);
@@ -298,8 +303,9 @@ class NodeEditor extends React.Component<Props, State> {
     const { toolRef, rightPaneRef, parent, commonNodes, back, classes } = this.props;
     const { isCommon, node, focusNode, map, hasDifference, cannotSaveReason, saved } = this.state;
     const flatNodes = EditableNodeUtil.toFlat(node);
-
+    // const cref = this.stageContainerRef.current;
     const nodeActionProps = {
+      // cref,
       click: this.click,
       dragStart: this.dragStart,
       dragMove: this.dragMove,
@@ -317,6 +323,7 @@ class NodeEditor extends React.Component<Props, State> {
       changeNode: this.changeFocusNode,
       addDetails: this.addDetails,
       addFromCommon: this.addFromCommon,
+      registAsCommon: this.registAsCommon,
       deleteSelf: this.deleteSelf,
     };
 
