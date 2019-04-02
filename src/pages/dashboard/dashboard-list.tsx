@@ -28,8 +28,11 @@ const styles = (theme: Theme) => createStyles({
   tableToolsContainer: {
     padding: theme.spacing.unit,
   },
-  textFieldGrid: {
-    paddingLeft: theme.spacing.unit,
+  addArea: {
+    width: '100%',
+  },
+  textField: {
+    minWidth: 240,
   },
   addButtonCell: {
     textAlign: 'right',
@@ -76,29 +79,31 @@ const DashboardList: React.FC<Props> = (props: Props) => {
     fileReader.readAsText(file);
     e.target.value = '';
   }
+
+  const handleChange = (e: any) => {
+    if (e.keyCode === 13) {
+      handleAdd();
+    }
+  }
   
   return (
     <Paper>
-      <Typography className={classes.label} variant="h5">{label}</Typography>
       <Grid container className={classes.tableToolsContainer} justify="space-between">
-        <Grid item xs={12} sm={8}>
-          <Grid container spacing={16}>
-            <Grid item xs={9}>
+        <Grid item xs={12} md={6}>
+          <Typography className={classes.label} variant="h5">{label}</Typography>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Grid container spacing={16} justify="space-between">
+            <Grid item xs>
               <TextField
-                label="新しいマニュアル"
+                className={classes.textField}
+                label="新しいマニュアル(Enterで追加)"
                 value={newLabel}
                 onChange={e => setNewLabel(e.target.value)}
-                // margin="none"
+                onKeyDown={handleChange}
                 fullWidth
               />
             </Grid>
-            <Grid item>
-              <IconButton onClick={handleAdd}><Add/></IconButton>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item>
-          <Grid container justify="flex-end" alignItems="flex-end" spacing={16}>
             <Grid item>
               <IconButton component="label">
                 <FileUpload/>

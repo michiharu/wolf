@@ -14,6 +14,7 @@ import {
 import TreeNode, { Type, EditableNode } from '../../data-types/tree-node';
 import { ButtonProps } from '@material-ui/core/Button';
 import EditableNodeUtil from '../../func/editable-node-util';
+import SimilarityTable from '../../components/similarity-table/similarity-table';
 
 const styles = (theme: Theme) => createStyles({
   rightPaneWrapper: {
@@ -61,6 +62,9 @@ const styles = (theme: Theme) => createStyles({
     marginTop: theme.spacing.unit,
     width: '100%',
   },
+  // similarityDialog: {
+  //   backgroundColor: theme.palette.background.default,
+  // }
 });
 
 export interface RightPaneProps {
@@ -151,104 +155,108 @@ const RightPane: React.FC<Props> = (props: Props) => {
       deleteSelf();
     }
   }
+  const [addCommonFlag, setAddCommonFlag] = useState(false);  
 
   return (
     <>
-    <Portal container={rightPaneRef}>
-    <Slide direction="left" in={node !== null} mountOnEnter>
-    <div className={classes.rightPaneWrapper}>
-    <div className={classes.rightPanePaper}>
-      <div className={classes.root}>
-        {isRoot &&
-        <FormControl variant="outlined" className={classes.commonSelectForm}>
-          <InputLabel ref={selectIsCommonRef}>マニュアル用途</InputLabel>
-          <Select
-            input={<OutlinedInput labelWidth={selectIsCommonWidth}/>}
-            value={isCommon}
-            onChange={changeIsCommon}
-          >
-            <MenuItem value="false">オリジナル</MenuItem>
-            <MenuItem value="true">共通</MenuItem>
-          </Select>
-        </FormControl>}
-        <TextField
-          variant="outlined"
-          className={classes.marginTop}
-          label="タイトル"
-          value={node !== null ? node.label : ''}
-          onChange={changeLabel}
-          fullWidth
-        />
-        <FormControl variant="outlined" className={classes.marginTop}>
-          <InputLabel ref={selectTypeRef}>タイプ</InputLabel>
-          <Select
-            classes={{
-              icon: focusType !== 'switch'
-                ? classes.selectType
-                : classnames(classes.selectType, classes.switchIcon),
-              select: classes.select
-            }}
-            input={<OutlinedInput labelWidth={selectTypeWidth}/>}
-            value={node !== null ? node.type : 'task'}
-            onChange={cahngeType}
-            IconComponent={
-              p => focusType === 'task' ?   <Task {...p}/> :
-                   focusType === 'switch' ? <Switch {...p}/> :
-                                            <Case {...p}/>}
-            disabled={node !== null && node.type === 'case'}
-          >
-            <MenuItem value="task">作業</MenuItem>
-            {node !== null && <MenuItem value="switch">分岐</MenuItem>}
-            {node !== null && node.type === 'case' && <MenuItem value="case">条件</MenuItem>}
-          </Select>
-        </FormControl>
-        <Divider className={classes.marginTop}/>
+      <Portal container={rightPaneRef}>
+        <Slide direction="left" in={node !== null} mountOnEnter>
+          <div className={classes.rightPaneWrapper}>
+          <div className={classes.rightPanePaper}>
+          <div className={classes.root}>
+            {isRoot &&
+            <FormControl variant="outlined" className={classes.commonSelectForm}>
+              <InputLabel ref={selectIsCommonRef}>マニュアル用途</InputLabel>
+              <Select
+                input={<OutlinedInput labelWidth={selectIsCommonWidth}/>}
+                value={isCommon}
+                onChange={changeIsCommon}
+              >
+                <MenuItem value="false">オリジナル</MenuItem>
+                <MenuItem value="true">共通</MenuItem>
+              </Select>
+            </FormControl>}
 
-        <TextField
-          variant="outlined"
-          className={classes.marginTop}
-          label="インプット"
-          value={node !== null ? node.input : ''}
-          onChange={changeInput}
-          InputProps={{startAdornment: InputIcon}}
-          fullWidth
-          multiline
-        />
-        
-        <TextField
-          variant="outlined"
-          className={classes.marginTop}
-          label="アウトプット"
-          value={node !== null ? node.output : ''}
-          onChange={changeOutput}
-          InputProps={{startAdornment: OutputIcon}}
-          fullWidth
-        />
+            <TextField
+              variant="outlined"
+              className={classes.marginTop}
+              label="タイトル"
+              value={node !== null ? node.label : ''}
+              onChange={changeLabel}
+              fullWidth
+            />
+            <FormControl variant="outlined" className={classes.marginTop}>
+              <InputLabel ref={selectTypeRef}>タイプ</InputLabel>
+              <Select
+                classes={{
+                  icon: focusType !== 'switch'
+                    ? classes.selectType
+                    : classnames(classes.selectType, classes.switchIcon),
+                  select: classes.select
+                }}
+                input={<OutlinedInput labelWidth={selectTypeWidth}/>}
+                value={node !== null ? node.type : 'task'}
+                onChange={cahngeType}
+                IconComponent={
+                  p => focusType === 'task' ?   <Task {...p}/> :
+                      focusType === 'switch' ? <Switch {...p}/> :
+                                                <Case {...p}/>}
+                disabled={node !== null && node.type === 'case'}
+              >
+                <MenuItem value="task">作業</MenuItem>
+                {node !== null && <MenuItem value="switch">分岐</MenuItem>}
+                {node !== null && node.type === 'case' && <MenuItem value="case">条件</MenuItem>}
+              </Select>
+            </FormControl>
+            <Divider className={classes.marginTop}/>
 
-        <Divider className={classes.marginTop}/>
-        <Button {...buttonProps} onClick={addDetails}>項目を追加</Button>
-        {commonNodes.length !== 0 &&
-        <FormControl className={classes.formControl}>
-          <InputLabel>共通マニュアルから項目を追加</InputLabel>
-          <Select
-            value=""
-            onChange={addFromCommon}
-          >
-            <MenuItem value=""><em>追加をキャンセル</em></MenuItem>
-            {commonNodes.map(c => <MenuItem key={c.id} value={c.id}>{c.label}</MenuItem>)}
-          </Select>
-        </FormControl>}
-        
-        <Divider className={classes.marginTop}/>
-        {!isRoot && (
-        <Button {...buttonProps} color="default" onClick={handleClickDelete}>この項目を削除</Button>)}
-        {node !== null &&
-        <Button {...buttonProps} color="default" onClick={() => registAsCommon(node)}>共通マニュアルとして登録</Button>}        
-      </div>
-      </div>
-      </div>
-    </Slide>
-    </Portal>
+            <TextField
+              variant="outlined"
+              className={classes.marginTop}
+              label="インプット"
+              value={node !== null ? node.input : ''}
+              onChange={changeInput}
+              InputProps={{startAdornment: InputIcon}}
+              fullWidth
+              multiline
+            />
+            
+            <TextField
+              variant="outlined"
+              className={classes.marginTop}
+              label="アウトプット"
+              value={node !== null ? node.output : ''}
+              onChange={changeOutput}
+              InputProps={{startAdornment: OutputIcon}}
+              fullWidth
+            />
+
+            <Divider className={classes.marginTop}/>
+            <Button {...buttonProps} onClick={addDetails}>項目を追加</Button>
+
+            {commonNodes.length !== 0 &&
+            <FormControl className={classes.formControl}>
+              <InputLabel>共通マニュアルから項目を追加</InputLabel>
+              <Select
+                value=""
+                onChange={addFromCommon}
+              >
+                <MenuItem value=""><em>追加をキャンセル</em></MenuItem>
+                {commonNodes.map(c => <MenuItem key={c.id} value={c.id}>{c.label}</MenuItem>)}
+              </Select>
+            </FormControl>}
+            
+            <Divider className={classes.marginTop}/>
+            {!isRoot && (
+            <Button {...buttonProps} color="default" onClick={handleClickDelete}>この項目を削除</Button>)}
+            {node !== null &&
+            <Button {...buttonProps} color="default" onClick={() => setAddCommonFlag(true)}>共通マニュアルに登録</Button>}        
+          </div>
+          </div>
+          </div>
+        </Slide>
+      </Portal>
+
       <Dialog open={deleteFlag} onClose={() => setDeleteFlag(false)}>
         <DialogTitle>この項目を削除してもよろしいですか？</DialogTitle>
         <DialogContent>
@@ -260,6 +268,23 @@ const RightPane: React.FC<Props> = (props: Props) => {
           <Button onClick={() => { deleteSelf(); setDeleteFlag(false)}} color="primary" autoFocus>Delete</Button>
         </DialogActions>
       </Dialog>
+
+      {node !== null &&
+      <Dialog
+        fullWidth
+        maxWidth="lg"
+        open={addCommonFlag}
+        onClose={() => setAddCommonFlag(false)}
+      >
+        <DialogTitle>{`「${node!.label}」を共通マニュアルに登録してもよろしいですか？`}</DialogTitle>
+        <DialogContent>
+          <SimilarityTable target={node} list={commonNodes}/>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAddCommonFlag(false)}>キャンセル</Button>
+          <Button onClick={() => {setAddCommonFlag(false); registAsCommon(node!);}} color="primary" autoFocus>登録</Button>
+        </DialogActions>
+      </Dialog>}
     </>
   );
 };

@@ -56,7 +56,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     addNode, addCommonList, deleteCommonList, history, classes
   } = props;
   const [searchText, setSearchText] = useState('');
-  const [openDepth, setOpenDepth] = useState<string>('all');
+  const [openDepth, setOpenDepth] = useState<string>('0');
 
   const words = TreeUtil.getSearchWords(searchText);
   const filteredNode = TreeUtil._searchAndFilter(words, treeNodes);
@@ -90,39 +90,31 @@ const Dashboard: React.FC<Props> = (props: Props) => {
   return (
     <div className={classes.root}>
 
-      <Grid container className={classes.searchContainer} justify="space-between">
+      <Grid container className={classes.searchContainer} justify="space-between" spacing={16}>
         <Grid item xs={12} sm={8}>
-          <Grid container spacing={16}>
-            <Grid item xs={12} sm={9}>
-              <TextField
-                label="Search field"
-                type="search"
-                onChange={e => setSearchText(e.target.value)}
-                margin="none"
-                fullWidth
-              />
-            </Grid>
-          </Grid>
+          <TextField
+            label="Search field"
+            type="search"
+            onChange={e => setSearchText(e.target.value)}
+            margin="none"
+            fullWidth
+          />
         </Grid>
         <Grid item>
-          <Grid container justify="flex-end" alignItems="flex-end" spacing={16}>
-            <Grid item>
-              <FormControl>
-                <InputLabel>展開する深さ</InputLabel>
-                <Select
-                  className={classes.formControl}
-                  classes={{ select: classes.select}}
-                  value={openDepth}
-                  onChange={e => setOpenDepth(e.target.value)}>
-                  <MenuItem value="0">すべてを閉じる</MenuItem>
-                  <MenuItem value="1">1</MenuItem>
-                  <MenuItem value="2">2</MenuItem>
-                  <MenuItem value="3">3</MenuItem>
-                  <MenuItem value="all">すべてを展開</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
+          <FormControl>
+            <InputLabel>展開する深さ</InputLabel>
+            <Select
+              className={classes.formControl}
+              classes={{ select: classes.select}}
+              value={openDepth}
+              onChange={e => setOpenDepth(e.target.value)}>
+              <MenuItem value="0">すべてを閉じる</MenuItem>
+              <MenuItem value="1">1</MenuItem>
+              <MenuItem value="2">2</MenuItem>
+              <MenuItem value="3">3</MenuItem>
+              <MenuItem value="all">すべてを展開</MenuItem>
+            </Select>
+          </FormControl>
         </Grid>
       </Grid>
       <div className={classes.listContainer}>
