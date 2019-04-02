@@ -1,9 +1,5 @@
 import * as React from 'react';
 import MUIDataTable, { MUIDataTableOptions, MUIDataTableColumn } from 'mui-datatables';
-
-import {
-  Table, TableHead, TableBody, TableRow, TableCell, Checkbox
-} from '@material-ui/core';
 import TreeNode from '../../data-types/tree-node';
 
 interface Props {
@@ -36,15 +32,49 @@ class SimilarityTable extends React.Component<Props, State> {
       responsive: 'scroll',
       rowHover: false,
       selectableRows: false,
+      pagination: false,
       filter: false,
       search: false,
       print: false,
-      download: false
+      download: false,
+      textLabels: {
+        body: {
+          noMatch: '表示するデータはありません。',
+          toolTip: 'ソート'
+        },
+        pagination: {
+          next: "Next Page",
+          previous: "Previous Page",
+          rowsPerPage: "Rows per page:",
+          displayRows: "of",
+        },
+        toolbar: {
+          search: "Search",
+          downloadCsv: "Download CSV",
+          print: "Print",
+          viewColumns: "View Columns",
+          filterTable: "Filter Table",
+        },
+        filter: {
+          all: "All",
+          title: "FILTERS",
+          reset: "RESET",
+        },
+        viewColumns: {
+          title: "Show Columns",
+          titleAria: "Show/Hide Table Columns",
+        },
+        selectedRows: {
+          text: "row(s) selected",
+          delete: "Delete",
+          deleteAria: "Delete Selected Rows",
+        },
+      }
     };
     return (
       <MUIDataTable
-        title={"登録済み共有マニュアルとの比較一覧"}
-        data={[target].concat(list)}
+        title={"同じ内容の共有マニュアルが存在します"}
+        data={list}
         columns={columns}
         options={options}
       />

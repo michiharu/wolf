@@ -109,7 +109,9 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   static getDerivedStateFromProps(nextProps: Props, prevState: State) {
-    if (prevState.node.id !== nextProps.node.id) {
+    if (prevState.node.id !== nextProps.node.id ||
+        prevState.node.children.length !== nextProps.node.children.length) {
+          
       const { parent, commonNodes, node } = nextProps;
       return NodeEditor.getInitialState(commonNodes, point, parent, node);
     }

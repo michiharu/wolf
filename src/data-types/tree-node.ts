@@ -7,13 +7,11 @@ export interface TreeNode {
   children: TreeNode[];
 }
 
-export interface TreeNode {
-  id: string;
-  type: Type;
-  label: string;
-  input: string;
-  output: string;
-  children: TreeNode[];
+export interface NodeWithSimilarity extends TreeNode {
+  _label: number;
+  _input: number;
+  _output: number;
+  _childrenLength: number;
 }
 
 export interface NodeWithoutId {

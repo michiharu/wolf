@@ -11,10 +11,11 @@ import {
 import {
   Task, Switch, Case, Input, Output, toolbarHeight, toolbarMinHeight, rightPainWidth
 } from '../../settings/layout';
-import TreeNode, { Type, EditableNode } from '../../data-types/tree-node';
+import TreeNode, { Type, EditableNode, NodeWithSimilarity } from '../../data-types/tree-node';
 import { ButtonProps } from '@material-ui/core/Button';
 import EditableNodeUtil from '../../func/editable-node-util';
 import SimilarityTable from '../../components/similarity-table/similarity-table';
+import SimilarityUtil from '../../func/similarity';
 
 const styles = (theme: Theme) => createStyles({
   rightPaneWrapper: {
@@ -155,7 +156,19 @@ const RightPane: React.FC<Props> = (props: Props) => {
       deleteSelf();
     }
   }
-  const [addCommonFlag, setAddCommonFlag] = useState(false);  
+  const [filteredSimilarityList, setFilteredSimilarityList] = useState<NodeWithSimilarity[] | null>(null);
+  const handleAddCommon = () => {
+    const similarityList = SimilarityUtil.get(node!, commonNodes);
+    const filteredList = similarityList
+    .filter(s => s._label === 100 && s._input === 100 && s._output === 100 && s._childrenLength === 100);
+    console.log(similarityList);
+
+    if (filteredList.length !== 0) {
+      setFilteredSimilarityList(filteredList);
+    } else {
+      registAsCommon(node!);
+    }
+  }
 
   return (
     <>
@@ -250,7 +263,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
             {!isRoot && (
             <Button {...buttonProps} color="default" onClick={handleClickDelete}>この項目を削除</Button>)}
             {node !== null &&
-            <Button {...buttonProps} color="default" onClick={() => setAddCommonFlag(true)}>共通マニュアルに登録</Button>}        
+            <Button {...buttonProps} color="default" onClick={handleAddCommon}>共通マニュアルに登録</Button>}        
           </div>
           </div>
           </div>
@@ -273,16 +286,16 @@ const RightPane: React.FC<Props> = (props: Props) => {
       <Dialog
         fullWidth
         maxWidth="lg"
-        open={addCommonFlag}
-        onClose={() => setAddCommonFlag(false)}
+        open={filteredSimilarityList !== null}
+        onClose={() => setFilteredSimilarityList(null)}
       >
         <DialogTitle>{`「${node!.label}」を共通マニュアルに登録してもよろしいですか？`}</DialogTitle>
         <DialogContent>
           <SimilarityTable target={node} list={commonNodes}/>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setAddCommonFlag(false)}>キャンセル</Button>
-          <Button onClick={() => {setAddCommonFlag(false); registAsCommon(node!);}} color="primary" autoFocus>登録</Button>
+          <Button onClick={() => setFilteredSimilarityList(null)}>キャンセル</Button>
+          <Button onClick={() => {setFilteredSimilarityList(null); registAsCommon(node!);}} color="primary" autoFocus>登録</Button>
         </DialogActions>
       </Dialog>}
     </>
