@@ -1,16 +1,19 @@
+import _ from 'lodash';
 import * as React from 'react';
+import { useState, useRef } from 'react';
 import { lightBlue, amber, yellow } from '@material-ui/core/colors';
 
 import Konva from 'konva';
 import { Rect, Text, Group } from 'react-konva';
 
 import { EditableNode, Point } from '../../data-types/tree-node';
-import { viewItem, unit } from '../../settings/layout';
 
 import NodeIconBox, { NodeIconBoxProps } from './icon-box';
+import KSize from '../../data-types/k-size';
 
 export interface EditableKNodeProps {
   node: EditableNode;
+  ks: KSize;
   click: (node: EditableNode) => void;
   deleteFocus: () => void;
   dragStart: (node: EditableNode) => void;
@@ -18,17 +21,18 @@ export interface EditableKNodeProps {
   dragEnd: () => void;
 }
 
-const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) => {
-  const { node, click, deleteFocus, dragStart, dragMove, dragEnd} = props;
+const origin: Point = {x: 32, y: 80};
 
+const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) => {
+  const { node, ks, click, deleteFocus, dragStart, dragMove, dragEnd} = props;
   const fill = node.type === 'task' ?   node.focus ? lightBlue[200] : lightBlue[300] :
                node.type === 'switch' ? node.focus ? amber[400] : amber[300] :
                                         node.focus ? yellow[400] : yellow[300];
   const baseRectProps = {
     x: 0, y: 0,
-    width: node.rect.w * unit,
-    height: node.rect.h * unit,
-    cornerRadius: viewItem.cornerRadius * unit,
+    width: node.rect.w * ks.unit,
+    height: node.rect.h * ks.unit,
+    cornerRadius: ks.cornerRadius * ks.unit,
     fill,
     shadowColor: node.focus ? fill : 'black',
     shadowBlur: node.focus ? 10 : 6,
@@ -44,11 +48,11 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
   const stroke = '#dddd';
   const strokeWidth = 2;
   const containerRectProps = {
-    x: viewItem.spr.w * unit,
-    y: viewItem.spr.h * unit,
-    width: (node.self.w - viewItem.spr.w) * unit,
-    height: (node.self.h - viewItem.spr.h) * unit,
-    cornerRadius: viewItem.cornerRadius * unit,
+    x: ks.spr.w * ks.unit,
+    y: ks.spr.h * ks.unit,
+    width: (node.self.w - ks.spr.w) * ks.unit,
+    height: (node.self.h - ks.spr.h) * ks.unit,
+    cornerRadius: ks.cornerRadius * ks.unit,
     stroke,
     strokeWidth,
     onClick: deleteFocus,
@@ -56,14 +60,14 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
 
   const labelProps = {
     text: node.label,
-    fontSize: viewItem.fontSize * unit,
-    x: viewItem.fontSize * unit,
-    y: (viewItem.rect.h - viewItem.fontHeight) / 2 * unit
+    fontSize: ks.fontSize * ks.unit,
+    x: ks.fontSize * ks.unit,
+    y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit
   };
 
   const iconBoxProps: NodeIconBoxProps = {
-    x: node.rect.w * unit,
-    y: labelProps.y - (viewItem.rect.h - viewItem.fontHeight) / 2 * unit,
+    x: node.rect.w * ks.unit,
+    y: labelProps.y - (ks.rect.h - ks.fontHeight) / 2 * ks.unit,
     node
   };
 
@@ -74,23 +78,20 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
   const handleDragMove = (e: any) => {
     const tr = e.target.getClientRect();
     const point = {
-      x: Math.floor(tr.x / unit) + viewItem.rect.w / 2,
-      y: Math.floor(tr.y / unit) + viewItem.rect.h / 2,
+      x: Math.floor((tr.x - origin.x) / ks.unit) + ks.rect.w / 2,
+      y: Math.floor((tr.y - origin.y) / ks.unit) + ks.rect.h / 2,
     };
     dragMove(node, point);
   }
 
   const handleDragEnd = (e: any) => {
-    e.target.to({
-      x: 0,
-      y: 0,
-      easing: Konva.Easings.EaseInOut,
-    });
+    e.target.to({ x: 0, y: 0, easing: Konva.Easings.EaseInOut });
     dragEnd();
   }
 
   const rectGroupProps = {
     x: 0, y:0,
+    onTap: handleClick,
     onClick: handleClick,
     draggable: true,
     onDragStart: handleDragStart,
@@ -99,7 +100,7 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
   };
 
   return (
-    <Group x={node.point.x * unit} y={node.point.y * unit} >
+    <Group x={origin.x + node.point.x * ks.unit} y={origin.y + node.point.y * ks.unit} >
       {node.open && <Rect {...containerRectProps}/>}
       <Group {...rectGroupProps}>
         <Rect {...baseRectProps}/>

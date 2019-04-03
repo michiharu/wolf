@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Group, Rect } from 'react-konva';
-import { viewItem, unit } from '../../settings/layout';
+import { ks } from '../../settings/layout';
 import { SvgPath } from '../../data-types/svg-path';
 import SvgToPath from './svg-to-path';
 import { number } from 'prop-types';
@@ -21,16 +21,16 @@ const Icon: React.FC<IconProps> = (props: IconProps) => {
   const {x, y, svg, color, backgroundColor, rotate, scale, onClick} = props;
   const baseRectProps = {
     x: 0, y: 0,
-    width: viewItem.rect.h * unit,
-    height: viewItem.rect.h * unit,
+    width: ks.rect.h * ks.unit,
+    height: ks.rect.h * ks.unit,
     fill: backgroundColor || '#ccc',
     opacity: 0.2,
-    cornerRadius: viewItem.rect.h / 2 * unit,
+    cornerRadius: ks.rect.h / 2 * ks.unit,
   };
-  const transRate = unit / 20;
+  const transRate = ks.unit / 20;
   const svgProps = {
-    x: (viewItem.rect.h - viewItem.icon) / 2 * unit,
-    y: (viewItem.rect.h - viewItem.icon) / 2 * unit,
+    x: (ks.rect.h - ks.icon) / 2 * ks.unit,
+    y: (ks.rect.h - ks.icon) / 2 * ks.unit,
     svg,
     fill: color || 'black',
     rotate: rotate || 0,
@@ -40,7 +40,7 @@ const Icon: React.FC<IconProps> = (props: IconProps) => {
   };
 
   return (
-    <Group x={x} y={scale ? y + viewItem.icon * unit : y} onClick={onClick}>
+    <Group x={x} y={scale ? y + ks.icon * ks.unit : y} onClick={onClick}>
       <Rect {...baseRectProps}/>
       <SvgToPath {...svgProps}/>
     </Group>

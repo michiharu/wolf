@@ -14,7 +14,7 @@ import Undo from '@material-ui/icons/Undo';
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
 import { TreeNode, Type, CheckNode, CheckRecord } from '../../data-types/tree-node';
-import { toolbarHeight, toolbarMinHeight, viewItem, unit } from '../../settings/layout';
+import { toolbarHeight, toolbarMinHeight, ks } from '../../settings/layout';
 
 import ToolContainer from '../../components/tool-container/tool-container';
 import CheckNodeUtil from '../../func/check-node-util';
@@ -62,7 +62,7 @@ export interface CheckListState {
   checkRecords: CheckRecord[];
 }
 
-const point = { x: viewItem.spr.w * 2, y: viewItem.spr.h * 5};
+const point = { x: ks.spr.w * 2, y: ks.spr.h * 5};
 
 class CheckList extends React.Component<Props, CheckListState> {
 
@@ -232,7 +232,7 @@ class CheckList extends React.Component<Props, CheckListState> {
             className={classes.printContainer}
             ref={this.printContainerRef}
           >
-            <Stage width={(flatNodes[0].self.w + point.x) * unit} height={(flatNodes[0].self.h + point.y) * unit}>
+            <Stage width={32 + flatNodes[0].self.w * ks.unit} height={80 + flatNodes[0].self.h * ks.unit}>
               <Layer>
                 {flatNodes.map(n => <CheckKNode key={n.id} node={n} {...nodeActionProps}/>)}
               </Layer>

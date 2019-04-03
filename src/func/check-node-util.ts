@@ -1,5 +1,5 @@
 import TreeNode, { Type, CheckNode, Point } from "../data-types/tree-node";
-import { viewItem } from "../settings/layout";
+import { ks } from "../settings/layout";
 import Util from "./util";
 import { checked } from "../resource/svg-icon";
 import { CheckListState } from "../pages/check-list/check-list";
@@ -8,8 +8,8 @@ export default class CheckNodeUtil {
 
   static get = (parentType: Type, node: TreeNode): CheckNode => {
     const rect = {
-      w: viewItem.rect.w,
-      h: viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0),
+      w: ks.rect.w,
+      h: ks.rect.h + (parentType === 'switch' ? ks.textline : 0),
     };
 
     return {
@@ -61,8 +61,8 @@ export default class CheckNodeUtil {
   static equal = (a: TreeNode, b: TreeNode): boolean => a.id === b.id;
 
   static calcTextlineHeight = (node: CheckNode): number => {
-    return (!Util.isEmpty(node.input)  ? viewItem.textline : 0)
-         + (!Util.isEmpty(node.output) ? viewItem.textline : 0);
+    return (!Util.isEmpty(node.input)  ? ks.textline : 0)
+         + (!Util.isEmpty(node.output) ? ks.textline : 0);
   }
 
   static calcSelfLength = (node: CheckNode, open: boolean, which: which) => {
@@ -73,28 +73,28 @@ export default class CheckNodeUtil {
           // task, open, width
           if (node.children.length !== 0) {
             const childrenLength = node.children.map(c => c.self.w).reduce((a, b) => Math.max(a, b));
-            return viewItem.indent + viewItem.spr.w + childrenLength;
+            return ks.indent + ks.spr.w + childrenLength;
           } else {
-            return viewItem.rect.w;
+            return ks.rect.w;
           }
         } else {
           // task, open, height
           if (node.children.length !== 0) {
-            return viewItem.rect.h + viewItem.spr.h
+            return ks.rect.h + ks.spr.h
               + CheckNodeUtil.calcTextlineHeight(node)
-              + node.children.map(c => c.self.h + viewItem.spr.h).reduce((a, b) => a + b);
+              + node.children.map(c => c.self.h + ks.spr.h).reduce((a, b) => a + b);
           } else {
-            return viewItem.rect.h
+            return ks.rect.h
               + CheckNodeUtil.calcTextlineHeight(node);
           }
         }
       } else {
         if (which === 'width') {
           // task, close, width
-          return viewItem.rect.w;
+          return ks.rect.w;
         } else {
           // task, close, height
-          return viewItem.rect.h;
+          return ks.rect.h;
         }
       }
     } else {
@@ -102,19 +102,19 @@ export default class CheckNodeUtil {
         if (which === 'width') {
           // switch, open, width
           if (node.children.length !== 0) {
-            return viewItem.indent
-              + node.children.map(c => c.self.w + viewItem.spr.w).reduce((a, b) => a + b);
+            return ks.indent
+              + node.children.map(c => c.self.w + ks.spr.w).reduce((a, b) => a + b);
           } else {
-            return viewItem.rect.w;
+            return ks.rect.w;
           }
         } else {
           // switch, open, height
           if (node.children.length !== 0) {
-            return viewItem.rect.h + viewItem.spr.h * 2
+            return ks.rect.h + ks.spr.h * 2
               + CheckNodeUtil.calcTextlineHeight(node)
               + node.children.map(c => c.self.h).reduce((a, b) => Math.max(a, b));
           } else {
-            return viewItem.rect.h
+            return ks.rect.h
               + CheckNodeUtil.calcTextlineHeight(node);
           }
         }
@@ -122,13 +122,13 @@ export default class CheckNodeUtil {
         if (which === 'width') {
           // task, close, width
           const checkedChild = node.children.find(c => c.checked);
-          if (checkedChild === undefined) { return viewItem.rect.w; }
-          return viewItem.indent + viewItem.spr.w + checkedChild.self.w;
+          if (checkedChild === undefined) { return ks.rect.w; }
+          return ks.indent + ks.spr.w + checkedChild.self.w;
         } else {
           // task, close, height
           const checkedChild = node.children.find(c => c.checked);
-          if (checkedChild === undefined) { return viewItem.rect.h; }
-          return viewItem.rect.h + viewItem.spr.h * 2 + checkedChild.self.h;
+          if (checkedChild === undefined) { return ks.rect.h; }
+          return ks.rect.h + ks.spr.h * 2 + checkedChild.self.h;
         }
       }
     }
@@ -299,8 +299,8 @@ export default class CheckNodeUtil {
   static _setSize = (node: CheckNode): CheckNode => {
 
     const rect = {
-      w: viewItem.rect.w,
-      h: viewItem.rect.h
+      w: ks.rect.w,
+      h: ks.rect.h
         + (node.open ? CheckNodeUtil.calcTextlineHeight(node) : 0)
     };
 
@@ -321,14 +321,14 @@ export default class CheckNodeUtil {
     const children = node.children.map(c => {
       const p: Point = (node.type === 'switch' && c.checked)
       ? {
-        x: point.x + viewItem.indent,
-        y: point.y + node.rect.h + viewItem.spr.h
+        x: point.x + ks.indent,
+        y: point.y + node.rect.h + ks.spr.h
       } : {
-        x: point.x + viewItem.indent + (node.type !== 'switch' ? 0 : anchor),
-        y: point.y + node.rect.h + viewItem.spr.h + (node.type === 'switch' ? 0 : anchor)
+        x: point.x + ks.indent + (node.type !== 'switch' ? 0 : anchor),
+        y: point.y + node.rect.h + ks.spr.h + (node.type === 'switch' ? 0 : anchor)
       };
       const child = CheckNodeUtil._setPoint(p, c);
-      anchor += node.type !== 'switch' ? c.self.h + viewItem.spr.h : c.self.w + viewItem.spr.w;
+      anchor += node.type !== 'switch' ? c.self.h + ks.spr.h : c.self.w + ks.spr.w;
       return child;
     });
 

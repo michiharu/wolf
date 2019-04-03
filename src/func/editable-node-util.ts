@@ -1,13 +1,12 @@
-import TreeNode, { Type, EditableNode, Point, Cell, NodeWithoutId } from "../data-types/tree-node";
-import { viewItem } from "../settings/layout";
-import Util from "./util";
+import TreeNode, { Type, EditableNode, Cell } from "../data-types/tree-node";
 import EditableNodeViewUtil from "./editable-node-view-util";
+import KSize from "../data-types/k-size";
 
 export default class EditableNodeUtil {
 
-  static get = (point: Point, parentType: Type, node: TreeNode): EditableNode => {
+  static get = (parentType: Type, node: TreeNode, ks: KSize): EditableNode => {
     const newNode = EditableNodeUtil._get(parentType, node);
-    return EditableNodeViewUtil.setCalcProps(point, newNode);
+    return EditableNodeViewUtil.setCalcProps(newNode, ks);
   }
 
   static _get = (parentType: Type, node: TreeNode): EditableNode => {
@@ -15,19 +14,16 @@ export default class EditableNodeUtil {
     const depth = {top: 0, bottom: 0};
     const point = {x: 0, y: 0};
     const children = node.children.map(c => EditableNodeUtil._get(node.type, c));
-    const rect = {
-      w: viewItem.rect.w,
-      h: viewItem.rect.h + (parentType === 'switch' ? viewItem.textline : 0),
-    };
+    const rect = { w: 0, h: 0};
     const open = children.length !== 0 ? true : false;
     const focus = false;
 
     return {...node, parentType, index, depth, point, open, focus, children, self: rect, rect};
   }
 
-  static open = (point: Point, node: EditableNode, id: string, open: boolean): EditableNode => {
+  static open = (node: EditableNode, ks: KSize, id: string, open: boolean): EditableNode => {
     const openNode = EditableNodeUtil._open(node, id, open);
-    return EditableNodeViewUtil.setCalcProps(point, openNode);
+    return EditableNodeViewUtil.setCalcProps(openNode, ks);
   }
 
   static _open = (node: EditableNode, id: string, open: boolean): EditableNode => {
@@ -65,18 +61,18 @@ export default class EditableNodeUtil {
     return a.action === b.action && a.node.id === b.node.id;
   }
 
-  static move = (point: Point, node: EditableNode, from: EditableNode, to: EditableNode): EditableNode => {
+  static move = (node: EditableNode, ks: KSize, from: EditableNode, to: EditableNode): EditableNode => {
     const deletedTree = EditableNodeUtil._deleteById(node, from.id);
     const setParentTypeNode = EditableNodeUtil.setParentType(from, to.parentType);
     const insertedNode = EditableNodeUtil._insert(deletedTree, setParentTypeNode, to);
-    return EditableNodeViewUtil.setCalcProps(point, insertedNode);
+    return EditableNodeViewUtil.setCalcProps(insertedNode, ks);
   }
 
-  static push = (point: Point, node: EditableNode, child: EditableNode, parent: EditableNode): EditableNode => {
+  static push = (node: EditableNode, ks: KSize, child: EditableNode, parent: EditableNode): EditableNode => {
     const deletedTree = EditableNodeUtil._deleteById(node, child.id);
     const setParentTypeChild = EditableNodeUtil.setParentType(child, parent.type);
     const pushedNode = EditableNodeUtil._push(deletedTree, setParentTypeChild, parent);
-    return EditableNodeViewUtil.setCalcProps(point, pushedNode);
+    return EditableNodeViewUtil.setCalcProps(pushedNode, ks);
   }
 
   static _push = (node: EditableNode, child: EditableNode, parent: EditableNode): EditableNode => {
@@ -121,18 +117,18 @@ export default class EditableNodeUtil {
     return {...node, children};
   }
 
-  static addDetails = (point: Point, node: EditableNode, parent: EditableNode): EditableNode => {
+  static addDetails = (node: EditableNode, ks: KSize, parent: EditableNode): EditableNode => {
     const newNode = EditableNodeUtil.getNewNode(parent.type);
     const pushedNode = EditableNodeUtil._push(node, newNode, parent);
     const openNode = EditableNodeUtil._open(pushedNode, parent.id, true);
-    return EditableNodeViewUtil.setCalcProps(point, openNode);
+    return EditableNodeViewUtil.setCalcProps(openNode, ks);
   }
 
-  static addFromCommon = (point: Point, node: EditableNode, parent: EditableNode, common: TreeNode): EditableNode => {
+  static addFromCommon = (node: EditableNode, ks: KSize, parent: EditableNode, common: TreeNode): EditableNode => {
     const newNode = EditableNodeUtil._get(parent.type, common);
     const pushedNode = EditableNodeUtil._push(node, newNode, parent);
     const openNode = EditableNodeUtil._open(pushedNode, parent.id, true);
-    return EditableNodeViewUtil.setCalcProps(point, openNode);
+    return EditableNodeViewUtil.setCalcProps(openNode, ks);
   }
 
   // Treeから指定した要素を返す
@@ -152,9 +148,9 @@ export default class EditableNodeUtil {
       .reduce((a, b) => a || b || null);
   }
 
-  static replace = (point: Point, node: EditableNode, target: EditableNode): EditableNode => {
+  static replace = (node: EditableNode, ks: KSize, target: EditableNode): EditableNode => {
     const replaceNode = EditableNodeUtil._replace(node, target);
-    return EditableNodeViewUtil.setCalcProps(point, replaceNode);
+    return EditableNodeViewUtil.setCalcProps(replaceNode, ks);
   }
 
   static _replace = (node: EditableNode, target: EditableNode): EditableNode => {
@@ -166,9 +162,9 @@ export default class EditableNodeUtil {
     }
   }
 
-  static replaceOnlySelf = (point: Point, node: EditableNode, target: EditableNode): EditableNode => {
+  static replaceOnlySelf = (node: EditableNode, ks: KSize, target: EditableNode): EditableNode => {
     const replaceNode = EditableNodeUtil._replaceOnlySelf(node, target);
-    return EditableNodeViewUtil.setCalcProps(point, replaceNode);
+    return EditableNodeViewUtil.setCalcProps(replaceNode, ks);
   }
 
   static _replaceOnlySelf = (node: EditableNode, target: EditableNode): EditableNode => {
@@ -185,9 +181,9 @@ export default class EditableNodeUtil {
     }
   }
 
-  static deleteById = (point: Point, node: EditableNode, id: string): EditableNode => {
+  static deleteById = (node: EditableNode, ks: KSize, id: string): EditableNode => {
     const deletedTree = EditableNodeUtil._deleteById(node, id);
-    return EditableNodeViewUtil.setCalcProps(point, deletedTree);
+    return EditableNodeViewUtil.setCalcProps(deletedTree, ks);
   }
 
   static _deleteById = (node: EditableNode, id: string): EditableNode => {

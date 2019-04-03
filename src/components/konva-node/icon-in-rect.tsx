@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Group } from 'react-konva';
-import { viewItem } from '../../settings/layout';
+import { ks } from '../../settings/layout';
 import { SvgPath } from '../../data-types/svg-path';
 import SvgToPath from './svg-to-path';
 
@@ -16,8 +16,8 @@ const IconInRect: React.FC<IconInRectProps> = (props: IconInRectProps) => {
   const {x, y, svg, color} = props;
 
   const svgProps = {
-    x: (viewItem.rect.h - viewItem.icon) / 2,
-    y: (viewItem.rect.h - viewItem.icon) / 2,
+    x: (ks.rect.h - ks.icon) / 2,
+    y: (ks.rect.h - ks.icon) / 2,
     svg,
     fill: color || 'black',
   };

@@ -23,11 +23,13 @@ const styles = (theme: Theme) => createStyles({
     overflow: 'visible',
     top: toolbarHeight,
     height: `calc(100vh - ${toolbarHeight}px)`,
+    right: -24,
     [theme.breakpoints.down('xs')]: {
       top: toolbarMinHeight,
-      height: `calc(100vh - ${toolbarMinHeight}px)`
+      height: `calc(100vh - ${toolbarMinHeight}px)`,
+      right: -16,
     },
-    right: -24,
+    
     width: '30vw',
     minWidth: rightPainWidth,
   },
@@ -221,7 +223,6 @@ const RightPane: React.FC<Props> = (props: Props) => {
                 {node !== null && node.type === 'case' && <MenuItem value="case">条件</MenuItem>}
               </Select>
             </FormControl>
-            <Divider className={classes.marginTop}/>
 
             <TextField
               variant="outlined"
@@ -244,7 +245,6 @@ const RightPane: React.FC<Props> = (props: Props) => {
               fullWidth
             />
 
-            <Divider className={classes.marginTop}/>
             <Button {...buttonProps} onClick={addDetails}>項目を追加</Button>
 
             {commonNodes.length !== 0 &&
@@ -259,7 +259,6 @@ const RightPane: React.FC<Props> = (props: Props) => {
               </Select>
             </FormControl>}
             
-            <Divider className={classes.marginTop}/>
             {!isRoot && (
             <Button {...buttonProps} color="default" onClick={handleClickDelete}>この項目を削除</Button>)}
             {node !== null &&

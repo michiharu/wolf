@@ -10,10 +10,10 @@ const styles = (theme: Theme) => createStyles({
     [theme.breakpoints.down('xs')]: {
       top: toolbarMinHeight,
     },
-    left: -theme.spacing.unit * 3,
+    left: -theme.spacing.unit * 2,
     paddingTop: theme.spacing.unit,
     paddingLeft: theme.spacing.unit,
-    width: `calc(100vw - ${drawerWidth}px)`,
+    width: `100vw`,
     height: 10,
   }
 });

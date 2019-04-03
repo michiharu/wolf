@@ -4,7 +4,7 @@ import { lightBlue, amber, yellow, grey } from '@material-ui/core/colors';
 import { Rect, Group, Text } from 'react-konva';
 
 import { CheckNode } from '../../data-types/tree-node';
-import { viewItem, unit } from '../../settings/layout';
+import { ks } from '../../settings/layout';
 
 import Util from '../../func/util';
 import NodeIconBox, { NodeIconBoxProps } from './icon-box';
@@ -27,9 +27,9 @@ const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
                              node.focus ? yellow[400]    : yellow[300];
   const baseRectProps = {
     x: 0, y: 0,
-    width: node.rect.w * unit,
-    height: node.rect.h * unit,
-    cornerRadius: viewItem.cornerRadius * unit,
+    width: node.rect.w * ks.unit,
+    height: node.rect.h * ks.unit,
+    cornerRadius: ks.cornerRadius * ks.unit,
     fill,
     shadowColor: node.focus ? fill : 'black',
     shadowBlur: node.focus ? 10 : 6,
@@ -50,11 +50,11 @@ const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
   const stroke = '#dddd';
   const strokeWidth = 2;
   const containerRectProps = {
-    x: viewItem.spr.w * unit,
-    y: viewItem.spr.h * unit,
-    width: (node.self.w - viewItem.spr.w) * unit,
-    height: (node.self.h - viewItem.spr.h) * unit,
-    cornerRadius: viewItem.cornerRadius * unit,
+    x: ks.spr.w * ks.unit,
+    y: ks.spr.h * ks.unit,
+    width: (node.self.w - ks.spr.w) * ks.unit,
+    height: (node.self.h - ks.spr.h) * ks.unit,
+    cornerRadius: ks.cornerRadius * ks.unit,
     stroke,
     strokeWidth,
   };
@@ -70,44 +70,28 @@ const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
 
   const labelProps = {
     text: node.label,
-    fontSize: viewItem.fontSize * unit,
-    x: (viewItem.fontSize + viewItem.icon) * unit,
-    y: (viewItem.rect.h - viewItem.fontHeight) / 2 * unit
+    fontSize: ks.fontSize * ks.unit,
+    x: (ks.fontSize + ks.icon) * ks.unit,
+    y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit
   };
 
   const iconBoxProps: NodeIconBoxProps = {
-    x: node.rect.w * unit,
-    y: labelProps.y - (viewItem.rect.h - viewItem.fontHeight) / 2 * unit,
+    x: node.rect.w * ks.unit,
+    y: labelProps.y - (ks.rect.h - ks.fontHeight) / 2 * ks.unit,
     node,
     forCheck: true,
   };
 
-  const xputs = [];
-  if (!Util.isEmpty(node.input)) { xputs.push(node.input); }
-  if (!Util.isEmpty(node.output)) { xputs.push(node.output); }
-  var anchorY = labelProps.y + (viewItem.fontHeight + viewItem.spr.h / 2) * unit;
-
   const rectGroupProps = { x: 0, y: 0, onClick: handleClick };
 
   return (
-    <Group x={node.point.x * unit} y={node.point.y * unit} >
+    <Group x={node.point.x * ks.unit} y={node.point.y * ks.unit} >
       {node.open && node.children.length !== 0 && <Rect {...containerRectProps}/>}
       <Group {...rectGroupProps}>
         <Rect {...baseRectProps}/>
         {node.type !== 'case' ? <CheckBox {...checkProps}/> : <RadioButton {...checkProps}/>}
         <Text {...labelProps}/>
         <NodeIconBox {...iconBoxProps}/>
-        {node.open && xputs.map(x => {
-          const xProps = {
-            text: x,
-            x: viewItem.fontSize * unit,
-            y: anchorY,
-            fontSize: viewItem.subFontSize * unit
-          };
-          const el = <Text key={x} {...xProps}/>;
-          anchorY += (viewItem.subFontHeight + viewItem.spr.h / 4) * unit;
-          return el;
-        })}
       </Group>
     </Group>
   );

@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Group, Rect, Text } from 'react-konva';
-import { viewItem, unit } from '../../settings/layout';
+import { ks } from '../../settings/layout';
 import { SvgPath } from '../../data-types/svg-path';
 
 import Icon, { IconProps } from './icon';
@@ -26,21 +26,21 @@ const IconWithBadge: React.FC<IconWithBadgeProps> = (props: IconWithBadgeProps) 
   if (badgeContent === false) { return <Group x={x} y={y}><Icon {...iconProps}/></Group>; }
 
   const over = 3 < badgeContent.length;
-  const bl = viewItem.rect.h * 0.9;
+  const bl = ks.rect.h * 0.9;
   const rectProps = {
-    x: (viewItem.rect.h / 2 - ((over ? 1 : badgeContent.length - 1) * viewItem.badgeFontSize / 4)) * unit,
-    y: viewItem.rect.h / 40 * unit,
-    width: (bl / 2 + (over ? 1 : (badgeContent.length - 1)) * viewItem.badgeFontSize / 2) * unit,
-    height: bl / 2 * unit,
+    x: (ks.rect.h / 2 - ((over ? 1 : badgeContent.length - 1) * ks.badgeFontSize / 4)) * ks.unit,
+    y: ks.rect.h / 40 * ks.unit,
+    width: (bl / 2 + (over ? 1 : (badgeContent.length - 1)) * ks.badgeFontSize / 2) * ks.unit,
+    height: bl / 2 * ks.unit,
     fill: theme.palette.primary.main,
-    cornerRadius: bl / 2 * unit,
+    cornerRadius: bl / 2 * ks.unit,
   };
 
   const textProps = {
-    x: (viewItem.rect.h / 2 + bl / 4 - (over ? 1.5 : badgeContent.length) * viewItem.badgeFontSize / 3.7) * unit,
-    y: (viewItem.rect.h * 0 + viewItem.rect.h / 4 - viewItem.badgeFontHeight / 2) * unit,
+    x: (ks.rect.h / 2 + bl / 4 - (over ? 1.5 : badgeContent.length) * ks.badgeFontSize / 3.7) * ks.unit,
+    y: (ks.rect.h * 0 + ks.rect.h / 4 - ks.badgeFontHeight / 2) * ks.unit,
     text: over ? '...' : badgeContent,
-    fontSize: viewItem.badgeFontSize * unit,
+    fontSize: ks.badgeFontSize * ks.unit,
     fill: '#fff',
   };
 

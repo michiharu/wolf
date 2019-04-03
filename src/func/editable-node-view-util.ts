@@ -1,47 +1,47 @@
 import { EditableNode, Point, Cell } from "../data-types/tree-node";
-import { viewItem } from "../settings/layout";
-import Util from "./util";
+import { ks } from "../settings/layout";
+import KSize from "../data-types/k-size";
 
 export default class EditableNodeViewUtil {
 
-  static calcSelfLength = (node: EditableNode, open: boolean, which: which) => {
+  static calcSelfLength = (node: EditableNode, ks: KSize, open: boolean, which: which) => {
     if (open) {
       if (which === 'width') {
         // task, open, width
         const childrenLength = node.children.length !== 0
           ? node.children.map(c => c.self.w).reduce((a, b) => Math.max(a, b))
-          : viewItem.rect.w;
-        return viewItem.indent + viewItem.spr.w + childrenLength;
+          : ks.rect.w;
+        return ks.indent + ks.spr.w + childrenLength;
       } else {
         // task, open, height
-        return viewItem.rect.h + viewItem.spr.h
+        return ks.rect.h + ks.spr.h
           + (node.children.length !== 0 ?
-              node.children.map(c => c.self.h + viewItem.spr.h).reduce((a, b) => a + b) : 0);
+              node.children.map(c => c.self.h + ks.spr.h).reduce((a, b) => a + b) : 0);
       }
     } else {
       if (which === 'width') {
         // task, close, width
-        return viewItem.rect.w;
+        return ks.rect.w;
       } else {
         // task, close, height
-        return viewItem.rect.h;
+        return ks.rect.h;
       }
     }
   }
 
-  static _setSize = (node: EditableNode): EditableNode => {
+  static _setSize = (node: EditableNode, ks: KSize): EditableNode => {
 
     const rect = {
-      w: viewItem.rect.w,
-      h: viewItem.rect.h
+      w: ks.rect.w,
+      h: ks.rect.h
     };
 
-    const children = node.children.map(c => (EditableNodeViewUtil._setSize(c)));
+    const children = node.children.map(c => (EditableNodeViewUtil._setSize(c, ks)));
     const newNode = {...node, children};
 
     const self = {
-      w: EditableNodeViewUtil.calcSelfLength(newNode, node.open, 'width'),
-      h: EditableNodeViewUtil.calcSelfLength(newNode, node.open, 'height')
+      w: EditableNodeViewUtil.calcSelfLength(newNode, ks, node.open, 'width'),
+      h: EditableNodeViewUtil.calcSelfLength(newNode, ks, node.open, 'height')
     };
 
     return {...node, children, self, rect};
@@ -52,11 +52,11 @@ export default class EditableNodeViewUtil {
     var anchor = 0;
     const children = node.children.map(c => {
       const p: Point = {
-        x: point.x + viewItem.indent,
-        y: point.y + node.rect.h + viewItem.spr.h + anchor
+        x: point.x + ks.indent,
+        y: point.y + node.rect.h + ks.spr.h + anchor
       };
       const child = EditableNodeViewUtil._setPoint(p, c);
-      anchor += c.self.h + viewItem.spr.h;
+      anchor += c.self.h + ks.spr.h;
       return child;
     });
 
@@ -77,9 +77,9 @@ export default class EditableNodeViewUtil {
     return {...node, children, index, depth};
   }
 
-  static setCalcProps = (point: Point, node: EditableNode) => {
-    const setSizeNode = EditableNodeViewUtil._setSize(node);
-    const setPointNode = EditableNodeViewUtil._setPoint(point, setSizeNode);
+  static setCalcProps = (node: EditableNode, ks: KSize) => {
+    const setSizeNode = EditableNodeViewUtil._setSize(node, ks);
+    const setPointNode = EditableNodeViewUtil._setPoint({x: 0, y: 0}, setSizeNode);
     const setDepthNode = EditableNodeViewUtil._setIndexAndDepth(0, 0, setPointNode);
     return setDepthNode;
   }
@@ -105,9 +105,9 @@ export default class EditableNodeViewUtil {
       const result = EditableNodeViewUtil.makeBaseMap(s);
 
       if (s.open) {
-        for(var x = s.point.x + viewItem.spr.w; x < s.point.x + s.self.w; x++) {
+        for(var x = s.point.x + ks.spr.w; x < s.point.x + s.self.w; x++) {
           if (x < 0) { continue; }
-          for(var y = s.point.y + viewItem.spr.h; y < s.point.y + s.self.h; y++) {
+          for(var y = s.point.y + ks.spr.h; y < s.point.y + s.self.h; y++) {
             result[x][y] = { node: s, action: 'push' };
           }
         }
@@ -123,7 +123,7 @@ export default class EditableNodeViewUtil {
       if (s.depth.top !== 0) {
         for(var x = s.point.x; x < s.point.x + s.rect.w; x++) {
           if (x < 0) { continue; }
-          for(var y = s.point.y - viewItem.spr.h; y < s.point.y; y++) {
+          for(var y = s.point.y - ks.spr.h; y < s.point.y; y++) {
             result[x][y] = { node: s, action: 'move' };
           }
         }

@@ -1,3 +1,5 @@
+import KSize from '../data-types/k-size';
+
 export const toolbarHeight = 64;
 export const toolbarMinHeight = 56;
 
@@ -9,15 +11,13 @@ export { default as Case } from '@material-ui/icons/Check';
 export { default as Input } from '@material-ui/icons/GetApp';
 export { default as Output } from '@material-ui/icons/Publish';
 
-export const  unit = 16;
-export const viewItem = {
+export const ks: KSize = {
+  unit: 16,
   rect: {w: 24, h: 2},
   spr: {w: 1, h: 1},
   indent: 2,
   fontSize: 0.9,
   fontHeight: 0.75,
-  subFontSize: 0.8,
-  subFontHeight: 0.68,
   textline: 1,
   icon: 1.25,
   badgeFontSize: 0.7,
