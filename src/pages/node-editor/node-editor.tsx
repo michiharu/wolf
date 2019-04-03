@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import * as React from 'react';
 import {
   Theme, createStyles, WithStyles, withStyles, Grid, Fab, Snackbar, IconButton,
@@ -130,9 +131,7 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   static getDerivedStateFromProps(nextProps: Props, prevState: State) {
-    if (prevState.node.id !== nextProps.node.id ||
-        prevState.node.children.length !== nextProps.node.children.length) {
-          
+    if (prevState.node.id !== nextProps.node.id) {
       const { parent, commonNodes, node } = nextProps;
       return NodeEditor.getInitialState(commonNodes, parent, node);
     }
@@ -246,7 +245,6 @@ class NodeEditor extends React.Component<Props, State> {
       if (cell === undefined || cell.node.id === target.id) { return; }
       if (beforeCell === null || !EditableNodeUtil.isEqualCell(beforeCell, cell)) {
         this.setState({beforeCell: cell});
-        console.log(`cell.action: ${cell.action}`);
 
         if (target.type === 'case') {
           if (cell.action === 'move' && dragParent!.children.find(c => c.id === cell.node.id) !== undefined) {
@@ -386,18 +384,18 @@ class NodeEditor extends React.Component<Props, State> {
 
         <Stage ref={this.stageRef} onClick={this.deleteFocus}>
           <Layer>
-            {map !== null && map.map((_, x) => (
+            {/* {map !== null && map.map((___, x) => (
             <Group key={`group-${x}`} x={32} y={80}>
-              {_.map((__, y) => {
-                const cell = map[x][y];
-                if (cell === undefined) { return <Rect key={`${x}-${y}`}/>; }
-                const fill = cell.action === 'push' ? 'yellow' :
-                            cell.action === 'move' ? 'blue'   : 'grey';
-                return (
-                  <Rect key={`${x}-${y}`} x={x * ks.unit} y={y * ks.unit + 300} width={ks.unit} height={ks.unit}
-                        fill={fill} stroke="#000" strokeWidth={1}/>);
-                })}
-            </Group>))}
+              {___.map((__, y) => {
+              const cell = map[x][y];
+              if (cell === undefined) { return <Rect key={`${x}-${y}`}/>; }
+              const fill = cell.action === 'push' ? ('#ccff' + _.padStart(String(cell.node.depth.top * 16), 2, '0')) :
+                          cell.action === 'move' ? 'blue'   : 'grey';
+              return (
+                <Rect key={`${x}-${y}`} x={x * ks.unit} y={y * ks.unit + 300} width={ks.unit} height={ks.unit}
+                      fill={fill} stroke="#000" strokeWidth={1}/>);
+              })}
+            </Group>))} */}
             {flatNodes.map(n => <EditableKNode key={n.id} node={n} {...nodeActionProps}/>)}
           </Layer>
         </Stage>
@@ -433,10 +431,9 @@ class NodeEditor extends React.Component<Props, State> {
           open={showViewSettings}
           onClose={() => this.setState({showViewSettings: false})}
           BackdropProps={{className: classes.viewSettingModal}}
+          disableAutoFocus
         >
-          <DialogContent>
-            <ViewSettings ks={ks} changeKS={this.changeKS}/>
-          </DialogContent>
+          <ViewSettings ks={ks} changeKS={this.changeKS}/>
         </Modal>
 
         <Snackbar

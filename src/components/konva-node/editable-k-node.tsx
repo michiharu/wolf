@@ -78,8 +78,8 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
   const handleDragMove = (e: any) => {
     const tr = e.target.getClientRect();
     const point = {
-      x: Math.floor((tr.x - origin.x) / ks.unit) + ks.rect.w / 2,
-      y: Math.floor((tr.y - origin.y) / ks.unit) + ks.rect.h / 2,
+      x: Math.round((tr.x - origin.x) / ks.unit + ks.rect.w / 2),
+      y: Math.round((tr.y - origin.y) / ks.unit + ks.rect.h / 2),
     };
     dragMove(node, point);
   }
