@@ -25,19 +25,19 @@ const origin: Point = {x: 32, y: 80};
 
 const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) => {
   const { node, ks, click, deleteFocus, dragStart, dragMove, dragEnd} = props;
-  const fill = node.type === 'task' ?   node.focus ? lightBlue[200] : lightBlue[300] :
-               node.type === 'switch' ? node.focus ? amber[400] : amber[300] :
-                                        node.focus ? yellow[400] : yellow[300];
+  const fill = node.type === 'task' ?   node.focus ? lightBlue[100] : lightBlue[50] :
+               node.type === 'switch' ? node.focus ? amber[200] : amber[100] :
+                                        node.focus ? yellow[200] : yellow[100];
   const baseRectProps = {
     x: 0, y: 0,
     width: node.rect.w * ks.unit,
     height: node.rect.h * ks.unit,
     cornerRadius: ks.cornerRadius * ks.unit,
     fill,
-    shadowColor: node.focus ? fill : 'black',
+    shadowColor: 'black',
     shadowBlur: node.focus ? 10 : 6,
-    shadowOffset: { x : 0, y : node.focus ? 0 : 3},
-    shadowOpacity: node.focus ? 1 : 0.2,
+    shadowOffset: { x: 0, y: 3},
+    shadowOpacity: 0.2,
   };
 
   const handleClick = (e: any) => {

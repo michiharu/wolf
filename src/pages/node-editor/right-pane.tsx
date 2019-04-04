@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import {
   Theme, createStyles, WithStyles, withStyles, Portal, TextField,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
-  InputAdornment, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Divider, Button, Slide
+  InputAdornment, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Divider, Button, Slide, Collapse
 } from '@material-ui/core';
 import {
   Task, Switch, Case, Input, Output, toolbarHeight, toolbarMinHeight, rightPainWidth
@@ -150,6 +150,8 @@ const RightPane: React.FC<Props> = (props: Props) => {
     className: classes.marginTop, color: 'primary', fullWidth: true
   };
 
+  const [openDetails, setOpenDetails] = useState(false);
+
   const [deleteFlag, setDeleteFlag] = useState(false);
   const handleClickDelete = () => {
     if (node!.children.length !== 0) {
@@ -244,6 +246,36 @@ const RightPane: React.FC<Props> = (props: Props) => {
               InputProps={{startAdornment: OutputIcon}}
               fullWidth
             />
+
+            <Collapse in={openDetails}>
+              <TextField
+                variant="outlined"
+                className={classes.marginTop}
+                label="インプット"
+                value={node !== null ? node.input : ''}
+                onChange={changeInput}
+                InputProps={{startAdornment: InputIcon}}
+                fullWidth
+                multiline
+              />
+              
+              <TextField
+                variant="outlined"
+                className={classes.marginTop}
+                label="アウトプット"
+                value={node !== null ? node.output : ''}
+                onChange={changeOutput}
+                InputProps={{startAdornment: OutputIcon}}
+                fullWidth
+              />
+            
+            </Collapse>
+
+            <Button {...buttonProps} onClick={() => setOpenDetails(!openDetails)}>
+              {`詳細を${openDetails ? '非' : ''}表示`}
+            </Button>
+
+            <Divider className={classes.marginTop} />
 
             <Button {...buttonProps} onClick={addDetails}>項目を追加</Button>
 
