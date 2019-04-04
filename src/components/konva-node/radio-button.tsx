@@ -3,8 +3,10 @@ import * as React from 'react';
 import Icon, { IconProps } from './icon';
 import radioChecked from '../../resource/svg-icon/radio-button/radio-button-checked';
 import radioUnchecked from '../../resource/svg-icon/radio-button/radio-button-unchecked';
+import KSize from '../../data-types/k-size';
 
 export interface CheckBoxProps {
+  ks: KSize;
   x: number;
   y: number;
   checked: boolean;
@@ -14,9 +16,9 @@ export interface CheckBoxProps {
 }
 
 const RadioButton: React.FC<CheckBoxProps> = (props: CheckBoxProps) => {
-  const {x, y, checked, color, backgroundColor, onClick} = props;
+  const {ks, x, y, checked, color, backgroundColor, onClick} = props;
   const iconButtonProps: IconProps = {
-    x, y,
+    ks, x, y,
     svg: checked ? radioChecked : radioUnchecked,
     color,
     backgroundColor,

@@ -10,6 +10,7 @@ import { Stage, Layer } from 'react-konva';
 import CheckBox from '../components/konva-node/check-box';
 import IconWithBadge from '../components/konva-node/icon-with-badge';
 import task from '../resource/svg-icon/task';
+import { ks } from '../settings/layout';
 
 storiesOf('Material-UI', module)
 .addDecorator(muiTheme())
@@ -26,24 +27,24 @@ storiesOf('Konva', module)
 .add('CheckBox - checked', () => (
   <Stage width={400} height={400}>
     <Layer>
-      <CheckBox x={20} y={20} checked={true}/>
+      <CheckBox ks={ks} x={20} y={20} checked={true}/>
     </Layer>
   </Stage>
 ))
 .add('CheckBox - blank', () => (
   <Stage width={400} height={400}>
     <Layer>
-      <CheckBox x={20} y={20} checked={false}/>
+      <CheckBox ks={ks} x={20} y={20} checked={false}/>
     </Layer>
   </Stage>
 ))
 .add('Icon with badge', () => (
   <Stage width={400} height={400}>
     <Layer>
-      <IconWithBadge x={20} y={20} svg={task} badgeContent="3"/>
-      <IconWithBadge x={80} y={40} svg={task} badgeContent="33"/>
-      <IconWithBadge x={140} y={60} svg={task} badgeContent="333"/>
-      <IconWithBadge x={200} y={80} svg={task} badgeContent="3333"/>
+      <IconWithBadge ks={ks} x={20} y={20} svg={task} badgeContent="3"/>
+      <IconWithBadge ks={ks} x={80} y={40} svg={task} badgeContent="33"/>
+      <IconWithBadge ks={ks} x={140} y={60} svg={task} badgeContent="333"/>
+      <IconWithBadge ks={ks} x={200} y={80} svg={task} badgeContent="3333"/>
     </Layer>
   </Stage>
 ))

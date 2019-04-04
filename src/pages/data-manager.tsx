@@ -2,10 +2,11 @@ import * as React from 'react';
 import Layout from './layout';
 import TreeNode from '../data-types/tree-node';
 import TreeUtil from '../func/tree';
+import keys from '../settings/storage-keys';
 
 interface State {
   treeNodes: TreeNode[];
-  selectedNodeList: TreeNode[] | null; // 選択されたNodeを最初の要素の深さを０として保持する
+  selectedNodeList: TreeNode[]; // 選択されたNodeを最初の要素の深さを０として保持する
   commonNodes: TreeNode[];
 }
 
@@ -13,9 +14,11 @@ class DataManager extends React.Component<{}, State> {
 
   constructor(props: {}) {
     super(props);
+    const treeNodesFromStorage = localStorage.getItem(keys.tree);
+    const treeNodes = treeNodesFromStorage !== null ? JSON.parse(treeNodesFromStorage) : [];
     this.state = {
-      treeNodes: [],
-      selectedNodeList: null,
+      treeNodes,
+      selectedNodeList: [],
       commonNodes: [],
     };
   }
@@ -28,10 +31,12 @@ class DataManager extends React.Component<{}, State> {
 
   changeNode = (target: TreeNode) => {
     const {treeNodes: nodeList, selectedNodeList} = this.state;
-    const newNodeList = TreeUtil.replace(nodeList!, target);
-    this.setState({treeNodes: newNodeList});
+    const treeNodes = TreeUtil.replace(nodeList!, target);
+    this.setState({treeNodes});
+    localStorage.setItem(keys.tree, JSON.stringify(treeNodes));
+
     const selectedNode = selectedNodeList![selectedNodeList!.length - 1];
-    const newSelectedNode = TreeUtil.find(newNodeList, selectedNode)!;
+    const newSelectedNode = TreeUtil.find(treeNodes, selectedNode)!;
     process.nextTick(() => this.selectNode(newSelectedNode));
   }
 
@@ -39,6 +44,7 @@ class DataManager extends React.Component<{}, State> {
     const { treeNodes } = this.state;
     treeNodes!.unshift(node);
     this.setState({treeNodes}); 
+    localStorage.setItem(keys.tree, JSON.stringify(treeNodes));
   }
 
   addCommonList = (node: TreeNode) => {

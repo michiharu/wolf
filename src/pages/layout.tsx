@@ -15,7 +15,7 @@ const styles = (theme: Theme) => createStyles({
 
 interface Props extends WithStyles<typeof styles> {
   treeNodes: TreeNode[];
-  selectedNodeList: TreeNode[] | null;
+  selectedNodeList: TreeNode[];
   commonNodes: TreeNode[];
 
   selectNode: (node: TreeNode | null) => void;

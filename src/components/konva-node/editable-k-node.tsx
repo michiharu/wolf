@@ -48,9 +48,9 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
   const stroke = '#dddd';
   const strokeWidth = 2;
   const containerRectProps = {
-    x: ks.spr.w * ks.unit,
+    x: ks.indent * 0.5 * ks.unit,
     y: ks.spr.h * ks.unit,
-    width: (node.self.w - ks.spr.w) * ks.unit,
+    width: (node.self.w - ks.indent * 0.5) * ks.unit,
     height: (node.self.h - ks.spr.h) * ks.unit,
     cornerRadius: ks.cornerRadius * ks.unit,
     stroke,
@@ -66,6 +66,7 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
   };
 
   const iconBoxProps: NodeIconBoxProps = {
+    ks,
     x: node.rect.w * ks.unit,
     y: labelProps.y - (ks.rect.h - ks.fontHeight) / 2 * ks.unit,
     node

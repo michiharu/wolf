@@ -1,12 +1,12 @@
 import * as React from 'react';
 
 import { Group, Rect } from 'react-konva';
-import { ks } from '../../settings/layout';
 import { SvgPath } from '../../data-types/svg-path';
 import SvgToPath from './svg-to-path';
-import { number } from 'prop-types';
+import KSize from '../../data-types/k-size';
 
 export interface IconProps {
+  ks: KSize;
   x: number;
   y: number;
   svg: SvgPath[];
@@ -18,7 +18,7 @@ export interface IconProps {
 }
 
 const Icon: React.FC<IconProps> = (props: IconProps) => {
-  const {x, y, svg, color, backgroundColor, rotate, scale, onClick} = props;
+  const {ks, x, y, svg, color, backgroundColor, rotate, scale, onClick} = props;
   const baseRectProps = {
     x: 0, y: 0,
     width: ks.rect.h * ks.unit,

@@ -167,6 +167,7 @@ class CheckList extends React.Component<Props, CheckListState> {
     const flatNodes = CheckNodeUtil.toFlat(node);
 
     const nodeActionProps = {
+      ks,
       click: this.click, check: this.check
     };
 

@@ -9,7 +9,7 @@ interface Props {
   toolRef: HTMLDivElement | null;
   rightPaneRef: HTMLDivElement | null;
   treeNodes: TreeNode[];
-  selectedNodeList: TreeNode[] | null;
+  selectedNodeList: TreeNode[];
   commonNodes: TreeNode[];
 
   changeNode: (node: TreeNode) => void;
@@ -51,7 +51,7 @@ class PageRouter extends React.Component<Props, State> {
             />
           )}
         />
-        {treeNodes.length === 0 && <Redirect to={link.dashboard}/>}
+        {selectedNodeList.length === 0 && <Redirect to={link.dashboard}/>}
         <Route
           exact
           path={link.edit}

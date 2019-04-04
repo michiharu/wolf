@@ -1,5 +1,4 @@
 import { EditableNode, Point, Cell } from "../data-types/tree-node";
-import { ks } from "../settings/layout";
 import KSize from "../data-types/k-size";
 
 export default class EditableNodeViewUtil {
@@ -11,12 +10,12 @@ export default class EditableNodeViewUtil {
         const childrenLength = node.children.length !== 0
           ? node.children.map(c => c.self.w).reduce((a, b) => Math.max(a, b))
           : ks.rect.w;
-        return ks.indent + ks.spr.w + childrenLength;
+        return ks.indent * 1.5 + childrenLength;
       } else {
         // task, open, height
-        return ks.rect.h + ks.spr.h
+        return ks.rect.h + ks.margin.h
           + (node.children.length !== 0 ?
-              node.children.map(c => c.self.h + ks.spr.h).reduce((a, b) => a + b) : 0);
+              node.children.map(c => c.self.h + ks.margin.h).reduce((a, b) => a + b) : 0);
       }
     } else {
       if (which === 'width') {
@@ -47,16 +46,16 @@ export default class EditableNodeViewUtil {
     return {...node, children, self, rect};
   }
 
-  static _setPoint = (point: Point, node: EditableNode): EditableNode => {
+  static _setPoint = (point: Point, node: EditableNode, ks: KSize): EditableNode => {
 
     var anchor = 0;
     const children = node.children.map(c => {
       const p: Point = {
         x: point.x + ks.indent,
-        y: point.y + node.rect.h + ks.spr.h + anchor
+        y: point.y + node.rect.h + ks.margin.h + anchor
       };
-      const child = EditableNodeViewUtil._setPoint(p, c);
-      anchor += c.self.h + ks.spr.h;
+      const child = EditableNodeViewUtil._setPoint(p, c, ks);
+      anchor += c.self.h + ks.margin.h;
       return child;
     });
 
@@ -79,7 +78,7 @@ export default class EditableNodeViewUtil {
 
   static setCalcProps = (node: EditableNode, ks: KSize) => {
     const setSizeNode = EditableNodeViewUtil._setSize(node, ks);
-    const setPointNode = EditableNodeViewUtil._setPoint({x: 0, y: 0}, setSizeNode);
+    const setPointNode = EditableNodeViewUtil._setPoint({x: 0, y: 0}, setSizeNode, ks);
     const setDepthNode = EditableNodeViewUtil._setIndexAndDepth(0, 0, setPointNode);
     return setDepthNode;
   }
@@ -95,7 +94,7 @@ export default class EditableNodeViewUtil {
     return base;
   }
 
-  static makeMap = (nodes: EditableNode[]): Cell[][] => {
+  static makeMap = (nodes: EditableNode[], ks: KSize): Cell[][] => {
     const root = nodes[0];
     const sorted = nodes.sort((a, b) => a.depth.bottom < b.depth.bottom ? 1 : -1);
 

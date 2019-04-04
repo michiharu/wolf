@@ -19,10 +19,10 @@ const styles = (theme: Theme) => createStyles({
   scroll: {
     
   },
-  xSetter: {
+  longSetter: {
     width: 200,
   },
-  ySetter: {
+  shortSetter: {
     width: 100,
   },
   slider: {
@@ -44,9 +44,25 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
 
   return (
     <Paper className={classes.root}>
-      <Grid container justify="space-around">
+      <Grid container justify="space-around" spacing={32}>
         <Grid item>
-          <div className={classes.xSetter}>
+          <div className={classes.longSetter}>
+            <Typography>表示の大きさ</Typography>
+            <Slider
+              classes={{ container: classes.slider }}
+              value={ks.unit}
+              min={10}
+              max={40}
+              step={1}
+              onChange={(_, value) => {
+                const newKS = {...ks, unit: value};
+                changeKS(newKS);
+              }}
+            />
+          </div>
+        </Grid>
+        <Grid item>
+          <div className={classes.longSetter}>
             <Typography>長方形の横幅</Typography>
             <Slider
               classes={{ container: classes.slider }}
@@ -62,13 +78,13 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
           </div>
         </Grid>
         <Grid item>
-          <div className={classes.ySetter}>
+          <div className={classes.shortSetter}>
             <Typography>長方形の縦幅</Typography>
             <Slider
               classes={{ container: classes.slider }}
               value={ks.rect.h}
               min={2}
-              max={6}
+              max={5}
               step={1}
               onChange={(_, value) => {
                 const newKS = {...ks, rect: {...ks.rect, h: value}};
@@ -78,32 +94,32 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
           </div>
         </Grid>
         <Grid item>
-          <div className={classes.xSetter}>
-            <Typography>余白の横幅</Typography>
+          <div className={classes.shortSetter}>
+            <Typography>インデント</Typography>
             <Slider
               classes={{ container: classes.slider }}
-              value={ks.spr.w}
-              min={1}
-              max={3}
-              step={1}
+              value={ks.indent}
+              min={2}
+              max={6}
+              step={2}
               onChange={(_, value) => {
-                const newKS = {...ks, spr: {...ks.spr, w: value}};
+                const newKS = {...ks, indent: value};
                 changeKS(newKS);
               }}
             />
           </div>
         </Grid>
         <Grid item>
-          <div className={classes.ySetter}>
-            <Typography>余白の縦幅</Typography>
+          <div className={classes.shortSetter}>
+            <Typography>縦の余白</Typography>
             <Slider
               classes={{ container: classes.slider }}
-              value={ks.spr.h}
+              value={ks.margin.h}
               min={1}
               max={3}
               step={1}
               onChange={(_, value) => {
-                const newKS = {...ks, spr: {...ks.spr, h: value}};
+                const newKS = {...ks, margin: {...ks.margin, h: value}};
                 changeKS(newKS);
               }}
             />

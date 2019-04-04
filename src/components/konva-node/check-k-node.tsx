@@ -4,21 +4,22 @@ import { lightBlue, amber, yellow, grey } from '@material-ui/core/colors';
 import { Rect, Group, Text } from 'react-konva';
 
 import { CheckNode } from '../../data-types/tree-node';
-import { ks } from '../../settings/layout';
 
 import Util from '../../func/util';
 import NodeIconBox, { NodeIconBoxProps } from './icon-box';
 import CheckBox, { CheckBoxProps } from './check-box';
 import RadioButton from './radio-button';
+import KSize from '../../data-types/k-size';
 
 export interface CheckKNodeProps {
+  ks: KSize;
   node: CheckNode;
   click: (node: CheckNode) => void;
   check: (node: CheckNode) => void;
 }
 
 const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
-  const {node, click, check} = props;
+  const {ks, node, click, check} = props;
 
   const fill =
     node.id === '--' || node.skipped ? grey[400] :
@@ -60,6 +61,7 @@ const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
   };
 
   const checkProps = {
+    ks,
     x: 0,
     y: 0,
     checked: node.checked,
@@ -76,6 +78,7 @@ const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
   };
 
   const iconBoxProps: NodeIconBoxProps = {
+    ks,
     x: node.rect.w * ks.unit,
     y: labelProps.y - (ks.rect.h - ks.fontHeight) / 2 * ks.unit,
     node,

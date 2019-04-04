@@ -14,6 +14,7 @@ export { default as Output } from '@material-ui/icons/Publish';
 export const ks: KSize = {
   unit: 16,
   rect: {w: 24, h: 2},
+  margin: {w: 1, h: 1},
   spr: {w: 1, h: 1},
   indent: 2,
   fontSize: 0.9,

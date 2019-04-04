@@ -3,6 +3,7 @@ import { Size } from "./tree-node";
 export default interface KSize {
   unit: number,
   rect: Size,
+  margin: Size,
   spr: Size,
   indent: number,
   fontSize: number,

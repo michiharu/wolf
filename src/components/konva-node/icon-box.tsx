@@ -1,13 +1,15 @@
 import * as React from 'react';
 
 import { Group } from 'react-konva';
-import { ks } from '../../settings/layout';
+
 import { EditableNode } from '../../data-types/tree-node';
 import { task, switchSvg} from '../../resource/svg-icon';
 import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
 import check from '../../resource/svg-icon/check';
+import KSize from '../../data-types/k-size';
 
 export interface NodeIconBoxProps {
+  ks: KSize;
   x: number;
   y: number;
   node: EditableNode;
@@ -15,11 +17,12 @@ export interface NodeIconBoxProps {
 }
 
 const NodeIconBox: React.FC<NodeIconBoxProps> = (props: NodeIconBoxProps) => {
-  const {x, y, node, forCheck} = props;
+  const {ks, x, y, node, forCheck} = props;
   const backgroundColor = '#0000';
   const badgeContent = String(node.children.length);
 
   const selfIconProps: IconWithBadgeProps = {
+    ks,
     x: 0, y: 0,
     svg: node.type === 'task' ? task : node.type === 'switch' ? switchSvg : check,
     backgroundColor, badgeContent,
