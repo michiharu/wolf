@@ -36,6 +36,9 @@ const styles = (theme: Theme) => createStyles({
   saveButton: {
     minWidth: 100,
   },
+  goTextButton: {
+    minWidth: 150,
+  },
   extendedIcon: {
     marginLeft: theme.spacing.unit,
   },
@@ -64,6 +67,7 @@ export interface EditorProps {
   commonNodes: TreeNode[];
   node: TreeNode;
   back: () => void;
+  goText: () => void;
   changeNode: (node: TreeNode) => void;
   addCommonList: (node: TreeNode) => void;
   deleteCommonList: (node: TreeNode) => void;
@@ -146,19 +150,19 @@ class NodeEditor extends React.Component<Props, State> {
     sref.draw();
   }
 
-  differenceCheck = () => {
-    if (EditableNodeUtil._hasDifference(this.props.node, this.state.node)) {
+  differenceCheck = (operation: () => void) => {
+    if (TreeUtil._hasDifference(this.props.node, this.state.node)) {
       this.setState({hasDifference: true});
     } else {
-      this.props.back();
+      operation();
     }
   }
 
   save = () => {
     const { parent, commonNodes, changeNode, addCommonList, deleteCommonList } = this.props;
     const {isCommon, node} = this.state;
-    const isAllSwitchHasCase = EditableNodeUtil._isAllSwitchHasCase(node);
-    const isAllCaseHasItem = EditableNodeUtil._isAllCaseHasItem(node);
+    const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
+    const isAllCaseHasItem = TreeUtil._isAllCaseHasItem(node);
     const cannotSaveReason: CannotSaveReason = !isAllSwitchHasCase ? 'switch' :
                                                !isAllCaseHasItem   ? 'case'   : null;
     if (cannotSaveReason === null) {
@@ -181,7 +185,7 @@ class NodeEditor extends React.Component<Props, State> {
     const {node} = this.props;
     const filename = `${node.label}.json`;
     const nodeWithoutId = TreeUtil._removeId(node);
-    fileDownload(JSON.stringify(nodeWithoutId), filename);
+    fileDownload(JSON.stringify(nodeWithoutId), filename, 'application/json');
   }
 
   setFocusState = (target: EditableNode, focus: boolean) => {
@@ -338,7 +342,7 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const { toolRef, rightPaneRef, parent, commonNodes, back, classes } = this.props;
+    const { toolRef, rightPaneRef, parent, commonNodes, back, goText, classes } = this.props;
     const {
       ks, isCommon, node, focusNode, map, hasDifference, saved, cannotSaveReason, showViewSettings
     } = this.state;
@@ -372,7 +376,7 @@ class NodeEditor extends React.Component<Props, State> {
         <ToolContainer containerRef={toolRef}>
           <Grid container spacing={8}>
             <Grid item>
-              <Fab color="primary" onClick={this.differenceCheck} size="medium"><ArrowBack/></Fab>
+              <Fab color="primary" onClick={() => this.differenceCheck(back)} size="medium"><ArrowBack/></Fab>
             </Grid>
             <Grid item>
               <Fab className={classes.saveButton} variant="extended" color="primary" onClick={this.save}>
@@ -385,6 +389,11 @@ class NodeEditor extends React.Component<Props, State> {
                 <Download/>
               </Fab>
             </Grid>)}
+            <Grid item>
+              <Fab className={classes.goTextButton} variant="extended" onClick={() => this.differenceCheck(goText)}>
+                テキストモードへ移動<CheckIcon className={classes.extendedIcon}/>
+              </Fab>
+            </Grid>
             <Grid item>
               <Fab onClick={() => this.setState({showViewSettings: true})} size="medium"><ViewSettingsIcon/></Fab>
             </Grid>

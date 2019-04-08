@@ -1,4 +1,5 @@
 import KSize from '../data-types/k-size';
+import TextEditSettings from '../data-types/text-edit-settings';
 
 export const toolbarHeight = 64;
 export const toolbarMinHeight = 56;
@@ -10,6 +11,15 @@ export { default as Switch } from '@material-ui/icons/CallSplit';
 export { default as Case } from '@material-ui/icons/Check';
 export { default as Input } from '@material-ui/icons/GetApp';
 export { default as Output } from '@material-ui/icons/Publish';
+export { default as PreConditions } from '@material-ui/icons/AssignmentLate';
+export { default as PostConditions } from '@material-ui/icons/AssignmentTurnedIn';
+export { default as WorkerInCharge } from '@material-ui/icons/People';
+export { default as Remarks } from '@material-ui/icons/InfoOutlined';
+export { default as NecessaryTools } from '@material-ui/icons/Build';
+export { default as Exceptions } from '@material-ui/icons/Error';
+export { default as Image } from '@material-ui/icons/Photo';
+export { default as Delete } from '@material-ui/icons/Delete';
+
 
 export const ks: KSize = {
   unit: 16,
@@ -24,4 +34,8 @@ export const ks: KSize = {
   badgeFontSize: 0.7,
   badgeFontHeight: 0.6,
   cornerRadius: 0.5,
+};
+
+export const tes: TextEditSettings = {
+  showAll: true,
 };

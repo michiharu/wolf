@@ -1,6 +1,6 @@
 import * as React from 'react';
 import TreeNode from '../../data-types/tree-node';
-import NodeEditor, { EditorProps } from './node-editor';
+import TextEditor, { EditorProps } from './text-editor';
 import { RouteComponentProps } from 'react-router';
 import link from '../../settings/path-list';
 
@@ -16,9 +16,9 @@ interface Props extends RouteComponentProps {
   deleteCommonList: (node: TreeNode) => void;
 }
 
-const EditorNullChecker: React.SFC<Props> = (props: Props) => {
+const TextNullChecker: React.SFC<Props> = (props: Props) => {
   const {
-    toolRef, rightPaneRef, treeNodes, selectedNodeList, commonNodes,
+    toolRef, treeNodes, selectedNodeList, commonNodes,
     changeNode, addCommonList, deleteCommonList, addNode, history
   } = props;
   if (toolRef === null || selectedNodeList === null || treeNodes === null) {
@@ -28,22 +28,20 @@ const EditorNullChecker: React.SFC<Props> = (props: Props) => {
   const parent = selectedNodeList.length === 1 ? null : selectedNodeList[selectedNodeList.length - 2];
 
   const back = () => history.push(link.dashboard);
-  const goText = () => history.push(link.text);
 
   const viewerProps: EditorProps = {
-    toolRef, rightPaneRef: rightPaneRef!,
+    toolRef,
     parent,
     commonNodes,
     node: selectedNodeList[selectedNodeList.length - 1],
     back,
-    goText,
     changeNode,
     addCommonList,
     deleteCommonList,
     addNode,
   }
   
-  return <NodeEditor {...viewerProps}/>;
+  return <TextEditor {...viewerProps}/>;
 };
 
-export default EditorNullChecker;
+export default TextNullChecker;

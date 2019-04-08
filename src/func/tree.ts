@@ -25,11 +25,20 @@ export default class TreeUtil {
                     : b !== false ? b : false);
   }
 
-  static replace = (nodeList: TreeNode[], target: TreeNode): TreeNode[] => {
+  static replaceChild = (nodeList: TreeNode[], target: TreeNode): TreeNode[] => {
     if (nodeList.length === 0) { return []; }
     return nodeList.map(n => target.id === n.id
       ? target
-      : {...n, children: TreeUtil.replace(n.children, target)});
+      : {...n, children: TreeUtil.replaceChild(n.children, target)});
+  }
+
+  static _replace = (node: TreeNode, target: TreeNode): TreeNode => {
+    if (node.id === target.id) {
+      return target;
+    } else {
+      const children = node.children.map(c => TreeUtil._replace(c, target));
+      return {...node, children};
+    }
   }
 
   static find = (nodeList: TreeNode[], target: TreeNode): TreeNode | undefined => {
@@ -88,6 +97,14 @@ export default class TreeUtil {
       label: node.label,
       input: node.input,
       output: node.output,
+      preConditions: node.preConditions,
+      postConditions: node.postConditions,
+      workerInCharge: node.workerInCharge,
+      remarks: node.remarks,
+      necessaryTools: node.necessaryTools,
+      exceptions: node.exceptions,
+      imageName: node.imageName,
+      imageBlob: node.imageBlob,
       children
     };
   }
@@ -104,6 +121,14 @@ export default class TreeUtil {
     label,
     input: '',
     output: '',
+    preConditions: '',
+    postConditions: '',
+    workerInCharge: '',
+    remarks: '',
+    necessaryTools: '',
+    exceptions: '',
+    imageName: '',
+    imageBlob: '',
     children: [],
   });
 
@@ -125,5 +150,55 @@ export default class TreeUtil {
     .map(n => ({node: n, children: TreeUtil._searchAndFilter(words, n.children)}))
     .filter(obj => TreeUtil.match(obj.node, words) || obj.children.length !== 0)
     .map(obj => ({...obj.node, children: obj.children}));
+  }
+
+  static _hasDifference = (a: TreeNode, b: TreeNode): boolean => {
+    if (a.id     !== b.id)     { return true; }
+    if (a.type   !== b.type)   { return true; }
+    if (a.label  !== b.label)  { return true; }
+    if (a.input  !== b.input)  { return true; }
+    if (a.output !== b.output) { return true; }
+
+    if (a.preConditions  !== b.preConditions)  { return true; }
+    if (a.postConditions !== b.postConditions) { return true; }
+    if (a.workerInCharge !== b.workerInCharge) { return true; }
+    if (a.remarks        !== b.remarks)        { return true; }
+    if (a.necessaryTools !== b.necessaryTools) { return true; }
+    if (a.exceptions     !== b.exceptions)     { return true; }
+    if (a.imageBlob      !== b.imageBlob)      { return true; }
+
+    if (a.children.length !== b.children.length) { return true; }
+    if (a.children.length === 0) { return false; }
+
+    return a.children
+    .map((_, i) => ({t: a.children[i], e: b.children[i]}))
+    .map(te => TreeUtil._hasDifference(te.t, te.e))
+    .reduce((a, b) => a || b);
+  }
+
+  static _isAllSwitchHasCase = (node: TreeNode): boolean => {
+    if (node.children.length === 0) {
+      if (node.type === 'switch') { return false; }
+      return true;
+    }
+    return node.children.map(c => TreeUtil._isAllSwitchHasCase(c)).reduce((a, b) => a && b);
+  }
+
+  static _isAllCaseHasItem = (node: TreeNode): boolean => {
+    if (node.children.length === 0) {
+      if (node.type === 'case') { return false; }
+      return true;
+    }
+    return node.children.map(c => TreeUtil._isAllCaseHasItem(c)).reduce((a, b) => a && b);
+  }
+
+  static _deleteById = (node: TreeNode, id: string): TreeNode => {
+    const findResult = node.children.find(c => c.id === id);
+    if (findResult !== undefined) {
+      return {...node, children: node.children.filter(c => c.id !== id)};
+    }
+
+    const children = node.children.map(c => TreeUtil._deleteById(c, id));
+    return {...node, children};
   }
 }

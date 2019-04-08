@@ -4,12 +4,14 @@ import ReactDOM from 'react-dom';
 import classnames from 'classnames';
 
 import {
-  Theme, createStyles, WithStyles, withStyles, Portal, TextField,
+  Theme, createStyles, WithStyles, withStyles, Portal, TextField, Grid,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
-  InputAdornment, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Divider, Button, Slide, Collapse
+  InputAdornment, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Divider, Button, Slide, Collapse, IconButton
 } from '@material-ui/core';
 import {
-  Task, Switch, Case, Input, Output, toolbarHeight, toolbarMinHeight, rightPainWidth
+  Task, Switch, Case, Input, Output, PreConditions, PostConditions,
+  WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Delete,
+  toolbarHeight, toolbarMinHeight, rightPainWidth
 } from '../../settings/layout';
 import TreeNode, { Type, EditableNode, NodeWithSimilarity } from '../../data-types/tree-node';
 import { ButtonProps } from '@material-ui/core/Button';
@@ -36,6 +38,7 @@ const styles = (theme: Theme) => createStyles({
   rightPanePaper: {
     width: '100%',
     height: '100%',
+    overflow: 'scroll',
     borderLeft: 'solid 1px #ccc',
     backgroundColor: theme.palette.background.paper
   },
@@ -87,6 +90,8 @@ export interface RightPaneProps {
 interface Props extends RightPaneProps, WithStyles<typeof styles> {}
 
 const RightPane: React.FC<Props> = (props: Props) => {
+  var fileReader: FileReader;
+  var fileName: string;
 
   const {
     rightPaneRef, node, commonNodes, isRoot, isCommon,
@@ -114,15 +119,6 @@ const RightPane: React.FC<Props> = (props: Props) => {
       changeNode(newNode);
     }
   };
-  const changeLabel = (e: any) => {
-    changeNode({...node!, label: e.target.value});
-  };
-  const changeInput = (e: any) => {
-    changeNode({...node!, input: e.target.value});
-  };
-  const changeOutput = (e: any) => {
-    changeNode({...node!, output: e.target.value});
-  };
 
   const selectIsCommonRef = useRef(null);
   const [selectIsCommonWidth, setSelectIsCommonWidth] = useState(0);
@@ -138,13 +134,23 @@ const RightPane: React.FC<Props> = (props: Props) => {
     });      
   }
 
-  const InputIcon = (
-    <InputAdornment position="start"><Input/></InputAdornment>
-  );
+  const InputIcon = <InputAdornment position="start"><Input/></InputAdornment>;
 
-  const OutputIcon = (
-    <InputAdornment position="start"><Output/></InputAdornment>
-  );
+  const OutputIcon = <InputAdornment position="start"><Output/></InputAdornment>;
+
+  const PreConditionsIcon = <InputAdornment position="start"><PreConditions/></InputAdornment>;
+
+  const PostConditionsIcon = <InputAdornment position="start"><PostConditions/></InputAdornment>;
+
+  const WorkerInChargeIcon = <InputAdornment position="start"><WorkerInCharge/></InputAdornment>;
+
+  const RemarksIcon = <InputAdornment position="start"><Remarks/></InputAdornment>;
+
+  const NecessaryToolsIcon = <InputAdornment position="start"><NecessaryTools/></InputAdornment>;
+
+  const ExceptionsIcon = <InputAdornment position="start"><Exceptions/></InputAdornment>;
+
+
   const focusType: Type = node === null ? 'task' : node.type; 
   const buttonProps: ButtonProps = {
     className: classes.marginTop, color: 'primary', fullWidth: true
@@ -174,6 +180,23 @@ const RightPane: React.FC<Props> = (props: Props) => {
     }
   }
 
+  const handleFileRead = () => {
+    const content = fileReader.result as string;
+    changeNode({...node!, imageName: fileName, imageBlob: content});
+    fileName = '';
+  }
+
+  const handleFileChosen = (e: any) => {
+    const file = e.target.files[0];
+    if (file === undefined) { return; }
+    fileReader = new FileReader();
+    fileReader.onload = handleFileRead;
+    fileReader.readAsDataURL(file);
+    const filePath = String(e.target.value).split('\\');
+    fileName = filePath[filePath.length - 1];
+    e.target.value = '';
+  }
+
   return (
     <>
       <Portal container={rightPaneRef}>
@@ -199,7 +222,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
               className={classes.marginTop}
               label="タイトル"
               value={node !== null ? node.label : ''}
-              onChange={changeLabel}
+              onChange={(e: any) => changeNode({...node!, label: e.target.value})}
               fullWidth
             />
             <FormControl variant="outlined" className={classes.marginTop}>
@@ -231,7 +254,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
               className={classes.marginTop}
               label="インプット"
               value={node !== null ? node.input : ''}
-              onChange={changeInput}
+              onChange={(e: any) => changeNode({...node!, input: e.target.value})}
               InputProps={{startAdornment: InputIcon}}
               fullWidth
               multiline
@@ -242,7 +265,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
               className={classes.marginTop}
               label="アウトプット"
               value={node !== null ? node.output : ''}
-              onChange={changeOutput}
+              onChange={(e: any) => changeNode({...node!, output: e.target.value})}
               InputProps={{startAdornment: OutputIcon}}
               fullWidth
             />
@@ -251,24 +274,83 @@ const RightPane: React.FC<Props> = (props: Props) => {
               <TextField
                 variant="outlined"
                 className={classes.marginTop}
-                label="インプット"
-                value={node !== null ? node.input : ''}
-                onChange={changeInput}
-                InputProps={{startAdornment: InputIcon}}
+                label="事前条件"
+                value={node !== null ? node.preConditions : ''}
+                onChange={(e: any) => changeNode({...node!, preConditions: e.target.value})}
+                InputProps={{startAdornment: PreConditionsIcon}}
                 fullWidth
                 multiline
               />
-              
               <TextField
                 variant="outlined"
                 className={classes.marginTop}
-                label="アウトプット"
-                value={node !== null ? node.output : ''}
-                onChange={changeOutput}
-                InputProps={{startAdornment: OutputIcon}}
+                label="事後条件"
+                value={node !== null ? node.postConditions : ''}
+                onChange={(e: any) => changeNode({...node!, postConditions: e.target.value})}
+                InputProps={{startAdornment: PostConditionsIcon}}
                 fullWidth
               />
-            
+              <TextField
+                variant="outlined"
+                className={classes.marginTop}
+                label="担当者"
+                value={node !== null ? node.workerInCharge : ''}
+                onChange={(e: any) => changeNode({...node!, workerInCharge: e.target.value})}
+                InputProps={{startAdornment: WorkerInChargeIcon}}
+                fullWidth
+                multiline
+              />
+              <TextField
+                variant="outlined"
+                className={classes.marginTop}
+                label="備考"
+                value={node !== null ? node.remarks : ''}
+                onChange={(e: any) => changeNode({...node!, remarks: e.target.value})}
+                InputProps={{startAdornment: RemarksIcon}}
+                fullWidth
+              />
+              <TextField
+                variant="outlined"
+                className={classes.marginTop}
+                label="必要システム・ツール"
+                value={node !== null ? node.necessaryTools : ''}
+                onChange={(e: any) => changeNode({...node!, necessaryTools: e.target.value})}
+                InputProps={{startAdornment: NecessaryToolsIcon
+                }}
+                fullWidth
+                multiline
+              />
+              <TextField
+                variant="outlined"
+                className={classes.marginTop}
+                label="例外"
+                value={node !== null ? node.exceptions : ''}
+                onChange={(e: any) => changeNode({...node!, exceptions: e.target.value})}
+                InputProps={{startAdornment: ExceptionsIcon}}
+                fullWidth
+              />
+              <Grid container className={classes.marginTop} spacing={16} alignItems="flex-end">
+                <Grid item>
+                  <IconButton component="label">
+                    <Image/>
+                    <form><input type="file" style={{ display: 'none' }} onChange={handleFileChosen}/></form>
+                  </IconButton>
+                </Grid>
+                <Grid item xs>
+                  <TextField
+                    value={node !== null && node.imageName !== undefined ? node.imageName : ''}
+                    fullWidth
+                    disabled
+                  />
+                </Grid>
+                <Grid item>
+                  <IconButton onClick={() => changeNode({...node!, imageName: '', imageBlob: ''})}>
+                    <Delete/>
+                  </IconButton>
+                </Grid>
+              </Grid>
+              {node !== null && node.imageBlob.length !== 0 && <img src={node.imageBlob} />}
+              
             </Collapse>
 
             <Button {...buttonProps} onClick={() => setOpenDetails(!openDetails)}>

@@ -31,7 +31,7 @@ class DataManager extends React.Component<{}, State> {
 
   changeNode = (target: TreeNode) => {
     const {treeNodes: nodeList, selectedNodeList} = this.state;
-    const treeNodes = TreeUtil.replace(nodeList!, target);
+    const treeNodes = TreeUtil.replaceChild(nodeList!, target);
     this.setState({treeNodes});
     localStorage.setItem(keys.tree, JSON.stringify(treeNodes));
 

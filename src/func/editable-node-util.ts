@@ -1,6 +1,7 @@
 import TreeNode, { Type, EditableNode, Cell } from "../data-types/tree-node";
 import EditableNodeViewUtil from "./editable-node-view-util";
 import KSize from "../data-types/k-size";
+import TreeUtil from "./tree";
 
 export default class EditableNodeUtil {
 
@@ -62,14 +63,14 @@ export default class EditableNodeUtil {
   }
 
   static move = (node: EditableNode, ks: KSize, from: EditableNode, to: EditableNode): EditableNode => {
-    const deletedTree = EditableNodeUtil._deleteById(node, from.id);
+    const deletedTree = TreeUtil._deleteById(node, from.id) as EditableNode; 
     const setParentTypeNode = EditableNodeUtil.setParentType(from, to.parentType);
     const insertedNode = EditableNodeUtil._insert(deletedTree, setParentTypeNode, to);
     return EditableNodeViewUtil.setCalcProps(insertedNode, ks);
   }
 
   static push = (node: EditableNode, ks: KSize, child: EditableNode, parent: EditableNode): EditableNode => {
-    const deletedTree = EditableNodeUtil._deleteById(node, child.id);
+    const deletedTree = TreeUtil._deleteById(node, child.id) as EditableNode;
     const setParentTypeChild = EditableNodeUtil.setParentType(child, parent.type);
     const pushedNode = EditableNodeUtil._push(deletedTree, setParentTypeChild, parent);
     return EditableNodeViewUtil.setCalcProps(pushedNode, ks);
@@ -96,6 +97,14 @@ export default class EditableNodeUtil {
     label: parentType !== 'switch' ? '新しい作業' : '新しい条件',
     input: '',
     output: '',
+    preConditions: '',
+    postConditions: '',
+    workerInCharge: '',
+    remarks: '',
+    necessaryTools: '',
+    exceptions: '',
+    imageName: '',
+    imageBlob: '',
     children: [],
     open: false,
     focus: false,
@@ -182,49 +191,8 @@ export default class EditableNodeUtil {
   }
 
   static deleteById = (node: EditableNode, ks: KSize, id: string): EditableNode => {
-    const deletedTree = EditableNodeUtil._deleteById(node, id);
+    const deletedTree = TreeUtil._deleteById(node, id) as EditableNode;
     return EditableNodeViewUtil.setCalcProps(deletedTree, ks);
-  }
-
-  static _deleteById = (node: EditableNode, id: string): EditableNode => {
-    const findResult = node.children.find(c => c.id === id);
-    if (findResult !== undefined) {
-      return {...node, children: node.children.filter(c => c.id !== id)};
-    }
-
-    const children = node.children.map(c => EditableNodeUtil._deleteById(c, id));
-    return {...node, children};
-  }
-
-  static _isAllSwitchHasCase = (node: EditableNode): boolean => {
-    if (node.children.length === 0) {
-      if (node.type === 'switch') { return false; }
-      return true;
-    }
-    return node.children.map(c => EditableNodeUtil._isAllSwitchHasCase(c)).reduce((a, b) => a && b);
-  }
-
-  static _isAllCaseHasItem = (node: EditableNode): boolean => {
-    if (node.children.length === 0) {
-      if (node.type === 'case') { return false; }
-      return true;
-    }
-    return node.children.map(c => EditableNodeUtil._isAllCaseHasItem(c)).reduce((a, b) => a && b);
-  }
-
-  static _hasDifference = (t: TreeNode, e: EditableNode): boolean => {
-    if (t.id     !== e.id)     { return true; }
-    if (t.type   !== e.type)   { return true; }
-    if (t.label  !== e.label)  { return true; }
-    if (t.input  !== e.input)  { return true; }
-    if (t.output !== e.output) { return true; }
-    if (t.children.length !== e.children.length) { return true; }
-    if (t.children.length === 0) { return false; }
-
-    return t.children
-    .map((_, i) => ({t: t.children[i], e: e.children[i]}))
-    .map(te => EditableNodeUtil._hasDifference(te.t, te.e))
-    .reduce((a, b) => a || b);
   }
 }
 

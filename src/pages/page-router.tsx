@@ -4,6 +4,7 @@ import TreeNode from '../data-types/tree-node';
 import link from '../settings/path-list';
 import EditorNullChecker from './node-editor/editor-null-checker';
 import Dashboard from './dashboard/dashboard';
+import TextNullChecker from './text-editor/text-null-checker';
 
 interface Props {
   toolRef: HTMLDivElement | null;
@@ -57,6 +58,24 @@ class PageRouter extends React.Component<Props, State> {
           path={link.edit}
           render={props => (
             <EditorNullChecker
+              {...props}
+              toolRef={toolRef}
+              rightPaneRef={rightPaneRef}
+              treeNodes={treeNodes}
+              selectedNodeList={selectedNodeList}
+              commonNodes={commonNodes}
+              changeNode={changeNode}
+              addNode={addNode}
+              addCommonList={addCommonList}
+              deleteCommonList={deleteCommonList}
+            />
+          )}
+        />
+        <Route
+          exact
+          path={link.text}
+          render={props => (
+            <TextNullChecker
               {...props}
               toolRef={toolRef}
               rightPaneRef={rightPaneRef}

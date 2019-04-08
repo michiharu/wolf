@@ -4,6 +4,14 @@ export interface TreeNode {
   label: string;
   input: string;
   output: string;
+  preConditions: string;
+  postConditions: string;
+  workerInCharge: string;
+  remarks: string;
+  necessaryTools: string;
+  exceptions: string;
+  imageName: string;
+  imageBlob: string;
   children: TreeNode[];
 }
 
@@ -19,16 +27,19 @@ export interface NodeWithoutId {
   label: string;
   input: string;
   output: string;
+  preConditions: string;
+  postConditions: string;
+  workerInCharge: string;
+  remarks: string;
+  necessaryTools: string;
+  exceptions: string;
+  imageName: string;
+  imageBlob: string;
   children: NodeWithoutId[];
 }
 
-export interface TreeNodeWithParents {
+export interface TreeNodeWithParents extends TreeNode {
   parents: Parent[];
-  id: string;
-  type: Type;
-  label: string;
-  input: string;
-  output: string;
   children: TreeNodeWithParents[];
 }
 
@@ -36,13 +47,8 @@ export type Parent = {id: string, label: string};
 
 export default TreeNode;
 
-export interface EditableNode {
+export interface EditableNode extends TreeNode {
   parentType: Type;
-  id: string;
-  type: Type;
-  label: string;
-  input: string;
-  output: string;
   children: EditableNode[];
 
   open: boolean;
@@ -57,13 +63,8 @@ export interface EditableNode {
   rect: Size;
 }
 
-export interface CheckNode {
+export interface CheckNode extends TreeNode {
   parentType: Type;
-  id: string;
-  type: Type;
-  label: string;
-  input: string;
-  output: string;
   children: CheckNode[];
 
   open: boolean;
