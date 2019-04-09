@@ -44,6 +44,7 @@ export interface DashboardProps {
   commonNodes: TreeNode[];
   selectNode: (node: TreeNode | null) => void;
   addNode: (node: TreeNode) => void;
+  deleteNode: (node: TreeNode) => void;
   addCommonList: (node: TreeNode) => void;
   deleteCommonList: (node: TreeNode) => void;
 }
@@ -53,7 +54,7 @@ interface Props extends DashboardProps, WithStyles<typeof styles>, RouteComponen
 const Dashboard: React.FC<Props> = (props: Props) => {
   const {
     treeNodes, commonNodes, selectNode: select,
-    addNode, addCommonList, deleteCommonList, history, classes
+    addNode, deleteNode, addCommonList, deleteCommonList, history, classes
   } = props;
   const [searchText, setSearchText] = useState('');
   const [openDepth, setOpenDepth] = useState<string>('0');
@@ -74,6 +75,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     addNode: (node: TreeNode) => {
       addNode(node);
     },
+    deleteNode
   };
 
   const commonProps: DashboardListProps = {
@@ -85,6 +87,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
       addNode(node);
       addCommonList(node);
     },
+    deleteNode
   };
   
   return (

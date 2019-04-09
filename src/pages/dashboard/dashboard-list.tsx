@@ -22,6 +22,9 @@ const styles = (theme: Theme) => createStyles({
   root: {
     marginBottom: theme.spacing.unit * 2,
   },
+  headerTitle: {
+    paddingLeft: theme.spacing.unit * 8,
+  },
   label: {
     padding: theme.spacing.unit,
   },
@@ -50,6 +53,7 @@ export interface DashboardListProps {
   openDepth: string;
   selectNode: (node: TreeNode | null) => void;
   addNode: (node: TreeNode) => void;
+  deleteNode: (node: TreeNode) => void;
 }
 
 interface Props extends DashboardListProps, WithStyles<typeof styles> {}
@@ -57,7 +61,7 @@ interface Props extends DashboardListProps, WithStyles<typeof styles> {}
 const DashboardList: React.FC<Props> = (props: Props) => {
   var fileReader: FileReader;
 
-  const { label, nodes, openDepth, selectNode, addNode, classes } = props;
+  const { label, nodes, openDepth, selectNode, addNode, deleteNode, classes } = props;
   const [newLabel, setNewLabel] = useState('');
 
   const handleAdd = () => {
@@ -117,9 +121,17 @@ const DashboardList: React.FC<Props> = (props: Props) => {
       </Grid>
       {nodes.length !== 0 && <Divider/>}
       <Table>
+        {nodes.length !== 0 &&
+        <TableHead>
+          <TableRow>
+            <TableCell><Typography variant="caption" className={classes.headerTitle}>タイトル</Typography></TableCell>
+            <TableCell/>
+          </TableRow>
+        </TableHead>}
+        
         <TableBody>
           {nodes.map((node, i) => {
-            const treeProps: ExpansionTreeProps = { node, depth: 0, openDepth, selectNode };
+            const treeProps: ExpansionTreeProps = { node, depth: 0, openDepth, selectNode, deleteNode };
             return <ExpansionTree key={`tree-0-${i}`} {...treeProps}/>;
           })}
         </TableBody>

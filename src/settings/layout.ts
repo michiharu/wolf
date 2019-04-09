@@ -19,7 +19,7 @@ export { default as NecessaryTools } from '@material-ui/icons/Build';
 export { default as Exceptions } from '@material-ui/icons/Error';
 export { default as Image } from '@material-ui/icons/Photo';
 export { default as Delete } from '@material-ui/icons/Delete';
-
+export { default as Close } from '@material-ui/icons/Close';
 
 export const ks: KSize = {
   unit: 16,

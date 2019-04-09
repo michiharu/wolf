@@ -14,12 +14,17 @@ class DataManager extends React.Component<{}, State> {
 
   constructor(props: {}) {
     super(props);
+
     const treeNodesFromStorage = localStorage.getItem(keys.tree);
     const treeNodes = treeNodesFromStorage !== null ? JSON.parse(treeNodesFromStorage) : [];
+
+    const commonNodesFromStorage = localStorage.getItem(keys.commonList);
+    const commonNodes = commonNodesFromStorage !== null ? JSON.parse(commonNodesFromStorage) : [];
+
     this.state = {
       treeNodes,
       selectedNodeList: [],
-      commonNodes: [],
+      commonNodes,
     };
   }
 
@@ -47,16 +52,26 @@ class DataManager extends React.Component<{}, State> {
     localStorage.setItem(keys.tree, JSON.stringify(treeNodes));
   }
 
+  deleteNode = (target: TreeNode) => {
+    const { treeNodes, commonNodes } = this.state;
+    const newTreeNodes = treeNodes.filter(n => n.id !== target.id);
+    this.setState({treeNodes: newTreeNodes}); 
+    localStorage.setItem(keys.tree, JSON.stringify(newTreeNodes));
+    if (commonNodes.indexOf(target) !== -1) { this.deleteCommonList(target); }
+  }
+
   addCommonList = (node: TreeNode) => {
     const { commonNodes } = this.state;
     commonNodes.push(node);
-    this.setState({commonNodes}); 
+    this.setState({commonNodes});
+    localStorage.setItem(keys.commonList, JSON.stringify(commonNodes));
   }
   deleteCommonList = (node: TreeNode) => {
     const { commonNodes } = this.state;
     const index = commonNodes.indexOf(node);
     commonNodes.splice(index, 1);
     this.setState({commonNodes});
+    localStorage.setItem(keys.commonList, JSON.stringify(commonNodes));
   }
 
   render () {
@@ -70,6 +85,7 @@ class DataManager extends React.Component<{}, State> {
         selectNode={this.selectNode}
         changeNode={this.changeNode}
         addNode={this.addNode}
+        deleteNode={this.deleteNode}
         addCommonList={this.addCommonList}
         deleteCommonList={this.deleteCommonList}
       />

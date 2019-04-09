@@ -30,6 +30,7 @@ import TextLineWithIcon, { TextLineWithIconProps } from './text-line-with-icon';
 const styles = (theme: Theme) => createStyles({
   root: {
     paddingLeft: theme.spacing.unit * 2,
+    paddingRight: theme.spacing.unit * 2,
     paddingTop: toolbarHeight,
     height: `calc(100vh - ${toolbarHeight}px)`,
     [theme.breakpoints.down('xs')]: {
@@ -209,7 +210,7 @@ class TextEditor extends React.Component<Props, State> {
     } = this.state;
 
     const textLineWithIconProps: TextLineWithIconProps = {
-      depth: 0,
+      itemNumber: node.label,
       node,
       commonNodes,
       changeNode: this.changeNode,

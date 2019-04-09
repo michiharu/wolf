@@ -68,9 +68,13 @@ const styles = (theme: Theme) => createStyles({
     marginTop: theme.spacing.unit,
     width: '100%',
   },
-  // similarityDialog: {
-  //   backgroundColor: theme.palette.background.default,
-  // }
+  imageForm: {marginTop: theme.spacing.unit},
+  imageIcon: {marginRight: theme.spacing.unit},
+  img: {
+    width: '100%',
+    height: 300,
+    objectFit: 'cover',
+  }
 });
 
 export interface RightPaneProps {
@@ -329,19 +333,13 @@ const RightPane: React.FC<Props> = (props: Props) => {
                 InputProps={{startAdornment: ExceptionsIcon}}
                 fullWidth
               />
-              <Grid container className={classes.marginTop} spacing={16} alignItems="flex-end">
-                <Grid item>
-                  <IconButton component="label">
-                    <Image/>
-                    <form><input type="file" style={{ display: 'none' }} onChange={handleFileChosen}/></form>
-                  </IconButton>
-                </Grid>
+              <Grid container className={classes.imageForm} spacing={16} alignItems="center">
                 <Grid item xs>
-                  <TextField
-                    value={node !== null && node.imageName !== undefined ? node.imageName : ''}
-                    fullWidth
-                    disabled
-                  />
+                  <Button component="label" size="large" fullWidth>
+                    <Image className={classes.imageIcon}/>
+                    {node !== null && node.imageName.length !== 0 ? node.imageName : 'ファイルを選択'}
+                    <form><input type="file" style={{ display: 'none' }} onChange={handleFileChosen}/></form>
+                  </Button>
                 </Grid>
                 <Grid item>
                   <IconButton onClick={() => changeNode({...node!, imageName: '', imageBlob: ''})}>
@@ -349,7 +347,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
                   </IconButton>
                 </Grid>
               </Grid>
-              {node !== null && node.imageBlob.length !== 0 && <img src={node.imageBlob} />}
+              {node !== null && node.imageBlob.length !== 0 && <img src={node.imageBlob} className={classes.img}/>}
               
             </Collapse>
 

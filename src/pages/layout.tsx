@@ -21,6 +21,7 @@ interface Props extends WithStyles<typeof styles> {
   selectNode: (node: TreeNode | null) => void;
   changeNode: (node: TreeNode) => void;
   addNode: (node: TreeNode) => void;
+  deleteNode: (node: TreeNode) => void;
   addCommonList: (node: TreeNode) => void;
   deleteCommonList: (node: TreeNode) => void;
 }
@@ -45,7 +46,7 @@ class Layout extends React.Component<Props, State> {
   render() {
     const {
       treeNodes, selectedNodeList, commonNodes,
-      selectNode, changeNode, addNode, addCommonList, deleteCommonList, classes
+      selectNode, changeNode, addNode, deleteNode, addCommonList, deleteCommonList, classes
     } = this.props;
     const { toolRef, rightPaneRef } = this.state;
 
@@ -71,6 +72,7 @@ class Layout extends React.Component<Props, State> {
                 selectNode={selectNode}
                 changeNode={changeNode}
                 addNode={addNode}
+                deleteNode={deleteNode}
                 addCommonList={addCommonList}
                 deleteCommonList={deleteCommonList}
               />
