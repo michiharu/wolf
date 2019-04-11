@@ -1,9 +1,9 @@
-import TreeNode, { TreeNodeWithParents, Parent, NodeWithoutId, NodeWithSimilarity } from "../data-types/tree-node";
+import { NodeWithSimilarity, Tree } from "../data-types/tree-node";
 import textDistPercent from "./text-dist";
 
 export default class SimilarityUtil {
 
-  static get = (target: TreeNode, nodeList: TreeNode[]): NodeWithSimilarity[] => {
+  static get = (target: Tree, nodeList: Tree[]): NodeWithSimilarity[] => {
     return nodeList.map(n => ({
       ...n,
       _label: textDistPercent(target.label, n.label),

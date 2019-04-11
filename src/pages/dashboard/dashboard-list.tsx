@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router';
 import { useState } from 'react';
 import {
   Theme, createStyles, WithStyles, withStyles, Paper, Grid, TextField,
@@ -9,13 +8,11 @@ import {
 } from '@material-ui/core';
 
 import FileUpload from '@material-ui/icons/NoteAdd';
-import Add from '@material-ui/icons/Add';
 
-import { TreeNode, NodeWithoutId } from '../../data-types/tree-node';
+import { TreeWithoutId, Tree } from '../../data-types/tree-node';
 
 import TreeUtil from '../../func/tree';
 import ExpansionTree, { ExpansionTreeProps } from '../../components/expansion-tree/expansion-tree';
-import link from '../../settings/path-list';
 import Util from '../../func/util';
 
 const styles = (theme: Theme) => createStyles({
@@ -49,11 +46,11 @@ const styles = (theme: Theme) => createStyles({
 
 export interface DashboardListProps {
   label?: string;
-  nodes: TreeNode[];
-  openDepth: string;
-  selectNode: (node: TreeNode | null) => void;
-  addNode: (node: TreeNode) => void;
-  deleteNode: (node: TreeNode) => void;
+  nodes: Tree[];
+  openAll: boolean;
+  selectNode: (node: Tree | null) => void;
+  addNode: (node: Tree) => void;
+  deleteNode: (node: Tree) => void;
 }
 
 interface Props extends DashboardListProps, WithStyles<typeof styles> {}
@@ -61,17 +58,17 @@ interface Props extends DashboardListProps, WithStyles<typeof styles> {}
 const DashboardList: React.FC<Props> = (props: Props) => {
   var fileReader: FileReader;
 
-  const { label, nodes, openDepth, selectNode, addNode, deleteNode, classes } = props;
+  const { label, nodes, openAll, selectNode, addNode, deleteNode, classes } = props;
   const [newLabel, setNewLabel] = useState('');
 
   const handleAdd = () => {
-    if (!Util.isEmpty(newLabel)) { addNode(TreeUtil.getNewNode(newLabel)); }
+    if (!Util.isEmpty(newLabel)) { addNode(TreeUtil.getNewNode('task')); }
     setNewLabel('');
   }
 
   const handleFileRead = () => {
     const content = fileReader.result as string;
-    const nodeWithoutId: NodeWithoutId = JSON.parse(content);
+    const nodeWithoutId: TreeWithoutId = JSON.parse(content);
     addNode(TreeUtil._setId(nodeWithoutId));
   }
 
@@ -131,7 +128,7 @@ const DashboardList: React.FC<Props> = (props: Props) => {
         
         <TableBody>
           {nodes.map((node, i) => {
-            const treeProps: ExpansionTreeProps = { node, depth: 0, openDepth, selectNode, deleteNode };
+            const treeProps: ExpansionTreeProps = { node, depth: 0, openAll, selectNode, deleteNode };
             return <ExpansionTree key={`tree-0-${i}`} {...treeProps}/>;
           })}
         </TableBody>

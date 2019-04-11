@@ -4,14 +4,12 @@ import {
 } from '@material-ui/core';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { TreeNode } from '../../data-types/tree-node';
+import { Tree } from '../../data-types/tree-node';
 import { Task, Switch, Case, Delete } from '../../settings/layout';
 
 const styles = (theme: Theme) => createStyles({
   row: {
-    '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.background.default,
-    }
+    '&:nth-of-type(odd)': { backgroundColor: theme.palette.background.default }
   },
   expand: { paddingLeft: theme.spacing.unit * 2 },
   switchIcon: {
@@ -20,17 +18,17 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export interface ExpansionTreeProps {
-  node: TreeNode;
+  node: Tree;
   depth: number;
-  openDepth: string;
-  selectNode: (node: TreeNode) => void;
-  deleteNode: (node: TreeNode) => void;
+  openAll: boolean;
+  selectNode: (node: Tree) => void;
+  deleteNode: (node: Tree) => void;
 }
 
 interface Props extends ExpansionTreeProps, WithStyles<typeof styles> {}
 
 interface State {
-  openDepth: string;
+  openAll: boolean;
   open: boolean;
   anchorEl: any;
 }
@@ -42,17 +40,17 @@ const ExpansionTree = withStyles(styles)(class extends React.Component<Props, St
   constructor(props: Props) {
     super(props);
     this.state = {
-      openDepth: props.openDepth,
-      open: props.openDepth === 'all' || props.depth < Number(props.openDepth),
+      openAll: props.openAll,
+      open: props.openAll,
       anchorEl: null,
     };
   }
 
   static getDerivedStateFromProps(nextProps: Props, prevState: State) {
-    if (prevState.openDepth !== nextProps.openDepth) {
+    if (prevState.openAll !== nextProps.openAll) {
       return {
-        openDepth: nextProps.openDepth,
-        open: nextProps.openDepth === 'all' || nextProps.depth < Number(nextProps.openDepth)
+        openAll: nextProps.openAll,
+        open: nextProps.openAll
       };
     }
     return null;
@@ -62,7 +60,7 @@ const ExpansionTree = withStyles(styles)(class extends React.Component<Props, St
   handleMore = (e: any) => this.setState({ anchorEl: e.currentTarget });
 
   render() {
-    const { node, depth, openDepth, selectNode, deleteNode, classes } = this.props;
+    const { node, depth, openAll, selectNode, deleteNode, classes } = this.props;
     const { open, anchorEl } = this.state;
 
     return (
@@ -85,6 +83,7 @@ const ExpansionTree = withStyles(styles)(class extends React.Component<Props, St
             </Grid>
           </TableCell>
           <TableCell style={{paddingRight: 8}}>
+            {depth === 0 &&
             <Grid container justify="flex-end">
               <Grid item>
                 <IconButton onClick={this.handleMore}>
@@ -97,7 +96,7 @@ const ExpansionTree = withStyles(styles)(class extends React.Component<Props, St
                   </MenuItem>
                 </Menu>
               </Grid>
-            </Grid>
+            </Grid>}
           </TableCell>
         </TableRow>
 
@@ -106,7 +105,7 @@ const ExpansionTree = withStyles(styles)(class extends React.Component<Props, St
             key={`tree-${depth}-${i}`}
             node={c}
             depth={depth + 1}
-            openDepth={openDepth}
+            openAll={openAll}
             selectNode={selectNode}
             deleteNode={deleteNode}
           />

@@ -1,6 +1,5 @@
 import * as React from 'react';
-import TreeNode from '../../data-types/tree-node';
-import NodeList from './list';
+import { TreeNode } from '../../data-types/tree-node';
 import CheckList, { CheckListProps } from './check-list';
 
 interface Props {
@@ -14,9 +13,6 @@ const EditorNullChecker: React.SFC<Props> = (props: Props) => {
   const { toolRef, treeNodes, selectedNodeList, selectNode } = props;
   if (toolRef === null || selectedNodeList === null || treeNodes === null) {
     return <p>Now Loading..</p>;
-  }
-  if (selectedNodeList.length === 0) {
-    return <NodeList treeNodes={treeNodes} selectNode={selectNode}/>;
   }
 
   const parent = selectedNodeList.length === 1 ? null : selectedNodeList[selectedNodeList.length - 2];

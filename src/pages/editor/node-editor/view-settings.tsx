@@ -1,9 +1,10 @@
 import * as React from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles, Grid, Paper, Typography,
+  Theme, createStyles, WithStyles, withStyles, Grid, Paper, Typography, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio,
 } from '@material-ui/core';
 import Slider from '@material-ui/lab/Slider';
-import KSize from '../../data-types/k-size';
+import KSize from '../../../data-types/k-size';
+import { FlowType, flowType } from './node-editor';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -13,7 +14,8 @@ const styles = (theme: Theme) => createStyles({
     width: '90vw',
     maxHeight: '45vh',
     transform: 'translate(-50%, -50%)',
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing.unit * 4,
+    paddingBottom: theme.spacing.unit * 2,
     outline: 'none',
   },
   scroll: {
@@ -33,18 +35,34 @@ const styles = (theme: Theme) => createStyles({
 
 export interface ViewSettingProps {
   ks: KSize;
+  ft: FlowType;
   changeKS: (ks: KSize) => void;
+  changeFT: (flowType: FlowType) => void;
 }
 
 interface Props extends ViewSettingProps, WithStyles<typeof styles> {}
 
 
 const ViewSettings: React.SFC<Props> = (props: Props) => {
-  const { ks, changeKS, classes } = props;
+  const { ks, ft, changeKS, changeFT, classes } = props;
 
   return (
     <Paper className={classes.root}>
-      <Grid container justify="space-around" spacing={32}>
+    <Grid container justify="space-between" spacing={32}>
+        <Grid item>
+          <FormControl>
+            <FormLabel>フローの表現</FormLabel>
+            <RadioGroup
+              value={ft}
+              onChange={(e: any) => changeFT(e.target.value as FlowType)}
+            >
+              <FormControlLabel value={flowType.arrow} control={<Radio />} label="フローチャート" />
+              <FormControlLabel value={flowType.rect}  control={<Radio />} label="包含関係図（オイラー図）" />
+            </RadioGroup>
+          </FormControl>
+        </Grid>
+      </Grid>
+      <Grid container justify="space-between" spacing={32}>
         <Grid item>
           <div className={classes.longSetter}>
             <Typography>表示の大きさ</Typography>

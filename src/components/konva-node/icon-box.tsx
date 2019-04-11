@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Group } from 'react-konva';
 
-import { EditableNode } from '../../data-types/tree-node';
+import { KTreeNode } from '../../data-types/tree-node';
 import { task, switchSvg} from '../../resource/svg-icon';
 import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
 import check from '../../resource/svg-icon/check';
@@ -12,7 +12,7 @@ export interface NodeIconBoxProps {
   ks: KSize;
   x: number;
   y: number;
-  node: EditableNode;
+  node: KTreeNode;
   forCheck?: boolean;
 }
 

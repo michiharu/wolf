@@ -13,4 +13,7 @@ export default interface KSize {
   badgeFontSize: number,
   badgeFontHeight: number,
   cornerRadius: number,
+  pointerSpace: number,
+  pointerLength : number,
+  pointerWidth : number
 }

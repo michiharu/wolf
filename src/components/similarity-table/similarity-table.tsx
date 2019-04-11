@@ -1,10 +1,10 @@
 import * as React from 'react';
 import MUIDataTable, { MUIDataTableOptions, MUIDataTableColumn } from 'mui-datatables';
-import TreeNode from '../../data-types/tree-node';
+import { Tree } from '../../data-types/tree-node';
 
 interface Props {
-  target: TreeNode;
-  list: TreeNode[];
+  target: Tree;
+  list: Tree[];
 }
 
 interface State {

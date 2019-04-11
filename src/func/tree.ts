@@ -1,9 +1,14 @@
-import TreeNode, { TreeNodeWithParents, Parent, NodeWithoutId } from "../data-types/tree-node";
+import {TreeNode, Parent, TreeWithoutId, Tree, Type } from "../data-types/tree-node";
 
 export default class TreeUtil {
 
+  static _getTreeNode = (node: Tree): TreeNode => {
+    const children = node.children.map(c => TreeUtil._getTreeNode(c));
+    return {...node, open: children.length !== 0, focus: false, children};
+  }
+
   // genealogy = 系譜：先祖〜targetのNodeリストを返す
-  static getGenealogy = (nodeList: TreeNode[], target: TreeNode): TreeNode[] => {
+  static getGenealogy = (nodeList: Tree[], target: Tree): Tree[] => {
 
     const genealogy = TreeUtil.getGeneOrFalse(nodeList, target);
     if (genealogy === false) { throw 'Target is not found.' }
@@ -11,7 +16,7 @@ export default class TreeUtil {
     return genealogy;
   }
 
-  private static getGeneOrFalse = (nodeList: TreeNode[], target: TreeNode): TreeNode[] | false => {
+  private static getGeneOrFalse = (nodeList: Tree[], target: Tree): Tree[] | false => {
     if (nodeList.length === 0) { return false; }
     
     const findResult = nodeList.find(n => target.id === n.id);
@@ -25,7 +30,7 @@ export default class TreeUtil {
                     : b !== false ? b : false);
   }
 
-  static replaceChild = (nodeList: TreeNode[], target: TreeNode): TreeNode[] => {
+  static replaceChild = (nodeList: Tree[], target: Tree): Tree[] => {
     if (nodeList.length === 0) { return []; }
     return nodeList.map(n => target.id === n.id
       ? target
@@ -41,7 +46,7 @@ export default class TreeUtil {
     }
   }
 
-  static find = (nodeList: TreeNode[], target: TreeNode): TreeNode | undefined => {
+  static find = (nodeList: Tree[], target: Tree): Tree | undefined => {
     if (nodeList.length === 0) { return undefined; }
     const findResult = nodeList.find(n => n.id === target.id);
     if (findResult !== undefined) { return findResult; }
@@ -61,21 +66,6 @@ export default class TreeUtil {
     return flatNodes.reduce((a, b) => a.concat(b));
   }
 
-  static toArrayWithParents = (parents: Parent[], nodeList: TreeNode[]): TreeNodeWithParents[] => {
-    const flatNodes: TreeNodeWithParents[][] = nodeList.map(n => {
-      if (n.children.length === 0) {
-        const emptyC: TreeNodeWithParents[] = [];
-        return [{...n, children: emptyC, parents}];
-      }
-      const parentsAddedSelf = parents.concat([{id: n.id, label: n.label}]);
-      const emptyP: Parent[] = [];
-      const children: TreeNodeWithParents[] = n.children.map(c => ({...c, children: [], parents: emptyP}))
-      return [{...n, children, parents}].concat(TreeUtil.toArrayWithParents(parentsAddedSelf, n.children));
-    });
-
-    return flatNodes.reduce((a, b) => a.concat(b));
-  }
-
   static search = <T extends TreeNode>(text: string, nodes: T[]): T[] => {
     const searchWords = text.split(/\s|　/).map(s => s.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&'));
 
@@ -90,7 +80,7 @@ export default class TreeUtil {
         .reduce((a, b) => a === true && b === true))
   }
 
-  static _removeId = (node: TreeNode): NodeWithoutId => {
+  static _removeId = (node: TreeNode): TreeWithoutId => {
     const children = node.children.map(c => TreeUtil._removeId(c));
     return {
       type: node.type,
@@ -109,16 +99,16 @@ export default class TreeUtil {
     };
   }
 
-  static _setId = (node: NodeWithoutId): TreeNode => {
+  static _setId = (node: TreeWithoutId): Tree => {
     const id = 'rand:' + String(Math.random()).slice(2);
     const children = node.children.map(c => TreeUtil._setId(c));
     return {...node, id, children};
   }
 
-  static getNewNode = (label: string): TreeNode => ({
-    type: 'task',
+  static getNewNode = (parentType: Type): TreeNode => ({
     id: 'rand:' + String(Math.random()).slice(2),
-    label,
+    type: parentType !== 'switch' ? 'task' : 'case',
+    label: parentType !== 'switch' ? '新しい作業' : '新しい条件',
     input: '',
     output: '',
     preConditions: '',
@@ -130,11 +120,13 @@ export default class TreeUtil {
     imageName: '',
     imageBlob: '',
     children: [],
+    open: false,
+    focus: false,
   });
 
   static getSearchWords = (text: string) => text.split(/\s|　/).map(s => s.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&'));
 
-  static match = (node: TreeNode, words: string[]): boolean => {
+  static match = (node: Tree, words: string[]): boolean => {
     if (words.length === 0) { return true; }
     return words
     .map(w => (
@@ -145,14 +137,14 @@ export default class TreeUtil {
     .reduce((a, b) => a === true && b === true);
   }
 
-  static _searchAndFilter = <T extends TreeNode>(words: string[], nodes: T[]): T[] => {
+  static _searchAndFilter = <T extends Tree>(words: string[], nodes: T[]): T[] => {
     return nodes
     .map(n => ({node: n, children: TreeUtil._searchAndFilter(words, n.children)}))
     .filter(obj => TreeUtil.match(obj.node, words) || obj.children.length !== 0)
     .map(obj => ({...obj.node, children: obj.children}));
   }
 
-  static _hasDifference = (a: TreeNode, b: TreeNode): boolean => {
+  static _hasDifference = (a: Tree, b: Tree): boolean => {
     if (a.id     !== b.id)     { return true; }
     if (a.type   !== b.type)   { return true; }
     if (a.label  !== b.label)  { return true; }
@@ -192,7 +184,7 @@ export default class TreeUtil {
     return node.children.map(c => TreeUtil._isAllCaseHasItem(c)).reduce((a, b) => a && b);
   }
 
-  static _deleteById = (node: TreeNode, id: string): TreeNode => {
+  static _deleteById = <T extends Tree>(node: T, id: string): T => {
     const findResult = node.children.find(c => c.id === id);
     if (findResult !== undefined) {
       return {...node, children: node.children.filter(c => c.id !== id)};
@@ -200,5 +192,72 @@ export default class TreeUtil {
 
     const children = node.children.map(c => TreeUtil._deleteById(c, id));
     return {...node, children};
+  }
+
+  static _open = (node: TreeNode, id: string, open: boolean): TreeNode => {
+    if (node.id === id) { return {...node, open}; }
+    const children = node.children.map(c => (TreeUtil._open(c, id, open)));
+    return {...node, children};
+  }
+
+  static _focus = (node: TreeNode, id: string): TreeNode => {
+    const children = node.children.map(c => (TreeUtil._focus(c, id)));
+    return {...node, children, focus: node.id === id};
+  }
+
+
+  static _deleteFocus = (node: TreeNode): TreeNode => {
+    if (node.focus === true) { return {...node, focus: false}; }
+    const children = node.children.map(c => (TreeUtil._deleteFocus(c)));
+    return {...node, children};
+  }
+
+  static move = <T extends Tree>(node: T, from: T, to: T): T => {
+    const deletedTree = TreeUtil._deleteById(node, from.id); 
+    return TreeUtil._insert(deletedTree, from, to);
+  }
+
+  static _insert = <T extends Tree>(node: T, target: T, to: T): T => {
+    const index = node.children.map(c => c.id).indexOf(to.id);
+    if (index !== -1) {
+      node.children.splice(index, 0, target);
+      return {...node};
+    }
+
+    const children = node.children.map(c => TreeUtil._insert(c, target, to));
+    return {...node, children};
+  }
+
+  static push = (node: TreeNode, child: TreeNode, parent: TreeNode): TreeNode => {
+    const deletedTree = TreeUtil._deleteById(node, child.id) as TreeNode;
+    const setParentTypeChild = TreeUtil.setParentType(child, parent.type);
+    return TreeUtil._push(deletedTree, setParentTypeChild, parent);
+  }
+
+  static _push = (node: TreeNode, child: TreeNode, parent: TreeNode): TreeNode => {
+    if (node.id === parent.id) {
+      node.children.push(child);
+      return {...node};
+    }
+    const children = node.children.map(c => TreeUtil._push(c, child, parent));
+    return {...node, children};
+  }
+  
+  static setParentType = (node: TreeNode, parentType: Type): TreeNode => {
+    const result = {...node, parentType};
+    return result;
+  }
+
+  static addDetails = (node: TreeNode, parent: TreeNode): TreeNode => {
+    const newNode = TreeUtil.getNewNode(parent.type);
+    const pushedNode = TreeUtil._push(node, newNode, parent);
+    return TreeUtil._open(pushedNode, parent.id, true);
+  }
+
+  static addFromCommon = (node: TreeNode, parent: TreeNode, common: Tree): TreeNode => {
+    const commonAsTreeNode = TreeUtil._getTreeNode(common);
+    const newNode = TreeUtil._getTreeNode(commonAsTreeNode);
+    const pushedNode = TreeUtil._push(node, newNode, parent);
+    return TreeUtil._open(pushedNode, parent.id, true);
   }
 }

@@ -34,6 +34,9 @@ export const ks: KSize = {
   badgeFontSize: 0.7,
   badgeFontHeight: 0.6,
   cornerRadius: 0.5,
+  pointerSpace: 0.2,
+  pointerLength: 0.6,
+  pointerWidth: 0.5
 };
 
 export const tes: TextEditSettings = {

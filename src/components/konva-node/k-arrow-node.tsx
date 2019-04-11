@@ -4,26 +4,25 @@ import { useState, useRef } from 'react';
 import { lightBlue, amber, yellow } from '@material-ui/core/colors';
 
 import Konva from 'konva';
-import { Rect, Text, Group } from 'react-konva';
+import { Rect, Text, Group, Arrow } from 'react-konva';
 
-import { EditableNode, Point } from '../../data-types/tree-node';
+import { KTreeNode, Point, KWithArrow } from '../../data-types/tree-node';
 
 import NodeIconBox, { NodeIconBoxProps } from './icon-box';
 import KSize from '../../data-types/k-size';
+import { sp } from '../../pages/editor/node-editor/node-editor';
 
-export interface EditableKNodeProps {
-  node: EditableNode;
+export interface KArrowNodeProps {
+  node: KWithArrow;
   ks: KSize;
-  click: (node: EditableNode) => void;
+  click: (node: KTreeNode) => void;
   deleteFocus: () => void;
-  dragStart: (node: EditableNode) => void;
-  dragMove: (node: EditableNode, point: Point) => void;
+  dragStart: (node: KTreeNode) => void;
+  dragMove: (node: KTreeNode, point: Point) => void;
   dragEnd: () => void;
 }
 
-const origin: Point = {x: 32, y: 80};
-
-const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) => {
+const KArrowNode: React.FC<KArrowNodeProps> = (props: KArrowNodeProps) => {
   const { node, ks, click, deleteFocus, dragStart, dragMove, dragEnd} = props;
   const fill = node.type === 'task' ?   node.focus ? lightBlue[100] : lightBlue[50] :
                node.type === 'switch' ? node.focus ? amber[200] : amber[100] :
@@ -45,18 +44,12 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
     click(node);
   }
 
-  const stroke = '#dddd';
-  const strokeWidth = 2;
-  const containerRectProps = {
-    x: ks.indent * 0.5 * ks.unit,
-    y: ks.spr.h * ks.unit,
-    width: (node.self.w - ks.indent * 0.5) * ks.unit,
-    height: (node.self.h - ks.spr.h) * ks.unit,
-    cornerRadius: ks.cornerRadius * ks.unit,
+  const stroke = '#999';
+
+  const arrowBaseProps = {
     stroke,
-    strokeWidth,
-    onClick: deleteFocus,
-  };
+    fill: stroke,
+  }
 
   const labelProps = {
     text: node.label,
@@ -79,8 +72,8 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
   const handleDragMove = (e: any) => {
     const tr = e.target.getClientRect();
     const point = {
-      x: Math.round((tr.x - origin.x) / ks.unit + ks.rect.w / 2),
-      y: Math.round((tr.y - origin.y) / ks.unit + ks.rect.h / 2),
+      x: Math.round((tr.x - sp.x) / ks.unit + ks.rect.w / 2),
+      y: Math.round((tr.y - sp.y) / ks.unit + ks.rect.h / 2),
     };
     dragMove(node, point);
   }
@@ -101,15 +94,18 @@ const EditableKNode: React.FC<EditableKNodeProps> = (props: EditableKNodeProps) 
   };
 
   return (
-    <Group x={origin.x + node.point.x * ks.unit} y={origin.y + node.point.y * ks.unit} >
-      {node.open && <Rect {...containerRectProps}/>}
+    <Group x={sp.x + node.point.x * ks.unit} y={sp.y + node.point.y * ks.unit} >
       <Group {...rectGroupProps}>
         <Rect {...baseRectProps}/>
         <NodeIconBox {...iconBoxProps}/>
         <Text {...labelProps}/>
+        {node.arrows.map((a, i) => {
+          const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
+          return <Arrow key={`${node.id}-arrow-${i}`} {...arrowBaseProps} points={points}/>;
+        })}
       </Group>
     </Group>
   );
 };
 
-export default EditableKNode;
+export default KArrowNode;

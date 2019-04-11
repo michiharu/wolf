@@ -4,20 +4,18 @@ import ReactDOM from 'react-dom';
 import classnames from 'classnames';
 
 import {
-  Theme, createStyles, WithStyles, withStyles, Portal, TextField, Grid,
+  Theme, createStyles, WithStyles, withStyles, TextField, Grid,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
-  InputAdornment, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Divider, Button, Slide, Collapse, IconButton, Typography, Paper
+  InputAdornment, FormControl, Select, MenuItem, Button, IconButton, Typography, Paper
 } from '@material-ui/core';
 import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
   WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Close,
-  toolbarHeight, toolbarMinHeight, rightPainWidth
-} from '../../settings/layout';
-import TreeNode, { Type, EditableNode, NodeWithSimilarity } from '../../data-types/tree-node';
-import { ButtonProps } from '@material-ui/core/Button';
-import EditableNodeUtil from '../../func/editable-node-util';
-import SimilarityTable from '../../components/similarity-table/similarity-table';
-import SimilarityUtil from '../../func/similarity';
+} from '../../../settings/layout';
+import { TreeNode, Type, NodeWithSimilarity, Tree } from '../../../data-types/tree-node';
+
+import SimilarityUtil from '../../../func/similarity';
+import TreeUtil from '../../../func/tree';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -71,7 +69,7 @@ const styles = (theme: Theme) => createStyles({
 export interface TextLineWithIconProps {
   itemNumber: string;
   node: TreeNode;
-  commonNodes: TreeNode[];
+  commonNodes: Tree[];
   changeNode: (node: TreeNode) => void;
   // addDetails: () => void;
   // addFromCommon: (e: any) => void;
@@ -105,7 +103,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
       const newNode: TreeNode = {...node, type: newType, children};
       changeNode(newNode);
     } else {
-      const newCase = EditableNodeUtil.getNewNode('switch');
+      const newCase = TreeUtil.getNewNode('switch');
       const children: TreeNode[] = [{...newCase, children: node.children}];
       const newNode: TreeNode = {...node, type: newType, children};
       changeNode(newNode);

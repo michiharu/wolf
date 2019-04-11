@@ -1,24 +1,21 @@
 import * as React from 'react';
-import { Route, Switch, Redirect } from 'react-router-dom';
-import TreeNode from '../data-types/tree-node';
+import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
+import { Tree } from '../data-types/tree-node';
 import link from '../settings/path-list';
-import EditorNullChecker from './node-editor/editor-null-checker';
+import EditorStateManager from './editor/editor-state-manager';
 import Dashboard from './dashboard/dashboard';
-import TextNullChecker from './text-editor/text-null-checker';
 
 interface Props {
-  toolRef: HTMLDivElement | null;
-  rightPaneRef: HTMLDivElement | null;
-  treeNodes: TreeNode[];
-  selectedNodeList: TreeNode[];
-  commonNodes: TreeNode[];
+  treeNodes: Tree[];
+  selectedNodeList: Tree[];
+  commonNodes: Tree[];
 
-  changeNode: (node: TreeNode) => void;
-  addNode: (node: TreeNode) => void;
-  deleteNode: (node: TreeNode) => void;
-  selectNode: (node: TreeNode | null) => void;
-  addCommonList: (node: TreeNode) => void;
-  deleteCommonList: (node: TreeNode) => void;
+  changeNode: (node: Tree) => void;
+  addNode: (node: Tree) => void;
+  deleteNode: (node: Tree) => void;
+  selectNode: (node: Tree | null) => void;
+  addCommonList: (node: Tree) => void;
+  deleteCommonList: (node: Tree) => void;
 }
 
 interface State {
@@ -33,66 +30,48 @@ class PageRouter extends React.Component<Props, State> {
 
   render () {
     const {
-      toolRef, rightPaneRef, treeNodes, selectedNodeList, commonNodes,
+      treeNodes, selectedNodeList, commonNodes,
       selectNode, changeNode, addNode, deleteNode, addCommonList, deleteCommonList,
     } = this.props;
     return (
-      <Switch>
-        <Route
-          exact
-          path={link.dashboard}
-          render={props => (
-            <Dashboard
-              {...props}
-              treeNodes={treeNodes}
-              selectNode={selectNode}
-              commonNodes={commonNodes}
-              addNode={addNode}
-              deleteNode={deleteNode}
-              addCommonList={addCommonList}
-              deleteCommonList={deleteCommonList}
-            />
-          )}
-        />
-        {selectedNodeList.length === 0 && <Redirect to={link.dashboard}/>}
-        <Route
-          exact
-          path={link.edit}
-          render={props => (
-            <EditorNullChecker
-              {...props}
-              toolRef={toolRef}
-              rightPaneRef={rightPaneRef}
-              treeNodes={treeNodes}
-              selectedNodeList={selectedNodeList}
-              commonNodes={commonNodes}
-              changeNode={changeNode}
-              addNode={addNode}
-              addCommonList={addCommonList}
-              deleteCommonList={deleteCommonList}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={link.text}
-          render={props => (
-            <TextNullChecker
-              {...props}
-              toolRef={toolRef}
-              rightPaneRef={rightPaneRef}
-              treeNodes={treeNodes}
-              selectedNodeList={selectedNodeList}
-              commonNodes={commonNodes}
-              changeNode={changeNode}
-              addNode={addNode}
-              addCommonList={addCommonList}
-              deleteCommonList={deleteCommonList}
-            />
-          )}
-        />
-        <Redirect to={link.dashboard}/>
-      </Switch>
+      <BrowserRouter>
+        <Switch>
+          <Route
+            exact
+            path={link.dashboard}
+            render={props => (
+              <Dashboard
+                {...props}
+                treeNodes={treeNodes}
+                selectNode={selectNode}
+                commonNodes={commonNodes}
+                addNode={addNode}
+                deleteNode={deleteNode}
+                addCommonList={addCommonList}
+                deleteCommonList={deleteCommonList}
+              />
+            )}
+          />
+          {selectedNodeList.length === 0 && <Redirect to={link.dashboard}/>}
+          <Route
+            exact
+            path={link.edit}
+            render={props => (
+              <EditorStateManager
+                {...props}
+                treeNodes={treeNodes}
+                selectedNodeList={selectedNodeList}
+                commonNodes={commonNodes}
+                changeNode={changeNode}
+                addNode={addNode}
+                addCommonList={addCommonList}
+                deleteCommonList={deleteCommonList}
+              />
+            )}
+          />
+          <Redirect to={link.dashboard}/>
+        </Switch>
+      </BrowserRouter>
     );
   }
 } 

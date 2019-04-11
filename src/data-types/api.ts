@@ -1,4 +1,4 @@
-import TreeNode from "./tree-node";
+import { Tree } from "./tree-node";
 
 export const loginURL = '/api/v1/login';
 export interface LoginPostRequest { // POST
@@ -12,5 +12,5 @@ export interface LoginPostResponse {
 }
 
 export const nodeURL = '/api/v1/node';
-export type NodeGetResponse = TreeNode[];
+export type NodeGetResponse = Tree[];
 

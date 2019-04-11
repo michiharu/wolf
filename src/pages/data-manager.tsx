@@ -1,13 +1,13 @@
 import * as React from 'react';
-import Layout from './layout';
-import TreeNode from '../data-types/tree-node';
+import { Tree } from '../data-types/tree-node';
 import TreeUtil from '../func/tree';
 import keys from '../settings/storage-keys';
+import PageRouter from './page-router';
 
 interface State {
-  treeNodes: TreeNode[];
-  selectedNodeList: TreeNode[]; // 選択されたNodeを最初の要素の深さを０として保持する
-  commonNodes: TreeNode[];
+  treeNodes: Tree[];
+  selectedNodeList: Tree[]; // 選択されたNodeを最初の要素の深さを０として保持する
+  commonNodes: Tree[];
 }
 
 class DataManager extends React.Component<{}, State> {
@@ -28,13 +28,13 @@ class DataManager extends React.Component<{}, State> {
     };
   }
 
-  selectNode = (node: TreeNode | null) => {
+  selectNode = (node: Tree | null) => {
     if (node === null) { return this.setState({selectedNodeList: []}); }
     const selectedNodeList = TreeUtil.getGenealogy(this.state.treeNodes!, node);
     this.setState({selectedNodeList});
   }
 
-  changeNode = (target: TreeNode) => {
+  changeNode = (target: Tree) => {
     const {treeNodes: nodeList, selectedNodeList} = this.state;
     const treeNodes = TreeUtil.replaceChild(nodeList!, target);
     this.setState({treeNodes});
@@ -45,14 +45,14 @@ class DataManager extends React.Component<{}, State> {
     process.nextTick(() => this.selectNode(newSelectedNode));
   }
 
-  addNode = (node: TreeNode) => {
+  addNode = (node: Tree) => {
     const { treeNodes } = this.state;
     treeNodes!.unshift(node);
     this.setState({treeNodes}); 
     localStorage.setItem(keys.tree, JSON.stringify(treeNodes));
   }
 
-  deleteNode = (target: TreeNode) => {
+  deleteNode = (target: Tree) => {
     const { treeNodes, commonNodes } = this.state;
     const newTreeNodes = treeNodes.filter(n => n.id !== target.id);
     this.setState({treeNodes: newTreeNodes}); 
@@ -60,13 +60,13 @@ class DataManager extends React.Component<{}, State> {
     if (commonNodes.indexOf(target) !== -1) { this.deleteCommonList(target); }
   }
 
-  addCommonList = (node: TreeNode) => {
+  addCommonList = (node: Tree) => {
     const { commonNodes } = this.state;
     commonNodes.push(node);
     this.setState({commonNodes});
     localStorage.setItem(keys.commonList, JSON.stringify(commonNodes));
   }
-  deleteCommonList = (node: TreeNode) => {
+  deleteCommonList = (node: Tree) => {
     const { commonNodes } = this.state;
     const index = commonNodes.indexOf(node);
     commonNodes.splice(index, 1);
@@ -78,7 +78,7 @@ class DataManager extends React.Component<{}, State> {
     const { treeNodes, selectedNodeList, commonNodes } = this.state;
 
     return (
-      <Layout
+      <PageRouter
         treeNodes={treeNodes}
         selectedNodeList={selectedNodeList}
         commonNodes={commonNodes}

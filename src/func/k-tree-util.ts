@@ -1,9 +1,37 @@
-import { EditableNode, Point, Cell } from "../data-types/tree-node";
+import {TreeNode, Type, KTreeNode, Cell, Tree, Point } from "../data-types/tree-node";
 import KSize from "../data-types/k-size";
+import TreeUtil from "./tree";
 
-export default class EditableNodeViewUtil {
+export default class KTreeUtil {
 
-  static calcSelfLength = (node: EditableNode, ks: KSize, open: boolean, which: which) => {
+  static get = <T extends KTreeNode>(node: TreeNode, base: T, ks: KSize): T => {
+    return KTreeUtil.setCalcProps(node, base, ks);
+  }
+
+  static _get = <T extends KTreeNode>(node: TreeNode, base: T): T => {
+    const index = 0;
+    const depth = {top: 0, bottom: 0};
+    const point = {x: 0, y: 0};
+    const children = node.children.map(c => KTreeUtil._get(c, base));
+    const rect = { w: 0, h: 0};
+
+    return {...base, ...node, index, depth, point, children, self: rect, rect};
+  }
+
+  static toFlat = <T extends TreeNode>(node: T): T[] => {
+    if (node.children.length === 0 || !node.open) { return [node]; }
+    return [node].concat((node.children as T[]).map(c => KTreeUtil.toFlat(c)).reduce((a, b) => a.concat(b)));
+  }
+
+  static _getPrent = (node: KTreeNode, target: KTreeNode): KTreeNode | null => {
+    if (node.children.length === 0) { return null; }
+    if (node.children.find(c => c.id === target.id) !== undefined) { return node; }
+    return node.children
+      .map(c => KTreeUtil._getPrent(c, target))
+      .reduce((a, b) => a || b || null);
+  }
+
+  static calcSelfLength = (node: KTreeNode, ks: KSize, open: boolean, which: which) => {
     if (open) {
       if (which === 'width') {
         // task, open, width
@@ -28,25 +56,27 @@ export default class EditableNodeViewUtil {
     }
   }
 
-  static _setSize = (node: EditableNode, ks: KSize): EditableNode => {
+  static _setSize = <T extends KTreeNode>(node: T, ks: KSize): T => {
 
     const rect = {
       w: ks.rect.w,
       h: ks.rect.h
     };
 
-    const children = node.children.map(c => (EditableNodeViewUtil._setSize(c, ks)));
+    const children = node.children.length !== 0
+      ? node.children.map(c => KTreeUtil._setSize(c, ks))
+      : node.children;
     const newNode = {...node, children};
 
     const self = {
-      w: EditableNodeViewUtil.calcSelfLength(newNode, ks, node.open, 'width'),
-      h: EditableNodeViewUtil.calcSelfLength(newNode, ks, node.open, 'height')
+      w: KTreeUtil.calcSelfLength(newNode, ks, node.open, 'width'),
+      h: KTreeUtil.calcSelfLength(newNode, ks, node.open, 'height')
     };
 
     return {...node, children, self, rect};
   }
 
-  static _setPoint = (point: Point, node: EditableNode, ks: KSize): EditableNode => {
+  static _setPoint = <T extends KTreeNode>(point: Point, node: T, ks: KSize): T => {
 
     var anchor = 0;
     const children = node.children.map(c => {
@@ -54,7 +84,7 @@ export default class EditableNodeViewUtil {
         x: point.x + ks.indent,
         y: point.y + node.rect.h + ks.margin.h + anchor
       };
-      const child = EditableNodeViewUtil._setPoint(p, c, ks);
+      const child = KTreeUtil._setPoint(p, c, ks);
       anchor += c.self.h + ks.margin.h;
       return child;
     });
@@ -62,28 +92,29 @@ export default class EditableNodeViewUtil {
     return {...node, point, children};
   }
 
-  static _setIndexAndDepth = (index: number, top: number, node: EditableNode): EditableNode=> {
+  static _setIndexAndDepth = <T extends KTreeNode>(index: number, top: number, node: T): T => {
 
     if (!node.open || node.children.length === 0) {
       const depth = {top, bottom: 0};
       return {...node, index, depth};
     }
 
-    const children = node.children.map((c, i) => (EditableNodeViewUtil._setIndexAndDepth(i, top + 1, c)));
+    const children = node.children.map((c, i) => (KTreeUtil._setIndexAndDepth(i, top + 1, c)));
     const bottom = children.map(c => c.depth.bottom).reduce((a, b) => a > b ? a : b) + 1;
     const depth = {top, bottom};
 
     return {...node, children, index, depth};
   }
 
-  static setCalcProps = (node: EditableNode, ks: KSize) => {
-    const setSizeNode = EditableNodeViewUtil._setSize(node, ks);
-    const setPointNode = EditableNodeViewUtil._setPoint({x: 0, y: 0}, setSizeNode, ks);
-    const setDepthNode = EditableNodeViewUtil._setIndexAndDepth(0, 0, setPointNode);
+  static setCalcProps = <T1 extends TreeNode, T2 extends KTreeNode>(node: T1, base: T2, ks: KSize): T2 => {
+    const editable = KTreeUtil._get(node, base);
+    const setSizeNode = KTreeUtil._setSize(editable, ks);
+    const setPointNode = KTreeUtil._setPoint({x: 0, y: 0}, setSizeNode, ks);
+    const setDepthNode = KTreeUtil._setIndexAndDepth(0, 0, setPointNode);
     return setDepthNode;
   }
 
-  static makeBaseMap = (node: EditableNode): Cell[][] => {
+  static makeBaseMap = (node: KTreeNode): Cell[][] => {
     const base: Cell[][] = [];
     for(var x = 0; x < node.point.x + node.self.w; x++) {
       base[x] = [];
@@ -94,14 +125,14 @@ export default class EditableNodeViewUtil {
     return base;
   }
 
-  static makeMap = (nodes: EditableNode[], ks: KSize): Cell[][] => {
+  static makeMap = (nodes: KTreeNode[], ks: KSize): Cell[][] => {
     const root = nodes[0];
     const sorted = nodes.sort((a, b) => a.depth.bottom < b.depth.bottom ? 1 : -1);
 
-    const selfBase = EditableNodeViewUtil.makeBaseMap(root);
+    const selfBase = KTreeUtil.makeBaseMap(root);
 
     const map: Cell[][][] = [selfBase].concat(sorted.map(s => {
-      const result = EditableNodeViewUtil.makeBaseMap(s);
+      const result = KTreeUtil.makeBaseMap(s);
 
       if (s.open) {
         for(var x = s.point.x + ks.spr.w; x < s.point.x + s.self.w; x++) {
