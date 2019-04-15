@@ -42,7 +42,6 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export interface TextEditorProps {
-  selected: boolean;
   commonNodes: Tree[];
   node: TreeNode;
   isCommon: string;

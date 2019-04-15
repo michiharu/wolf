@@ -16,6 +16,7 @@ import { TreeNode, Type, NodeWithSimilarity, Tree } from '../../../data-types/tr
 
 import SimilarityUtil from '../../../func/similarity';
 import TreeUtil from '../../../func/tree';
+import { phrase } from '../../../settings/phrase';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -183,10 +184,9 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
 
   return (
     <div className={classes.root}>
-      <Grid container alignItems="flex-end" spacing={16}>
+      <Grid container spacing={16}>
         <Grid item xs={12} lg={8}>
-          <Typography variant="h5">{itemNumber}</Typography>
-          <Grid container spacing={8} alignItems="flex-end">
+          <Grid container alignItems="flex-end" spacing={8}>
             <Grid item>
               <FormControl>
                 <Select
@@ -212,15 +212,20 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
               </FormControl>
             </Grid>
             <Grid item xs>
-              <TextField
-                placeholder="タイトル"
-                value={node.label}
-                InputProps={{classes: {input: classes.title}}}
-                onChange={(e: any) => changeNode({...node!, label: e.target.value})}
-                fullWidth
-              />
+              {node.label !== itemNumber && <Typography variant="h5">{itemNumber}</Typography>}
             </Grid>
           </Grid>
+          <TextField
+            style={{paddingLeft: 80}}
+            placeholder={
+              node.type === 'task' ? phrase.placeholder.task :
+              node.type === 'switch' ? phrase.placeholder.switch : phrase.placeholder.case
+            }
+            value={node.label}
+            InputProps={{classes: {input: classes.title}}}
+            onChange={(e: any) => changeNode({...node!, label: e.target.value})}
+            fullWidth
+          />
           <TextField
             style={{paddingLeft: 80}}
             placeholder="インプット"

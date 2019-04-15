@@ -10,6 +10,7 @@ import { Stage, Layer, Group, Rect } from 'react-konva';
 
 import { TreeNode, Type, KTreeNode, Cell, Point, Tree, baseKTreeNode, baseKWithArrow } from '../../../data-types/tree-node';
 import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth } from '../../../settings/layout';
+import { rs as defaultRS } from '../../../settings/reading';
 
 import KTreeUtil from '../../../func/k-tree-util';
 import KRectNode from '../../../components/konva-node/k-rect-node';
@@ -17,9 +18,12 @@ import RightPane, { RightPaneProps } from './right-pane';
 import TreeUtil from '../../../func/tree';
 import KSize from '../../../data-types/k-size';
 import keys from '../../../settings/storage-keys';
-import ViewSettings from './view-settings';
+import ViewSettings, { ViewSettingProps } from './view-settings';
 import KArrowNode from '../../../components/konva-node/k-arrow-node';
 import KArrowUtil from '../../../func/k-arrow-util';
+import Util from '../../../func/util';
+import { phrase } from '../../../settings/phrase';
+import ReadingSetting from '../../../data-types/reading-settings';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -76,10 +80,8 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export interface NodeEditorProps {
-  selected: boolean;
-  parent: Tree | null;
   commonNodes: Tree[];
-  tree: TreeNode;
+  node: TreeNode;
   isCommon: string;
   edit: (node: TreeNode) => void;
   changeIsCommon: (e: any) => void;
@@ -93,6 +95,7 @@ interface Props extends NodeEditorProps, WithStyles<typeof styles> {}
 interface State {
   ks: KSize;
   ft: FlowType;
+  rs: ReadingSetting;
   beforeCell: Cell | null;
   dragParent: TreeNode | null;
   focusNode: TreeNode | null;
@@ -109,15 +112,14 @@ class NodeEditor extends React.Component<Props, State> {
   stageContainerRef = React.createRef<HTMLMainElement>();
   stageRef = React.createRef<any>();
 
-  node: KTreeNode;
+  calcedNode: KTreeNode;
   map: Cell[][] | null = null; 
 
   constructor(props: Props) {
     super(props);
-    
     const state = NodeEditor.getInitialState();
     this.state = state;
-    this.node = KTreeUtil.get(props.tree, baseKTreeNode, state.ks);
+    this.calcedNode = KTreeUtil.get(props.node, baseKTreeNode, state.ks);
   }
 
   static getInitialState = (): State => {
@@ -125,9 +127,12 @@ class NodeEditor extends React.Component<Props, State> {
     const ks = ksFromStorage !== null ? JSON.parse(ksFromStorage) as KSize : defaultKS;
     const ftFromStorage = localStorage.getItem(keys.ft);
     const ft = ftFromStorage !== null ? JSON.parse(ftFromStorage) as FlowType : 'arrow';
+    const rsFromStorage = localStorage.getItem(keys.rs);
+    const rs = rsFromStorage !== null ? JSON.parse(rsFromStorage) as ReadingSetting : defaultRS;
     return {
       ks,
       ft,
+      rs,
       beforeCell: null,
       dragParent: null,
       focusNode: null,
@@ -149,29 +154,41 @@ class NodeEditor extends React.Component<Props, State> {
     const {ks} = this.state;
     const cref = this.stageContainerRef.current, sref = this.stageRef.current;
     if (cref === null || sref === null) { throw 'Cannot find elements.'; }
-    sref.width(Math.max((this.node.self.w + ks.spr.w) * ks.unit + sp.x, cref.offsetWidth));
-    sref.height(Math.max((this.node.self.h + ks.spr.h) * ks.unit + sp.y, cref.offsetHeight));
+    sref.width(Math.max((this.calcedNode.self.w + ks.spr.w) * ks.unit + sp.x, cref.offsetWidth));
+    sref.height(Math.max((this.calcedNode.self.h + ks.spr.h) * ks.unit + sp.y, cref.offsetHeight));
     sref.draw();
   }
 
   setFocusState = (target: KTreeNode, focus: boolean) => {
-    const { edit } = this.props;
+    const { node, edit } = this.props;
     const {ks} = this.state;
-    const newNode = TreeUtil._focus(this.node, target.id);
+    const newNode = TreeUtil._focus(node, target.id);
     edit(newNode);
     const focusNode: KTreeNode = {...target, focus};
     this.setState({focusNode});
   }
 
   setOpenState = (target: KTreeNode, open: boolean) => {
-    const { edit } = this.props;
-    edit(TreeUtil._open(this.node, target.id, open));
+    const { node, edit } = this.props;
+    edit(TreeUtil._open(node, target.id, open));
     const focusNode: KTreeNode = {...target, open};
     this.setState({focusNode});
     process.nextTick(() => this.resize());
   }
 
   click = (target: KTreeNode) => {
+    const { rs } = this.state;
+    if (!target.focus && rs.playOnClick) {
+      const ssu = new SpeechSynthesisUtterance();
+      ssu.text = !Util.isEmpty(target.label) ? target.label :
+      target.type === 'task' ? phrase.empty.task :
+      target.type === 'switch' ? phrase.empty.switch : phrase.empty.case;
+      ssu.lang = 'ja-JP';
+      ssu.rate = rs.rate;
+      ssu.pitch = rs.pitch;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(ssu);
+    }
     // before: {focus: false, open: false}
     // after:  {focus: true,  open: false}
     // action => focus: true
@@ -194,22 +211,22 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   deleteFocus = () => {
-    const { edit } = this.props;
-    edit(TreeUtil._deleteFocus(this.node));
+    const { node, edit } = this.props;
+    edit(TreeUtil._deleteFocus(node));
     this.setState({focusNode: null});
   }
 
   dragStart = (target: KTreeNode) => {
-    const { edit } = this.props;
-    const dragParent = KTreeUtil._getPrent(this.node, target);
-    const openNode = TreeUtil._open(this.node, target.id, false);
+    const { node, edit } = this.props;
+    const dragParent = KTreeUtil._getPrent(node, target);
+    const openNode = TreeUtil._open(node, target.id, false);
     edit(TreeUtil._deleteFocus(openNode));
     this.setState({dragParent, focusNode: null});
     
   }
 
   dragMove = (target: KTreeNode, p: Point) => {
-    const { edit } = this.props;
+    const { node, edit } = this.props;
     const {dragParent, beforeCell} = this.state;
     const map = this.map;
 
@@ -221,23 +238,23 @@ class NodeEditor extends React.Component<Props, State> {
         
         if (target.type === 'case') {
           if (cell.action === 'move' && dragParent!.children.find(c => c.id === cell.node.id) !== undefined) {
-            edit(TreeUtil.move(this.node, target, cell.node));
+            edit(TreeUtil.move(node, target, cell.node));
             process.nextTick(() => this.resize());
           }
           if (cell.action === 'push' && dragParent!.id === cell.node.id) {
-            edit(TreeUtil.push(this.node, target, cell.node));
+            edit(TreeUtil.push(node, target, cell.node));
             process.nextTick(() => this.resize());
           }
           return;
         }
 
         if (cell.action === 'move' && cell.node.type !== 'case') {
-          edit(TreeUtil.move(this.node, target, cell.node));
+          edit(TreeUtil.move(node, target, cell.node));
           process.nextTick(() => this.resize());
         }
 
         if (cell.action === 'push' && cell.node.type !== 'switch') {
-          edit(TreeUtil.push(this.node, target, cell.node));
+          edit(TreeUtil.push(node, target, cell.node));
           process.nextTick(() => this.resize());
         }
       }
@@ -249,26 +266,26 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   changeFocusNode = (target: TreeNode) => {
-    const { edit } = this.props;
-    edit(TreeUtil._replace(this.node, target));
+    const { node, edit } = this.props;
+    edit(TreeUtil._replace(node, target));
     this.setState({focusNode: target});
   }
 
   addDetails = () => {
-    const { edit } = this.props;
+    const { node, edit } = this.props;
     const {focusNode} = this.state;
-    edit(TreeUtil.addDetails(this.node, focusNode!));
+    edit(TreeUtil.addDetails(node, focusNode!));
     process.nextTick(() => this.resize());
   }
 
   addFromCommon = (e: any) => {
-    const { edit, commonNodes } = this.props;
+    const { node, edit, commonNodes } = this.props;
     const common = commonNodes.find(c => c.id === e.target.value);
     if (common === undefined) { return; }
     
     const setIdCommon = TreeUtil._setId(common);
     const {focusNode} = this.state;
-    edit(TreeUtil.addFromCommon(this.node, focusNode!, setIdCommon));
+    edit(TreeUtil.addFromCommon(node, focusNode!, setIdCommon));
     process.nextTick(() => this.resize());
   }
 
@@ -280,9 +297,9 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   deleteSelf = () => {
-    const { edit } = this.props;
+    const { node, edit } = this.props;
     const {focusNode} = this.state;
-    edit(TreeUtil._deleteById(this.node, focusNode!.id));
+    edit(TreeUtil._deleteById(node, focusNode!.id));
     this.setState({focusNode: null});
     process.nextTick(() => this.resize());
   }
@@ -299,14 +316,19 @@ class NodeEditor extends React.Component<Props, State> {
     process.nextTick(() => this.resize());
   }
 
+  changeRS = (rs: ReadingSetting) => {
+    this.setState({rs});
+    localStorage.setItem(keys.rs, JSON.stringify(rs));
+  }
+
   render() {
-    const { selected, parent, tree, isCommon, commonNodes, changeIsCommon, classes } = this.props;
+    const { node: tree, isCommon, commonNodes, changeIsCommon, classes } = this.props;
     const {
-      ks, ft, focusNode, showViewSettings
+      ks, ft, rs, focusNode, showViewSettings
     } = this.state;
 
     const node  = KTreeUtil.get(tree, baseKTreeNode, ks);
-    this.node = node;
+    this.calcedNode = node;
     const flatNodes = KTreeUtil.toFlat(node);
     const map = KTreeUtil.makeMap(flatNodes, ks);
     this.map = map;
@@ -333,6 +355,10 @@ class NodeEditor extends React.Component<Props, State> {
       deleteSelf: this.deleteSelf,
     };
 
+    const viewSettingProps: ViewSettingProps = {
+      ks, ft, rs, changeKS: this.changeKS, changeFT: this.changeFT, changeRS: this.changeRS
+    };
+
     return (
       <div className={classes.root}>
         <main className={classes.stageContainer} ref={this.stageContainerRef}>
@@ -356,7 +382,7 @@ class NodeEditor extends React.Component<Props, State> {
               {ft === 'rect' && flatNodes.map(n => <KRectNode key={n.id} node={n} {...nodeActionProps}/>)}
             </Layer>
           </Stage>
-          {selected &&
+
           <>
             <IconButton className={classes.viewSettingButton} onClick={() => this.setState({showViewSettings: true})}>
               <ViewSettingsIcon/>
@@ -364,7 +390,7 @@ class NodeEditor extends React.Component<Props, State> {
             <Paper className={classes.rightPaneContainer}>
               <RightPane {...rightPaneProps}/>
             </Paper>
-          </>}
+          </>
           
           <Modal
             open={showViewSettings}
@@ -372,7 +398,7 @@ class NodeEditor extends React.Component<Props, State> {
             BackdropProps={{className: classes.viewSettingModal}}
             disableAutoFocus
           >
-            <ViewSettings ks={ks} ft={ft} changeKS={this.changeKS} changeFT={this.changeFT}/>
+            <ViewSettings {...viewSettingProps}/>
           </Modal>
 
         </main>

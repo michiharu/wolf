@@ -7,10 +7,13 @@ import Konva from 'konva';
 import { Rect, Text, Group } from 'react-konva';
 
 import { KTreeNode, Point } from '../../data-types/tree-node';
-
-import NodeIconBox, { NodeIconBoxProps } from './icon-box';
 import KSize from '../../data-types/k-size';
+import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
+import { task, switchSvg } from '../../resource/svg-icon';
 import { sp } from '../../pages/editor/node-editor/node-editor';
+import Util from '../../func/util';
+import { phrase } from '../../settings/phrase';
+import check from '../../resource/svg-icon/check';
 
 export interface KRectNodeProps {
   node: KTreeNode;
@@ -58,17 +61,24 @@ const KRectNode: React.FC<KRectNodeProps> = (props: KRectNodeProps) => {
   };
 
   const labelProps = {
-    text: node.label,
+    text: Util.isEmpty(node.label)
+      ? node.type === 'task' ? phrase.empty.task : node.type === 'switch' ? phrase.empty.switch : phrase.empty.case
+      : node.label,
     fontSize: ks.fontSize * ks.unit,
     x: ks.fontSize * ks.unit,
     y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit
   };
 
-  const iconBoxProps: NodeIconBoxProps = {
+  const backgroundColor = '#0000';
+  const badgeContent = String(node.children.length);
+
+  const iconRight = -(ks.rect.h * 0.98);
+  const iconWithBadgeProps: IconWithBadgeProps = {
     ks,
-    x: node.rect.w * ks.unit,
-    y: labelProps.y - (ks.rect.h - ks.fontHeight) / 2 * ks.unit,
-    node
+    x: (ks.rect.w + iconRight) * ks.unit, y: 0,
+    svg: node.type === 'task' ? task : node.type === 'switch' ? switchSvg : check,
+    backgroundColor, badgeContent,
+    scale: node.type !== 'switch' ? undefined : {x: 1, y: -1},
   };
 
   const handleDragStart = (e: any) => {
@@ -104,7 +114,7 @@ const KRectNode: React.FC<KRectNodeProps> = (props: KRectNodeProps) => {
       {node.open && <Rect {...containerRectProps}/>}
       <Group {...rectGroupProps}>
         <Rect {...baseRectProps}/>
-        <NodeIconBox {...iconBoxProps}/>
+        {node.children.length !== 0 && <IconWithBadge {...iconWithBadgeProps}/>}
         <Text {...labelProps}/>
       </Group>
     </Group>

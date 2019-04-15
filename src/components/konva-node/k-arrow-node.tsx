@@ -8,22 +8,27 @@ import { Rect, Text, Group, Arrow } from 'react-konva';
 
 import { KTreeNode, Point, KWithArrow } from '../../data-types/tree-node';
 
-import NodeIconBox, { NodeIconBoxProps } from './icon-box';
 import KSize from '../../data-types/k-size';
 import { sp } from '../../pages/editor/node-editor/node-editor';
+import Util from '../../func/util';
+import { phrase } from '../../settings/phrase';
+import IconInRect, { IconInRectProps } from './icon-in-rect';
+import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
+import { task, switchSvg, flag } from '../../resource/svg-icon';
+import check from '../../resource/svg-icon/check';
+import { theme } from '../..';
 
 export interface KArrowNodeProps {
   node: KWithArrow;
   ks: KSize;
   click: (node: KTreeNode) => void;
-  deleteFocus: () => void;
   dragStart: (node: KTreeNode) => void;
   dragMove: (node: KTreeNode, point: Point) => void;
   dragEnd: () => void;
 }
 
 const KArrowNode: React.FC<KArrowNodeProps> = (props: KArrowNodeProps) => {
-  const { node, ks, click, deleteFocus, dragStart, dragMove, dragEnd} = props;
+  const { node, ks, click, dragStart, dragMove, dragEnd} = props;
   const fill = node.type === 'task' ?   node.focus ? lightBlue[100] : lightBlue[50] :
                node.type === 'switch' ? node.focus ? amber[200] : amber[100] :
                                         node.focus ? yellow[200] : yellow[100];
@@ -49,20 +54,36 @@ const KArrowNode: React.FC<KArrowNodeProps> = (props: KArrowNodeProps) => {
   const arrowBaseProps = {
     stroke,
     fill: stroke,
+    pointerLength: ks.pointerLength * ks.unit,
+    pointerWidth: ks.pointerWidth * ks.unit,
   }
 
   const labelProps = {
-    text: node.label,
+    text: Util.isEmpty(node.label)
+      ? node.type === 'task' ? phrase.empty.task : node.type === 'switch' ? phrase.empty.switch : phrase.empty.case
+      : node.label,
     fontSize: ks.fontSize * ks.unit,
     x: ks.fontSize * ks.unit,
     y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit
   };
 
-  const iconBoxProps: NodeIconBoxProps = {
+  const backgroundColor = '#0000';
+  const badgeContent = String(node.children.length);
+
+  const iconRight = -(ks.rect.h * 0.98);
+  const iconWithBadgeProps: IconWithBadgeProps = {
     ks,
-    x: node.rect.w * ks.unit,
-    y: labelProps.y - (ks.rect.h - ks.fontHeight) / 2 * ks.unit,
-    node
+    x: (ks.rect.w + iconRight) * ks.unit, y: 0,
+    svg: node.type === 'task' ? task : node.type === 'switch' ? switchSvg : check,
+    backgroundColor, badgeContent,
+    scale: node.type !== 'switch' ? undefined : {x: 1, y: -1},
+  };
+
+  const endIconProps: IconInRectProps = {
+    ks,
+    x: iconRight * ks.unit, y: 0,
+    svg: flag,
+    color: theme.palette.secondary.main,
   };
 
   const handleDragStart = (e: any) => {
@@ -97,12 +118,13 @@ const KArrowNode: React.FC<KArrowNodeProps> = (props: KArrowNodeProps) => {
     <Group x={sp.x + node.point.x * ks.unit} y={sp.y + node.point.y * ks.unit} >
       <Group {...rectGroupProps}>
         <Rect {...baseRectProps}/>
-        <NodeIconBox {...iconBoxProps}/>
+        {node.children.length !== 0 && <IconWithBadge {...iconWithBadgeProps}/>}
         <Text {...labelProps}/>
         {node.arrows.map((a, i) => {
           const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
           return <Arrow key={`${node.id}-arrow-${i}`} {...arrowBaseProps} points={points}/>;
         })}
+        {node.arrows.length === 0 && <IconInRect {...endIconProps}/>}
       </Group>
     </Group>
   );

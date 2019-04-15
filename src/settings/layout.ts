@@ -22,11 +22,11 @@ export { default as Delete } from '@material-ui/icons/Delete';
 export { default as Close } from '@material-ui/icons/Close';
 
 export const ks: KSize = {
-  unit: 16,
-  rect: {w: 24, h: 2},
+  unit: 20,
+  rect: {w: 16, h: 3},
   margin: {w: 1, h: 1},
   spr: {w: 1, h: 1},
-  indent: 2,
+  indent: 4,
   fontSize: 0.9,
   fontHeight: 0.75,
   textline: 1,
@@ -35,8 +35,8 @@ export const ks: KSize = {
   badgeFontHeight: 0.6,
   cornerRadius: 0.5,
   pointerSpace: 0.2,
-  pointerLength: 0.6,
-  pointerWidth: 0.5
+  pointerLength: 0.4,
+  pointerWidth: 0.4
 };
 
 export const tes: TextEditSettings = {

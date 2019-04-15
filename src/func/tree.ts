@@ -108,7 +108,7 @@ export default class TreeUtil {
   static getNewNode = (parentType: Type): TreeNode => ({
     id: 'rand:' + String(Math.random()).slice(2),
     type: parentType !== 'switch' ? 'task' : 'case',
-    label: parentType !== 'switch' ? '新しい作業' : '新しい条件',
+    label: '',
     input: '',
     output: '',
     preConditions: '',

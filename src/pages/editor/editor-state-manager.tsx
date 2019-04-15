@@ -126,10 +126,8 @@ class EditorStateManager extends React.Component<Props, State> {
     } = this.state;
   
     const nodeProps: NodeEditorProps = {
-      selected: true,
-      parent,
       commonNodes,
-      tree: node,
+      node,
       isCommon,
       edit: this.edit,
       changeIsCommon: this.changeIsCommon,
@@ -139,7 +137,6 @@ class EditorStateManager extends React.Component<Props, State> {
     };
 
     const textProps: TextEditorProps = {
-      selected: true,
       commonNodes,
       node,
       isCommon,

@@ -6,7 +6,6 @@ import { Rect, Group, Text } from 'react-konva';
 import { CheckNode } from '../../data-types/tree-node';
 
 import Util from '../../func/util';
-import NodeIconBox, { NodeIconBoxProps } from './icon-box';
 import CheckBox, { CheckBoxProps } from './check-box';
 import RadioButton from './radio-button';
 import KSize from '../../data-types/k-size';
@@ -77,14 +76,6 @@ const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
     y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit
   };
 
-  const iconBoxProps: NodeIconBoxProps = {
-    ks,
-    x: node.rect.w * ks.unit,
-    y: labelProps.y - (ks.rect.h - ks.fontHeight) / 2 * ks.unit,
-    node,
-    forCheck: true,
-  };
-
   const rectGroupProps = { x: 0, y: 0, onClick: handleClick };
 
   return (
@@ -94,7 +85,6 @@ const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
         <Rect {...baseRectProps}/>
         {node.type !== 'case' ? <CheckBox {...checkProps}/> : <RadioButton {...checkProps}/>}
         <Text {...labelProps}/>
-        <NodeIconBox {...iconBoxProps}/>
       </Group>
     </Group>
   );

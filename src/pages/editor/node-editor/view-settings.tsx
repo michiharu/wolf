@@ -1,10 +1,13 @@
 import * as React from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles, Grid, Paper, Typography, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio,
+  Theme, createStyles, WithStyles, withStyles, Grid, Paper, Typography, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Button, FormGroup, Switch,
 } from '@material-ui/core';
 import Slider from '@material-ui/lab/Slider';
 import KSize from '../../../data-types/k-size';
 import { FlowType, flowType } from './node-editor';
+import { ks as defaultKS } from '../../../settings/layout';
+import ReadingSetting from '../../../data-types/reading-settings';
+
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -18,8 +21,12 @@ const styles = (theme: Theme) => createStyles({
     paddingBottom: theme.spacing.unit * 2,
     outline: 'none',
   },
-  scroll: {
-    
+  speechLabel: {
+    marginTop: theme.spacing.unit * 3.8,
+  },
+  cardSettingLabel: {
+    paddingTop: theme.spacing.unit * 3,
+    paddingBottom: theme.spacing.unit * 3,
   },
   longSetter: {
     width: 200,
@@ -36,19 +43,21 @@ const styles = (theme: Theme) => createStyles({
 export interface ViewSettingProps {
   ks: KSize;
   ft: FlowType;
+  rs: ReadingSetting;
   changeKS: (ks: KSize) => void;
   changeFT: (flowType: FlowType) => void;
+  changeRS: (rs: ReadingSetting) => void;
 }
 
 interface Props extends ViewSettingProps, WithStyles<typeof styles> {}
 
 
 const ViewSettings: React.SFC<Props> = (props: Props) => {
-  const { ks, ft, changeKS, changeFT, classes } = props;
+  const { ks, ft, rs, changeKS, changeFT, changeRS, classes } = props;
 
   return (
     <Paper className={classes.root}>
-    <Grid container justify="space-between" spacing={32}>
+      <Grid container spacing={32}>
         <Grid item>
           <FormControl>
             <FormLabel>フローの表現</FormLabel>
@@ -61,7 +70,53 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
             </RadioGroup>
           </FormControl>
         </Grid>
+        <Grid item>
+          <Grid container spacing={40}>
+            <Grid item>
+              <FormControl>
+                <FormLabel>音声読み上げ</FormLabel>
+                <FormGroup>
+                  <FormControlLabel
+                    control={
+                      <Switch value={rs.playOnClick} onChange={(e: any) => changeRS({...rs, playOnClick: e.target.checked})}/>
+                    }
+                    label="カード選択時に読み上げ"
+                    labelPlacement="start"
+                  />
+                </FormGroup>
+              </FormControl>
+            </Grid>
+            <Grid item>
+              <Typography className={classes.speechLabel}>再生スピード</Typography>
+              <div className={classes.shortSetter}>
+                <Slider
+                  classes={{ container: classes.slider }}
+                  value={rs.rate}
+                  min={0.1}
+                  max={1.5}
+                  step={0.1}
+                  onChange={(_, value) => changeRS({...rs, rate: value})}
+                />
+              </div>
+            </Grid>
+            <Grid item>
+              <Typography className={classes.speechLabel}>再生ピッチ</Typography>
+              <div className={classes.shortSetter}>
+                <Slider
+                  classes={{ container: classes.slider }}
+                  value={rs.pitch}
+                  min={0.1}
+                  max={2}
+                  step={0.1}
+                  onChange={(_, value) => changeRS({...rs, pitch: value})}
+                />
+              </div>
+            </Grid>
+          </Grid>
+        </Grid>
       </Grid>
+
+      <FormLabel className={classes.cardSettingLabel}>カード表示設定</FormLabel>
       <Grid container justify="space-between" spacing={32}>
         <Grid item>
           <div className={classes.longSetter}>
@@ -70,7 +125,7 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
               classes={{ container: classes.slider }}
               value={ks.unit}
               min={10}
-              max={40}
+              max={30}
               step={1}
               onChange={(_, value) => {
                 const newKS = {...ks, unit: value};
@@ -85,8 +140,8 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
             <Slider
               classes={{ container: classes.slider }}
               value={ks.rect.w}
-              min={12}
-              max={40}
+              min={14}
+              max={30}
               step={1}
               onChange={(_, value) => {
                 const newKS = {...ks, rect: {...ks.rect, w: value}};
@@ -102,7 +157,7 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
               classes={{ container: classes.slider }}
               value={ks.rect.h}
               min={2}
-              max={5}
+              max={4}
               step={1}
               onChange={(_, value) => {
                 const newKS = {...ks, rect: {...ks.rect, h: value}};
@@ -142,6 +197,9 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
               }}
             />
           </div>
+        </Grid>
+        <Grid item>
+          <Button variant="contained" onClick={() => changeKS(defaultKS)}>既定値へ戻す</Button>
         </Grid>
       </Grid>
     </Paper>
