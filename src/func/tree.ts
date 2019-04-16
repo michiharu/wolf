@@ -2,9 +2,9 @@ import {TreeNode, Parent, TreeWithoutId, Tree, Type } from "../data-types/tree-n
 
 export default class TreeUtil {
 
-  static _getTreeNode = (node: Tree): TreeNode => {
-    const children = node.children.map(c => TreeUtil._getTreeNode(c));
-    return {...node, open: children.length !== 0, focus: false, children};
+  static _getTreeNode = (node: Tree, base: TreeNode): TreeNode => {
+    const children = node.children.map(c => TreeUtil._getTreeNode(c, base));
+    return {...base, ...node, open: children.length !== 0, focus: false, children};
   }
 
   // genealogy = 系譜：先祖〜targetのNodeリストを返す
@@ -254,10 +254,9 @@ export default class TreeUtil {
     return TreeUtil._open(pushedNode, parent.id, true);
   }
 
-  static addFromCommon = (node: TreeNode, parent: TreeNode, common: Tree): TreeNode => {
-    const commonAsTreeNode = TreeUtil._getTreeNode(common);
-    const newNode = TreeUtil._getTreeNode(commonAsTreeNode);
-    const pushedNode = TreeUtil._push(node, newNode, parent);
+  static addFromCommon = (node: TreeNode, parent: TreeNode, common: Tree, base: TreeNode): TreeNode => {
+    const commonAsTreeNode = TreeUtil._getTreeNode(common, base);
+    const pushedNode = TreeUtil._push(node, commonAsTreeNode, parent);
     return TreeUtil._open(pushedNode, parent.id, true);
   }
 }

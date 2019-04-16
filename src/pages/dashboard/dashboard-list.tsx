@@ -62,7 +62,10 @@ const DashboardList: React.FC<Props> = (props: Props) => {
   const [newLabel, setNewLabel] = useState('');
 
   const handleAdd = () => {
-    if (!Util.isEmpty(newLabel)) { addNode(TreeUtil.getNewNode('task')); }
+    if (!Util.isEmpty(newLabel)) {
+      const newNode = TreeUtil.getNewNode('task');
+      addNode({...newNode, label: newLabel});
+    }
     setNewLabel('');
   }
 

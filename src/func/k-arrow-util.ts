@@ -10,7 +10,6 @@ export default class KArrowUtil {
     nodeSetArrow = KArrowUtil._setInArrowOfSwitch(nodeSetArrow, ks);
     nodeSetArrow = KArrowUtil._setNextArrow(nodeSetArrow, ks);
     nodeSetArrow = KArrowUtil._setReturnArrow(nodeSetArrow, null, null, ks);
-    console.log(nodeSetArrow);
     return nodeSetArrow;
   }
 

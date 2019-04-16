@@ -8,7 +8,7 @@ import ViewSettingsIcon from '@material-ui/icons/Settings';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
-import { TreeNode, Type, KTreeNode, Cell, Point, Tree, baseKTreeNode, baseKWithArrow } from '../../../data-types/tree-node';
+import { TreeNode, Type, KTreeNode, Cell, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode } from '../../../data-types/tree-node';
 import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth } from '../../../settings/layout';
 import { rs as defaultRS } from '../../../settings/reading';
 
@@ -285,7 +285,7 @@ class NodeEditor extends React.Component<Props, State> {
     
     const setIdCommon = TreeUtil._setId(common);
     const {focusNode} = this.state;
-    edit(TreeUtil.addFromCommon(node, focusNode!, setIdCommon));
+    edit(TreeUtil.addFromCommon(node, focusNode!, setIdCommon, baseTreeNode));
     process.nextTick(() => this.resize());
   }
 
@@ -317,6 +317,7 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   changeRS = (rs: ReadingSetting) => {
+    console.log(rs);
     this.setState({rs});
     localStorage.setItem(keys.rs, JSON.stringify(rs));
   }

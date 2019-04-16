@@ -7,7 +7,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import Download from '@material-ui/icons/SaveAlt';
 import CloseIcon from '@material-ui/icons/Close';
 
-import { Tree, TreeNode } from '../../data-types/tree-node';
+import { Tree, TreeNode, baseTreeNode } from '../../data-types/tree-node';
 import NodeEditor, { NodeEditorProps } from './node-editor/node-editor';
 import { RouteComponentProps } from 'react-router';
 import link from '../../settings/path-list';
@@ -59,7 +59,7 @@ class EditorStateManager extends React.Component<Props, State> {
   }
 
   static getInitialState = (selectedNodeList: Tree[], commonNodes: Tree[]): State => {
-    const node = TreeUtil._getTreeNode(selectedNodeList[selectedNodeList.length - 1]);
+    const node = TreeUtil._getTreeNode(selectedNodeList[selectedNodeList.length - 1], baseTreeNode);
     return {
       tabIndex: 0,
       parent: selectedNodeList.length === 1 ? null : selectedNodeList[selectedNodeList.length - 2],
@@ -73,7 +73,7 @@ class EditorStateManager extends React.Component<Props, State> {
 
   differenceCheck = () => {
     const { selectedNodeList } = this.props;
-    const node = TreeUtil._getTreeNode(selectedNodeList[selectedNodeList.length - 1]);
+    const node = TreeUtil._getTreeNode(selectedNodeList[selectedNodeList.length - 1], baseTreeNode);
     if (TreeUtil._hasDifference(node, this.state.node)) {
       this.setState({hasDifference: true});
     } else {
@@ -150,32 +150,16 @@ class EditorStateManager extends React.Component<Props, State> {
       <div className={classes.root}>
         <AppBar color="default">
           <Toolbar>
-            <Grid container justify="space-between" alignItems="center" spacing={16}>
-              <Grid item>
-                <Grid container alignItems="center" spacing={16}>
-                  <Grid item>
-                    <Button size="large" onClick={this.differenceCheck}>Flow Like</Button>
-                  </Grid>
-                  <Grid item>
-                    <Tabs indicatorColor="primary" value={tabIndex} onChange={(_, tabIndex) => this.setState({tabIndex})}>
-                      <Tab label="カード表示" />
-                      <Tab label="テキスト表示" />
-                    </Tabs>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item>
-                <Grid container spacing={8}>
-                  <Grid item>
-                    <IconButton onClick={this.save}><SaveIcon/></IconButton>
-                  </Grid>
-                  {parent === null && (
-                  <Grid item>
-                    <IconButton onClick={this.download}><Download/></IconButton>
-                  </Grid>)}
-                </Grid>
-              </Grid>
-            </Grid>
+            <Button size="large" onClick={this.differenceCheck}>Flow Like</Button>
+            <Tabs indicatorColor="primary" value={tabIndex} onChange={(_, tabIndex) => this.setState({tabIndex})}>
+              <Tab label="カード表示" />
+              <Tab label="テキスト表示" />
+            </Tabs>
+
+            <div style={{flexGrow: 1}} />
+
+            <IconButton onClick={this.save}><SaveIcon/></IconButton>
+            <IconButton onClick={this.download}><Download/></IconButton>
           </Toolbar>
         </AppBar>
         <div className={classes.toolbar}/>

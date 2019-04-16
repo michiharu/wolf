@@ -20,6 +20,7 @@ const styles = (theme: Theme) => createStyles({
     padding: theme.spacing.unit * 4,
     paddingBottom: theme.spacing.unit * 2,
     outline: 'none',
+    overflow: 'scroll',
   },
   speechLabel: {
     marginTop: theme.spacing.unit * 3.8,
@@ -58,7 +59,7 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
   return (
     <Paper className={classes.root}>
       <Grid container spacing={32}>
-        <Grid item>
+        <Grid item xs={12} md={4}>
           <FormControl>
             <FormLabel>フローの表現</FormLabel>
             <RadioGroup
@@ -70,7 +71,7 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
             </RadioGroup>
           </FormControl>
         </Grid>
-        <Grid item>
+        <Grid item xs={12} md>
           <Grid container spacing={40}>
             <Grid item>
               <FormControl>
@@ -78,7 +79,7 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
                 <FormGroup>
                   <FormControlLabel
                     control={
-                      <Switch value={rs.playOnClick} onChange={(e: any) => changeRS({...rs, playOnClick: e.target.checked})}/>
+                      <Switch checked={rs.playOnClick} onChange={(e: any) => changeRS({...rs, playOnClick: e.target.checked})}/>
                     }
                     label="カード選択時に読み上げ"
                     labelPlacement="start"
@@ -118,7 +119,7 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
 
       <FormLabel className={classes.cardSettingLabel}>カード表示設定</FormLabel>
       <Grid container justify="space-between" spacing={32}>
-        <Grid item>
+        <Grid item xs={12} md={4}>
           <div className={classes.longSetter}>
             <Typography>表示の大きさ</Typography>
             <Slider
@@ -134,7 +135,7 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
             />
           </div>
         </Grid>
-        <Grid item>
+        <Grid item xs={6} md={4}>
           <div className={classes.longSetter}>
             <Typography>長方形の横幅</Typography>
             <Slider
@@ -150,7 +151,7 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
             />
           </div>
         </Grid>
-        <Grid item>
+        <Grid item xs={6} md={4}>
           <div className={classes.shortSetter}>
             <Typography>長方形の縦幅</Typography>
             <Slider
@@ -166,7 +167,7 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
             />
           </div>
         </Grid>
-        <Grid item>
+        <Grid item xs={6} md={4}>
           <div className={classes.shortSetter}>
             <Typography>インデント</Typography>
             <Slider
@@ -182,7 +183,7 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
             />
           </div>
         </Grid>
-        <Grid item>
+        <Grid item xs={6} md={4}>
           <div className={classes.shortSetter}>
             <Typography>縦の余白</Typography>
             <Slider
@@ -198,7 +199,7 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
             />
           </div>
         </Grid>
-        <Grid item>
+        <Grid item xs={12} md={4}>
           <Button variant="contained" onClick={() => changeKS(defaultKS)}>既定値へ戻す</Button>
         </Grid>
       </Grid>

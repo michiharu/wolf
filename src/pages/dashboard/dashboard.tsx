@@ -141,38 +141,32 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     <div className={classes.root}>
       <AppBar color="default">
         <Toolbar className={classes.appBar}>
-          <Grid container justify="space-between" alignItems="center" spacing={16}>
-            <Grid item>
-              <Button size="large">Flow Like</Button>
-            </Grid>
-            <Grid item xs={12} sm={8}>
-              <div className={classes.search}>
-                <div className={classes.searchIcon}>
-                  <SearchIcon />
-                </div>
-                <InputBase
-                  placeholder="Search…"
-                  classes={{
-                    root: classes.inputRoot,
-                    input: classes.inputInput,
-                  }}
-                  onChange={e => setSearchText(e.target.value)}
-                />
-              </div>
-            </Grid>
-            <Grid item>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={openAll}
-                    onChange={e => setOpenAll(e.target.checked)}
-                    color="primary"
-                  />
-                }
-                label="すべてを展開"
+          <Button size="large">Flow Like</Button>
+
+          <div className={classes.search}>
+            <div className={classes.searchIcon}>
+              <SearchIcon />
+            </div>
+            <InputBase
+              placeholder="Search…"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput,
+              }}
+              onChange={e => setSearchText(e.target.value)}
+            />
+          </div>
+          <div style={{flexGrow: 1}} />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={openAll}
+                onChange={e => setOpenAll(e.target.checked)}
+                color="primary"
               />
-            </Grid>
-          </Grid>
+            }
+            label="すべてを展開"
+          />
         </Toolbar>
       </AppBar>
       <div className={classes.toolbar}/>
