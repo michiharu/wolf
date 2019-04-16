@@ -124,7 +124,7 @@ const KArrowNode: React.FC<KArrowNodeProps> = (props: KArrowNodeProps) => {
           const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
           return <Arrow key={`${node.id}-arrow-${i}`} {...arrowBaseProps} points={points}/>;
         })}
-        {node.arrows.length === 0 && <IconInRect {...endIconProps}/>}
+        {node.arrows.length === 0 && node.point.x !== 0 && <IconInRect {...endIconProps}/>}
       </Group>
     </Group>
   );

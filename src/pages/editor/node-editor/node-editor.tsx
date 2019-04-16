@@ -309,6 +309,14 @@ class NodeEditor extends React.Component<Props, State> {
     localStorage.setItem(keys.rs, JSON.stringify(rs));
   }
 
+  reset = () => {
+    this.setState({ks: defaultKS, ft: 'arrow', rs: defaultRS});
+    localStorage.setItem(keys.ks, JSON.stringify(defaultKS));
+    localStorage.setItem(keys.ft, JSON.stringify('arrow'));
+    localStorage.setItem(keys.rs, JSON.stringify(defaultRS));
+    process.nextTick(() => this.resize());
+  }
+
   render() {
     const { node: tree, commonNodes, classes } = this.props;
     const {
@@ -343,7 +351,8 @@ class NodeEditor extends React.Component<Props, State> {
     };
 
     const viewSettingProps: ViewSettingProps = {
-      ks, ft, rs, changeKS: this.changeKS, changeFT: this.changeFT, changeRS: this.changeRS
+      ks, ft, rs,
+      changeKS: this.changeKS, changeFT: this.changeFT, changeRS: this.changeRS, reset: this.reset
     };
 
     return (

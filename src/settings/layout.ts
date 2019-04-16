@@ -22,9 +22,9 @@ export { default as Delete } from '@material-ui/icons/Delete';
 export { default as Close } from '@material-ui/icons/Close';
 
 export const ks: KSize = {
-  unit: 20,
-  rect: {w: 16, h: 3},
-  margin: {w: 1, h: 1},
+  unit: 16,
+  rect: {w: 16, h: 2},
+  margin: {w: 1, h: 2},
   spr: {w: 1, h: 1},
   indent: 4,
   fontSize: 0.9,

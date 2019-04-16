@@ -48,13 +48,14 @@ export interface ViewSettingProps {
   changeKS: (ks: KSize) => void;
   changeFT: (flowType: FlowType) => void;
   changeRS: (rs: ReadingSetting) => void;
+  reset: () => void;
 }
 
 interface Props extends ViewSettingProps, WithStyles<typeof styles> {}
 
 
 const ViewSettings: React.SFC<Props> = (props: Props) => {
-  const { ks, ft, rs, changeKS, changeFT, changeRS, classes } = props;
+  const { ks, ft, rs, changeKS, changeFT, changeRS, reset, classes } = props;
 
   return (
     <Paper className={classes.root}>
@@ -126,7 +127,7 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
               classes={{ container: classes.slider }}
               value={ks.unit}
               min={10}
-              max={30}
+              max={24}
               step={1}
               onChange={(_, value) => {
                 const newKS = {...ks, unit: value};
@@ -200,7 +201,9 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
           </div>
         </Grid>
         <Grid item xs={12} md={4}>
-          <Button variant="contained" onClick={() => changeKS(defaultKS)}>既定値へ戻す</Button>
+          <Button variant="contained" onClick={reset}>
+            既定値へ戻す
+          </Button>
         </Grid>
       </Grid>
     </Paper>

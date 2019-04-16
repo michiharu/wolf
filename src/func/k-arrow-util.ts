@@ -15,7 +15,7 @@ export default class KArrowUtil {
 
   static _setArrowProps = (node: KTreeNode, base: KWithArrow): KWithArrow => {
     const children = node.children.map(c => KArrowUtil._setArrowProps(c, base));
-    return {...base, ...node, children};
+    return {...base, ...node, children, arrows: []};
   }
 
   static _setInArrowOfNotSwitch = (node: KWithArrow, ks: KSize): KWithArrow => {
