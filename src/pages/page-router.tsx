@@ -64,8 +64,6 @@ class PageRouter extends React.Component<Props, State> {
                 commonNodes={commonNodes}
                 changeNode={changeNode}
                 addNode={addNode}
-                addCommonList={addCommonList}
-                deleteCommonList={deleteCommonList}
               />
             )}
           />

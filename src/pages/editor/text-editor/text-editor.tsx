@@ -44,10 +44,7 @@ const styles = (theme: Theme) => createStyles({
 export interface TextEditorProps {
   commonNodes: Tree[];
   node: TreeNode;
-  isCommon: string;
   edit: (node: TreeNode) => void;
-  addCommonList: (node: TreeNode) => void;
-  deleteCommonList: (node: TreeNode) => void;
   addNode: (node: TreeNode) => void;
 }
 

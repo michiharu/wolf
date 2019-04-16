@@ -8,6 +8,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
   InputAdornment, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Divider, Button, Slide, Collapse, IconButton, Paper
 } from '@material-ui/core';
+import ViewSettingsIcon from '@material-ui/icons/Settings';
 import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
   WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Delete,
@@ -24,7 +25,23 @@ import { phrase } from '../../../settings/phrase';
 const styles = (theme: Theme) => createStyles({
   root: {
     width: '100%',
-    padding: theme.spacing.unit * 2,
+    maxHeight: '100%',
+    overflow: 'scroll',
+  },
+  main: {
+    position: 'relative',
+    width: `calc(100% - ${theme.spacing.unit * 3}px)`,
+    padding: theme.spacing.unit,
+    paddingTop: theme.spacing.unit * 2,
+  },
+  slideBar: {
+    position: 'absolute',
+    top: theme.spacing.unit * 1,
+    right: -theme.spacing.unit * 2,
+    width: theme.spacing.unit * 2,
+    height: `calc(100% - ${theme.spacing.unit * 2}px)`,
+    backgroundColor: '#eee',
+    borderRadius: theme.spacing.unit,
   },
   commonSelectForm: {
     minWidth: 120,
@@ -55,16 +72,15 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export interface RightPaneProps {
+  isRoot: boolean;
   node: TreeNode | null;
   commonNodes: Tree[];
-  isRoot: boolean;
-  isCommon: string;
-  changeIsCommon: (e: any) => void;
   changeNode: (node: TreeNode) => void;
   addDetails: () => void;
   addFromCommon: (e: any) => void;
   registAsCommon: (node: TreeNode) => void;
   deleteSelf: () => void;
+  setShowViewSettings: () => void;
 }
 
 interface Props extends RightPaneProps, WithStyles<typeof styles> { }
@@ -74,8 +90,8 @@ const RightPane: React.FC<Props> = (props: Props) => {
   var fileName: string;
 
   const {
-    node, commonNodes, isRoot, isCommon,
-    changeIsCommon, changeNode, addDetails, addFromCommon, registAsCommon, deleteSelf, classes
+    isRoot, node, commonNodes, changeNode, addDetails,
+    addFromCommon, registAsCommon, deleteSelf, setShowViewSettings, classes
   } = props;
 
   const cahngeType = (e: any) => {
@@ -174,178 +190,169 @@ const RightPane: React.FC<Props> = (props: Props) => {
 
   return (
 
-    <div className={classes.root}>
-      <Grid container spacing={16}>
-        {isRoot &&
-        <Grid item>
-          <FormControl variant="outlined" className={classes.commonSelectForm}>
-            <InputLabel ref={selectIsCommonRef}>マニュアル用途</InputLabel>
-            <Select
-              input={<OutlinedInput labelWidth={selectIsCommonWidth} />}
-              value={isCommon}
-              onChange={changeIsCommon}
-              disabled={node === null}
-            >
-              <MenuItem value="false">オリジナル</MenuItem>
-              <MenuItem value="true">共通</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>}
-        <Grid item>
-          <FormControl variant="outlined">
-            <InputLabel>タイプ</InputLabel>
-            <Select
-              classes={{
-                icon: focusType !== 'switch'
-                  ? classes.selectType
-                  : classnames(classes.selectType, classes.switchIcon),
-                select: classes.select
-              }}
-              input={<OutlinedInput labelWidth={48} />}
-              value={node !== null ? node.type : 'task'}
-              onChange={cahngeType}
-              IconComponent={
-                p => focusType === 'task' ? <Task {...p} /> :
-                  focusType === 'switch' ? <Switch {...p} /> :
-                    <Case {...p} />}
-              disabled={node === null || node.type === 'case'}
-            >
-              <MenuItem value="task">作業</MenuItem>
-              {node !== null && <MenuItem value="switch">分岐</MenuItem>}
-              {node !== null && node.type === 'case' && <MenuItem value="case">条件</MenuItem>}
-            </Select>
-          </FormControl>
+    <Paper className={classes.root}>
+      <div className={classes.main}>
+        <Grid container spacing={16} alignItems="center">
+          <Grid item xs>
+            <FormControl variant="outlined">
+              <InputLabel>タイプ</InputLabel>
+              <Select
+                classes={{
+                  icon: focusType !== 'switch'
+                    ? classes.selectType
+                    : classnames(classes.selectType, classes.switchIcon),
+                  select: classes.select
+                }}
+                input={<OutlinedInput labelWidth={48} />}
+                value={node !== null ? node.type : 'task'}
+                onChange={cahngeType}
+                IconComponent={
+                  p => focusType === 'task' ? <Task {...p} /> :
+                    focusType === 'switch' ? <Switch {...p} /> :
+                      <Case {...p} />}
+                disabled={node === null || node.type === 'case'}
+              >
+                <MenuItem value="task">作業</MenuItem>
+                {node !== null && <MenuItem value="switch">分岐</MenuItem>}
+                {node !== null && node.type === 'case' && <MenuItem value="case">条件</MenuItem>}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item>
+            <IconButton onClick={setShowViewSettings}>
+              <ViewSettingsIcon/>
+            </IconButton>
+          </Grid>
         </Grid>
-      </Grid>
 
-      <TextField
-        variant="outlined"
-        className={classes.marginTop}
-        label="タイトル"
-        placeholder={
-          node === null ? 'タイトル' :
-          node.type === 'task' ? phrase.placeholder.task :
-          node.type === 'switch' ? phrase.placeholder.switch : phrase.placeholder.case
-        }
-        InputLabelProps={{shrink: true}}
-        value={node !== null ? node.label : ''}
-        onChange={(e: any) => changeNode({ ...node!, label: e.target.value })}
-        fullWidth
-        disabled={node === null}
-      />
+        <TextField
+          variant="outlined"
+          className={classes.marginTop}
+          label="タイトル"
+          placeholder={
+            node === null ? 'タイトル' :
+            node.type === 'task' ? phrase.placeholder.task :
+            node.type === 'switch' ? phrase.placeholder.switch : phrase.placeholder.case
+          }
+          InputLabelProps={{shrink: true}}
+          value={node !== null ? node.label : ''}
+          onChange={(e: any) => changeNode({ ...node!, label: e.target.value })}
+          fullWidth
+          disabled={node === null}
+        />
 
-      <Grid container className={classes.imageForm} spacing={16} alignItems="center">
-        <Grid item xs>
-          <Button component="label" size="large" fullWidth disabled={node === null}>
-            <Image className={classes.imageIcon} />
-            {node !== null && node.imageName.length !== 0 ? node.imageName : 'ファイルを選択'}
-            <form><input type="file" style={{ display: 'none' }} onChange={handleFileChosen} /></form>
-          </Button>
+        <Grid container className={classes.imageForm} spacing={16} alignItems="center">
+          <Grid item xs>
+            <Button component="label" size="large" fullWidth disabled={node === null}>
+              <Image className={classes.imageIcon} />
+              {node !== null && node.imageName.length !== 0 ? node.imageName : 'ファイルを選択'}
+              <form><input type="file" style={{ display: 'none' }} onChange={handleFileChosen} /></form>
+            </Button>
+          </Grid>
+          <Grid item>
+            <IconButton onClick={() => changeNode({ ...node!, imageName: '', imageBlob: '' })} disabled={node === null}>
+              <Delete />
+            </IconButton>
+          </Grid>
         </Grid>
-        <Grid item>
-          <IconButton onClick={() => changeNode({ ...node!, imageName: '', imageBlob: '' })} disabled={node === null}>
-            <Delete />
-          </IconButton>
-        </Grid>
-      </Grid>
-      {node !== null && node.imageBlob.length !== 0 && <img src={node.imageBlob} className={classes.img} />}
+        {node !== null && node.imageBlob.length !== 0 && <img src={node.imageBlob} className={classes.img} />}
 
-      <Collapse in={openDetails}>
-        <TextField
-          variant="outlined"
-          className={classes.marginTop}
-          label="インプット"
-          value={node !== null ? node.input : ''}
-          onChange={(e: any) => changeNode({ ...node!, input: e.target.value })}
-          InputProps={{ startAdornment: InputIcon }}
-          fullWidth
-          multiline
-          disabled={node === null}
-        />
+        <Collapse in={openDetails}>
+          <TextField
+            variant="outlined"
+            className={classes.marginTop}
+            label="インプット"
+            value={node !== null ? node.input : ''}
+            onChange={(e: any) => changeNode({ ...node!, input: e.target.value })}
+            InputProps={{ startAdornment: InputIcon }}
+            fullWidth
+            multiline
+            disabled={node === null}
+          />
 
-        <TextField
-          variant="outlined"
-          className={classes.marginTop}
-          label="アウトプット"
-          value={node !== null ? node.output : ''}
-          onChange={(e: any) => changeNode({ ...node!, output: e.target.value })}
-          InputProps={{ startAdornment: OutputIcon }}
-          fullWidth
-          disabled={node === null}
-        />
-        <TextField
-          variant="outlined"
-          className={classes.marginTop}
-          label="事前条件"
-          value={node !== null ? node.preConditions : ''}
-          onChange={(e: any) => changeNode({ ...node!, preConditions: e.target.value })}
-          InputProps={{ startAdornment: PreConditionsIcon }}
-          fullWidth
-          disabled={node === null}
-        />
-        <TextField
-          variant="outlined"
-          className={classes.marginTop}
-          label="事後条件"
-          value={node !== null ? node.postConditions : ''}
-          onChange={(e: any) => changeNode({ ...node!, postConditions: e.target.value })}
-          InputProps={{ startAdornment: PostConditionsIcon }}
-          fullWidth
-          disabled={node === null}
-        />
-        <TextField
-          variant="outlined"
-          className={classes.marginTop}
-          label="担当者"
-          value={node !== null ? node.workerInCharge : ''}
-          onChange={(e: any) => changeNode({ ...node!, workerInCharge: e.target.value })}
-          InputProps={{ startAdornment: WorkerInChargeIcon }}
-          fullWidth
-          disabled={node === null}
-        />
-        <TextField
-          variant="outlined"
-          className={classes.marginTop}
-          label="備考"
-          value={node !== null ? node.remarks : ''}
-          onChange={(e: any) => changeNode({ ...node!, remarks: e.target.value })}
-          InputProps={{ startAdornment: RemarksIcon }}
-          fullWidth
-          disabled={node === null}
-        />
-        <TextField
-          variant="outlined"
-          className={classes.marginTop}
-          label="必要システム・ツール"
-          value={node !== null ? node.necessaryTools : ''}
-          onChange={(e: any) => changeNode({ ...node!, necessaryTools: e.target.value })}
-          InputProps={{
-            startAdornment: NecessaryToolsIcon
-          }}
-          fullWidth
-          disabled={node === null}
-        />
-        <TextField
-          variant="outlined"
-          className={classes.marginTop}
-          label="例外"
-          value={node !== null ? node.exceptions : ''}
-          onChange={(e: any) => changeNode({ ...node!, exceptions: e.target.value })}
-          InputProps={{ startAdornment: ExceptionsIcon }}
-          fullWidth
-          disabled={node === null}
-        />
-      </Collapse>
+          <TextField
+            variant="outlined"
+            className={classes.marginTop}
+            label="アウトプット"
+            value={node !== null ? node.output : ''}
+            onChange={(e: any) => changeNode({ ...node!, output: e.target.value })}
+            InputProps={{ startAdornment: OutputIcon }}
+            fullWidth
+            disabled={node === null}
+          />
+          <TextField
+            variant="outlined"
+            className={classes.marginTop}
+            label="事前条件"
+            value={node !== null ? node.preConditions : ''}
+            onChange={(e: any) => changeNode({ ...node!, preConditions: e.target.value })}
+            InputProps={{ startAdornment: PreConditionsIcon }}
+            fullWidth
+            disabled={node === null}
+          />
+          <TextField
+            variant="outlined"
+            className={classes.marginTop}
+            label="事後条件"
+            value={node !== null ? node.postConditions : ''}
+            onChange={(e: any) => changeNode({ ...node!, postConditions: e.target.value })}
+            InputProps={{ startAdornment: PostConditionsIcon }}
+            fullWidth
+            disabled={node === null}
+          />
+          <TextField
+            variant="outlined"
+            className={classes.marginTop}
+            label="担当者"
+            value={node !== null ? node.workerInCharge : ''}
+            onChange={(e: any) => changeNode({ ...node!, workerInCharge: e.target.value })}
+            InputProps={{ startAdornment: WorkerInChargeIcon }}
+            fullWidth
+            disabled={node === null}
+          />
+          <TextField
+            variant="outlined"
+            className={classes.marginTop}
+            label="備考"
+            value={node !== null ? node.remarks : ''}
+            onChange={(e: any) => changeNode({ ...node!, remarks: e.target.value })}
+            InputProps={{ startAdornment: RemarksIcon }}
+            fullWidth
+            disabled={node === null}
+          />
+          <TextField
+            variant="outlined"
+            className={classes.marginTop}
+            label="必要システム・ツール"
+            value={node !== null ? node.necessaryTools : ''}
+            onChange={(e: any) => changeNode({ ...node!, necessaryTools: e.target.value })}
+            InputProps={{
+              startAdornment: NecessaryToolsIcon
+            }}
+            fullWidth
+            disabled={node === null}
+          />
+          <TextField
+            variant="outlined"
+            className={classes.marginTop}
+            label="例外"
+            value={node !== null ? node.exceptions : ''}
+            onChange={(e: any) => changeNode({ ...node!, exceptions: e.target.value })}
+            InputProps={{ startAdornment: ExceptionsIcon }}
+            fullWidth
+            disabled={node === null}
+          />
+        </Collapse>
 
-      <Button {...buttonProps} onClick={() => setOpenDetails(!openDetails)}>
-        {`詳細を${openDetails ? '非' : ''}表示`}
-      </Button>
+        <Button {...buttonProps} onClick={() => setOpenDetails(!openDetails)}>
+          {`詳細を${openDetails ? '非' : ''}表示`}
+        </Button>
 
-      <Divider className={classes.marginTop} />
+        <Divider className={classes.marginTop} />
 
-      <Button {...buttonProps} onClick={addDetails} disabled={node === null}>項目を追加</Button>
+        <Button {...buttonProps} onClick={addDetails} disabled={node === null}>項目を追加</Button>
 
-      {commonNodes.length !== 0 && node !== null &&
+        {commonNodes.length !== 0 && node !== null &&
         <FormControl className={classes.formControl}>
           <InputLabel>共通マニュアルから項目を追加</InputLabel>
           <Select
@@ -356,11 +363,13 @@ const RightPane: React.FC<Props> = (props: Props) => {
             {commonNodes.map(c => <MenuItem key={c.id} value={c.id}>{c.label}</MenuItem>)}
           </Select>
         </FormControl>}
-
-      {!isRoot && (
+        {!isRoot && (
         <Button {...buttonProps} color="default" onClick={handleClickDelete} disabled={node === null}>この項目を削除</Button>)}
-      {node !== null &&
+
+        {node !== null &&
         <Button {...buttonProps} color="default" onClick={handleAddCommon}>共通マニュアルに登録</Button>}
+        <div className={classes.slideBar}/>
+      </div>
       <Dialog open={deleteFlag} onClose={() => setDeleteFlag(false)}>
         <DialogTitle>この項目を削除してもよろしいですか？</DialogTitle>
         <DialogContent>
@@ -389,7 +398,8 @@ const RightPane: React.FC<Props> = (props: Props) => {
             <Button onClick={() => { setFilteredSimilarityList(null); registAsCommon(node!); }} color="primary" autoFocus>登録</Button>
           </DialogActions>
         </Dialog>}
-    </div>
+        
+    </Paper>
   );
 };
 

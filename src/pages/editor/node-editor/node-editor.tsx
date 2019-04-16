@@ -4,8 +4,6 @@ import {
   Theme, createStyles, WithStyles, withStyles, IconButton, Modal, Paper,
 } from '@material-ui/core';
 
-import ViewSettingsIcon from '@material-ui/icons/Settings';
-
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
 import { TreeNode, Type, KTreeNode, Cell, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode } from '../../../data-types/tree-node';
@@ -38,16 +36,15 @@ const styles = (theme: Theme) => createStyles({
   },
   rightPaneContainer: {
     position: 'fixed',
-    overflow: 'scroll',
     width: '40vw',
     minWidth: rightPainWidth,
-    right: 8,
-
-    top: toolbarHeight + theme.spacing.unit * 2,
-    maxHeight: `calc(100vh - ${toolbarHeight + theme.spacing.unit * 4}px)`,
+    right: 0,
+    padding: theme.spacing.unit,
+    top: toolbarHeight,
+    height: `calc(100vh - ${toolbarHeight}px)`,
     [theme.breakpoints.down('xs')]: {
-      top: toolbarMinHeight + theme.spacing.unit * 2,
-      maxHeight: `calc(100vh - ${toolbarMinHeight}px)`,
+      top: toolbarMinHeight,
+      height: `calc(100vh - ${toolbarMinHeight}px)`,
     },
   },
   saveButton: {
@@ -55,14 +52,6 @@ const styles = (theme: Theme) => createStyles({
   },
   extendedIcon: {
     marginLeft: theme.spacing.unit,
-  },
-  viewSettingButton: {
-    position: 'fixed',
-    top: toolbarHeight + theme.spacing.unit * 2,
-    right: `calc(40vw + ${theme.spacing.unit * 2}px)`,
-    [theme.breakpoints.down('xs')]: {
-      top: toolbarMinHeight + theme.spacing.unit * 2,
-    },
   },
   viewSettingModal: {
     backgroundColor: '#0002',
@@ -82,11 +71,7 @@ const styles = (theme: Theme) => createStyles({
 export interface NodeEditorProps {
   commonNodes: Tree[];
   node: TreeNode;
-  isCommon: string;
   edit: (node: TreeNode) => void;
-  changeIsCommon: (e: any) => void;
-  addCommonList: (node: Tree) => void;
-  deleteCommonList: (node: Tree) => void;
   addNode: (node: Tree) => void;
 }
 
@@ -111,6 +96,7 @@ class NodeEditor extends React.Component<Props, State> {
 
   stageContainerRef = React.createRef<HTMLMainElement>();
   stageRef = React.createRef<any>();
+  rightPaneRef = React.createRef<HTMLDivElement>();
 
   calcedNode: KTreeNode;
   map: Cell[][] | null = null; 
@@ -152,9 +138,11 @@ class NodeEditor extends React.Component<Props, State> {
 
   resize = () => {
     const {ks} = this.state;
-    const cref = this.stageContainerRef.current, sref = this.stageRef.current;
-    if (cref === null || sref === null) { throw 'Cannot find elements.'; }
-    sref.width(Math.max((this.calcedNode.self.w + ks.spr.w) * ks.unit + sp.x, cref.offsetWidth));
+    const cref = this.stageContainerRef.current;
+    const sref = this.stageRef.current;
+    const rref = this.rightPaneRef.current;
+    if (cref === null || sref === null || rref === null) { throw 'Cannot find elements.'; }
+    sref.width((this.calcedNode.self.w + ks.spr.w) * ks.unit + sp.x + rightPainWidth);
     sref.height(Math.max((this.calcedNode.self.h + ks.spr.h) * ks.unit + sp.y, cref.offsetHeight));
     sref.draw();
   }
@@ -290,10 +278,9 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   registAsCommon = (target: TreeNode) => {
-    const { addNode, addCommonList } = this.props;
+    const { addNode} = this.props;
     const newNode = TreeUtil._setId(target);
     addNode(newNode);
-    addCommonList(newNode);
   }
 
   deleteSelf = () => {
@@ -323,7 +310,7 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const { node: tree, isCommon, commonNodes, changeIsCommon, classes } = this.props;
+    const { node: tree, commonNodes, classes } = this.props;
     const {
       ks, ft, rs, focusNode, showViewSettings
     } = this.state;
@@ -344,16 +331,15 @@ class NodeEditor extends React.Component<Props, State> {
     };
 
     const rightPaneProps: RightPaneProps = {
+      isRoot: focusNode !== null && node.id === focusNode.id,
       node: focusNode,
       commonNodes,
-      isRoot: focusNode === null ? false : parent === null && focusNode.id === node.id,
-      isCommon,
-      changeIsCommon,
       changeNode: this.changeFocusNode,
       addDetails: this.addDetails,
       addFromCommon: this.addFromCommon,
       registAsCommon: this.registAsCommon,
       deleteSelf: this.deleteSelf,
+      setShowViewSettings: () => this.setState({showViewSettings: true})
     };
 
     const viewSettingProps: ViewSettingProps = {
@@ -384,14 +370,9 @@ class NodeEditor extends React.Component<Props, State> {
             </Layer>
           </Stage>
 
-          <>
-            <IconButton className={classes.viewSettingButton} onClick={() => this.setState({showViewSettings: true})}>
-              <ViewSettingsIcon/>
-            </IconButton>
-            <Paper className={classes.rightPaneContainer}>
-              <RightPane {...rightPaneProps}/>
-            </Paper>
-          </>
+          <div ref={this.rightPaneRef} className={classes.rightPaneContainer}>
+            <RightPane {...rightPaneProps}/>
+          </div>
           
           <Modal
             open={showViewSettings}

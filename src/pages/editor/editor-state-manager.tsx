@@ -14,7 +14,6 @@ import link from '../../settings/path-list';
 import TreeUtil from '../../func/tree';
 import { fileDownload } from '../../func/file-download';
 import TextEditor, { TextEditorProps } from './text-editor/text-editor';
-import SwipeableViews from 'react-swipeable-views';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -34,15 +33,11 @@ interface Props extends WithStyles<typeof styles>, RouteComponentProps {
   commonNodes: Tree[];
   changeNode: (node: Tree) => void;
   addNode: (node: Tree) => void;
-  addCommonList: (node: Tree) => void;
-  deleteCommonList: (node: Tree) => void;
 }
 
 interface State {
   tabIndex: number;
-  parent: Tree | null;
   node: TreeNode;
-  isCommon: string;
   hasDifference: boolean;
   cannotSaveReason: CannotSaveReason;
   saved: boolean;
@@ -62,9 +57,7 @@ class EditorStateManager extends React.Component<Props, State> {
     const node = TreeUtil._getTreeNode(selectedNodeList[selectedNodeList.length - 1], baseTreeNode);
     return {
       tabIndex: 0,
-      parent: selectedNodeList.length === 1 ? null : selectedNodeList[selectedNodeList.length - 2],
       node,
-      isCommon: commonNodes.find(c => c.id === node.id) !== undefined ? 'true' : 'false',
       hasDifference: false,
       cannotSaveReason: null,
       saved: false,
@@ -91,11 +84,9 @@ class EditorStateManager extends React.Component<Props, State> {
     this.setState({node: editNode});
   }
 
-  changeIsCommon = (e: any) => this.setState({isCommon: e.target.value});
-
   save = () => {
-    const { commonNodes, changeNode, addCommonList, deleteCommonList } = this.props;
-    const {parent, node, isCommon} = this.state;
+    const { changeNode } = this.props;
+    const {node} = this.state;
     const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
     const isAllCaseHasItem = TreeUtil._isAllCaseHasItem(node);
     const cannotSaveReason: CannotSaveReason = !isAllSwitchHasCase ? 'switch' :
@@ -104,45 +95,30 @@ class EditorStateManager extends React.Component<Props, State> {
     if (cannotSaveReason === null) {
       this.setState({saved: true});
       changeNode(node);
-      if (parent === null) {
-        if (isCommon === 'true' && commonNodes.find(c => c.id === node.id) === undefined) {
-          addCommonList(node);
-        }
-        if (isCommon === 'false' && commonNodes.find(c => c.id === node.id) !== undefined) {
-          deleteCommonList(node);
-        }
-      }
     }
   }
 
   render() {
     const {
-      commonNodes, addCommonList, deleteCommonList, addNode, classes
+      commonNodes, addNode, classes
     } = this.props;
 
     const {
-      tabIndex, parent, node, isCommon,
+      tabIndex, node,
       hasDifference, cannotSaveReason, saved
     } = this.state;
   
     const nodeProps: NodeEditorProps = {
       commonNodes,
       node,
-      isCommon,
       edit: this.edit,
-      changeIsCommon: this.changeIsCommon,
-      addCommonList,
-      deleteCommonList,
       addNode,
     };
 
     const textProps: TextEditorProps = {
       commonNodes,
       node,
-      isCommon,
       edit: this.edit,
-      addCommonList,
-      deleteCommonList,
       addNode,
     };
     
