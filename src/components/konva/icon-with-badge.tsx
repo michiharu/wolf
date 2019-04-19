@@ -22,7 +22,7 @@ export interface IconWithBadgeProps {
 const IconWithBadge: React.FC<IconWithBadgeProps> = (props: IconWithBadgeProps) => {
   const {ks, x, y, svg, color, backgroundColor, badgeContent, rotate, scale} = props;
   const iconProps: IconProps = {
-    ks, x: 0, y: 0, svg, color, backgroundColor: backgroundColor || '#0000', rotate, scale
+    ks, x: 0, y: 0, svg, color, backgroundColor: backgroundColor || '#0000', rotate,
   };
   if (badgeContent === false) { return <Group x={x} y={y}><Icon {...iconProps}/></Group>; }
 

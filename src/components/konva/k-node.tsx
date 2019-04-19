@@ -11,22 +11,21 @@ import IconInRect, { IconInRectProps } from './icon-in-rect';
 import { theme } from '../..';
 import Util from '../../func/util';
 import { phrase } from '../../settings/phrase';
-import KFAB, { KFABProps } from './k-fab';
 import { add } from '../../resource/svg-icon/add';
 import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
 import KSize from '../../data-types/k-size';
 import check from '../../resource/svg-icon/check';
+import Icon, { IconProps } from './icon';
 
 export interface KNodeProps {
   node: KWithArrow;
   isRoot: boolean;
   ks: KSize;
   ft: FlowType;
-  click: (node: KTreeNode) => void;
+  click: (node: KWithArrow) => void;
   dragStart: (node: KTreeNode) => void;
   dragMove: (node: KTreeNode, point: Point) => void;
   dragEnd: () => void;
-  addDetails: () => void;
   addNextBrother: () => void;
   deleteFocus: () => void;
 }
@@ -41,7 +40,7 @@ class KNode extends React.Component<KNodeProps> {
   }
 
   componentDidMount() {
-    process.nextTick(() => this.setState({didRender: true}));
+    process.nextTick(() => this.setState({}));
   }
 
   handleClick = (e: any) => {
@@ -77,7 +76,7 @@ class KNode extends React.Component<KNodeProps> {
   }
   
   render() {
-    const { isRoot, node, ks, ft, addDetails, addNextBrother } = this.props;
+    const { isRoot, node, ks, ft, addNextBrother } = this.props;
     const fill = node.type === 'task' ?   node.focus ? lightBlue[100] : lightBlue[50] :
                node.type === 'switch' ? node.focus ? amber[200] : amber[100] :
                                         node.focus ? yellow[200] : yellow[100];
@@ -85,7 +84,7 @@ class KNode extends React.Component<KNodeProps> {
       x: 0, y: 0,
       width: node.rect.w * ks.unit,
       height: node.rect.h * ks.unit,
-      cornerRadius: ks.cornerRadius * ks.unit,
+      cornerRadius: 4,
       fill,
       shadowColor: 'black',
       shadowBlur: node.focus ? 10 : 6,
@@ -98,19 +97,15 @@ class KNode extends React.Component<KNodeProps> {
         ? node.type === 'task' ? phrase.empty.task : node.type === 'switch' ? phrase.empty.switch : phrase.empty.case
         : node.label,
       fontSize: ks.fontSize * ks.unit,
-      x: ks.fontSize * ks.unit,
+      x: (ks.rect.h + ks.fontSize / 2) * ks.unit,
       y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit
     };
 
-    const backgroundColor = '#0000';
-    const badgeContent = String(node.children.length);
-
-    const iconRight = -(ks.rect.h * 0.98);
-    const iconWithBadgeProps: IconWithBadgeProps = {
+    const iconProps: IconProps = {
       ks,
-      x: (ks.rect.w + iconRight) * ks.unit, y: 0,
+      x: 0, y: 0,
       svg: node.type === 'task' ? task : node.type === 'switch' ? switchSvg : check,
-      backgroundColor, badgeContent,
+      backgroundColor: node.focus ? '#0006' : undefined,
       scale: node.type !== 'switch' ? undefined : {x: 1, y: -1},
     };
 
@@ -124,34 +119,7 @@ class KNode extends React.Component<KNodeProps> {
       onDragMove: this.handleDragMove,
       onDragEnd: this.handleDragEnd,
     };
-    const hasChild = node.children.length !== 0;
-    const addChildProps: KFABProps = {
-      ks,
-      x: !hasChild && !node.open
-        ? (ks.rect.w + ks.spr.w * 0.5) * ks.unit
-        : ((ks.rect.w - ks.rect.h) / 2 + ks.indent) * ks.unit,
-      y: !hasChild && !node.open ? ks.spr.h * ks.unit : ks.rect.h * ks.unit,
-      svg: add, 
-      size: 'small',
-      color: 'secondary',
-      onClick: (e: any) => {
-        e.cancelBubble = true;
-        addDetails();
-      }
-    };
-  
-    const addBrotherProps: KFABProps = {
-      ks,
-      x: (ks.rect.w - ks.rect.h) / 2  * ks.unit,
-      y: ks.rect.h * ks.unit,
-      svg: add, 
-      size: 'small',
-      color: 'secondary',
-      onClick: (e: any) => {
-        e.cancelBubble = true;
-        addNextBrother();
-      }
-    };
+
     const baseEl = this.baseRef.current;
     const dragEl = this.draggableRef.current;
     const willAnimation = dragEl !== null && !dragEl.isDragging();
@@ -168,13 +136,13 @@ class KNode extends React.Component<KNodeProps> {
     const y = !willAnimation ? sp.y + node.point.y * ks.unit : undefined;
 
     const containerRectProps = {
-      x: ks.indent * 0.5 * ks.unit,
+      x: (ks.indent / 2 - ks.spr.w) * ks.unit,
       y: ks.spr.h * ks.unit,
-      width: (node.self.w - ks.indent * 0.5) * ks.unit,
+      width: (node.self.w - (ks.indent / 2 - ks.spr.w)) * ks.unit,
       height: (node.self.h - ks.spr.h) * ks.unit,
       onClick: this.handleDeleteFocus,
       cornerRadius: ks.cornerRadius * ks.unit,
-      stroke: ft === 'rect' ? '#dddd' : '#0000',
+      stroke: (ft === 'rect' || node.focus) ? '#dddd' : '#0000',
       strokeWidth: 2,
     };
 
@@ -186,7 +154,7 @@ class KNode extends React.Component<KNodeProps> {
     }
     const endIconProps: IconInRectProps = {
       ks,
-      x: iconRight * ks.unit, y: 0,
+      x: ks.spr.w * ks.unit, y: 0,
       svg: flag,
       color: theme.palette.secondary.main,
     };
@@ -197,14 +165,12 @@ class KNode extends React.Component<KNodeProps> {
           {node.arrows.length === 0 && node.point.x !== 0 && <IconInRect {...endIconProps}/>}
           {node.open && <Rect {...containerRectProps}/>}
           <Rect {...baseRectProps}/>
-          {node.children.length !== 0 && <IconWithBadge {...iconWithBadgeProps}/>}
+          <Icon {...iconProps}/>
           <Text {...labelProps}/>
           {ft === 'arrow' && node.arrows.map((a, i) => {
             const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
             return <Arrow key={`${node.id}-arrow-${i}`} {...arrowBaseProps} points={points}/>;
           })}
-          {node.focus && !(hasChild && !node.open) && <KFAB {...addChildProps}/>}
-          {node.focus && !node.open && !isRoot && <KFAB {...addBrotherProps}/>}
         </Group>
       </Group>
     );

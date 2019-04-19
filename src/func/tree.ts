@@ -1,4 +1,4 @@
-import {TreeNode, Parent, TreeWithoutId, Tree, Type } from "../data-types/tree-node";
+import {TreeNode, Parent, TreeWithoutId, Tree, Type, baseTreeNode } from "../data-types/tree-node";
 
 export default class TreeUtil {
 
@@ -56,6 +56,17 @@ export default class TreeUtil {
                     : b !== undefined ? b : undefined);
   }
 
+  static _findById = <T extends Tree>(node: T, targetId: string): T | undefined => {
+    if (node.id === targetId) {
+      return node;
+    }
+    if (node.children.length === 0) {
+      return undefined;
+    }
+    return (node.children as T[])
+      .map(c => TreeUtil._findById(c, targetId)).reduce((a, b) => a || b || undefined);
+  }
+
   static toArray = (nodeList: TreeNode[]): TreeNode[] => {
     const flatNodes: TreeNode[][] = nodeList.map(n => {
       if (n.children.length === 0) return [n];
@@ -105,21 +116,10 @@ export default class TreeUtil {
     return {...node, id, children};
   }
 
-  static getNewNode = (parentType: Type): TreeNode => ({
+  static getNewNode = <T extends Tree>(parentType: Type, base: T): T => ({
+    ...base, 
     id: 'rand:' + String(Math.random()).slice(2),
     type: parentType !== 'switch' ? 'task' : 'case',
-    label: '',
-    input: '',
-    output: '',
-    preConditions: '',
-    postConditions: '',
-    workerInCharge: '',
-    remarks: '',
-    necessaryTools: '',
-    exceptions: '',
-    imageName: '',
-    imageBlob: '',
-    children: [],
     open: false,
     focus: false,
   });
@@ -194,7 +194,7 @@ export default class TreeUtil {
     return {...node, children};
   }
 
-  static _open = (node: TreeNode, id: string, open: boolean): TreeNode => {
+  static _open = <T extends TreeNode>(node: T, id: string, open: boolean): T => {
     if (node.id === id) { return {...node, open}; }
     const children = node.children.map(c => (TreeUtil._open(c, id, open)));
     return {...node, children};
@@ -260,15 +260,15 @@ export default class TreeUtil {
     return result;
   }
 
-  static addDetails = (node: TreeNode, parent: TreeNode): TreeNode => {
-    const newNode = TreeUtil.getNewNode(parent.type);
+  static addDetails = <T extends TreeNode>(node: T, parent: T): T => {
+    const newNode = TreeUtil.getNewNode(parent.type, baseTreeNode);
     const pushedNode = TreeUtil._unshift(node, newNode, parent);
-    return TreeUtil._open(pushedNode, parent.id, true);
+    return TreeUtil._open(pushedNode, parent.id, true) as T;
   }
 
   static addNextBrother = (node: TreeNode, to: TreeNode): TreeNode => {
     const parentNode = TreeUtil._getPrent(node, to);
-    const newNode = TreeUtil.getNewNode(parentNode!.type);
+    const newNode = TreeUtil.getNewNode(parentNode!.type, baseTreeNode);
     return TreeUtil._insertNext(node, newNode, to);
   }
 
@@ -278,7 +278,7 @@ export default class TreeUtil {
     return TreeUtil._open(pushedNode, parent.id, true);
   }
 
-  static _unshift = (node: TreeNode, child: TreeNode, parent: TreeNode): TreeNode => {
+  static _unshift = <T extends TreeNode>(node: T, child: T, parent: T): T => {
     if (node.id === parent.id) {
       node.children.unshift(child);
       return {...node};

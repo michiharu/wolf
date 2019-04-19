@@ -12,7 +12,7 @@ import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
   WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Close,
 } from '../../../settings/layout';
-import { TreeNode, Type, NodeWithSimilarity, Tree } from '../../../data-types/tree-node';
+import { TreeNode, Type, NodeWithSimilarity, Tree, baseTreeNode } from '../../../data-types/tree-node';
 
 import SimilarityUtil from '../../../func/similarity';
 import TreeUtil from '../../../func/tree';
@@ -104,7 +104,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
       const newNode: TreeNode = {...node, type: newType, children};
       changeNode(newNode);
     } else {
-      const newCase = TreeUtil.getNewNode('switch');
+      const newCase = TreeUtil.getNewNode('switch', baseTreeNode);
       const children: TreeNode[] = [{...newCase, children: node.children}];
       const newNode: TreeNode = {...node, type: newType, children};
       changeNode(newNode);

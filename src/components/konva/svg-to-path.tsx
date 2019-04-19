@@ -9,11 +9,11 @@ export interface SvgToPathProps {
   y: number;
   fill: string;
   scale?: {x: number, y: number};
-  rotate?: number;
+  rotation?: number;
 }
 
 const SvgToPath: React.FC<SvgToPathProps> = (props: SvgToPathProps) => {
-  const {svg, x, y, fill, scale, rotate} = props;
+  const {svg, x, y, fill, scale, rotation} = props;
   const basePathProps = {x: 0, y: 0};
 
   return (
@@ -25,7 +25,7 @@ const SvgToPath: React.FC<SvgToPathProps> = (props: SvgToPathProps) => {
           data={s.d}
           fill={s.fill ? fill : '#0000'}
           scale={{x: scale ? scale.x : 1, y: scale ? scale.y : 1}}
-          rotate={rotate || 0}
+          rotation={rotation || 0}
         />
       ))}
     </Group>

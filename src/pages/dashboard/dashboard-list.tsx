@@ -9,7 +9,7 @@ import {
 
 import FileUpload from '@material-ui/icons/NoteAdd';
 
-import { TreeWithoutId, Tree } from '../../data-types/tree-node';
+import { TreeWithoutId, Tree, baseTree } from '../../data-types/tree-node';
 
 import TreeUtil from '../../func/tree';
 import ExpansionTree, { ExpansionTreeProps } from '../../components/expansion-tree/expansion-tree';
@@ -63,7 +63,7 @@ const DashboardList: React.FC<Props> = (props: Props) => {
 
   const handleAdd = () => {
     if (!Util.isEmpty(newLabel)) {
-      const newNode = TreeUtil.getNewNode('task');
+      const newNode = TreeUtil.getNewNode('task', baseTree);
       addNode({...newNode, label: newLabel});
     }
     setNewLabel('');

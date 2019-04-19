@@ -20,17 +20,20 @@ export interface IconProps {
 const Icon: React.FC<IconProps> = (props: IconProps) => {
   const {ks, x, y, svg, color, backgroundColor, rotate, scale, onClick} = props;
   const baseRectProps = {
-    x: 0, y: 0,
-    width: ks.rect.h * ks.unit,
-    height: ks.rect.h * ks.unit,
-    fill: backgroundColor || '#ccc',
+    x: (ks.rect.h - ks.icon * 2) / 2 * ks.unit,
+    y: (ks.rect.h - ks.icon * 2) / 2 * ks.unit,
+    width: ks.icon * 2 * ks.unit,
+    height: ks.icon * 2 * ks.unit,
+    fill: backgroundColor,
     opacity: 0.2,
     cornerRadius: ks.rect.h / 2 * ks.unit,
   };
-  const transRate = ks.unit / 20; // 20はsvgアイコンのサイズ
+  const transRate = ks.unit / 24;
   const svgProps = {
     x: (ks.rect.h - ks.icon) / 2 * ks.unit,
-    y: (ks.rect.h - ks.icon) / 2 * ks.unit,
+    y: scale === undefined
+      ? (ks.rect.h - ks.icon) / 2 * ks.unit
+      : (ks.rect.h - ks.icon * scale.y) / 2 * ks.unit,
     svg,
     fill: color || 'black',
     rotate: rotate || 0,
@@ -40,7 +43,7 @@ const Icon: React.FC<IconProps> = (props: IconProps) => {
   };
 
   return (
-    <Group x={x} y={scale ? y + ks.icon * ks.unit : y} onClick={onClick}>
+    <Group x={x} y={y} onClick={onClick}>
       <Rect {...baseRectProps}/>
       <SvgToPath {...svgProps}/>
     </Group>

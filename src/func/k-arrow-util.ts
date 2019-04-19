@@ -1,5 +1,6 @@
 import {KTreeNode, KWithArrow, Point, TreeNode } from "../data-types/tree-node";
 import KSize from "../data-types/k-size";
+import { buttonArea } from "./k-tree-util";
 
 
 export default class KArrowUtil {
@@ -21,9 +22,11 @@ export default class KArrowUtil {
   static _setInArrowOfNotSwitch = (node: KWithArrow, ks: KSize): KWithArrow => {
     const children = node.children.map(c => KArrowUtil._setInArrowOfNotSwitch(c, ks));
     if (node.type !== 'switch' && (node.open && children.length !== 0)) {
+      const focusMargin = (node.focus && ks.margin.h * ks.unit < buttonArea)
+            ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0;
       const arrows: Point[][] = [[
-        {x: ks.rect.w / 2 - ks.spr.w * 2 + ks.indent, y: ks.rect.h},
-        {x: ks.rect.w / 2 - ks.spr.w * 2 + ks.indent, y: ks.rect.h + ks.margin.h - ks.pointerSpace}
+        {x: ks.rect.w / 2 - ks.spr.w * 4 + ks.indent, y: ks.rect.h},
+        {x: ks.rect.w / 2 - ks.spr.w * 4 + ks.indent, y: ks.rect.h + ks.margin.h + focusMargin - ks.pointerSpace}
       ]];
       return {...node, children, arrows};
     }
@@ -33,7 +36,9 @@ export default class KArrowUtil {
   static _setInArrowOfSwitch = (node: KWithArrow, ks: KSize): KWithArrow => {
     const children = node.children.map(c => KArrowUtil._setInArrowOfSwitch(c, ks));
     if (node.open && node.type === 'switch' && children.length !== 0) {
-      var anchor = ks.rect.h + ks.margin.h + ks.rect.h * 0.5;
+      const focusMargin = (node.focus && ks.margin.h * ks.unit < buttonArea)
+            ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0;
+      var anchor = ks.rect.h + ks.margin.h + ks.rect.h * 0.5 + focusMargin;
       const arrows: Point[][] = children.map((c, i) => {
         const points = [
           {x: (ks.indent - ks.pointerSpace) / 2, y: ks.rect.h},
@@ -54,9 +59,12 @@ export default class KArrowUtil {
         return KArrowUtil._setNextArrow(c, ks);
       } else {
         if (c.type !== 'case' && node.children.length - 1 !== i) {
+          const focusMargin = (c.focus && ks.margin.h * ks.unit < buttonArea)
+            ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0;
+          const openMargin = c.open ? ks.spr.h * 2 : 0;
           const arrows: Point[][] = [[
-            {x: ks.rect.w / 2 - ks.spr.w * 2, y: ks.rect.h},
-            {x: ks.rect.w / 2 - ks.spr.w * 2, y: ks.rect.h + ks.margin.h - ks.pointerSpace}
+            {x: ks.rect.w / 2 - ks.spr.w * 4, y: ks.rect.h},
+            {x: ks.rect.w / 2 - ks.spr.w * 4, y: ks.rect.h + ks.margin.h + focusMargin + openMargin - ks.pointerSpace}
           ]];
           return {...c, arrows};
         } else {
@@ -110,11 +118,11 @@ export default class KArrowUtil {
   static getArrowPoints = (node: KWithArrow, before: KWithArrow, exit: KWithArrow, ks: KSize): Point[][] => {
     const dv: Point = {x: exit.point.x - node.point.x, y: exit.point.y - node.point.y};
     if (before.type === 'task' && !KArrowUtil._hasUnderNode(before, node)) {
-      const exitCenter = ks.rect.w / 2  - ks.spr.w * 2 - (node.point.x - before.point.x);
+      const exitCenter = ks.rect.w / 2  - ks.spr.w * 4 - (node.point.x - before.point.x);
       if (exitCenter < 0) {
         return [[
-          {x: ks.rect.w / 2 - ks.spr.w * 2, y: ks.rect.h},
-          {x: ks.rect.w / 2 - ks.spr.w * 2, y: ks.rect.h + ks.spr.h},
+          {x: ks.rect.w / 2 - ks.spr.w * 4, y: ks.rect.h},
+          {x: ks.rect.w / 2 - ks.spr.w * 4, y: ks.rect.h + ks.spr.h},
           {x: exitCenter,    y: ks.rect.h + ks.spr.h},
           {x: exitCenter,    y: dv.y - ks.pointerSpace},
         ]];
@@ -133,8 +141,8 @@ export default class KArrowUtil {
         {x: ks.rect.w, y: ks.rect.h / 2},
         {x: secondPointX, y: ks.rect.h / 2},
         {x: secondPointX, y: dv.y - ks.spr.h * margin},
-        {x: ks.rect.w / 2 - ks.spr.w * 2 + dv.x, y: dv.y - ks.spr.h * margin},
-        {x: ks.rect.w / 2 - ks.spr.w * 2 + dv.x, y: dv.y - ks.pointerSpace}
+        {x: ks.rect.w / 2 - ks.spr.w * 4 + dv.x, y: dv.y - ks.spr.h * margin},
+        {x: ks.rect.w / 2 - ks.spr.w * 4 + dv.x, y: dv.y - ks.pointerSpace}
       ]];
     }
   }

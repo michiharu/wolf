@@ -1,16 +1,19 @@
 import _ from 'lodash';
 import * as React from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles, IconButton, Modal, Paper,
+  Theme, createStyles, WithStyles, withStyles,
+  Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText,
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Modal, 
 } from '@material-ui/core';
+import Add from '@material-ui/icons/Add';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
-import { TreeNode, Type, KTreeNode, Cell, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode } from '../../../data-types/tree-node';
-import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth } from '../../../settings/layout';
+import { TreeNode, Type, KTreeNode, Cell, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode, KWithArrow } from '../../../data-types/tree-node';
+import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth, Task, Switch, Case, Delete } from '../../../settings/layout';
 import { rs as defaultRS } from '../../../settings/reading';
 
-import KTreeUtil from '../../../func/k-tree-util';
+import KTreeUtil, { buttonArea, buttonSize, buttonMargin } from '../../../func/k-tree-util';
 import RightPane, { RightPaneProps } from './right-pane';
 import TreeUtil from '../../../func/tree';
 import KSize from '../../../data-types/k-size';
@@ -27,11 +30,15 @@ const styles = (theme: Theme) => createStyles({
     width: '100%',
   },
   toolbar: theme.mixins.toolbar,
-  stageContainer: {
+  main: {
     height: `calc(100vh - ${toolbarHeight}px)`,
     [theme.breakpoints.down('xs')]: {
       height: `calc(100vh - ${toolbarMinHeight}px)`,
     },
+  },
+  stageContainer: {
+    position: 'relative',
+    paddingBottom: '100vh',
   },
   rightPaneContainer: {
     position: 'fixed',
@@ -82,7 +89,9 @@ interface State {
   rs: ReadingSetting;
   beforeCell: Cell | null;
   dragParent: TreeNode | null;
-  focusNode: TreeNode | null;
+  focusNode: KWithArrow | null;
+  typeAnchorEl: any;
+  deleteFlag: boolean;
   hasDifference: boolean;
   showViewSettings: boolean;
 }
@@ -93,7 +102,7 @@ export const sp = {x: 16, y: 16};
 
 class NodeEditor extends React.Component<Props, State> {
 
-  stageContainerRef = React.createRef<HTMLMainElement>();
+  stageContainerRef = React.createRef<HTMLDivElement>();
   stageRef = React.createRef<any>();
   rightPaneRef = React.createRef<HTMLDivElement>();
 
@@ -121,6 +130,8 @@ class NodeEditor extends React.Component<Props, State> {
       beforeCell: null,
       dragParent: null,
       focusNode: null,
+      typeAnchorEl: null,
+      deleteFlag: false,
       hasDifference: false,
       showViewSettings: false,
     };
@@ -142,29 +153,28 @@ class NodeEditor extends React.Component<Props, State> {
     const rref = this.rightPaneRef.current;
     if (cref === null || sref === null || rref === null) { throw 'Cannot find elements.'; }
     sref.width((this.calcedNode.self.w + ks.spr.w) * ks.unit + sp.x + rightPainWidth);
-    sref.height(Math.max((this.calcedNode.self.h + ks.spr.h) * ks.unit + sp.y, cref.offsetHeight));
+    sref.height(Math.max((this.calcedNode.self.h + ks.spr.h) * ks.unit + sp.y, window.innerHeight));
     sref.draw();
   }
 
-  setFocusState = (target: KTreeNode, focus: boolean) => {
-    console.log(target);
+  setFocusState = (target: KWithArrow, focus: boolean) => {
     const { node, edit } = this.props;
-    const {ks} = this.state;
     const newNode = TreeUtil._focus(node, target.id);
     edit(newNode);
-    const focusNode: KTreeNode = {...target, focus};
-    this.setState({focusNode});
-  }
-
-  setOpenState = (target: KTreeNode, open: boolean) => {
-    const { node, edit } = this.props;
-    edit(TreeUtil._open(node, target.id, open));
-    const focusNode: KTreeNode = {...target, open};
+    const focusNode: KWithArrow = {...target, focus};
     this.setState({focusNode});
     process.nextTick(() => this.resize());
   }
 
-  click = (target: KTreeNode) => {
+  setOpenState = (target: KWithArrow, open: boolean) => {
+    const { node, edit } = this.props;
+    edit(TreeUtil._open(node, target.id, open));
+    const focusNode: KWithArrow = {...target, open};
+    this.setState({focusNode});
+    process.nextTick(() => this.resize());
+  }
+
+  click = (target: KWithArrow) => {
     const { rs } = this.state;
     if (!target.focus && rs.playOnClick) {
       const ssu = new SpeechSynthesisUtterance();
@@ -202,6 +212,7 @@ class NodeEditor extends React.Component<Props, State> {
     const { node, edit } = this.props;
     edit(TreeUtil._deleteFocus(node));
     this.setState({focusNode: null});
+    process.nextTick(() => this.resize());
   }
 
   dragStart = (target: KTreeNode) => {
@@ -253,16 +264,41 @@ class NodeEditor extends React.Component<Props, State> {
     this.setState({dragParent: null});
   }
 
-  changeFocusNode = (target: TreeNode) => {
+  changeFocusNode = (target: KWithArrow) => {
     const { node, edit } = this.props;
     edit(TreeUtil._replace(node, target));
     this.setState({focusNode: target});
   }
 
+  cahngeType = (type: Type) => {
+    const { focusNode: node } = this.state;
+    this.setState({typeAnchorEl: null});
+
+    if (node === null) { throw 'No focus node.'; }
+    if (node.type === type) { return; }
+
+    if (node.children.length === 0) {
+      const newNode: KWithArrow = { ...node, type };
+      this.changeFocusNode(newNode);
+    }
+
+    if (type === 'task') {
+      const children: KWithArrow[] = node.children.map(c => c.children).reduce((a, b) => a.concat(b));
+      const newNode: KWithArrow = { ...node, type, children };
+      this.changeFocusNode(newNode);
+    } else {
+      const newCase = TreeUtil.getNewNode('switch', baseKWithArrow);
+      const children: KWithArrow[] = [{ ...newCase, children: node.children }];
+      const newNode: KWithArrow = { ...node, type, children };
+      this.changeFocusNode(newNode);
+    }
+  };
+
   addDetails = () => {
     const { node, edit } = this.props;
     const {focusNode} = this.state;
-    edit(TreeUtil.addDetails(node, focusNode!));
+    const addDetailsNode = TreeUtil.addDetails(node, focusNode!);
+    edit(addDetailsNode);
     process.nextTick(() => this.resize());
   }
 
@@ -294,7 +330,7 @@ class NodeEditor extends React.Component<Props, State> {
     const { node, edit } = this.props;
     const {focusNode} = this.state;
     edit(TreeUtil._deleteById(node, focusNode!.id));
-    this.setState({focusNode: null});
+    this.setState({focusNode: null, deleteFlag: false});
     process.nextTick(() => this.resize());
   }
 
@@ -327,7 +363,7 @@ class NodeEditor extends React.Component<Props, State> {
   render() {
     const { node: tree, commonNodes, classes } = this.props;
     const {
-      ks, ft, rs, focusNode, showViewSettings
+      ks, ft, rs, focusNode, typeAnchorEl, deleteFlag, showViewSettings
     } = this.state;
     const kTreeNode = KTreeUtil.get(tree, baseKWithArrow, ks);
     const node = KArrowUtil.get(kTreeNode, baseKWithArrow, ks);
@@ -343,7 +379,6 @@ class NodeEditor extends React.Component<Props, State> {
       dragStart: this.dragStart,
       dragMove: this.dragMove,
       dragEnd: this.dragEnd,
-      addDetails: this.addDetails,
       addNextBrother: this.addNextBrother,
       deleteFocus: this.deleteFocus
     };
@@ -365,30 +400,161 @@ class NodeEditor extends React.Component<Props, State> {
       changeKS: this.changeKS, changeFT: this.changeFT, changeRS: this.changeRS, reset: this.reset
     };
 
+    var AddChildButton:   JSX.Element | undefined = undefined;
+    var AddBrotherButton: JSX.Element | undefined = undefined;
+    var TypeButton:       JSX.Element | undefined = undefined;
+    var DeleteButton:     JSX.Element | undefined = undefined;
+    var ExpandButton:     JSX.Element | undefined = undefined;
+
+    if (focusNode !== null) {
+      const calcedFN = TreeUtil._findById(node, focusNode.id)!;
+      const buttonPoint = buttonSize / 2 + buttonMargin * 1.5;
+      if (!(focusNode.children.length !== 0 && !focusNode.open)) {
+        const bySide = calcedFN.children.length === 0 && !calcedFN.open;
+        const buttonStyle: React.CSSProperties = {
+          position: 'absolute',
+          left: bySide
+            ? (calcedFN!.point.x + ks.rect.w)                   * ks.unit + sp.x + buttonPoint
+            : (calcedFN!.point.x + (ks.rect.w + ks.indent) / 2) * ks.unit + sp.x + buttonPoint,
+          top: bySide
+            ? (calcedFN!.point.y + ks.rect.h / 2) * ks.unit + sp.y + buttonPoint
+            : (calcedFN!.point.y + ks.rect.h)     * ks.unit + sp.y + buttonPoint,
+          transform: `translate(-50%, -50%)`
+        };
+  
+        AddChildButton = (
+          <IconButton color="secondary" style={buttonStyle} onClick={this.addDetails}>
+            <Add/>
+          </IconButton>
+        );
+      }
+      if (!calcedFN.open) {
+        const buttonStyle: React.CSSProperties = {
+          position: 'absolute',
+          left: (calcedFN!.point.x + ks.rect.w / 2) * ks.unit + sp.x,
+          top:  (calcedFN!.point.y + ks.rect.h)     * ks.unit + sp.y + buttonPoint,
+          transform: `translate(-50%, -50%)`
+        };
+  
+        AddBrotherButton = (
+          <IconButton color="secondary" style={buttonStyle} onClick={this.addNextBrother}>
+            <Add/>
+          </IconButton>
+        );
+      }
+      (() => {
+        const buttonStyle: React.CSSProperties = {
+          position: 'absolute',
+          left: (calcedFN!.point.x + ks.rect.h / 2) * ks.unit + sp.x,
+          top:  (calcedFN!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
+          transform: `translate(-50%, -50%) scale(${ks.unit / 24})`,
+          color: '#000',
+        };
+        TypeButton = (
+          <div>
+            <IconButton style={buttonStyle} onClick={e => this.setState({typeAnchorEl: e.currentTarget})} disableRipple>
+              {calcedFN.type === 'task' ? <Task/> : calcedFN.type === 'switch' ? <Switch style={{transform: 'scale(1, -1)'}}/> : <Case/>}
+            </IconButton>
+            <Menu
+              anchorEl={typeAnchorEl}
+              open={Boolean(typeAnchorEl)}
+              onClose={() => this.setState({typeAnchorEl: null})}
+            >
+              {calcedFN.type !== 'case' &&
+              <MenuItem onClick={() => this.cahngeType('task')}>
+                <ListItemIcon><Task/></ListItemIcon>
+                <ListItemText inset primary="作業"/>
+              </MenuItem>}
+              {calcedFN.type !== 'case' &&
+              <MenuItem onClick={() => this.cahngeType('switch')}>
+                <ListItemIcon><Switch style={{transform: 'scale(1, -1)'}}/></ListItemIcon>
+                <ListItemText inset primary="分岐"/>
+              </MenuItem>}
+              {calcedFN.type === 'case' &&
+              <MenuItem onClick={() => this.cahngeType('case')}>
+                <ListItemIcon><Case/></ListItemIcon>
+                <ListItemText inset primary="条件"/>
+              </MenuItem>}
+            </Menu>
+          </div>
+        );
+      })();
+      (() => {
+        const buttonStyle: React.CSSProperties = {
+          position: 'absolute',
+          left: (calcedFN!.point.x + ks.rect.w - ks.rect.h / 2) * ks.unit + sp.x,
+          top:  (calcedFN!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
+          transform: `translate(-50%, -50%) scale(${ks.unit / 24})`,
+          color: '#000',
+        };
+        DeleteButton = (
+          <IconButton style={buttonStyle} onClick={() => this.setState({deleteFlag: true})} disableRipple>
+            <Delete/>
+          </IconButton>
+        );
+      })();
+      (() => {
+        const buttonStyle: React.CSSProperties = {
+          position: 'absolute',
+          left: (calcedFN!.point.x + ks.rect.w - ks.rect.h / 2 - ks.icon * 2) * ks.unit + sp.x,
+          top:  (calcedFN!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
+          transform: `translate(-50%, -50%) scale(${ks.unit / 24})`,
+          color: '#000',
+        };
+        ExpandButton = (
+          <IconButton style={buttonStyle} onClick={() => this.setState({deleteFlag: true})} disableRipple>
+            <More/>
+          </IconButton>
+        );
+      })();
+    }
+
+    
     return (
       <div className={classes.root}>
-        <main className={classes.stageContainer} ref={this.stageContainerRef}>
-          <Stage ref={this.stageRef} onClick={this.deleteFocus}>
-            <Layer>
-              {/* {map !== null && map.map((___, x) => (
-              <Group key={`group-${x}`} x={sp.x} y={sp.y}>
-                {___.map((__, y) => {
-                const cell = map[x][y];
-                if (cell === undefined) { return <Rect key={`${x}-${y}`}/>; }
-                const fill = cell.action === 'push' ? ('#ccff' + _.padStart(String(cell.node.depth.top * 16), 2, '0')) :
-                            cell.action === 'move' ? 'blue'   : 'grey';
-                return (
-                  <Rect key={`${x}-${y}`} x={x * ks.unit} y={y * ks.unit + 300} width={ks.unit} height={ks.unit}
-                        fill={fill} stroke="#000" strokeWidth={1}/>);
-                })}
-              </Group>))} */}
-              {flatNodes.map((n, i) => <KNode key={n.id} node={n} isRoot={i === 0} {...nodeActionProps}/>)}
-            </Layer>
-          </Stage>
+        <main className={classes.main}>
+          <div className={classes.stageContainer} ref={this.stageContainerRef}>
+            <Stage ref={this.stageRef} onClick={this.deleteFocus}>
+              <Layer>
+                {/* {map !== null && map.map((___, x) => (
+                <Group key={`group-${x}`} x={sp.x} y={sp.y}>
+                  {___.map((__, y) => {
+                  const cell = map[x][y];
+                  if (cell === undefined) { return <Rect key={`${x}-${y}`}/>; }
+                  const fill = cell.action === 'push' ? ('#ccff' + _.padStart(String(cell.node.depth.top * 16), 2, '0')) :
+                              cell.action === 'move' ? 'blue'   : 'grey';
+                  return (
+                    <Rect key={`${x}-${y}`} x={x * ks.unit} y={y * ks.unit + 300} width={ks.unit} height={ks.unit}
+                          fill={fill} stroke="#000" strokeWidth={1}/>);
+                  })}
+                </Group>))} */}
+                {flatNodes.map((n, i) => <KNode key={n.id} node={n} isRoot={i === 0} {...nodeActionProps}/>)}
+              </Layer>
+            </Stage>
+
+            {AddChildButton}
+            {AddBrotherButton}
+            {TypeButton}
+            {DeleteButton}
+          </div>
+          
 
           <div ref={this.rightPaneRef} className={classes.rightPaneContainer}>
             <RightPane {...rightPaneProps}/>
           </div>
+
+          <Dialog open={deleteFlag} onClose={() => this.setState({deleteFlag: false})}>
+            <DialogTitle>この項目を削除してもよろしいですか？</DialogTitle>
+            {focusNode !== null && focusNode.children.length !== 0 &&
+            <DialogContent>
+              <DialogContentText>この項目には詳細項目が含まれています。削除してもよろしいですか？</DialogContentText>
+            </DialogContent>}
+            
+            <DialogActions>
+              <Button onClick={() => this.setState({deleteFlag: false})}>Cancel</Button>
+              <Button onClick={this.deleteSelf} color="primary" autoFocus>Delete</Button>
+            </DialogActions>
+          </Dialog>
           
           <Modal
             open={showViewSettings}

@@ -23,28 +23,29 @@ export default class KTreeUtil {
     return [node].concat((node.children as T[]).map(c => KTreeUtil.toFlat(c)).reduce((a, b) => a.concat(b)));
   }
 
-
-  static calcSelfLength = (node: KTreeNode, ks: KSize, open: boolean, which: which) => {
-    if (open) {
+  static calcSelfLength = (node: KTreeNode, ks: KSize, which: which) => {
+    const over = node.focus && ks.margin.h * ks.unit < buttonArea;
+    if (node.open) {
       if (which === 'width') {
-        // task, open, width
+        // open, width
         const childrenLength = node.children.length !== 0
           ? node.children.map(c => c.self.w).reduce((a, b) => Math.max(a, b))
           : ks.rect.w;
         return ks.indent * 1.5 + childrenLength;
       } else {
-        // task, open, height
+        // open, height
         return ks.rect.h + ks.margin.h
+          + (over ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0)
           + (node.children.length !== 0 ?
               node.children.map(c => c.self.h + ks.margin.h).reduce((a, b) => a + b) : 0);
       }
     } else {
       if (which === 'width') {
-        // task, close, width
+        // close, width
         return ks.rect.w;
       } else {
-        // task, close, height
-        return ks.rect.h;
+        // close, height
+        return ks.rect.h + (over ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0);
       }
     }
   }
@@ -62,8 +63,8 @@ export default class KTreeUtil {
     const newNode = {...node, children};
 
     const self = {
-      w: KTreeUtil.calcSelfLength(newNode, ks, node.open, 'width'),
-      h: KTreeUtil.calcSelfLength(newNode, ks, node.open, 'height')
+      w: KTreeUtil.calcSelfLength(newNode, ks, 'width'),
+      h: KTreeUtil.calcSelfLength(newNode, ks, 'height')
     };
 
     return {...node, children, self, rect};
@@ -71,7 +72,8 @@ export default class KTreeUtil {
 
   static _setPoint = <T extends KTreeNode>(point: Point, node: T, ks: KSize): T => {
 
-    var anchor = 0;
+    var anchor = (node.focus && ks.margin.h * ks.unit < buttonArea)
+      ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0;
     const children = node.children.map(c => {
       const p: Point = {
         x: point.x + ks.indent,
@@ -170,3 +172,6 @@ export default class KTreeUtil {
 }
 
 export type which = 'width' | 'height';
+export const buttonSize = 48;
+export const buttonMargin = 4;
+export const buttonArea = buttonSize + buttonMargin * 2;

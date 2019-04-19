@@ -13,7 +13,7 @@ import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
   WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Delete,
 } from '../../../settings/layout';
-import {TreeNode, Type, NodeWithSimilarity, Tree } from '../../../data-types/tree-node';
+import {TreeNode, Type, NodeWithSimilarity, Tree, KWithArrow, baseKWithArrow } from '../../../data-types/tree-node';
 import { ButtonProps } from '@material-ui/core/Button';
 import SimilarityTable from '../../../components/similarity-table/similarity-table';
 import SimilarityUtil from '../../../func/similarity';
@@ -59,9 +59,9 @@ const styles = (theme: Theme) => createStyles({
 
 export interface RightPaneProps {
   isRoot: boolean;
-  node: TreeNode | null;
+  node: KWithArrow | null;
   commonNodes: Tree[];
-  changeNode: (node: TreeNode) => void;
+  changeNode: (node: KWithArrow) => void;
   addDetails: () => void;
   addFromCommon: (e: any) => void;
   registAsCommon: (node: TreeNode) => void;
@@ -86,18 +86,18 @@ const RightPane: React.FC<Props> = (props: Props) => {
     if (node.type === newType) { return; }
 
     if (node.children.length === 0) {
-      const newNode: TreeNode = { ...node, type: newType };
+      const newNode: KWithArrow = { ...node, type: newType };
       changeNode(newNode);
     }
 
     if (newType === 'task') {
-      const children: TreeNode[] = node.children.map(c => c.children).reduce((a, b) => a.concat(b));
-      const newNode: TreeNode = { ...node, type: newType, children };
+      const children: KWithArrow[] = node.children.map(c => c.children).reduce((a, b) => a.concat(b));
+      const newNode: KWithArrow = { ...node, type: newType, children };
       changeNode(newNode);
     } else {
-      const newCase = TreeUtil.getNewNode('switch');
-      const children: TreeNode[] = [{ ...newCase, children: node.children }];
-      const newNode: TreeNode = { ...node, type: newType, children };
+      const newCase = TreeUtil.getNewNode('switch', baseKWithArrow);
+      const children: KWithArrow[] = [{ ...newCase, children: node.children }];
+      const newNode: KWithArrow = { ...node, type: newType, children };
       changeNode(newNode);
     }
   };
