@@ -3,14 +3,14 @@ import * as React from 'react';
 import {
   Theme, createStyles, WithStyles, withStyles,
   Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText,
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Modal, 
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Modal, Badge, TextField, 
 } from '@material-ui/core';
 import Add from '@material-ui/icons/Add';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
 import { TreeNode, Type, KTreeNode, Cell, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode, KWithArrow } from '../../../data-types/tree-node';
-import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth, Task, Switch, Case, Delete } from '../../../settings/layout';
+import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth, Task, Switch, Case, Delete, More, Less } from '../../../settings/layout';
 import { rs as defaultRS } from '../../../settings/reading';
 
 import KTreeUtil, { buttonArea, buttonSize, buttonMargin } from '../../../func/k-tree-util';
@@ -405,6 +405,7 @@ class NodeEditor extends React.Component<Props, State> {
     var TypeButton:       JSX.Element | undefined = undefined;
     var DeleteButton:     JSX.Element | undefined = undefined;
     var ExpandButton:     JSX.Element | undefined = undefined;
+    var Label:            JSX.Element | undefined = undefined;
 
     if (focusNode !== null) {
       const calcedFN = TreeUtil._findById(node, focusNode.id)!;
@@ -502,9 +503,36 @@ class NodeEditor extends React.Component<Props, State> {
           color: '#000',
         };
         ExpandButton = (
-          <IconButton style={buttonStyle} onClick={() => this.setState({deleteFlag: true})} disableRipple>
-            <More/>
+          <IconButton style={buttonStyle} onClick={() => this.setOpenState(focusNode, !focusNode.open)} disableRipple>
+            <Badge badgeContent={focusNode.children.length} color="primary">
+              {!focusNode.open ? <More/> : <Less/>}
+            </Badge>
           </IconButton>
+        );
+      })();
+      (() => {
+        const labelStyle: React.CSSProperties = {
+          position: 'absolute',
+          left: (calcedFN!.point.x + ks.rect.h + ks.fontSize / 2) * ks.unit + sp.x,
+          top:  (calcedFN!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
+          width: (ks.rect.w - ks.fontSize - ks.rect.h * 1.5 - ks.icon * 3) * ks.unit,
+          transform: `translateY(-50%)`,
+        };
+        const fontSize: React.CSSProperties = {
+          fontSize: 18 / 20 * ks.unit
+        };
+        Label = (
+          <TextField
+            style={labelStyle}
+            InputProps={{style: fontSize}}
+            placeholder={
+              calcedFN.type === 'task' ? phrase.placeholder.task :
+              calcedFN.type === 'switch' ? phrase.placeholder.switch : phrase.placeholder.case
+            }
+            InputLabelProps={{shrink: true}}
+            value={calcedFN.label}
+            onChange={(e: any) => this.changeFocusNode({ ...calcedFN!, label: e.target.value })}
+          />
         );
       })();
     }
@@ -536,8 +564,9 @@ class NodeEditor extends React.Component<Props, State> {
             {AddBrotherButton}
             {TypeButton}
             {DeleteButton}
-          </div>
-          
+            {ExpandButton}
+            {Label}
+          </div>        
 
           <div ref={this.rightPaneRef} className={classes.rightPaneContainer}>
             <RightPane {...rightPaneProps}/>
