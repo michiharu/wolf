@@ -27,7 +27,7 @@ const Icon: React.FC<IconProps> = (props: IconProps) => {
     opacity: 0.2,
     cornerRadius: ks.rect.h / 2 * ks.unit,
   };
-  const transRate = ks.unit / 20;
+  const transRate = ks.unit / 20; // 20はsvgアイコンのサイズ
   const svgProps = {
     x: (ks.rect.h - ks.icon) / 2 * ks.unit,
     y: (ks.rect.h - ks.icon) / 2 * ks.unit,

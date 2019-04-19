@@ -1,10 +1,10 @@
-import {KTreeNode, KWithArrow, Point } from "../data-types/tree-node";
+import {KTreeNode, KWithArrow, Point, TreeNode } from "../data-types/tree-node";
 import KSize from "../data-types/k-size";
 
 
 export default class KArrowUtil {
 
-  static get = (nodeSetCalcProps: KTreeNode, base: KWithArrow, ks: KSize): KWithArrow => {
+  static get = <T extends KTreeNode>(nodeSetCalcProps: T, base: KWithArrow, ks: KSize): KWithArrow => {
     var nodeSetArrow = KArrowUtil._setArrowProps(nodeSetCalcProps, base);
     nodeSetArrow = KArrowUtil._setInArrowOfNotSwitch(nodeSetArrow, ks);
     nodeSetArrow = KArrowUtil._setInArrowOfSwitch(nodeSetArrow, ks);
@@ -20,10 +20,10 @@ export default class KArrowUtil {
 
   static _setInArrowOfNotSwitch = (node: KWithArrow, ks: KSize): KWithArrow => {
     const children = node.children.map(c => KArrowUtil._setInArrowOfNotSwitch(c, ks));
-    if (node.type !== 'switch' && node.open && children.length !== 0) {
+    if (node.type !== 'switch' && (node.open && children.length !== 0)) {
       const arrows: Point[][] = [[
-        {x: ks.rect.w / 2 + ks.indent, y: ks.rect.h},
-        {x: ks.rect.w / 2 + ks.indent, y: ks.rect.h + ks.margin.h - ks.pointerSpace}
+        {x: ks.rect.w / 2 - ks.spr.w * 2 + ks.indent, y: ks.rect.h},
+        {x: ks.rect.w / 2 - ks.spr.w * 2 + ks.indent, y: ks.rect.h + ks.margin.h - ks.pointerSpace}
       ]];
       return {...node, children, arrows};
     }
@@ -55,8 +55,8 @@ export default class KArrowUtil {
       } else {
         if (c.type !== 'case' && node.children.length - 1 !== i) {
           const arrows: Point[][] = [[
-            {x: ks.rect.w / 2, y: ks.rect.h},
-            {x: ks.rect.w / 2, y: ks.rect.h + ks.margin.h - ks.pointerSpace}
+            {x: ks.rect.w / 2 - ks.spr.w * 2, y: ks.rect.h},
+            {x: ks.rect.w / 2 - ks.spr.w * 2, y: ks.rect.h + ks.margin.h - ks.pointerSpace}
           ]];
           return {...c, arrows};
         } else {
@@ -100,14 +100,21 @@ export default class KArrowUtil {
     return node;
   }
 
+  static _hasUnderNode = (node: KWithArrow, target: KWithArrow): boolean => {
+    if (node.children.length === 0) { return false; }
+    const hasUnder = node.children.map(c => target.point.y < c.point.y).reduce((a, b) => a || b);
+    if (hasUnder) { return true; }
+    return node.children.map(c => KArrowUtil._hasUnderNode(c, target)).reduce((a, b) => a || b);;
+  } 
+
   static getArrowPoints = (node: KWithArrow, before: KWithArrow, exit: KWithArrow, ks: KSize): Point[][] => {
     const dv: Point = {x: exit.point.x - node.point.x, y: exit.point.y - node.point.y};
-    if (before.type === 'task') {
-      const exitCenter = ks.rect.w / 2 - (node.point.x - before.point.x);
+    if (before.type === 'task' && !KArrowUtil._hasUnderNode(before, node)) {
+      const exitCenter = ks.rect.w / 2  - ks.spr.w * 2 - (node.point.x - before.point.x);
       if (exitCenter < 0) {
         return [[
-          {x: ks.rect.w / 2, y: ks.rect.h},
-          {x: ks.rect.w / 2, y: ks.rect.h + ks.spr.h},
+          {x: ks.rect.w / 2 - ks.spr.w * 2, y: ks.rect.h},
+          {x: ks.rect.w / 2 - ks.spr.w * 2, y: ks.rect.h + ks.spr.h},
           {x: exitCenter,    y: ks.rect.h + ks.spr.h},
           {x: exitCenter,    y: dv.y - ks.pointerSpace},
         ]];
@@ -126,8 +133,8 @@ export default class KArrowUtil {
         {x: ks.rect.w, y: ks.rect.h / 2},
         {x: secondPointX, y: ks.rect.h / 2},
         {x: secondPointX, y: dv.y - ks.spr.h * margin},
-        {x: ks.rect.w / 2 + dv.x, y: dv.y - ks.spr.h * margin},
-        {x: ks.rect.w / 2 + dv.x, y: dv.y - ks.pointerSpace}
+        {x: ks.rect.w / 2 - ks.spr.w * 2 + dv.x, y: dv.y - ks.spr.h * margin},
+        {x: ks.rect.w / 2 - ks.spr.w * 2 + dv.x, y: dv.y - ks.pointerSpace}
       ]];
     }
   }

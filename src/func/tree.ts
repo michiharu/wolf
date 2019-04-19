@@ -228,6 +228,18 @@ export default class TreeUtil {
     return {...node, children};
   }
 
+  static _insertNext = <T extends Tree>(node: T, target: T, to: T): T => {
+    const index = node.children.map(c => c.id).indexOf(to.id);
+    if (index !== -1) {
+      const children = [...node.children];
+      children.splice(index + 1, 0, target);
+      return {...node, children};
+    }
+
+    const children = node.children.map(c => TreeUtil._insertNext(c, target, to));
+    return {...node, children};
+  }
+
   static push = (node: TreeNode, child: TreeNode, parent: TreeNode): TreeNode => {
     const deletedTree = TreeUtil._deleteById(node, child.id) as TreeNode;
     const setParentTypeChild = TreeUtil.setParentType(child, parent.type);
@@ -250,13 +262,36 @@ export default class TreeUtil {
 
   static addDetails = (node: TreeNode, parent: TreeNode): TreeNode => {
     const newNode = TreeUtil.getNewNode(parent.type);
-    const pushedNode = TreeUtil._push(node, newNode, parent);
+    const pushedNode = TreeUtil._unshift(node, newNode, parent);
     return TreeUtil._open(pushedNode, parent.id, true);
+  }
+
+  static addNextBrother = (node: TreeNode, to: TreeNode): TreeNode => {
+    const parentNode = TreeUtil._getPrent(node, to);
+    const newNode = TreeUtil.getNewNode(parentNode!.type);
+    return TreeUtil._insertNext(node, newNode, to);
   }
 
   static addFromCommon = (node: TreeNode, parent: TreeNode, common: Tree, base: TreeNode): TreeNode => {
     const commonAsTreeNode = TreeUtil._getTreeNode(common, base);
     const pushedNode = TreeUtil._push(node, commonAsTreeNode, parent);
     return TreeUtil._open(pushedNode, parent.id, true);
+  }
+
+  static _unshift = (node: TreeNode, child: TreeNode, parent: TreeNode): TreeNode => {
+    if (node.id === parent.id) {
+      node.children.unshift(child);
+      return {...node};
+    }
+    const children = node.children.map(c => TreeUtil._unshift(c, child, parent));
+    return {...node, children};
+  }
+
+  static _getPrent = <T extends Tree>(node: T, target: T): T | null => {
+    if (node.children.length === 0) { return null; }
+    if (node.children.find(c => c.id === target.id) !== undefined) { return node; }
+    return node.children
+      .map(c => TreeUtil._getPrent(c, target))
+      .reduce((a, b) => a || b || null) as T;
   }
 }

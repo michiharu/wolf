@@ -23,13 +23,6 @@ export default class KTreeUtil {
     return [node].concat((node.children as T[]).map(c => KTreeUtil.toFlat(c)).reduce((a, b) => a.concat(b)));
   }
 
-  static _getPrent = <T extends TreeNode>(node: T, target: T): T | null => {
-    if (node.children.length === 0) { return null; }
-    if (node.children.find(c => c.id === target.id) !== undefined) { return node; }
-    return node.children
-      .map(c => KTreeUtil._getPrent(c, target))
-      .reduce((a, b) => a || b || null) as T;
-  }
 
   static calcSelfLength = (node: KTreeNode, ks: KSize, open: boolean, which: which) => {
     if (open) {
@@ -137,9 +130,7 @@ export default class KTreeUtil {
       if (s.open) {
         for(var x = s.point.x + ks.spr.w; x < s.point.x + s.self.w; x++) {
           if (x < 0) { continue; }
-          for(var y = s.point.y + ks.spr.h; y < s.point.y + s.self.h; y++) {
-            result[x][y] = { node: s, action: 'push' };
-          }
+          result[x][s.point.y + s.self.h - 1] = { node: s, action: 'push' };
         }
       }
 

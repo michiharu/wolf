@@ -11,17 +11,16 @@ import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth } from
 import { rs as defaultRS } from '../../../settings/reading';
 
 import KTreeUtil from '../../../func/k-tree-util';
-import KRectNode from '../../../components/konva-node/k-rect-node';
 import RightPane, { RightPaneProps } from './right-pane';
 import TreeUtil from '../../../func/tree';
 import KSize from '../../../data-types/k-size';
 import keys from '../../../settings/storage-keys';
 import ViewSettings, { ViewSettingProps } from './view-settings';
-import KArrowNode from '../../../components/konva-node/k-arrow-node';
-import KArrowUtil from '../../../func/k-arrow-util';
-import Util from '../../../func/util';
 import { phrase } from '../../../settings/phrase';
 import ReadingSetting from '../../../data-types/reading-settings';
+import KNode from '../../../components/konva/k-node';
+import Util from '../../../func/util';
+import KArrowUtil from '../../../func/k-arrow-util';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -148,6 +147,7 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   setFocusState = (target: KTreeNode, focus: boolean) => {
+    console.log(target);
     const { node, edit } = this.props;
     const {ks} = this.state;
     const newNode = TreeUtil._focus(node, target.id);
@@ -206,7 +206,7 @@ class NodeEditor extends React.Component<Props, State> {
 
   dragStart = (target: KTreeNode) => {
     const { node, edit } = this.props;
-    const dragParent = KTreeUtil._getPrent(node, target);
+    const dragParent = TreeUtil._getPrent(node, target);
     const openNode = TreeUtil._open(node, target.id, false);
     edit(TreeUtil._deleteFocus(openNode));
     this.setState({dragParent, focusNode: null});
@@ -266,6 +266,13 @@ class NodeEditor extends React.Component<Props, State> {
     process.nextTick(() => this.resize());
   }
 
+  addNextBrother = () => {
+    const { node, edit } = this.props;
+    const {focusNode} = this.state;
+    edit(TreeUtil.addNextBrother(node, focusNode!));
+    process.nextTick(() => this.resize());
+  }
+
   addFromCommon = (e: any) => {
     const { node, edit, commonNodes } = this.props;
     const common = commonNodes.find(c => c.id === e.target.value);
@@ -322,8 +329,8 @@ class NodeEditor extends React.Component<Props, State> {
     const {
       ks, ft, rs, focusNode, showViewSettings
     } = this.state;
-
-    const node  = KTreeUtil.get(tree, baseKTreeNode, ks);
+    const kTreeNode = KTreeUtil.get(tree, baseKWithArrow, ks);
+    const node = KArrowUtil.get(kTreeNode, baseKWithArrow, ks);
     this.calcedNode = node;
     const flatNodes = KTreeUtil.toFlat(node);
     const map = KTreeUtil.makeMap(flatNodes, ks);
@@ -331,10 +338,13 @@ class NodeEditor extends React.Component<Props, State> {
 
     const nodeActionProps = {
       ks,
+      ft,
       click: this.click,
       dragStart: this.dragStart,
       dragMove: this.dragMove,
       dragEnd: this.dragEnd,
+      addDetails: this.addDetails,
+      addNextBrother: this.addNextBrother,
       deleteFocus: this.deleteFocus
     };
 
@@ -372,10 +382,7 @@ class NodeEditor extends React.Component<Props, State> {
                         fill={fill} stroke="#000" strokeWidth={1}/>);
                 })}
               </Group>))} */}
-              {ft === 'arrow' &&
-              KTreeUtil.toFlat(KArrowUtil.get(node, baseKWithArrow, ks))
-              .map(n => <KArrowNode key={n.id} node={n} {...nodeActionProps}/>)}
-              {ft === 'rect' && flatNodes.map(n => <KRectNode key={n.id} node={n} {...nodeActionProps}/>)}
+              {flatNodes.map((n, i) => <KNode key={n.id} node={n} isRoot={i === 0} {...nodeActionProps}/>)}
             </Layer>
           </Stage>
 

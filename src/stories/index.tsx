@@ -7,8 +7,8 @@ import FlowItem from '../components/flow-item';
 import Crop from '@material-ui/icons/Crop169';
 import Switch from '@material-ui/icons/Share';
 import { Stage, Layer } from 'react-konva';
-import CheckBox from '../components/konva-node/check-box';
-import IconWithBadge from '../components/konva-node/icon-with-badge';
+import CheckBox from '../components/konva/check-box';
+import IconWithBadge from '../components/konva/icon-with-badge';
 import task from '../resource/svg-icon/task';
 import { ks } from '../settings/layout';
 

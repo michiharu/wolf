@@ -30,7 +30,7 @@ export const ks: KSize = {
   fontSize: 0.9,
   fontHeight: 0.75,
   textline: 1,
-  icon: 1.25,
+  icon: 1.5,
   badgeFontSize: 0.7,
   badgeFontHeight: 0.6,
   cornerRadius: 0.5,

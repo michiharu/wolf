@@ -56,10 +56,10 @@ export class ScrollableTextField extends React.Component<TextFieldProps, State> 
         {!focus && !hover &&
         <div
           ref={this.coverRef}
-          style={{position: 'absolute', top, left, width, height, backgroundColor: '#ccc3'}}
+          style={{position: 'absolute', top, left, width, height}}
           onClick={this.setFocus}
           onTouchEnd={this.setFocus}
-          onMouseEnter={() => this.setState({hover: true})}
+          onMouseEnter={() => !this.props.disabled && this.setState({hover: true})}
         />}
       </div>
     );

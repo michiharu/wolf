@@ -18,7 +18,7 @@ import { toolbarHeight, toolbarMinHeight, ks } from '../../settings/layout';
 
 import ToolContainer from '../../components/tool-container/tool-container';
 import CheckNodeUtil from '../../func/check-node-util';
-import CheckKNode from '../../components/konva-node/check-k-node';
+import CheckKNode from '../../components/konva/check-k-node';
 import { fileDownload } from '../../func/file-download';
 
 const styles = (theme: Theme) => createStyles({
