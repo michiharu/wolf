@@ -16,17 +16,20 @@ import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
 import KSize from '../../data-types/k-size';
 import check from '../../resource/svg-icon/check';
 import Icon, { IconProps } from './icon';
+import more from '../../resource/svg-icon/expand/more';
+import less from '../../resource/svg-icon/expand/less';
 
 export interface KNodeProps {
   node: KWithArrow;
   isRoot: boolean;
+  labelFocus: boolean;
   ks: KSize;
   ft: FlowType;
-  click: (node: KWithArrow) => void;
+  focus: (node: KWithArrow) => void;
+  expand: (node: KWithArrow) => void;
   dragStart: (node: KTreeNode) => void;
   dragMove: (node: KTreeNode, point: Point) => void;
   dragEnd: () => void;
-  addNextBrother: () => void;
   deleteFocus: () => void;
 }
 
@@ -43,10 +46,16 @@ class KNode extends React.Component<KNodeProps> {
     process.nextTick(() => this.setState({}));
   }
 
-  handleClick = (e: any) => {
+  handleFocus = (e: any) => {
     e.cancelBubble = true;
-    const {node, click} = this.props;
-    click(node);
+    const {node, focus} = this.props;
+    focus(node);
+  }
+
+  handleExpand = (e: any) => {
+    e.cancelBubble = true;
+    const {node, expand} = this.props;
+    expand(node);
   }
 
   handleDragStart = (e: any) => {
@@ -76,7 +85,7 @@ class KNode extends React.Component<KNodeProps> {
   }
   
   render() {
-    const { isRoot, node, ks, ft, addNextBrother } = this.props;
+    const { node, ks, ft, labelFocus } = this.props;
     const fill = node.type === 'task' ?   node.focus ? lightBlue[100] : lightBlue[50] :
                node.type === 'switch' ? node.focus ? amber[200] : amber[100] :
                                         node.focus ? yellow[200] : yellow[100];
@@ -89,7 +98,7 @@ class KNode extends React.Component<KNodeProps> {
       shadowColor: 'black',
       shadowBlur: node.focus ? 10 : 6,
       shadowOffset: { x: 0, y: 3},
-      shadowOpacity: 0.2,
+      shadowOpacity: node.focus ? 0.4 : 0.2,
     };
 
     const labelProps = {
@@ -101,19 +110,17 @@ class KNode extends React.Component<KNodeProps> {
       y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit
     };
 
-    const iconProps: IconProps = {
+    const typeProps: IconProps = {
       ks,
       x: 0, y: 0,
       svg: node.type === 'task' ? task : node.type === 'switch' ? switchSvg : check,
-      backgroundColor: node.focus ? '#0006' : undefined,
       scale: node.type !== 'switch' ? undefined : {x: 1, y: -1},
     };
 
     const rectGroupProps = {
       x: 0, y:0,
       ref: this.draggableRef,
-      onTap: this.handleClick,
-      onClick: this.handleClick,
+      onClick: this.handleFocus,
       draggable: true,
       onDragStart: this.handleDragStart,
       onDragMove: this.handleDragMove,
@@ -139,10 +146,11 @@ class KNode extends React.Component<KNodeProps> {
       x: (ks.indent / 2 - ks.spr.w) * ks.unit,
       y: ks.spr.h * ks.unit,
       width: (node.self.w - (ks.indent / 2 - ks.spr.w)) * ks.unit,
-      height: (node.self.h - ks.spr.h) * ks.unit,
+      height: node.self.h * ks.unit,
       onClick: this.handleDeleteFocus,
       cornerRadius: ks.cornerRadius * ks.unit,
-      stroke: (ft === 'rect' || node.focus) ? '#dddd' : '#0000',
+      stroke: ft === 'rect' ? '#dddd' : '#0000',
+      fill: node.focus ? theme.palette.background.paper : '#0000',
       strokeWidth: 2,
     };
 
@@ -159,14 +167,23 @@ class KNode extends React.Component<KNodeProps> {
       color: theme.palette.secondary.main,
     };
 
+    const expandProps: IconWithBadgeProps = {
+      ks,
+      x: (ks.rect.w - ks.rect.h) * ks.unit, y: 0,
+      svg: node.open ? less : more,
+      badgeContent: node.children.length,
+      onClick: this.handleExpand,
+    };
+
     return (
       <Group ref={this.baseRef} x={x} y={y} >
         <Group {...rectGroupProps}>
           {node.arrows.length === 0 && node.point.x !== 0 && <IconInRect {...endIconProps}/>}
           {node.open && <Rect {...containerRectProps}/>}
           <Rect {...baseRectProps}/>
-          <Icon {...iconProps}/>
-          {!node.focus && <Text {...labelProps}/>}
+          <Icon {...typeProps}/>
+          {!labelFocus && <Text {...labelProps}/>}
+          <IconWithBadge {...expandProps}/>
           {ft === 'arrow' && node.arrows.map((a, i) => {
             const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
             return <Arrow key={`${node.id}-arrow-${i}`} {...arrowBaseProps} points={points}/>;

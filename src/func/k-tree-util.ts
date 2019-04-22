@@ -172,6 +172,6 @@ export default class KTreeUtil {
 }
 
 export type which = 'width' | 'height';
-export const buttonSize = 48;
-export const buttonMargin = 4;
+export const buttonSize = 0; // 48;
+export const buttonMargin = 0; // 4;
 export const buttonArea = buttonSize + buttonMargin * 2;

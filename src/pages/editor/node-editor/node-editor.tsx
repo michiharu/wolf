@@ -3,9 +3,11 @@ import * as React from 'react';
 import {
   Theme, createStyles, WithStyles, withStyles,
   Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText,
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Modal, Badge, TextField, 
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Modal, Badge, TextField, Fab, Paper, MuiThemeProvider, createMuiTheme, 
 } from '@material-ui/core';
 import Add from '@material-ui/icons/Add';
+import ViewSettingsIcon from '@material-ui/icons/Settings';
+import AddNext from '@material-ui/icons/Forward';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
@@ -24,6 +26,7 @@ import ReadingSetting from '../../../data-types/reading-settings';
 import KNode from '../../../components/konva/k-node';
 import Util from '../../../func/util';
 import KArrowUtil from '../../../func/k-arrow-util';
+import { theme } from '../../..';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -38,10 +41,17 @@ const styles = (theme: Theme) => createStyles({
   },
   stageContainer: {
     position: 'relative',
-    paddingBottom: '100vh',
+  },
+  settingsButton: {
+    position: 'fixed',
+    right: theme.spacing.unit,
+    top: toolbarHeight + theme.spacing.unit,
+    [theme.breakpoints.down('xs')]: {
+      top: toolbarMinHeight + theme.spacing.unit,
+    },
   },
   rightPaneContainer: {
-    position: 'fixed',
+    
     width: '40vw',
     minWidth: rightPainWidth,
     right: 0,
@@ -90,6 +100,7 @@ interface State {
   beforeCell: Cell | null;
   dragParent: TreeNode | null;
   focusNode: KWithArrow | null;
+  labelFocus: boolean;
   typeAnchorEl: any;
   deleteFlag: boolean;
   hasDifference: boolean;
@@ -104,7 +115,7 @@ class NodeEditor extends React.Component<Props, State> {
 
   stageContainerRef = React.createRef<HTMLDivElement>();
   stageRef = React.createRef<any>();
-  rightPaneRef = React.createRef<HTMLDivElement>();
+  labelRef = React.createRef<any>();
 
   calcedNode: KTreeNode;
   map: Cell[][] | null = null; 
@@ -130,6 +141,7 @@ class NodeEditor extends React.Component<Props, State> {
       beforeCell: null,
       dragParent: null,
       focusNode: null,
+      labelFocus: false,
       typeAnchorEl: null,
       deleteFlag: false,
       hasDifference: false,
@@ -150,23 +162,19 @@ class NodeEditor extends React.Component<Props, State> {
     const {ks} = this.state;
     const cref = this.stageContainerRef.current;
     const sref = this.stageRef.current;
-    const rref = this.rightPaneRef.current;
-    if (cref === null || sref === null || rref === null) { throw 'Cannot find elements.'; }
-    sref.width((this.calcedNode.self.w + ks.spr.w) * ks.unit + sp.x + rightPainWidth);
-    sref.height(Math.max((this.calcedNode.self.h + ks.spr.h) * ks.unit + sp.y, window.innerHeight));
+    if (cref === null || sref === null) { throw 'Cannot find elements.'; }
+    sref.width(Math.max((this.calcedNode.self.w + ks.spr.w) * ks.unit + sp.x, cref.offsetWidth));
+    sref.height(Math.max((this.calcedNode.self.h + ks.spr.h) * ks.unit + sp.y, cref.offsetHeight));
     sref.draw();
   }
 
-  setFocusState = (target: KWithArrow, focus: boolean) => {
+  setOpenState = (target: KWithArrow, open: boolean) => {
     const { node, edit } = this.props;
-    const newNode = TreeUtil._focus(node, target.id);
-    edit(newNode);
-    const focusNode: KWithArrow = {...target, focus};
-    this.setState({focusNode});
+    edit(TreeUtil._open(node, target.id, open));
     process.nextTick(() => this.resize());
   }
 
-  setOpenState = (target: KWithArrow, open: boolean) => {
+  setOpenFocusState = (target: KWithArrow, open: boolean) => {
     const { node, edit } = this.props;
     edit(TreeUtil._open(node, target.id, open));
     const focusNode: KWithArrow = {...target, open};
@@ -174,7 +182,8 @@ class NodeEditor extends React.Component<Props, State> {
     process.nextTick(() => this.resize());
   }
 
-  click = (target: KWithArrow) => {
+  focus = (target: KWithArrow) => {
+    const { node, edit } = this.props;
     const { rs } = this.state;
     if (!target.focus && rs.playOnClick) {
       const ssu = new SpeechSynthesisUtterance();
@@ -187,31 +196,22 @@ class NodeEditor extends React.Component<Props, State> {
       speechSynthesis.cancel();
       speechSynthesis.speak(ssu);
     }
-    // before: {focus: false, open: false}
-    // after:  {focus: true,  open: false}
-    // action => focus: true
-    if (!target.focus && !target.open) { this.setFocusState(target, true); }
-
-    // before: {focus: true, open: false}
-    // after:  {focus: true, open: true}
-    // action => open: true
-    if (target.focus && !target.open)  { this.setOpenState(target, true); }
-
-    // before: {focus: false, open: true}
-    // after:  {focus: true,  open: true}
-    // action => focus: true
-    if (!target.focus && target.open)  { this.setFocusState(target, true); }
-
-    // before: {focus: true, open: true}
-    // after:  {focus: true, open: false}
-    // action => open: false
-    if (target.focus && target.open)   { this.setOpenState(target, false); }
+    if (!target.focus) {
+      const newNode = TreeUtil._focus(node, target.id);
+      edit(newNode);
+      const focusNode: KWithArrow = {...target, focus: true};
+      this.setState({focusNode, labelFocus: false});
+      process.nextTick(() => this.resize());
+    } else {
+      process.nextTick(() => this.labelRef.current!.focus());
+      this.setState({labelFocus: true});
+    }
   }
 
   deleteFocus = () => {
     const { node, edit } = this.props;
     edit(TreeUtil._deleteFocus(node));
-    this.setState({focusNode: null});
+    this.setState({focusNode: null, labelFocus: false});
     process.nextTick(() => this.resize());
   }
 
@@ -220,7 +220,7 @@ class NodeEditor extends React.Component<Props, State> {
     const dragParent = TreeUtil._getPrent(node, target);
     const openNode = TreeUtil._open(node, target.id, false);
     edit(TreeUtil._deleteFocus(openNode));
-    this.setState({dragParent, focusNode: null});
+    this.setState({dragParent, focusNode: null, labelFocus: false});
     
   }
 
@@ -284,12 +284,12 @@ class NodeEditor extends React.Component<Props, State> {
 
     if (type === 'task') {
       const children: KWithArrow[] = node.children.map(c => c.children).reduce((a, b) => a.concat(b));
-      const newNode: KWithArrow = { ...node, type, children };
+      const newNode: KWithArrow = { ...node, type, children, open: true };
       this.changeFocusNode(newNode);
     } else {
       const newCase = TreeUtil.getNewNode('switch', baseKWithArrow);
       const children: KWithArrow[] = [{ ...newCase, children: node.children }];
-      const newNode: KWithArrow = { ...node, type, children };
+      const newNode: KWithArrow = { ...node, type, children, open: true };
       this.changeFocusNode(newNode);
     }
   };
@@ -347,7 +347,6 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   changeRS = (rs: ReadingSetting) => {
-    console.log(rs);
     this.setState({rs});
     localStorage.setItem(keys.rs, JSON.stringify(rs));
   }
@@ -361,9 +360,9 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const { node: tree, commonNodes, classes } = this.props;
+    const { node: tree, classes } = this.props;
     const {
-      ks, ft, rs, focusNode, typeAnchorEl, deleteFlag, showViewSettings
+      ks, ft, rs, focusNode, labelFocus, typeAnchorEl, deleteFlag, showViewSettings
     } = this.state;
     const kTreeNode = KTreeUtil.get(tree, baseKWithArrow, ks);
     const node = KArrowUtil.get(kTreeNode, baseKWithArrow, ks);
@@ -375,74 +374,54 @@ class NodeEditor extends React.Component<Props, State> {
     const nodeActionProps = {
       ks,
       ft,
-      click: this.click,
+      focus: this.focus,
+      expand: (target: KWithArrow) => this.setOpenState(target, !target.open),
       dragStart: this.dragStart,
       dragMove: this.dragMove,
       dragEnd: this.dragEnd,
-      addNextBrother: this.addNextBrother,
       deleteFocus: this.deleteFocus
-    };
-
-    const rightPaneProps: RightPaneProps = {
-      isRoot: focusNode !== null && node.id === focusNode.id,
-      node: focusNode,
-      commonNodes,
-      changeNode: this.changeFocusNode,
-      addDetails: this.addDetails,
-      addFromCommon: this.addFromCommon,
-      registAsCommon: this.registAsCommon,
-      deleteSelf: this.deleteSelf,
-      setShowViewSettings: () => this.setState({showViewSettings: true})
     };
 
     const viewSettingProps: ViewSettingProps = {
       ks, ft, rs,
       changeKS: this.changeKS, changeFT: this.changeFT, changeRS: this.changeRS, reset: this.reset
     };
-
-    var AddChildButton:   JSX.Element | undefined = undefined;
-    var AddBrotherButton: JSX.Element | undefined = undefined;
+    var ActionButtonBox:  JSX.Element | undefined = undefined;
     var TypeButton:       JSX.Element | undefined = undefined;
-    var DeleteButton:     JSX.Element | undefined = undefined;
-    var ExpandButton:     JSX.Element | undefined = undefined;
+    var ExpandButton:       JSX.Element | undefined = undefined;
     var Label:            JSX.Element | undefined = undefined;
 
     if (focusNode !== null) {
       const calcedFN = TreeUtil._findById(node, focusNode.id)!;
-      const buttonPoint = buttonSize / 2 + buttonMargin * 1.5;
-      if (!(focusNode.children.length !== 0 && !focusNode.open)) {
-        const bySide = calcedFN.children.length === 0 && !calcedFN.open;
-        const buttonStyle: React.CSSProperties = {
+
+      if (!labelFocus && typeAnchorEl === null) {
+        const isRoot = calcedFN.id === node.id;
+        const boxStyle: React.CSSProperties = {
           position: 'absolute',
-          left: bySide
-            ? (calcedFN!.point.x + ks.rect.w)                   * ks.unit + sp.x + buttonPoint
-            : (calcedFN!.point.x + (ks.rect.w + ks.indent) / 2) * ks.unit + sp.x + buttonPoint,
-          top: bySide
-            ? (calcedFN!.point.y + ks.rect.h / 2) * ks.unit + sp.y + buttonPoint
-            : (calcedFN!.point.y + ks.rect.h)     * ks.unit + sp.y + buttonPoint,
-          transform: `translate(-50%, -50%)`
+          left: (calcedFN!.point.x) * ks.unit + sp.x,
+          top:  isRoot
+          ? (calcedFN!.point.y + calcedFN.rect.h) * ks.unit + sp.x + theme.spacing.unit
+          : (calcedFN!.point.y) * ks.unit + sp.x - theme.spacing.unit,
+          transform: isRoot ? undefined : 'translateY(-100%)',
+          backgroundColor: theme.palette.grey[900],
         };
-  
-        AddChildButton = (
-          <IconButton color="secondary" style={buttonStyle} onClick={this.addDetails}>
-            <Add/>
-          </IconButton>
+        ActionButtonBox = (
+          <Paper style={boxStyle}>
+            <MuiThemeProvider theme={createMuiTheme({typography: {useNextVariants: true}, palette: {type: 'dark'}})}>
+              {!isRoot && <Button onClick={this.addNextBrother}>
+                次の項目を追加<AddNext style={{transform: 'rotate(90deg)'}} /><Add/>
+              </Button>}
+              <Button onClick={this.addDetails}>
+                詳細項目を追加<AddNext/><Add/>
+              </Button>
+              <Button onClick={() => calcedFN.children.length === 0 ? this.deleteSelf() : this.setState({deleteFlag: true})}>
+                削除<Delete/>
+              </Button>
+            </MuiThemeProvider>
+          </Paper>
         );
       }
-      if (!calcedFN.open) {
-        const buttonStyle: React.CSSProperties = {
-          position: 'absolute',
-          left: (calcedFN!.point.x + ks.rect.w / 2) * ks.unit + sp.x,
-          top:  (calcedFN!.point.y + ks.rect.h)     * ks.unit + sp.y + buttonPoint,
-          transform: `translate(-50%, -50%)`
-        };
-  
-        AddBrotherButton = (
-          <IconButton color="secondary" style={buttonStyle} onClick={this.addNextBrother}>
-            <Add/>
-          </IconButton>
-        );
-      }
+
       (() => {
         const buttonStyle: React.CSSProperties = {
           position: 'absolute',
@@ -459,7 +438,10 @@ class NodeEditor extends React.Component<Props, State> {
             <Menu
               anchorEl={typeAnchorEl}
               open={Boolean(typeAnchorEl)}
-              onClose={() => this.setState({typeAnchorEl: null})}
+              onClose={() => {
+                this.deleteFocus();
+                this.setState({typeAnchorEl: null});
+              }}
             >
               {calcedFN.type !== 'case' &&
               <MenuItem onClick={() => this.cahngeType('task')}>
@@ -480,6 +462,7 @@ class NodeEditor extends React.Component<Props, State> {
           </div>
         );
       })();
+
       (() => {
         const buttonStyle: React.CSSProperties = {
           position: 'absolute',
@@ -488,41 +471,28 @@ class NodeEditor extends React.Component<Props, State> {
           transform: `translate(-50%, -50%) scale(${ks.unit / 24})`,
           color: '#000',
         };
-        DeleteButton = (
-          <IconButton style={buttonStyle} onClick={() => this.setState({deleteFlag: true})} disableRipple>
-            <Delete/>
-          </IconButton>
-        );
-      })();
-      (() => {
-        const buttonStyle: React.CSSProperties = {
-          position: 'absolute',
-          left: (calcedFN!.point.x + ks.rect.w - ks.rect.h / 2 - ks.icon * 2) * ks.unit + sp.x,
-          top:  (calcedFN!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
-          transform: `translate(-50%, -50%) scale(${ks.unit / 24})`,
-          color: '#000',
-        };
         ExpandButton = (
-          <IconButton style={buttonStyle} onClick={() => this.setOpenState(focusNode, !focusNode.open)} disableRipple>
-            <Badge badgeContent={focusNode.children.length} color="primary">
-              {!focusNode.open ? <More/> : <Less/>}
-            </Badge>
+          <IconButton style={buttonStyle} onClick={() => this.setOpenFocusState(calcedFN, !calcedFN.open)} disableRipple>
+            {!focusNode.open ? <More/> : <Less/>}
           </IconButton>
         );
       })();
+
       (() => {
         const labelStyle: React.CSSProperties = {
           position: 'absolute',
-          left: (calcedFN!.point.x + ks.rect.h + ks.fontSize / 2) * ks.unit + sp.x,
+          left: (calcedFN!.point.x + ks.rect.h + ks.spr.w / 2) * ks.unit + sp.x,
           top:  (calcedFN!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
-          width: (ks.rect.w - ks.fontSize - ks.rect.h * 1.5 - ks.icon * 3) * ks.unit,
+          width: (ks.rect.w - (ks.rect.h + ks.spr.w / 2) * 2) * ks.unit,
           transform: `translateY(-50%)`,
+          display: labelFocus ? undefined : 'none',
         };
         const fontSize: React.CSSProperties = {
-          fontSize: 18 / 20 * ks.unit
+          fontSize: 18.2 / 20 * ks.unit
         };
         Label = (
           <TextField
+            inputRef={this.labelRef}
             style={labelStyle}
             InputProps={{style: fontSize}}
             placeholder={
@@ -537,7 +507,6 @@ class NodeEditor extends React.Component<Props, State> {
       })();
     }
 
-    
     return (
       <div className={classes.root}>
         <main className={classes.main}>
@@ -556,21 +525,20 @@ class NodeEditor extends React.Component<Props, State> {
                           fill={fill} stroke="#000" strokeWidth={1}/>);
                   })}
                 </Group>))} */}
-                {flatNodes.map((n, i) => <KNode key={n.id} node={n} isRoot={i === 0} {...nodeActionProps}/>)}
+                {flatNodes.map((n, i) => (
+                  <KNode key={n.id} node={n} isRoot={i === 0} labelFocus={labelFocus && n.id === focusNode!.id} {...nodeActionProps}/>
+                ))}
               </Layer>
             </Stage>
-
-            {AddChildButton}
-            {AddBrotherButton}
-            {TypeButton}
-            {DeleteButton}
-            {ExpandButton}
+            {ActionButtonBox}
             {Label}
-          </div>        
-
-          <div ref={this.rightPaneRef} className={classes.rightPaneContainer}>
-            <RightPane {...rightPaneProps}/>
+            {TypeButton}
+            {ExpandButton}
           </div>
+
+          <Fab className={classes.settingsButton} onClick={() => this.setState({showViewSettings: true})}>
+            <ViewSettingsIcon/>
+          </Fab>
 
           <Dialog open={deleteFlag} onClose={() => this.setState({deleteFlag: false})}>
             <DialogTitle>この項目を削除してもよろしいですか？</DialogTitle>

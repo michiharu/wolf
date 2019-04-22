@@ -8,7 +8,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
   InputAdornment, FormControl, InputLabel, Select, OutlinedInput, MenuItem, Divider, Button, Slide, Collapse, IconButton, Paper
 } from '@material-ui/core';
-import ViewSettingsIcon from '@material-ui/icons/Settings';
+
 import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
   WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Delete,
@@ -204,9 +204,7 @@ const RightPane: React.FC<Props> = (props: Props) => {
           </FormControl>
         </Grid>
         <Grid item>
-          <IconButton onClick={setShowViewSettings}>
-            <ViewSettingsIcon/>
-          </IconButton>
+          
         </Grid>
       </Grid>
       <ScrollableTextField

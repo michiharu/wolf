@@ -41,10 +41,10 @@ storiesOf('Konva', module)
 .add('Icon with badge', () => (
   <Stage width={400} height={400}>
     <Layer>
-      <IconWithBadge ks={ks} x={20} y={20} svg={task} badgeContent="3"/>
-      <IconWithBadge ks={ks} x={80} y={40} svg={task} badgeContent="33"/>
-      <IconWithBadge ks={ks} x={140} y={60} svg={task} badgeContent="333"/>
-      <IconWithBadge ks={ks} x={200} y={80} svg={task} badgeContent="3333"/>
+      <IconWithBadge ks={ks} x={20} y={20} svg={task} badgeContent={0}/>
+      <IconWithBadge ks={ks} x={80} y={40} svg={task} badgeContent={3}/>
+      <IconWithBadge ks={ks} x={140} y={60} svg={task} badgeContent={333}/>
+      <IconWithBadge ks={ks} x={200} y={80} svg={task} badgeContent={3333}/>
     </Layer>
   </Stage>
 ))
