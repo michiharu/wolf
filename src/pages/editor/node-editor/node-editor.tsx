@@ -9,6 +9,7 @@ import Add from '@material-ui/icons/Add';
 import ViewSettingsIcon from '@material-ui/icons/Settings';
 import AddNext from '@material-ui/icons/Forward';
 
+import Konva from 'konva';
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
 import { TreeNode, Type, KTreeNode, Cell, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode, KWithArrow } from '../../../data-types/tree-node';
@@ -35,13 +36,11 @@ const styles = (theme: Theme) => createStyles({
   },
   toolbar: theme.mixins.toolbar,
   main: {
+    overflow: 'scroll',
     height: `calc(100vh - ${toolbarHeight}px)`,
     [theme.breakpoints.down('xs')]: {
       height: `calc(100vh - ${toolbarMinHeight}px)`,
     },
-  },
-  stageContainer: {
-    position: 'relative',
   },
   settingsButton: {
     position: 'fixed',
@@ -100,7 +99,6 @@ interface State {
   rs: ReadingSetting;
   beforeCell: Cell | null;
   dragParent: TreeNode | null;
-  focusNode: KWithArrow | null;
   labelFocus: boolean;
   typeAnchorEl: any;
   deleteFlag: boolean;
@@ -114,7 +112,7 @@ export const sp = {x: 16, y: 16};
 
 class NodeEditor extends React.Component<Props, State> {
 
-  stageContainerRef = React.createRef<HTMLDivElement>();
+  mainRef = React.createRef<HTMLMainElement>();
   stageRef = React.createRef<any>();
   labelRef = React.createRef<any>();
 
@@ -142,7 +140,6 @@ class NodeEditor extends React.Component<Props, State> {
       rs,
       beforeCell: null,
       dragParent: null,
-      focusNode: null,
       labelFocus: false,
       typeAnchorEl: null,
       deleteFlag: false,
@@ -152,22 +149,68 @@ class NodeEditor extends React.Component<Props, State> {
   }
   
   componentDidMount() {
-    process.nextTick(this.resize);
+    process.nextTick(() => {
+      this.resize();
+      this.addScrollEventListener();
+    });
     window.addEventListener('resize', this.resize);
+  }
+
+  addScrollEventListener = () => {
+    const scrollContainer = this.mainRef.current;
+    if (scrollContainer === null) { throw 'Cannot find elements.'; }
+    scrollContainer.addEventListener('scroll', this.scroll);
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
+    const scrollContainer = this.mainRef.current;
+    if (scrollContainer === null) { throw 'Cannot find elements.'; }
+    scrollContainer.removeEventListener('scroll', this.scroll);
   }
 
   resize = () => {
-    const {ks} = this.state;
-    const cref = this.stageContainerRef.current;
-    const sref = this.stageRef.current;
-    if (cref === null || sref === null) { throw 'Cannot find elements.'; }
-    sref.width(Math.max((this.kTree.self.w + ks.spr.w) * ks.unit + sp.x, cref.offsetWidth));
-    sref.height(Math.max((this.kTree.self.h + ks.spr.h) * ks.unit + sp.y, cref.offsetHeight));
-    sref.draw();
+    const mref = this.mainRef.current;
+    const stage = this.stageRef.current;
+    if (mref === null || stage === null) { throw 'Cannot find elements.'; }
+    stage.width(mref.offsetWidth);
+    stage.height(mref.offsetHeight);
+    stage.draw();
+  }
+
+  scroll = () => {
+    const scrollContainer = this.mainRef.current;
+    const stage = this.stageRef.current;
+    if (scrollContainer === null || stage === null) { throw 'Cannot find elements.'; }
+    const dx = scrollContainer.scrollLeft;
+    const dy = scrollContainer.scrollTop;
+    stage.container().style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+    stage.x(-dx);
+    stage.y(-dy);
+    stage.batchDraw();
+  }
+
+  scrollToNew = (node: TreeNode) => {
+    const main = this.mainRef.current;
+    const stage = this.stageRef.current;
+    if (main === null || stage === null) { throw 'Cannot find elements.'; }
+
+    const { ks } = this.state;
+    var  kTree = TreeUtil._get(node, baseKTreeNode);
+    kTree = KTreeUtil.setCalcProps(kTree, ks);
+    const focusNode = TreeNodeUtil._getFocusNode(kTree)!;
+    if (sp.y + (focusNode.point.y + ks.rect.h) * ks.unit < main.scrollTop + main.offsetHeight) { return; }
+    const maxScroll = sp.y + (kTree.self.h + ks.spr.h * 2) * ks.unit - main.offsetHeight;
+
+    const dx = main.scrollLeft;
+    const dy = Math.min(sp.y + (focusNode.point.y + ks.rect.h * 2 + ks.margin.h) * ks.unit - main.offsetHeight, maxScroll);
+    
+    const onFinish = () => {
+      main.scrollTop = dy;
+      stage.container().style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+    };
+    
+    stage.to({x: -dx, y: -dy, duration: 1, onFinish});
   }
 
   expand = (target: KWithArrow, open: boolean) => {
@@ -179,17 +222,6 @@ class NodeEditor extends React.Component<Props, State> {
     //   const focusNode: KWithArrow = {...target, open};
     //   this.setState({focusNode});
     // }
-    edit(newNode);
-    process.nextTick(() => this.resize());
-  }
-
-  expandFocusNode = (target: KWithArrow, open: boolean) => {
-    const { node, edit } = this.props;
-    var newNode = TreeNodeUtil._open(node, target.id, open);
-    newNode = TreeNodeUtil._deleteFocus(newNode);
-    newNode = TreeNodeUtil._focus(newNode, target.id);
-    const focusNode: KWithArrow = {...target, open};
-    this.setState({focusNode});
     edit(newNode);
     process.nextTick(() => this.resize());
   }
@@ -211,8 +243,7 @@ class NodeEditor extends React.Component<Props, State> {
     if (!target.focus) {
       const newNode = TreeNodeUtil._focus(node, target.id);
       edit(newNode);
-      const focusNode: KWithArrow = {...target, focus: true};
-      this.setState({focusNode, labelFocus: false});
+      this.setState({labelFocus: false});
       process.nextTick(() => this.resize());
     } else {
       process.nextTick(() => this.labelRef.current!.focus());
@@ -223,17 +254,17 @@ class NodeEditor extends React.Component<Props, State> {
   deleteFocus = () => {
     const { node, edit } = this.props;
     edit(TreeNodeUtil._deleteFocus(node));
-    this.setState({focusNode: null, labelFocus: false});
+    this.setState({labelFocus: false});
     process.nextTick(() => this.resize());
   }
 
   dragStart = (target: KTreeNode) => {
     const { node, edit } = this.props;
     const dragParent = TreeUtil._getPrent(node, target);
-    const openNode = TreeNodeUtil._open(node, target.id, false);
-    edit(TreeNodeUtil._deleteFocus(openNode));
-    this.setState({dragParent, focusNode: null, labelFocus: false});
-    
+    var newNode = TreeNodeUtil._open(node, target.id, false);
+    newNode = TreeNodeUtil._deleteFocus(newNode);
+    edit(newNode);
+    this.setState({dragParent, labelFocus: false});
   }
 
   dragMove = (target: KTreeNode, p: Point) => {
@@ -276,49 +307,49 @@ class NodeEditor extends React.Component<Props, State> {
     this.setState({dragParent: null});
   }
 
-  changeFocusNode = (target: KWithArrow) => {
+  changeFocusNode = (target: TreeNode) => {
     const { node, edit } = this.props;
     edit(TreeUtil._replace(node, target));
-    this.setState({focusNode: target});
   }
 
   cahngeType = (type: Type) => {
-    const { focusNode: node } = this.state;
+    const { node } = this.props;
     this.setState({typeAnchorEl: null});
 
     if (node === null) { throw 'No focus node.'; }
     if (node.type === type) { return; }
 
     if (node.children.length === 0) {
-      const newNode: KWithArrow = { ...node, type };
+      const newNode = { ...node, type };
       this.changeFocusNode(newNode);
     }
 
     if (type === 'task') {
-      const children: KWithArrow[] = node.children.map(c => c.children).reduce((a, b) => a.concat(b));
-      const newNode: KWithArrow = { ...node, type, children, open: true };
+      const children = node.children.map(c => c.children).reduce((a, b) => a.concat(b));
+      const newNode = { ...node, type, children, open: true };
       this.changeFocusNode(newNode);
     } else {
       const newCase = TreeUtil.getNewNode('switch', baseKWithArrow);
-      const children: KWithArrow[] = [{ ...newCase, children: node.children }];
-      const newNode: KWithArrow = { ...node, type, children, open: true };
+      const children = [{ ...newCase, children: node.children }];
+      const newNode = { ...node, type, children, open: true };
       this.changeFocusNode(newNode);
     }
   };
 
   addDetails = () => {
     const { node, edit } = this.props;
-    const {focusNode} = this.state;
-    const addDetailsNode = TreeNodeUtil.addDetails(node, focusNode!);
+    const focusNode = TreeNodeUtil._getFocusNode(node)!;
+    const addDetailsNode = TreeNodeUtil.addDetails(node, focusNode);
     edit(addDetailsNode);
     process.nextTick(() => this.resize());
   }
 
   addNextBrother = () => {
     const { node, edit } = this.props;
-    const {focusNode} = this.state;
-    edit(TreeNodeUtil.addNextBrother(node, focusNode!));
-    process.nextTick(() => this.resize());
+    const focusNode = TreeNodeUtil._getFocusNode(node)!;
+    const addNextBrotherNode = TreeNodeUtil.addNextBrother(node, focusNode);
+    edit(addNextBrotherNode);
+    process.nextTick(() => {this.resize(); this.scrollToNew(addNextBrotherNode)});
   }
 
   addFromCommon = (e: any) => {
@@ -327,8 +358,8 @@ class NodeEditor extends React.Component<Props, State> {
     if (common === undefined) { return; }
     
     const setIdCommon = TreeUtil._setId(common);
-    const {focusNode} = this.state;
-    edit(TreeNodeUtil.addFromCommon(node, focusNode!, setIdCommon, baseTreeNode));
+    const focusNode = TreeNodeUtil._getFocusNode(node)!;
+    edit(TreeNodeUtil.addFromCommon(node, focusNode, setIdCommon, baseTreeNode));
     process.nextTick(() => this.resize());
   }
 
@@ -340,9 +371,9 @@ class NodeEditor extends React.Component<Props, State> {
 
   deleteSelf = () => {
     const { node, edit } = this.props;
-    const {focusNode} = this.state;
-    edit(TreeUtil._deleteById(node, focusNode!.id));
-    this.setState({focusNode: null, deleteFlag: false});
+    const focusNode = TreeNodeUtil._getFocusNode(node)!;
+    edit(TreeUtil._deleteById(node, focusNode.id));
+    this.setState({deleteFlag: false});
     process.nextTick(() => this.resize());
   }
 
@@ -374,7 +405,7 @@ class NodeEditor extends React.Component<Props, State> {
   render() {
     const { node: tree, classes } = this.props;
     const {
-      ks, ft, rs, focusNode, labelFocus, typeAnchorEl, deleteFlag, showViewSettings
+      ks, ft, rs, labelFocus, typeAnchorEl, deleteFlag, showViewSettings
     } = this.state;
     const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
     const node = KArrowUtil.setArrow(kTreeNode, ks);
@@ -400,20 +431,20 @@ class NodeEditor extends React.Component<Props, State> {
     };
     var ActionButtonBox:  JSX.Element | undefined = undefined;
     var TypeButton:       JSX.Element | undefined = undefined;
-    var ExpandButton:       JSX.Element | undefined = undefined;
+    var ExpandButton:     JSX.Element | undefined = undefined;
     var Label:            JSX.Element | undefined = undefined;
 
-    if (focusNode !== null) {
-      const calcedFN = TreeUtil._find(node, focusNode.id)!;
+    const focusNode = TreeNodeUtil._getFocusNode(node)!;
+    if (focusNode !== undefined) {
 
       if (!labelFocus && typeAnchorEl === null) {
-        const isRoot = calcedFN.id === node.id;
+        const isRoot = focusNode.depth.top === 0;
         const boxStyle: React.CSSProperties = {
           position: 'absolute',
-          left: (calcedFN!.point.x) * ks.unit + sp.x,
+          left: (focusNode!.point.x) * ks.unit + sp.x,
           top:  isRoot
-          ? (calcedFN!.point.y + calcedFN.rect.h) * ks.unit + sp.x + theme.spacing.unit
-          : (calcedFN!.point.y) * ks.unit + sp.x - theme.spacing.unit,
+          ? (focusNode!.point.y + focusNode.rect.h) * ks.unit + sp.x + theme.spacing.unit
+          : (focusNode!.point.y) * ks.unit + sp.x - theme.spacing.unit,
           transform: isRoot ? undefined : 'translateY(-100%)',
           backgroundColor: theme.palette.grey[900],
         };
@@ -426,7 +457,7 @@ class NodeEditor extends React.Component<Props, State> {
               <Button onClick={this.addDetails}>
                 詳細項目を追加<AddNext/><Add/>
               </Button>
-              <Button onClick={() => calcedFN.children.length === 0 ? this.deleteSelf() : this.setState({deleteFlag: true})}>
+              <Button onClick={() => focusNode.children.length === 0 ? this.deleteSelf() : this.setState({deleteFlag: true})}>
                 削除<Delete/>
               </Button>
             </MuiThemeProvider>
@@ -437,15 +468,15 @@ class NodeEditor extends React.Component<Props, State> {
       (() => {
         const buttonStyle: React.CSSProperties = {
           position: 'absolute',
-          left: (calcedFN!.point.x + ks.rect.h / 2) * ks.unit + sp.x,
-          top:  (calcedFN!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
+          left: (focusNode!.point.x + ks.rect.h / 2) * ks.unit + sp.x,
+          top:  (focusNode!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
           transform: `translate(-50%, -50%) scale(${ks.unit / 24})`,
           color: '#000',
         };
         TypeButton = (
           <div>
             <IconButton style={buttonStyle} onClick={e => this.setState({typeAnchorEl: e.currentTarget})} disableRipple>
-              {calcedFN.type === 'task' ? <Task/> : calcedFN.type === 'switch' ? <Switch style={{transform: 'scale(1, -1)'}}/> : <Case/>}
+              {focusNode.type === 'task' ? <Task/> : focusNode.type === 'switch' ? <Switch style={{transform: 'scale(1, -1)'}}/> : <Case/>}
             </IconButton>
             <Menu
               anchorEl={typeAnchorEl}
@@ -455,17 +486,17 @@ class NodeEditor extends React.Component<Props, State> {
                 this.setState({typeAnchorEl: null});
               }}
             >
-              {calcedFN.type !== 'case' &&
+              {focusNode.type !== 'case' &&
               <MenuItem onClick={() => this.cahngeType('task')}>
                 <ListItemIcon><Task/></ListItemIcon>
                 <ListItemText inset primary="作業"/>
               </MenuItem>}
-              {calcedFN.type !== 'case' &&
+              {focusNode.type !== 'case' &&
               <MenuItem onClick={() => this.cahngeType('switch')}>
                 <ListItemIcon><Switch style={{transform: 'scale(1, -1)'}}/></ListItemIcon>
                 <ListItemText inset primary="分岐"/>
               </MenuItem>}
-              {calcedFN.type === 'case' &&
+              {focusNode.type === 'case' &&
               <MenuItem onClick={() => this.cahngeType('case')}>
                 <ListItemIcon><Case/></ListItemIcon>
                 <ListItemText inset primary="条件"/>
@@ -478,13 +509,13 @@ class NodeEditor extends React.Component<Props, State> {
       (() => {
         const buttonStyle: React.CSSProperties = {
           position: 'absolute',
-          left: (calcedFN!.point.x + ks.rect.w - ks.rect.h / 2) * ks.unit + sp.x,
-          top:  (calcedFN!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
+          left: (focusNode!.point.x + ks.rect.w - ks.rect.h / 2) * ks.unit + sp.x,
+          top:  (focusNode!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
           transform: `translate(-50%, -50%) scale(${ks.unit / 24})`,
           color: '#000',
         };
         ExpandButton = (
-          <IconButton style={buttonStyle} onClick={() => this.expandFocusNode(calcedFN, !calcedFN.open)} disableRipple>
+          <IconButton style={buttonStyle} onClick={() => this.expand(focusNode, !focusNode.open)} disableRipple>
             {!focusNode.open ? <More/> : <Less/>}
           </IconButton>
         );
@@ -493,8 +524,8 @@ class NodeEditor extends React.Component<Props, State> {
       (() => {
         const labelStyle: React.CSSProperties = {
           position: 'absolute',
-          left: (calcedFN!.point.x + ks.rect.h + ks.spr.w / 2) * ks.unit + sp.x,
-          top:  (calcedFN!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
+          left: (focusNode!.point.x + ks.rect.h + ks.spr.w / 2) * ks.unit + sp.x,
+          top:  (focusNode!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
           width: (ks.rect.w - (ks.rect.h + ks.spr.w / 2) * 2) * ks.unit,
           transform: `translateY(-50%)`,
           display: labelFocus ? undefined : 'none',
@@ -508,21 +539,27 @@ class NodeEditor extends React.Component<Props, State> {
             style={labelStyle}
             InputProps={{style: fontSize}}
             placeholder={
-              calcedFN.type === 'task' ? phrase.placeholder.task :
-              calcedFN.type === 'switch' ? phrase.placeholder.switch : phrase.placeholder.case
+              focusNode.type === 'task' ? phrase.placeholder.task :
+              focusNode.type === 'switch' ? phrase.placeholder.switch : phrase.placeholder.case
             }
             InputLabelProps={{shrink: true}}
-            value={calcedFN.label}
-            onChange={(e: any) => this.changeFocusNode({ ...calcedFN!, label: e.target.value })}
+            value={focusNode.label}
+            onChange={(e: any) => this.changeFocusNode({ ...focusNode!, label: e.target.value })}
           />
         );
       })();
     }
 
+    const largeContainerStyle: React.CSSProperties = {
+      position: 'relative',
+      width: sp.x + (node.self.w + ks.spr.w * 2) * ks.unit,
+      height: sp.y + (node.self.h + ks.spr.h * 2) * ks.unit,
+    };
+
     return (
       <div className={classes.root}>
-        <main className={classes.main}>
-          <div className={classes.stageContainer} ref={this.stageContainerRef}>
+        <main className={classes.main} ref={this.mainRef}>
+          <div style={largeContainerStyle}>
             <Stage ref={this.stageRef} onClick={this.deleteFocus}>
               <Layer>
                 {/* {map !== null && map.map((___, x) => (
@@ -538,7 +575,7 @@ class NodeEditor extends React.Component<Props, State> {
                   })}
                 </Group>))} */}
                 {flatNodes.map((n, i) => (
-                  <KNode key={n.id} node={n} labelFocus={labelFocus && n.id === focusNode!.id} {...nodeActionProps}/>
+                  <KNode key={n.id} node={n} labelFocus={labelFocus} {...nodeActionProps}/>
                 ))}
               </Layer>
             </Stage>
@@ -547,6 +584,7 @@ class NodeEditor extends React.Component<Props, State> {
             {TypeButton}
             {ExpandButton}
           </div>
+            
 
           <Fab className={classes.settingsButton} onClick={() => this.setState({showViewSettings: true})}>
             <ViewSettingsIcon/>
@@ -554,14 +592,14 @@ class NodeEditor extends React.Component<Props, State> {
 
           <Dialog open={deleteFlag} onClose={() => this.setState({deleteFlag: false})}>
             <DialogTitle>この項目を削除してもよろしいですか？</DialogTitle>
-            {focusNode !== null && focusNode.children.length !== 0 &&
+            {Boolean(focusNode) && focusNode.children.length !== 0 &&
             <DialogContent>
               <DialogContentText>この項目には詳細項目が含まれています。削除してもよろしいですか？</DialogContentText>
             </DialogContent>}
             
             <DialogActions>
-              <Button onClick={() => this.setState({deleteFlag: false})}>Cancel</Button>
-              <Button onClick={this.deleteSelf} color="primary" autoFocus>Delete</Button>
+              <Button onClick={() => this.setState({deleteFlag: false})}>キャンセル</Button>
+              <Button onClick={this.deleteSelf} color="primary" autoFocus>削除</Button>
             </DialogActions>
           </Dialog>
           

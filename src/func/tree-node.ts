@@ -24,6 +24,12 @@ export default class TreeNodeUtil {
     return {...node, children, focus: node.id === id};
   }
 
+  static _getFocusNode = <T extends TreeNode>(node: T): T | undefined => {
+    if (node.focus) { return node; }
+    if (node.children.length === 0) { return undefined; }
+    return node.children.map(c => TreeNodeUtil._getFocusNode(c) as T)
+    .reduce((a, b) => a || b || undefined);
+  }
 
   static _deleteFocus = <T extends TreeNode>(node: T): T => {
     if (node.focus === true) { return {...node, focus: false}; }
@@ -37,10 +43,13 @@ export default class TreeNodeUtil {
     return TreeNodeUtil._open(pushedNode, parent.id, true) as T;
   }
 
-  static addNextBrother = (node: TreeNode, to: TreeNode): TreeNode => {
+  static addNextBrother = <T extends TreeNode>(node: T, to: T): T => {
     const parentNode = TreeUtil._getPrent(node, to);
-    const newNode = TreeUtil.getNewNode(parentNode!.type, baseTreeNode);
-    return TreeUtil._insert(node, newNode, to, true);
+    if (parentNode === null) { throw 'cannot find a parent.' }
+    var newNode = TreeUtil.getNewNode(parentNode.type, baseTreeNode) as T;
+    newNode = {...newNode, focus: true};
+    const deleteFocusNode = TreeNodeUtil._deleteFocus(node);
+    return TreeUtil._insert(deleteFocusNode, newNode, to, true);
   }
 
   static addFromCommon = (node: TreeNode, parent: TreeNode, common: Tree, base: TreeNode): TreeNode => {

@@ -181,9 +181,13 @@ export default class TreeUtil {
 
   static _insert = <T extends Tree>(node: T, target: T, to: T, isNext: boolean): T => {
     const index = node.children.map(c => c.id).indexOf(to.id);
-    const children = index !== -1
-    ? node.children.slice().splice(index + (isNext ? 1 : 0), 0, target)
-    : node.children.map(c => TreeUtil._insert(c, target, to, isNext));
+
+    if (index !== -1) {
+      node.children.splice(index + (isNext ? 1 : 0), 0, target);
+      return node;
+    }
+
+    const children = node.children.map(c => TreeUtil._insert(c, target, to, isNext));
     return {...node, children};
   }
 

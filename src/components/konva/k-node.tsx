@@ -181,7 +181,7 @@ class KNode extends React.Component<KNodeProps> {
           {node.open && <Rect {...containerRectProps}/>}
           <Rect {...baseRectProps}/>
           <Icon {...typeProps}/>
-          {!labelFocus && <Text {...labelProps}/>}
+          {!(node.focus && labelFocus) &&  <Text {...labelProps}/>}
           <IconWithBadge {...expandProps}/>
           {ft === 'arrow' && node.arrows.map((a, i) => {
             const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
