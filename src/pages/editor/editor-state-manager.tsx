@@ -14,6 +14,7 @@ import link from '../../settings/path-list';
 import TreeUtil from '../../func/tree';
 import { fileDownload } from '../../func/file-download';
 import TextEditor, { TextEditorProps } from './text-editor/text-editor';
+import TreeNodeUtil from '../../func/tree-node';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -54,7 +55,8 @@ class EditorStateManager extends React.Component<Props, State> {
   }
 
   static getInitialState = (selectedNodeList: Tree[], commonNodes: Tree[]): State => {
-    const node = TreeUtil._getTreeNode(selectedNodeList[selectedNodeList.length - 1], baseTreeNode);
+    var node = TreeUtil._get(selectedNodeList[selectedNodeList.length - 1], baseTreeNode);
+    node = TreeNodeUtil._init(node);
     return {
       tabIndex: 0,
       node,
@@ -66,7 +68,7 @@ class EditorStateManager extends React.Component<Props, State> {
 
   differenceCheck = () => {
     const { selectedNodeList } = this.props;
-    const node = TreeUtil._getTreeNode(selectedNodeList[selectedNodeList.length - 1], baseTreeNode);
+    const node = TreeUtil._get(selectedNodeList[selectedNodeList.length - 1], baseTreeNode);
     if (TreeUtil._hasDifference(node, this.state.node)) {
       this.setState({hasDifference: true});
     } else {

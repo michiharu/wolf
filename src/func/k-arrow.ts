@@ -1,25 +1,19 @@
 import {KTreeNode, KWithArrow, Point, TreeNode } from "../data-types/tree-node";
 import KSize from "../data-types/k-size";
-import { buttonArea } from "./k-tree-util";
+import { buttonArea } from "./k-tree";
 
 
 export default class KArrowUtil {
 
-  static get = <T extends KTreeNode>(nodeSetCalcProps: T, base: KWithArrow, ks: KSize): KWithArrow => {
-    var nodeSetArrow = KArrowUtil._setArrowProps(nodeSetCalcProps, base);
-    nodeSetArrow = KArrowUtil._setInArrowOfNotSwitch(nodeSetArrow, ks);
-    nodeSetArrow = KArrowUtil._setInArrowOfSwitch(nodeSetArrow, ks);
-    nodeSetArrow = KArrowUtil._setNextArrow(nodeSetArrow, ks);
-    nodeSetArrow = KArrowUtil._setReturnArrow(nodeSetArrow, null, null, ks);
-    return nodeSetArrow;
+  static setArrow = <T extends KWithArrow>(node: T, ks: KSize): T => {
+    var kArrow = KArrowUtil._setInArrowOfNotSwitch(node, ks);
+    kArrow = KArrowUtil._setInArrowOfSwitch(kArrow, ks);
+    kArrow = KArrowUtil._setNextArrow(kArrow, ks);
+    kArrow = KArrowUtil._setReturnArrow(kArrow, null, null, ks);
+    return kArrow;
   }
 
-  static _setArrowProps = (node: KTreeNode, base: KWithArrow): KWithArrow => {
-    const children = node.children.map(c => KArrowUtil._setArrowProps(c, base));
-    return {...base, ...node, children, arrows: []};
-  }
-
-  static _setInArrowOfNotSwitch = (node: KWithArrow, ks: KSize): KWithArrow => {
+  static _setInArrowOfNotSwitch = <T extends KWithArrow>(node: T, ks: KSize): T => {
     const children = node.children.map(c => KArrowUtil._setInArrowOfNotSwitch(c, ks));
     if (node.type !== 'switch' && (node.open && children.length !== 0)) {
       const focusMargin = (node.focus && ks.margin.h * ks.unit < buttonArea)
@@ -33,7 +27,7 @@ export default class KArrowUtil {
     return {...node, children};
   }
 
-  static _setInArrowOfSwitch = (node: KWithArrow, ks: KSize): KWithArrow => {
+  static _setInArrowOfSwitch = <T extends KWithArrow>(node: T, ks: KSize): T => {
     const children = node.children.map(c => KArrowUtil._setInArrowOfSwitch(c, ks));
     if (node.open && node.type === 'switch' && children.length !== 0) {
       const focusMargin = (node.focus && ks.margin.h * ks.unit < buttonArea)
@@ -53,7 +47,7 @@ export default class KArrowUtil {
     return {...node, children};
   }
 
-  static _setNextArrow = (node: KWithArrow, ks: KSize): KWithArrow => {
+  static _setNextArrow = <T extends KWithArrow>(node: T, ks: KSize): T => {
     const children = node.children.map((c, i) => {
       if (c.open && c.children.length !== 0) {
         return KArrowUtil._setNextArrow(c, ks);
@@ -75,7 +69,7 @@ export default class KArrowUtil {
     return {...node, children};
   }
 
-  static _setReturnArrow = (node: KWithArrow, before: KWithArrow | null, exit: KWithArrow | null, ks: KSize): KWithArrow => {
+  static _setReturnArrow = <T extends KWithArrow>(node: T, before: T | null, exit: T | null, ks: KSize): T => {
     if (node.open && node.children.length !== 0) {
       const children = node.children.map((c, i, _children) => {
         const isLastChildren = _children.length - 1 === i;
@@ -108,14 +102,14 @@ export default class KArrowUtil {
     return node;
   }
 
-  static _hasUnderNode = (node: KWithArrow, target: KWithArrow): boolean => {
+  static _hasUnderNode = <T extends KWithArrow>(node: T, target: T): boolean => {
     if (node.children.length === 0) { return false; }
     const hasUnder = node.children.map(c => target.point.y < c.point.y).reduce((a, b) => a || b);
     if (hasUnder) { return true; }
     return node.children.map(c => KArrowUtil._hasUnderNode(c, target)).reduce((a, b) => a || b);;
   } 
 
-  static getArrowPoints = (node: KWithArrow, before: KWithArrow, exit: KWithArrow, ks: KSize): Point[][] => {
+  static getArrowPoints = <T extends KWithArrow>(node: T, before: T, exit: T, ks: KSize): Point[][] => {
     const dv: Point = {x: exit.point.x - node.point.x, y: exit.point.y - node.point.y};
     if (before.type === 'task' && !KArrowUtil._hasUnderNode(before, node)) {
       const exitCenter = ks.rect.w / 2  - ks.spr.w * 4 - (node.point.x - before.point.x);

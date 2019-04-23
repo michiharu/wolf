@@ -21,7 +21,6 @@ import less from '../../resource/svg-icon/expand/less';
 
 export interface KNodeProps {
   node: KWithArrow;
-  isRoot: boolean;
   labelFocus: boolean;
   ks: KSize;
   ft: FlowType;
@@ -178,7 +177,7 @@ class KNode extends React.Component<KNodeProps> {
     return (
       <Group ref={this.baseRef} x={x} y={y} >
         <Group {...rectGroupProps}>
-          {node.arrows.length === 0 && node.point.x !== 0 && <IconInRect {...endIconProps}/>}
+          {node.arrows.length === 0 && node.depth.top !== 0 && <IconInRect {...endIconProps}/>}
           {node.open && <Rect {...containerRectProps}/>}
           <Rect {...baseRectProps}/>
           <Icon {...typeProps}/>

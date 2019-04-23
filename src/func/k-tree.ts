@@ -1,27 +1,8 @@
 import {TreeNode, Type, KTreeNode, Cell, Tree, Point } from "../data-types/tree-node";
 import KSize from "../data-types/k-size";
-import TreeUtil from "./tree";
+import TreeNodeUtil from "./tree-node";
 
 export default class KTreeUtil {
-
-  static get = <T extends KTreeNode>(node: TreeNode, base: T, ks: KSize): T => {
-    return KTreeUtil.setCalcProps(node, base, ks);
-  }
-
-  static _get = <T extends KTreeNode>(node: TreeNode, base: T): T => {
-    const index = 0;
-    const depth = {top: 0, bottom: 0};
-    const point = {x: 0, y: 0};
-    const children = node.children.map(c => KTreeUtil._get(c, base));
-    const rect = { w: 0, h: 0};
-
-    return {...base, ...node, index, depth, point, children, self: rect, rect};
-  }
-
-  static toFlat = <T extends TreeNode>(node: T): T[] => {
-    if (node.children.length === 0 || !node.open) { return [node]; }
-    return [node].concat((node.children as T[]).map(c => KTreeUtil.toFlat(c)).reduce((a, b) => a.concat(b)));
-  }
 
   static calcSelfLength = (node: KTreeNode, ks: KSize, which: which) => {
     const over = node.focus && ks.margin.h * ks.unit < buttonArea;
@@ -101,15 +82,14 @@ export default class KTreeUtil {
     return {...node, children, index, depth};
   }
 
-  static setCalcProps = <T1 extends TreeNode, T2 extends KTreeNode>(node: T1, base: T2, ks: KSize): T2 => {
-    const editable = KTreeUtil._get(node, base);
-    const setSizeNode = KTreeUtil._setSize(editable, ks);
-    const setPointNode = KTreeUtil._setPoint({x: 0, y: 0}, setSizeNode, ks);
-    const setDepthNode = KTreeUtil._setIndexAndDepth(0, 0, setPointNode);
-    return setDepthNode;
+  static setCalcProps = <T extends KTreeNode>(node: T, ks: KSize): T => {
+    var kNode = KTreeUtil._setSize(node, ks);
+    kNode = KTreeUtil._setPoint({x: 0, y: 0}, kNode, ks);
+    kNode = KTreeUtil._setIndexAndDepth(0, 0, kNode);
+    return kNode;
   }
 
-  static makeBaseMap = (node: KTreeNode): Cell[][] => {
+  static makeBaseMap = <T extends KTreeNode>(node: T): Cell[][] => {
     const base: Cell[][] = [];
     for(var x = 0; x < node.point.x + node.self.w; x++) {
       base[x] = [];
@@ -120,7 +100,7 @@ export default class KTreeUtil {
     return base;
   }
 
-  static makeMap = (nodes: KTreeNode[], ks: KSize): Cell[][] => {
+  static makeMap = <T extends KTreeNode>(nodes: T[], ks: KSize): Cell[][] => {
     const root = nodes[0];
     const sorted = nodes.sort((a, b) => a.depth.bottom < b.depth.bottom ? 1 : -1);
 

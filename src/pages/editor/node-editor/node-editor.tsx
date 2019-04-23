@@ -15,9 +15,9 @@ import { TreeNode, Type, KTreeNode, Cell, Point, Tree, baseKTreeNode, baseKWithA
 import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth, Task, Switch, Case, Delete, More, Less } from '../../../settings/layout';
 import { rs as defaultRS } from '../../../settings/reading';
 
-import KTreeUtil, { buttonArea, buttonSize, buttonMargin } from '../../../func/k-tree-util';
-import RightPane, { RightPaneProps } from './right-pane';
 import TreeUtil from '../../../func/tree';
+import TreeNodeUtil from '../../../func/tree-node';
+import KTreeUtil from '../../../func/k-tree';
 import KSize from '../../../data-types/k-size';
 import keys from '../../../settings/storage-keys';
 import ViewSettings, { ViewSettingProps } from './view-settings';
@@ -25,8 +25,9 @@ import { phrase } from '../../../settings/phrase';
 import ReadingSetting from '../../../data-types/reading-settings';
 import KNode from '../../../components/konva/k-node';
 import Util from '../../../func/util';
-import KArrowUtil from '../../../func/k-arrow-util';
+import KArrowUtil from '../../../func/k-arrow';
 import { theme } from '../../..';
+
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -117,14 +118,15 @@ class NodeEditor extends React.Component<Props, State> {
   stageRef = React.createRef<any>();
   labelRef = React.createRef<any>();
 
-  calcedNode: KTreeNode;
+  kTree: KTreeNode;
   map: Cell[][] | null = null; 
 
   constructor(props: Props) {
     super(props);
     const state = NodeEditor.getInitialState();
     this.state = state;
-    this.calcedNode = KTreeUtil.get(props.node, baseKTreeNode, state.ks);
+    const kTree = TreeUtil._get(props.node, baseKTreeNode);
+    this.kTree = KTreeUtil.setCalcProps(kTree, state.ks);
   }
 
   static getInitialState = (): State => {
@@ -163,22 +165,32 @@ class NodeEditor extends React.Component<Props, State> {
     const cref = this.stageContainerRef.current;
     const sref = this.stageRef.current;
     if (cref === null || sref === null) { throw 'Cannot find elements.'; }
-    sref.width(Math.max((this.calcedNode.self.w + ks.spr.w) * ks.unit + sp.x, cref.offsetWidth));
-    sref.height(Math.max((this.calcedNode.self.h + ks.spr.h) * ks.unit + sp.y, cref.offsetHeight));
+    sref.width(Math.max((this.kTree.self.w + ks.spr.w) * ks.unit + sp.x, cref.offsetWidth));
+    sref.height(Math.max((this.kTree.self.h + ks.spr.h) * ks.unit + sp.y, cref.offsetHeight));
     sref.draw();
   }
 
-  setOpenState = (target: KWithArrow, open: boolean) => {
+  expand = (target: KWithArrow, open: boolean) => {
     const { node, edit } = this.props;
-    edit(TreeUtil._open(node, target.id, open));
+    var newNode = TreeNodeUtil._open(node, target.id, open);
+    // if (open) {
+    //   newNode = TreeNodeUtil._deleteFocus(newNode);
+    //   newNode = TreeNodeUtil._focus(newNode, target.id);
+    //   const focusNode: KWithArrow = {...target, open};
+    //   this.setState({focusNode});
+    // }
+    edit(newNode);
     process.nextTick(() => this.resize());
   }
 
-  setOpenFocusState = (target: KWithArrow, open: boolean) => {
+  expandFocusNode = (target: KWithArrow, open: boolean) => {
     const { node, edit } = this.props;
-    edit(TreeUtil._open(node, target.id, open));
+    var newNode = TreeNodeUtil._open(node, target.id, open);
+    newNode = TreeNodeUtil._deleteFocus(newNode);
+    newNode = TreeNodeUtil._focus(newNode, target.id);
     const focusNode: KWithArrow = {...target, open};
     this.setState({focusNode});
+    edit(newNode);
     process.nextTick(() => this.resize());
   }
 
@@ -197,7 +209,7 @@ class NodeEditor extends React.Component<Props, State> {
       speechSynthesis.speak(ssu);
     }
     if (!target.focus) {
-      const newNode = TreeUtil._focus(node, target.id);
+      const newNode = TreeNodeUtil._focus(node, target.id);
       edit(newNode);
       const focusNode: KWithArrow = {...target, focus: true};
       this.setState({focusNode, labelFocus: false});
@@ -210,7 +222,7 @@ class NodeEditor extends React.Component<Props, State> {
 
   deleteFocus = () => {
     const { node, edit } = this.props;
-    edit(TreeUtil._deleteFocus(node));
+    edit(TreeNodeUtil._deleteFocus(node));
     this.setState({focusNode: null, labelFocus: false});
     process.nextTick(() => this.resize());
   }
@@ -218,8 +230,8 @@ class NodeEditor extends React.Component<Props, State> {
   dragStart = (target: KTreeNode) => {
     const { node, edit } = this.props;
     const dragParent = TreeUtil._getPrent(node, target);
-    const openNode = TreeUtil._open(node, target.id, false);
-    edit(TreeUtil._deleteFocus(openNode));
+    const openNode = TreeNodeUtil._open(node, target.id, false);
+    edit(TreeNodeUtil._deleteFocus(openNode));
     this.setState({dragParent, focusNode: null, labelFocus: false});
     
   }
@@ -297,7 +309,7 @@ class NodeEditor extends React.Component<Props, State> {
   addDetails = () => {
     const { node, edit } = this.props;
     const {focusNode} = this.state;
-    const addDetailsNode = TreeUtil.addDetails(node, focusNode!);
+    const addDetailsNode = TreeNodeUtil.addDetails(node, focusNode!);
     edit(addDetailsNode);
     process.nextTick(() => this.resize());
   }
@@ -305,7 +317,7 @@ class NodeEditor extends React.Component<Props, State> {
   addNextBrother = () => {
     const { node, edit } = this.props;
     const {focusNode} = this.state;
-    edit(TreeUtil.addNextBrother(node, focusNode!));
+    edit(TreeNodeUtil.addNextBrother(node, focusNode!));
     process.nextTick(() => this.resize());
   }
 
@@ -316,7 +328,7 @@ class NodeEditor extends React.Component<Props, State> {
     
     const setIdCommon = TreeUtil._setId(common);
     const {focusNode} = this.state;
-    edit(TreeUtil.addFromCommon(node, focusNode!, setIdCommon, baseTreeNode));
+    edit(TreeNodeUtil.addFromCommon(node, focusNode!, setIdCommon, baseTreeNode));
     process.nextTick(() => this.resize());
   }
 
@@ -364,10 +376,10 @@ class NodeEditor extends React.Component<Props, State> {
     const {
       ks, ft, rs, focusNode, labelFocus, typeAnchorEl, deleteFlag, showViewSettings
     } = this.state;
-    const kTreeNode = KTreeUtil.get(tree, baseKWithArrow, ks);
-    const node = KArrowUtil.get(kTreeNode, baseKWithArrow, ks);
-    this.calcedNode = node;
-    const flatNodes = KTreeUtil.toFlat(node);
+    const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
+    const node = KArrowUtil.setArrow(kTreeNode, ks);
+    this.kTree = node;
+    const flatNodes = TreeNodeUtil.toArrayWithoutClose(node);
     const map = KTreeUtil.makeMap(flatNodes, ks);
     this.map = map;
 
@@ -375,7 +387,7 @@ class NodeEditor extends React.Component<Props, State> {
       ks,
       ft,
       focus: this.focus,
-      expand: (target: KWithArrow) => this.setOpenState(target, !target.open),
+      expand: (target: KWithArrow) => this.expand(target, !target.open),
       dragStart: this.dragStart,
       dragMove: this.dragMove,
       dragEnd: this.dragEnd,
@@ -392,7 +404,7 @@ class NodeEditor extends React.Component<Props, State> {
     var Label:            JSX.Element | undefined = undefined;
 
     if (focusNode !== null) {
-      const calcedFN = TreeUtil._findById(node, focusNode.id)!;
+      const calcedFN = TreeUtil._find(node, focusNode.id)!;
 
       if (!labelFocus && typeAnchorEl === null) {
         const isRoot = calcedFN.id === node.id;
@@ -472,7 +484,7 @@ class NodeEditor extends React.Component<Props, State> {
           color: '#000',
         };
         ExpandButton = (
-          <IconButton style={buttonStyle} onClick={() => this.setOpenFocusState(calcedFN, !calcedFN.open)} disableRipple>
+          <IconButton style={buttonStyle} onClick={() => this.expandFocusNode(calcedFN, !calcedFN.open)} disableRipple>
             {!focusNode.open ? <More/> : <Less/>}
           </IconButton>
         );
@@ -526,7 +538,7 @@ class NodeEditor extends React.Component<Props, State> {
                   })}
                 </Group>))} */}
                 {flatNodes.map((n, i) => (
-                  <KNode key={n.id} node={n} isRoot={i === 0} labelFocus={labelFocus && n.id === focusNode!.id} {...nodeActionProps}/>
+                  <KNode key={n.id} node={n} labelFocus={labelFocus && n.id === focusNode!.id} {...nodeActionProps}/>
                 ))}
               </Layer>
             </Stage>

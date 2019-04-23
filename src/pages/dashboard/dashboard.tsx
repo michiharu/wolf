@@ -106,7 +106,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
   const [searchText, setSearchText] = useState('');
   const [openAll, setOpenAll] = useState(false);
 
-  const words = TreeUtil.getSearchWords(searchText);
+  const words = TreeUtil.splitSearchWords(searchText);
   const filteredNode = TreeUtil._searchAndFilter(words, treeNodes);
 
   const selectNode = (node: Tree | null) => {
