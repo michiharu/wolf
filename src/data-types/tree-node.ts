@@ -125,5 +125,5 @@ export interface CheckRecord {
 export type Type = 'task' | 'switch' | 'case';
 export type Point = {x: number, y: number};
 export type Size = {w: number, h:number};
-export type FlatAction = 'push' | 'move' | 'none';
-export type Cell = {node: KTreeNode, action: FlatAction} | undefined;
+export type FlatAction = 'moveToBrother' | 'moveInOut';
+export type Row = {node: KTreeNode, action: FlatAction} | undefined;

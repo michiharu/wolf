@@ -6,10 +6,11 @@ import {
 import SaveIcon from '@material-ui/icons/Save';
 import Download from '@material-ui/icons/SaveAlt';
 import CloseIcon from '@material-ui/icons/Close';
+import ViewSettingsIcon from '@material-ui/icons/Settings';
 
 import { Tree, TreeNode, baseTreeNode } from '../../data-types/tree-node';
 import NodeEditor, { NodeEditorProps } from './node-editor/node-editor';
-import { RouteComponentProps } from 'react-router';
+import { RouteComponentProps, withRouter } from 'react-router';
 import link from '../../settings/path-list';
 import TreeUtil from '../../func/tree';
 import { fileDownload } from '../../func/file-download';
@@ -37,11 +38,15 @@ interface Props extends WithStyles<typeof styles>, RouteComponentProps {
 }
 
 interface State {
-  tabIndex: number;
+  tabIndex: number; // 0: カード表示、1: テキスト表示
+  // divergent thinking（発散思考）、 convergent thinking（収束思考）
+  mode: 'd' | 'dc' | 'cd' | 'c';
   node: TreeNode;
   hasDifference: boolean;
   cannotSaveReason: CannotSaveReason;
   saved: boolean;
+  nextLink: string | null;
+  showViewSettings: boolean;
 }
 
 export type CannotSaveReason = 'switch' | 'case' | null;
@@ -54,25 +59,52 @@ class EditorStateManager extends React.Component<Props, State> {
     this.state = EditorStateManager.getInitialState(selectedNodeList, commonNodes);
   }
 
+  componentDidMount() {
+    /*
+      popstateイベントはstateが変更される際に発火する。
+      browserのhistoryはreactの読み込み時点から変化しておらずreact-routerが別にhistory管理を行なっているため、
+      空のstateを追加（history.pushState）することでブラウザーの戻るボタンでpopstateイベントが発火するようにする。
+    */
+    history.pushState('', '', null);
+    window.onpopstate = this.popstate;
+    
+  }
+
+  componentWillUnmount() {
+    window.onpopstate = null;
+  }
+
+  popstate = (e: any) => {
+    e.preventDefault();
+    this.differenceCheck(null);
+  }
+
   static getInitialState = (selectedNodeList: Tree[], commonNodes: Tree[]): State => {
     var node = TreeUtil._get(selectedNodeList[selectedNodeList.length - 1], baseTreeNode);
     node = TreeNodeUtil._init(node);
     return {
       tabIndex: 0,
       node,
+      mode: 'd',
       hasDifference: false,
       cannotSaveReason: null,
       saved: false,
+      nextLink: null,
+      showViewSettings: false,
     };
   }
 
-  differenceCheck = () => {
-    const { selectedNodeList } = this.props;
+  differenceCheck = (nextLink: string | null) => {
+    const { selectedNodeList, history } = this.props;
     const node = TreeUtil._get(selectedNodeList[selectedNodeList.length - 1], baseTreeNode);
     if (TreeUtil._hasDifference(node, this.state.node)) {
-      this.setState({hasDifference: true});
+      this.setState({hasDifference: true, nextLink});
     } else {
-      this.props.history.push(link.dashboard);
+      if (nextLink !== null) {
+        history.push(nextLink)
+      } else {
+        history.goBack();
+      }
     }
   }
 
@@ -100,21 +132,28 @@ class EditorStateManager extends React.Component<Props, State> {
     }
   }
 
-  render() {
-    const {
-      commonNodes, addNode, classes
-    } = this.props;
+  saveAndGo = () => {
+    const { changeNode, history } = this.props;
+    const { node, nextLink } = this.state;
+    changeNode(node);
+    if (nextLink !== null) {
+      history.push(nextLink)
+    } else {
+      history.goBack();
+    }
+  }
 
-    const {
-      tabIndex, node,
-      hasDifference, cannotSaveReason, saved
-    } = this.state;
+  render() {
+    const { commonNodes, addNode, classes } = this.props;
+    const { tabIndex, node, hasDifference, cannotSaveReason, saved, showViewSettings } = this.state;
   
     const nodeProps: NodeEditorProps = {
       commonNodes,
       node,
+      showViewSettings,
       edit: this.edit,
       addNode,
+      closeViewSettings: () => this.setState({showViewSettings: false}),
     };
 
     const textProps: TextEditorProps = {
@@ -123,12 +162,16 @@ class EditorStateManager extends React.Component<Props, State> {
       edit: this.edit,
       addNode,
     };
+
+    const cannotSave: CannotSaveReason = cannotSaveReason !== null ? cannotSaveReason :
+      !TreeUtil._isAllSwitchHasCase(node) ? 'switch' :
+      !TreeUtil._isAllCaseHasItem(node)   ? 'case'   : null;
     
     return (
       <div className={classes.root}>
         <AppBar color="default">
           <Toolbar>
-            <Button size="large" onClick={this.differenceCheck}>Flow Like</Button>
+            <Button size="large" onClick={() => this.differenceCheck(link.dashboard)}>Flow Like</Button>
             <Tabs indicatorColor="primary" value={tabIndex} onChange={(_, tabIndex) => this.setState({tabIndex})}>
               <Tab label="カード表示" />
               <Tab label="テキスト表示" />
@@ -136,8 +179,15 @@ class EditorStateManager extends React.Component<Props, State> {
 
             <div style={{flexGrow: 1}} />
 
+            {tabIndex === 0 && <>
+              <IconButton onClick={this.save}><SaveIcon/></IconButton>
+              <IconButton onClick={this.download}><Download/></IconButton>
+              <div style={{flexGrow: 1}} />
+            </>}
+
             <IconButton onClick={this.save}><SaveIcon/></IconButton>
             <IconButton onClick={this.download}><Download/></IconButton>
+            <IconButton onClick={() => this.setState({showViewSettings: true})}><ViewSettingsIcon/></IconButton>
           </Toolbar>
         </AppBar>
         <div className={classes.toolbar}/>
@@ -146,15 +196,18 @@ class EditorStateManager extends React.Component<Props, State> {
         {tabIndex === 1 && <TextEditor {...textProps}/>}
         
         <Dialog open={hasDifference} onClose={() => this.setState({hasDifference: false})}>
-          <DialogTitle>マニュアルは編集されています。</DialogTitle>
+          <DialogTitle>マニュアルを保存せずに画面を移動してもよろしいですか？</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              保存せずに画面を移動してもよろしいですか？
+              {cannotSave === 'switch' && '現在のデータは、分岐に条件が設定されていない項目があるため保存できません。'}
+              {cannotSave === 'case'   && '現在のデータは、条件に詳細項目が設定されていない項目があるため保存できません。'}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => this.setState({hasDifference: false})}>Cancel</Button>
-            <Button onClick={() => this.props.history.push(link.dashboard)} color="primary" autoFocus>OK</Button>
+            <Button onClick={() => this.setState({hasDifference: false, nextLink: null})}>いいえ</Button>
+            {cannotSave === null &&
+            <Button onClick={this.saveAndGo} color="primary" autoFocus>保存して移動</Button>}
+            <Button onClick={() => this.props.history.push(link.dashboard)} color="primary">保存せずに移動</Button>
           </DialogActions>
         </Dialog>
 
@@ -194,4 +247,4 @@ class EditorStateManager extends React.Component<Props, State> {
   }
 }
 
-export default withStyles(styles)(EditorStateManager);
+export default withRouter(withStyles(styles)(EditorStateManager));

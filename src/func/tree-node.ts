@@ -43,13 +43,13 @@ export default class TreeNodeUtil {
     return TreeNodeUtil._open(pushedNode, parent.id, true) as T;
   }
 
-  static addNextBrother = <T extends TreeNode>(node: T, to: T): T => {
-    const parentNode = TreeUtil._getPrent(node, to);
+  static addNextBrother = <T extends TreeNode>(tree: T, to: T): {node: T, newNode: T} => {
+    const parentNode = TreeUtil._getPrent(tree, to);
     if (parentNode === null) { throw 'cannot find a parent.' }
-    var newNode = TreeUtil.getNewNode(parentNode.type, baseTreeNode) as T;
-    newNode = {...newNode, focus: true};
-    const deleteFocusNode = TreeNodeUtil._deleteFocus(node);
-    return TreeUtil._insert(deleteFocusNode, newNode, to, true);
+    const newNode = TreeUtil.getNewNode(parentNode.type, baseTreeNode) as T;
+    var node = TreeNodeUtil._deleteFocus(tree);
+    node = TreeUtil._insert(node, newNode, to, true);
+    return {node, newNode};
   }
 
   static addFromCommon = (node: TreeNode, parent: TreeNode, common: Tree, base: TreeNode): TreeNode => {

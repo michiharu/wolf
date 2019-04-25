@@ -22,11 +22,14 @@ export { default as Delete } from '@material-ui/icons/Delete';
 export { default as Close } from '@material-ui/icons/Close';
 export { default as More } from '@material-ui/icons/ExpandMore';
 export { default as Less } from '@material-ui/icons/ExpandLess';
+export { default as Divergent } from '@material-ui/icons/BlurOn';
+export { default as Convergent } from '@material-ui/icons/BlurCircular';
+// divergent thinking（発散思考）、 convergent thinking（収束思考）
 
 
 export const ks: KSize = {
-  unit: 16,
-  rect: {w: 30, h: 2},
+  unit: 20,
+  rect: {w: 24, h: 3},
   margin: {w: 1, h: 2},
   spr: {w: 1, h: 1},
   indent: 4,
@@ -34,8 +37,8 @@ export const ks: KSize = {
   fontHeight: 0.75,
   textline: 1,
   icon: 1,
-  badgeFontSize: 0.5,
-  badgeFontHeight: 0.42,
+  badgeFontSize: 0.7,
+  badgeFontHeight: 0.6,
   cornerRadius: 0.5,
   pointerSpace: 0.2,
   pointerLength: 0.4,

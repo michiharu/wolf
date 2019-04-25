@@ -6,11 +6,17 @@ import { buttonArea } from "./k-tree";
 export default class KArrowUtil {
 
   static setArrow = <T extends KWithArrow>(node: T, ks: KSize): T => {
-    var kArrow = KArrowUtil._setInArrowOfNotSwitch(node, ks);
+    var kArrow = KArrowUtil._resetArrow(node);
+    kArrow = KArrowUtil._setInArrowOfNotSwitch(kArrow, ks);
     kArrow = KArrowUtil._setInArrowOfSwitch(kArrow, ks);
     kArrow = KArrowUtil._setNextArrow(kArrow, ks);
     kArrow = KArrowUtil._setReturnArrow(kArrow, null, null, ks);
     return kArrow;
+  }
+
+  static _resetArrow = <T extends KWithArrow>(node: T): T => {
+    const children = node.children.map(c => KArrowUtil._resetArrow(c));
+    return {...node, children, arrows: []};
   }
 
   static _setInArrowOfNotSwitch = <T extends KWithArrow>(node: T, ks: KSize): T => {
@@ -55,7 +61,7 @@ export default class KArrowUtil {
         if (c.type !== 'case' && node.children.length - 1 !== i) {
           const focusMargin = (c.focus && ks.margin.h * ks.unit < buttonArea)
             ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0;
-          const openMargin = c.open ? ks.spr.h * 2 : 0;
+          const openMargin = c.open ? ks.margin.h : 0;
           const arrows: Point[][] = [[
             {x: ks.rect.w / 2 - ks.spr.w * 4, y: ks.rect.h},
             {x: ks.rect.w / 2 - ks.spr.w * 4, y: ks.rect.h + ks.margin.h + focusMargin + openMargin - ks.pointerSpace}

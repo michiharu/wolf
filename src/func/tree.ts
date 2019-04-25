@@ -174,9 +174,12 @@ export default class TreeUtil {
     return {...node, children};
   }
 
-  static move = <T extends Tree>(node: T, from: T, to: T): T => {
+  static moveBrother = <T extends Tree>(node: T, from: T, to: T): T => {
+    const parentNode = TreeUtil._getPrent(node, from);
+    const childrenIds = parentNode!.children.map(c => c.id);
+    const isNext = childrenIds.indexOf(from.id) + 1 === childrenIds.indexOf(to.id);
     const deletedTree = TreeUtil._deleteById(node, from.id); 
-    return TreeUtil._insert(deletedTree, from, to, false);
+    return TreeUtil._insert(deletedTree, from, to, isNext);
   }
 
   static _insert = <T extends Tree>(node: T, target: T, to: T, isNext: boolean): T => {
@@ -191,28 +194,27 @@ export default class TreeUtil {
     return {...node, children};
   }
 
-  static push = <T extends Tree>(node: T, child: T, parent: T): T => {
+  static moveInOut = <T extends Tree>(node: T, child: T, parentNode: T): T => {
+    const moveIn = parentNode.children.find(c => c.id === child.id) === undefined;
     const deletedTree = TreeUtil._deleteById(node, child.id);
-    const setParentTypeChild = TreeUtil.setParentType(child, parent.type);
-    return TreeUtil._push(deletedTree, setParentTypeChild, parent);
+    if (moveIn) {
+      return TreeUtil._push(deletedTree, child, parentNode);
+    } else {
+      return TreeUtil._insert(deletedTree, child, parentNode, true);
+    }
   }
 
-  static _push = <T extends Tree>(node: T, child: T, parent: T): T => {
-    const children = node.id === parent.id
+  static _push = <T extends Tree>(node: T, child: T, parentNode: T): T => {
+    const children = node.id === parentNode.id
     ? node.children.concat([child])
-    : node.children.map(c => TreeUtil._push(c, child, parent));
+    : node.children.map(c => TreeUtil._push(c, child, parentNode));
     return {...node, children};
   }
-  
-  static setParentType = <T extends Tree>(node: T, parentType: Type): T => {
-    const result = {...node, parentType};
-    return result;
-  }
 
-  static _unshift = <T extends Tree>(node: T, child: T, parent: T): T => {
-    const children = node.id === parent.id
+  static _unshift = <T extends Tree>(node: T, child: T, parentNode: T): T => {
+    const children = node.id === parentNode.id
     ? [child].concat(node.children as T[])
-    : node.children.map(c => TreeUtil._unshift(c, child, parent));
+    : node.children.map(c => TreeUtil._unshift(c, child, parentNode));
     return {...node, children};
   }
 

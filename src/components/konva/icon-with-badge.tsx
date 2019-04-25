@@ -39,8 +39,8 @@ const IconWithBadge: React.FC<IconWithBadgeProps> = (props: IconWithBadgeProps) 
   };
 
   const textProps = {
-    x: (ks.rect.h / 2 + bl / 2.2 - (badgeLength) * ks.badgeFontSize / 6) * ks.unit,
-    y: (ks.rect.h * 9 / 20 - bl * 0.76) * ks.unit,
+    x: (ks.rect.h / 2 + bl / 2.2 - (badgeLength) * ks.badgeFontSize / 5.5) * ks.unit,
+    y: (ks.rect.h * 9 / 20 - bl * 0.75) * ks.unit,
     text: badgeContent,
     fontSize: ks.badgeFontSize * ks.unit,
     fill: '#fff',

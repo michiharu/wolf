@@ -1,4 +1,4 @@
-import {TreeNode, Type, KTreeNode, Cell, Tree, Point } from "../data-types/tree-node";
+import {TreeNode, Type, KTreeNode, Row, Tree, Point } from "../data-types/tree-node";
 import KSize from "../data-types/k-size";
 import TreeNodeUtil from "./tree-node";
 
@@ -89,62 +89,44 @@ export default class KTreeUtil {
     return kNode;
   }
 
-  static makeBaseMap = <T extends KTreeNode>(node: T): Cell[][] => {
-    const base: Cell[][] = [];
-    for(var x = 0; x < node.point.x + node.self.w; x++) {
-      base[x] = [];
-      for(var y = 0; y < node.point.y + node.self.h; y++) {
-        base[x][y] = undefined;
-      }
-    }
+  static makeBaseMap = <T extends KTreeNode>(node: T): Row[] => {
+    const base: Row[]= [];
+    for(var y = 0; y < node.point.y + node.self.h; y++) { base[y] = undefined; }
     return base;
   }
 
-  static makeMap = <T extends KTreeNode>(nodes: T[], ks: KSize): Cell[][] => {
+  static makeMap = <T extends KTreeNode>(nodes: T[], ks: KSize): Row[] => {
     const root = nodes[0];
     const sorted = nodes.sort((a, b) => a.depth.bottom < b.depth.bottom ? 1 : -1);
 
     const selfBase = KTreeUtil.makeBaseMap(root);
 
-    const map: Cell[][][] = [selfBase].concat(sorted.map(s => {
+    const map: Row[][] = [selfBase].concat(sorted.map(s => {
       const result = KTreeUtil.makeBaseMap(s);
 
       if (s.open) {
-        for(var x = s.point.x + ks.spr.w; x < s.point.x + s.self.w; x++) {
-          if (x < 0) { continue; }
-          result[x][s.point.y + s.self.h - 1] = { node: s, action: 'push' };
-        }
-      }
-
-      for(var x = s.point.x; x < s.point.x + s.rect.w; x++) {
-        if (x < 0) { continue; }
-        for(var y = s.point.y; y < s.point.y + s.rect.h; y++) {
-          result[x][y] = { node: s, action: 'none'};
+        for(var y = s.point.y + s.self.h - ks.margin.h; y < s.point.y + s.self.h; y++) {
+          result[y] = { node: s, action: 'moveInOut' };
         }
       }
       
       if (s.depth.top !== 0) {
-        for(var x = s.point.x; x < s.point.x + s.rect.w; x++) {
-          if (x < 0) { continue; }
-          for(var y = s.point.y - ks.spr.h; y < s.point.y; y++) {
-            result[x][y] = { node: s, action: 'move' };
-          }
+        for(var y = s.point.y; y < s.point.y + s.rect.h; y++) {
+          result[y] = { node: s, action: 'moveToBrother' };
         }
       }
       
       return result;
     }));
 
-    return map.reduce((before, next) => before.map((_, x) => {
-      return _.map((beforeCell, y) => {
-        if (next.length - 1 < x) { return beforeCell; }
-        const nextCell = next[x][y];
-        return nextCell !== undefined ? nextCell : beforeCell;
-      });
+    return map.reduce((before, next) => before.map((beforeRow, r) => {
+      if (next.length - 1 < r) { return beforeRow; }
+      const nextRow = next[r];
+      return nextRow || beforeRow;
     }))
   }
   
-  static isEqualCell = (a: Cell, b: Cell): boolean => {
+  static isEqualCell = (a: Row, b: Row): boolean => {
     if (a === undefined && b === undefined) { return true; }
     if (a === undefined || b === undefined) { return false; }
     return a.action === b.action && a.node.id === b.node.id;

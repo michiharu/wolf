@@ -142,8 +142,8 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
             <Slider
               classes={{ container: classes.slider }}
               value={ks.rect.w}
-              min={30}
-              max={42}
+              min={20}
+              max={40}
               step={1}
               onChange={(_, value) => {
                 const newKS = {...ks, rect: {...ks.rect, w: value}};

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { lightBlue, amber, yellow } from '@material-ui/core/colors';
+import { lightBlue, amber, yellow, grey } from '@material-ui/core/colors';
 import Konva from 'konva';
 import { Rect, Group, Text, Arrow } from 'react-konva';
 import { task, switchSvg, flag } from '../../resource/svg-icon';
@@ -7,7 +7,6 @@ import { task, switchSvg, flag } from '../../resource/svg-icon';
 import { KWithArrow, KTreeNode, Point } from '../../data-types/tree-node';
 
 import { sp, FlowType } from '../../pages/editor/node-editor/node-editor';
-import IconInRect, { IconInRectProps } from './icon-in-rect';
 import { theme } from '../..';
 import Util from '../../func/util';
 import { phrase } from '../../settings/phrase';
@@ -63,12 +62,13 @@ class KNode extends React.Component<KNodeProps> {
   }
 
   handleDragMove = (e: any) => {
-    const {node, ks, dragMove} = this.props;
+    const {node, dragMove} = this.props;
     const tr = e.target.getClientRect();
-    const point = {
-      x: Math.round((tr.x - sp.x) / ks.unit + ks.rect.w / 2),
-      y: Math.round((tr.y - sp.y) / ks.unit + ks.rect.h / 2),
-    };
+    const point = { x: tr.x, y: tr.y };
+    // const point = {
+    //   x: Math.round((tr.x - sp.x) / ks.unit + ks.rect.w / 2),
+    //   y: Math.round((tr.y - sp.y) / ks.unit + ks.rect.h / 2),
+    // };
     dragMove(node, point);
   }
 
@@ -85,19 +85,20 @@ class KNode extends React.Component<KNodeProps> {
   
   render() {
     const { node, ks, ft, labelFocus } = this.props;
-    const fill = node.type === 'task' ?   node.focus ? lightBlue[100] : lightBlue[50] :
-               node.type === 'switch' ? node.focus ? amber[200] : amber[100] :
-                                        node.focus ? yellow[200] : yellow[100];
+    const fill = node.type === 'task' ? lightBlue[50] :
+               node.type === 'switch' ? amber[100] : yellow[100];
     const baseRectProps = {
       x: 0, y: 0,
       width: node.rect.w * ks.unit,
       height: node.rect.h * ks.unit,
       cornerRadius: 4,
       fill,
-      shadowColor: 'black',
-      shadowBlur: node.focus ? 10 : 6,
-      shadowOffset: { x: 0, y: 3},
-      shadowOpacity: node.focus ? 0.4 : 0.2,
+      stroke: node.focus ? '#80bdff' : '#0000',
+      strokeWidth: 6,
+      shadowColor: node.focus ? '#80bdff' : 'black',
+      shadowBlur: 6,
+      shadowOffsetY: node.focus ? 0 : 3,
+      shadowOpacity: node.focus ? 1 : 0.2,
     };
 
     const labelProps = {
@@ -145,23 +146,23 @@ class KNode extends React.Component<KNodeProps> {
       x: (ks.indent / 2 - ks.spr.w) * ks.unit,
       y: ks.spr.h * ks.unit,
       width: (node.self.w - (ks.indent / 2 - ks.spr.w)) * ks.unit,
-      height: node.self.h * ks.unit,
+      height: (node.self.h - ks.spr.h) * ks.unit,
       onClick: this.handleDeleteFocus,
       cornerRadius: ks.cornerRadius * ks.unit,
-      stroke: ft === 'rect' ? '#dddd' : '#0000',
-      fill: node.focus ? theme.palette.background.paper : '#0000',
-      strokeWidth: 2,
+      stroke: grey[500],
+      fill: node.depth.top === 0 ? theme.palette.background.paper : '#00000009',
+      strokeWidth: ft === 'rect' ? 1 : 0,
     };
 
     const arrowBaseProps = {
-      stroke: '#999',
-      fill: '#999',
+      stroke: grey[700],
+      fill: grey[700],
       pointerLength: ks.pointerLength * ks.unit,
       pointerWidth: ks.pointerWidth * ks.unit,
     }
-    const endIconProps: IconInRectProps = {
+    const endIconProps: IconProps = {
       ks,
-      x: ks.spr.w * ks.unit, y: 0,
+      x: -ks.rect.h * ks.unit, y: 0,
       svg: flag,
       color: theme.palette.secondary.main,
     };
@@ -177,7 +178,7 @@ class KNode extends React.Component<KNodeProps> {
     return (
       <Group ref={this.baseRef} x={x} y={y} >
         <Group {...rectGroupProps}>
-          {node.arrows.length === 0 && node.depth.top !== 0 && <IconInRect {...endIconProps}/>}
+          
           {node.open && <Rect {...containerRectProps}/>}
           <Rect {...baseRectProps}/>
           <Icon {...typeProps}/>
@@ -187,6 +188,7 @@ class KNode extends React.Component<KNodeProps> {
             const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
             return <Arrow key={`${node.id}-arrow-${i}`} {...arrowBaseProps} points={points}/>;
           })}
+          {node.arrows.length === 0 && node.depth.top !== 0 && <Icon {...endIconProps}/>}
         </Group>
       </Group>
     );
