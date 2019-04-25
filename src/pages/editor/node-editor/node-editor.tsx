@@ -11,8 +11,8 @@ import AddNext from '@material-ui/icons/Forward';
 import Konva from 'konva';
 import { Stage, Layer, Group, Rect, Text } from 'react-konva';
 
-import { TreeNode, Type, KTreeNode, Row, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode, KWithArrow } from '../../../data-types/tree-node';
-import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth, Task, Switch, Case, Delete, More, Less } from '../../../settings/layout';
+import { TreeNode, Type, KTreeNode, DragRow, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode, KWithArrow } from '../../../data-types/tree-node';
+import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth, Task, Switch, Case, Delete, More, Less, ks } from '../../../settings/layout';
 import { rs as defaultRS } from '../../../settings/reading';
 
 import TreeUtil from '../../../func/tree';
@@ -27,6 +27,10 @@ import KNode from '../../../components/konva/k-node';
 import Util from '../../../func/util';
 import KArrowUtil from '../../../func/k-arrow';
 import { theme } from '../../..';
+import { NodeEditMode } from '../../../data-types/node-edit-mode';
+import { grey } from '@material-ui/core/colors';
+import KMemo from '../../../components/konva/k-memo';
+import { node } from 'prop-types';
 
 
 const styles = (theme: Theme) => createStyles({
@@ -84,10 +88,14 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export interface NodeEditorProps {
+  mode: NodeEditMode;
   commonNodes: Tree[];
   node: TreeNode;
+  memoList: KTreeNode[];
   showViewSettings: boolean;
   edit: (node: TreeNode) => void;
+  editMemo: (memo: KTreeNode) => void;
+  deleteMemo: (memo: KTreeNode) => void;
   addNode: (node: Tree) => void;
   closeViewSettings: () => void;
 }
@@ -95,6 +103,7 @@ export interface NodeEditorProps {
 interface Props extends NodeEditorProps, WithStyles<typeof styles> {}
 
 interface State {
+  didRender: boolean;
   ks: KSize;
   ft: FlowType;
   rs: ReadingSetting;
@@ -103,6 +112,7 @@ interface State {
   typeAnchorEl: any;
   deleteFlag: boolean;
   hasDifference: boolean;
+  testMemo: KTreeNode | null;
 }
 
 export type FlowType = 'rect' | 'arrow';
@@ -114,10 +124,13 @@ class NodeEditor extends React.Component<Props, State> {
 
   mainRef = React.createRef<HTMLMainElement>();
   stageRef = React.createRef<any>();
+  convergentRef = React.createRef<any>();
+
+  createBoxRef = React.createRef<HTMLDivElement>();
   labelRef = React.createRef<any>();
 
   kTree: KTreeNode;
-  rows: Row[] | null = null; 
+  rows: DragRow[] | null = null; 
 
   constructor(props: Props) {
     super(props);
@@ -135,6 +148,7 @@ class NodeEditor extends React.Component<Props, State> {
     const rsFromStorage = localStorage.getItem(keys.rs);
     const rs = rsFromStorage !== null ? JSON.parse(rsFromStorage) as ReadingSetting : defaultRS;
     return {
+      didRender: false,
       ks,
       ft,
       rs,
@@ -143,6 +157,7 @@ class NodeEditor extends React.Component<Props, State> {
       typeAnchorEl: null,
       deleteFlag: false,
       hasDifference: false,
+      testMemo: null,
     };
   }
   
@@ -150,6 +165,7 @@ class NodeEditor extends React.Component<Props, State> {
     process.nextTick(() => {
       this.resize();
       this.addScrollEventListener();
+      this.setState({didRender: true});
     });
     window.addEventListener('resize', this.resize);
   }
@@ -171,21 +187,39 @@ class NodeEditor extends React.Component<Props, State> {
     const mref = this.mainRef.current;
     const stage = this.stageRef.current;
     if (mref === null || stage === null) { throw 'Cannot find elements.'; }
-    stage.width(mref.offsetWidth);
-    stage.height(mref.offsetHeight);
+    stage.width(mref.offsetWidth - theme.spacing.unit * 2);
+    stage.height(mref.offsetHeight - theme.spacing.unit * 2);
     stage.draw();
   }
 
   scroll = () => {
+    const { mode, node, edit } = this.props;
+    const { ks } = this.state;
     const scrollContainer = this.mainRef.current;
     const stage = this.stageRef.current;
-    if (scrollContainer === null || stage === null) { throw 'Cannot find elements.'; }
+    const createBox = this.createBoxRef.current;
+    if (scrollContainer === null || stage === null || createBox === null) { throw 'Cannot find elements.'; }
+    // canvasをmainと一致するよう移動
     const dx = scrollContainer.scrollLeft;
     const dy = scrollContainer.scrollTop;
     stage.container().style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
-    stage.x(-dx);
-    stage.y(-dy);
-    stage.batchDraw();
+    createBox.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+
+    const convergent = this.convergentRef.current;
+    if (convergent === null) { return; }
+
+    // convergent領域をスクロール
+    convergent.x(-dx + (mode === 'dc' ? stage.width() / 2 : 0));
+    convergent.y(-dy);
+    stage.draw();
+
+    const f = TreeNodeUtil._getFocusNode(this.kTree)!;
+    if (f !== undefined) {
+      console.log(``);
+      if (f.point.x * ks.unit < dx || stage.width() / 2 + dx < (f.point.x + f.rect.w) * ks.unit) {
+        edit(TreeNodeUtil._deleteFocus(node));
+      }
+    }
   }
 
   scrollToNew = (result: { node: TreeNode, newNode: TreeNode }) => {
@@ -220,19 +254,13 @@ class NodeEditor extends React.Component<Props, State> {
   expand = (target: KWithArrow, open: boolean) => {
     const { node, edit } = this.props;
     var newNode = TreeNodeUtil._open(node, target.id, open);
-    // if (open) {
-    //   newNode = TreeNodeUtil._deleteFocus(newNode);
-    //   newNode = TreeNodeUtil._focus(newNode, target.id);
-    //   const focusNode: KWithArrow = {...target, open};
-    //   this.setState({focusNode});
-    // }
     edit(newNode);
     process.nextTick(() => this.resize());
   }
 
   focus = (target: KWithArrow) => {
     const { node, edit } = this.props;
-    const { rs } = this.state;
+    const { rs, ks } = this.state;
     if (!target.focus && rs.playOnClick) {
       const ssu = new SpeechSynthesisUtterance();
       ssu.text = !Util.isEmpty(target.label) ? target.label :
@@ -244,14 +272,22 @@ class NodeEditor extends React.Component<Props, State> {
       speechSynthesis.cancel();
       speechSynthesis.speak(ssu);
     }
+
+    const stage = this.stageRef.current!;
+    const scrollContainer = this.mainRef.current!;
+    const dx = scrollContainer.scrollLeft;
+    const targetLeft = target.point.x * ks.unit;
+    const targetRight = (target.point.x + target.rect.w) * ks.unit;
+    if (targetLeft < dx || stage.width() / 2 + dx < targetRight) { return; }
+
     if (!target.focus) {
       const newNode = TreeNodeUtil._focus(node, target.id);
       edit(newNode);
       this.setState({labelFocus: false});
       process.nextTick(() => this.resize());
     } else {
-      process.nextTick(() => this.labelRef.current!.focus());
       this.setState({labelFocus: true});
+      process.nextTick(() => this.labelRef.current!.focus());
     }
   }
 
@@ -272,14 +308,15 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   dragMove = (target: KTreeNode, p: Point) => {
-    const { node: tree, edit } = this.props;
+    const { mode, node: tree, edit } = this.props;
     const {dragParent, ks} = this.state;
     const node = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
     const scrollContainer = this.mainRef.current;
-    if (scrollContainer === null) { throw 'Cannot find elements.'; }
+    const stage = this.stageRef.current;
+    if (scrollContainer === null || stage === null) { throw 'Cannot find elements.'; }
     const dx = scrollContainer.scrollLeft;
     const dy = scrollContainer.scrollTop;
-    const pointX = Math.round((p.x + dx - sp.x) / ks.unit + ks.rect.w / 2);
+    const pointX = Math.round((p.x + dx - sp.x - (mode === 'dc' ? stage.width() / 2 : 0)) / ks.unit + ks.rect.w / 2);
     const pointY = Math.round((p.y + dy - sp.y) / ks.unit + ks.rect.h / 2);
 
     const rows = this.rows;
@@ -317,6 +354,62 @@ class NodeEditor extends React.Component<Props, State> {
 
   dragEnd = () => {
     this.setState({dragParent: null});
+  }
+
+  dragEndMemo = (memo: KTreeNode) => {
+    const { mode } = this.props;
+    const { ks } = this.state;
+    const scrollContainer = this.mainRef.current;
+    const stage = this.stageRef.current;
+    if (scrollContainer === null || stage === null) { throw 'Cannot find elements.'; }
+    
+    if (mode === 'dc') {
+      const memoX = (memo.point.x + memo.rect.w / 2) * ks.unit;
+      if (stage.width() / 2 < memoX) {
+        // node.point = -sp + scrollDelta + groupDelta + memo.point
+        const scrollDelta = {x: scrollContainer.scrollLeft, y: scrollContainer.scrollTop};
+        const groupDelta = {x: -stage.width() / 2, y: 0};
+        const point = {
+          x: memo.point.x + Math.round((-sp.x + scrollDelta.x + groupDelta.x) / ks.unit),
+          y: memo.point.y + Math.round((-sp.y + scrollDelta.y + groupDelta.y) / ks.unit),
+        };
+        this.props.editMemo({...memo, isMemo: false});
+        return;
+      }
+    }
+    this.props.editMemo(memo);
+  }
+
+  moveToConvergent = (memo: KTreeNode) => {
+    const { mode, node: tree, memoList, edit, deleteMemo } = this.props;
+    if (memoList.find(m => m.id === memo.id) === undefined) { return; }
+    const { ks } = this.state;
+    const scrollContainer = this.mainRef.current;
+    const stage = this.stageRef.current;
+    if (scrollContainer === null || stage === null) { throw 'Cannot find elements.'; }
+    if (mode === 'dc') {
+      // node.point = -sp + scrollDelta + groupDelta + memo.point
+      const scrollDelta = {x: scrollContainer.scrollLeft, y: scrollContainer.scrollTop};
+      const groupDelta = {x: -stage.width() / 2, y: 0};
+      const point = {
+        x: memo.point.x + Math.round((-sp.x + scrollDelta.x + groupDelta.x) / ks.unit),
+        y: memo.point.y + Math.round((-sp.y + scrollDelta.y + groupDelta.y) / ks.unit),
+      };
+      // this.props.editMemo({...memo, isMemo: false});
+      this.setState({testMemo: {...memo, point}});
+
+      const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
+      const flatNodes = TreeNodeUtil.toArrayWithoutClose(kTreeNode);
+      const rows = KTreeUtil.makeDropMap(flatNodes, ks);
+      const row = rows[point.y];
+      if (row !== undefined) {
+        if (row.action === 'insertBefore') { edit(TreeUtil._insert(tree, memo, row.node, false)); }
+        if (row.action === 'insertNext') { edit(TreeUtil._insert(tree, memo, row.node, true)); }
+        if (row.action === 'insertLast') { edit(TreeUtil._push(tree, memo, row.node)); }
+        process.nextTick(() => this.resize());
+        deleteMemo(memo);
+      }
+    }
   }
 
   changeFocusNode = (target: TreeNode) => {
@@ -415,17 +508,18 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const { node: tree, showViewSettings, closeViewSettings, classes } = this.props;
+    const { mode, node: tree, memoList, showViewSettings, closeViewSettings, classes } = this.props;
     const {
-      ks, ft, rs, labelFocus, typeAnchorEl, deleteFlag,
+      ks, ft, rs, labelFocus, typeAnchorEl, deleteFlag, testMemo,
     } = this.state;
     const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
     const node = KArrowUtil.setArrow(kTreeNode, ks);
     this.kTree = node;
     const flatNodes = TreeNodeUtil.toArrayWithoutClose(node);
-    const rows = KTreeUtil.makeMap(flatNodes, ks);
+    const rows = KTreeUtil.makeDragMap(flatNodes, ks);
     this.rows = rows;
 
+    const stage = this.stageRef.current;
     const nodeActionProps = {
       ks,
       ft,
@@ -437,23 +531,58 @@ class NodeEditor extends React.Component<Props, State> {
       deleteFocus: this.deleteFocus
     };
 
+    const memoActionProps = {
+      ks,
+      ft,
+      mode,
+      focus: this.focus,
+      dragEnd: this.dragEndMemo,
+      moveToConvergent: this.moveToConvergent,
+    };
+
     const viewSettingProps: ViewSettingProps = {
       ks, ft, rs,
       changeKS: this.changeKS, changeFT: this.changeFT, changeRS: this.changeRS, reset: this.reset
     };
+    var CreateBox:        JSX.Element | undefined = undefined;
     var ActionButtonBox:  JSX.Element | undefined = undefined;
     var TypeButton:       JSX.Element | undefined = undefined;
     var ExpandButton:     JSX.Element | undefined = undefined;
     var Label:            JSX.Element | undefined = undefined;
 
-    const focusNode = TreeNodeUtil._getFocusNode(node)!;
-    if (focusNode) {
+    if (mode !== 'c') {
+
+      const boxPosition: React.CSSProperties | undefined = stage !== null ? {
+        position: 'absolute',
+        left: mode === 'd' ? stage.width() / 2 : mode === 'dc' ? stage.width() / 4 : stage.width() * 3 / 4,
+        top: theme.spacing.unit * 2,
+        transform: 'translateX(-50%)',
+      } : undefined;
+
+      const boxStyle: React.CSSProperties | undefined = stage !== null ? {
+        backgroundColor: theme.palette.background.paper,
+        borderRadius: theme.shape.borderRadius,
+        padding: theme.spacing.unit,
+      } : undefined;
+
+      CreateBox = (
+        <div style={boxPosition}>
+          <div ref={this.createBoxRef} style={boxStyle}>
+            <TextField/>
+            <Button style={{marginLeft: theme.spacing.unit}}>作成</Button>
+          </div>
+        </div>
+      );
+    }
+
+    const focusNode = TreeNodeUtil._getFocusNode(node);
+    if (mode !== 'd' && focusNode) {
 
       if (!labelFocus && typeAnchorEl === null) {
         const isRoot = focusNode.depth.top === 0;
         const boxStyle: React.CSSProperties = {
           position: 'absolute',
-          left: (focusNode!.point.x) * ks.unit + sp.x + 8,
+          left: (focusNode!.point.x) * ks.unit + sp.x + 8 + (mode === 'dc' ? stage.width() / 2 : 0),
           top: (focusNode!.point.y + focusNode.rect.h) * ks.unit + sp.x - 8,
           backgroundColor: theme.palette.grey[800],
         };
@@ -477,7 +606,7 @@ class NodeEditor extends React.Component<Props, State> {
       (() => {
         const buttonStyle: React.CSSProperties = {
           position: 'absolute',
-          left: (focusNode!.point.x + ks.rect.h / 2) * ks.unit + sp.x,
+          left: (focusNode!.point.x + ks.rect.h / 2) * ks.unit + sp.x + (mode === 'dc' ? stage.width() / 2 : 0),
           top:  (focusNode!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
           transform: `translate(-50%, -50%) scale(${ks.unit / 24})`,
           color: '#000',
@@ -518,7 +647,7 @@ class NodeEditor extends React.Component<Props, State> {
       (() => {
         const buttonStyle: React.CSSProperties = {
           position: 'absolute',
-          left: (focusNode!.point.x + ks.rect.w - ks.rect.h / 2) * ks.unit + sp.x,
+          left: (focusNode!.point.x + ks.rect.w - ks.rect.h / 2) * ks.unit + sp.x + (mode === 'dc' ? stage.width() / 2 : 0),
           top:  (focusNode!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
           transform: `translate(-50%, -50%) scale(${ks.unit / 24})`,
           color: '#000',
@@ -533,7 +662,7 @@ class NodeEditor extends React.Component<Props, State> {
       (() => {
         const labelStyle: React.CSSProperties = {
           position: 'absolute',
-          left: (focusNode!.point.x + ks.rect.h + ks.spr.w / 2) * ks.unit + sp.x,
+          left: (focusNode!.point.x + ks.rect.h + ks.spr.w / 2) * ks.unit + sp.x + (mode === 'dc' ? stage.width() / 2 : 0),
           top:  (focusNode!.point.y + ks.rect.h / 2) * ks.unit + sp.x,
           width: (ks.rect.w - (ks.rect.h + ks.spr.w / 2) * 2) * ks.unit,
           transform: `translateY(-50%)`,
@@ -559,11 +688,27 @@ class NodeEditor extends React.Component<Props, State> {
       })();
     }
 
-    const largeContainerStyle: React.CSSProperties = {
+    const main = this.mainRef.current;
+    const largeContainerStyle: React.CSSProperties | undefined = main !== null ?
+    mode !== 'd' ? {
       position: 'relative',
-      width: sp.x + (node.self.w + ks.spr.w * 2) * ks.unit,
-      height: sp.y + (node.self.h + ks.spr.h * 2) * ks.unit + marginBottom,
-    };
+      overflow: 'hidden',
+      width: Math.max(sp.x + (node.self.w + ks.spr.w * 2) * ks.unit
+         + ((mode === 'dc' || mode === 'cd') ? stage.width() / 2 : 0), main.offsetWidth),
+      height: Math.max(sp.y + (node.self.h + ks.spr.h * 2) * ks.unit + marginBottom, main.offsetHeight),
+    } :{
+      position: 'relative',
+      overflow: 'hidden',
+      width: main.offsetWidth,
+      height: main.offsetHeight,
+    } : undefined;
+    const divergentContainerRectProps = stage !== null ? {
+      x: 0,
+      y: 0,
+      width: mode !== 'd' ? stage.width() / 2 : stage.width(),
+      height: stage.height(),
+      fill: theme.palette.background.default,
+    } : undefined;
 
     return (
       <div className={classes.root}>
@@ -571,28 +716,37 @@ class NodeEditor extends React.Component<Props, State> {
           <div style={largeContainerStyle}>
             <Stage ref={this.stageRef} onClick={this.deleteFocus}>
               <Layer>
-                {flatNodes.map(n => <KNode key={n.id} node={n} labelFocus={labelFocus} {...nodeActionProps}/>)}
-                {/* <Group x={sp.x} y={sp.y} draggable>
-                  {rows !== null && rows.map((___, y) => {
-                  const row = rows[y];
-                  if (row === undefined) { return <Rect key={`${y}`}/>; }
-                  const fill = row.action === 'moveInOut' ? ('#ccff' + _.padStart(String(row.node.depth.top * 16), 2, '0')) :
-                              row.action === 'moveToBrother' ? 'blue' : 'grey';
-                  const labelProps = {
-                    text: row.node.type,
-                    fontSize: ks.fontSize * ks.unit,
-                  };
-                  return (
-                    <Group key={`${y}`} x={0} y={y * ks.unit + 300}>
-                        <Rect x={0} y={0} width={node.self.w * ks.unit} height={ks.unit} fill={fill} stroke="#000" strokeWidth={1}/>
-                        <Text {...labelProps}/>
-                    </Group>
-                  );
-                  })}
-                </Group> */}
-                {/* {flatNodes.map(n => <KNode key={n.id} node={n} labelFocus={labelFocus} {...nodeActionProps}/>)} */}
+              {mode !== 'd' && (
+                <Group ref={this.convergentRef} x={mode === 'dc' ? stage.width() / 2 : 0}>
+                  {flatNodes.map(n => <KNode key={n.id} node={n} labelFocus={labelFocus} {...nodeActionProps}/>)}
+                  {/* <Group x={sp.x} y={sp.y} draggable>
+                    {rows !== null && rows.map((___, y) => {
+                    const row = rows[y];
+                    if (row === undefined) { return <Rect key={`${y}`}/>; }
+                    const fill = row.action === 'moveInOut' ? ('#ccff' + _.padStart(String(row.node.depth.top * 16), 2, '0')) :
+                                row.action === 'moveToBrother' ? 'blue' : 'grey';
+                    const labelProps = {
+                      text: row.node.type,
+                      fontSize: ks.fontSize * ks.unit,
+                    };
+                    return (
+                      <Group key={`${y}`} x={0} y={y * ks.unit + 300}>
+                          <Rect x={0} y={0} width={node.self.w * ks.unit} height={ks.unit} fill={fill} stroke="#000" strokeWidth={1}/>
+                          <Text {...labelProps}/>
+                      </Group>
+                    );
+                    })}
+                  </Group> */}
+                  {/* {testMemo !== null && <KNode node={{...testMemo, arrows: [], children: []}} labelFocus={labelFocus} {...nodeActionProps}/>} */}
+                </Group>)}
+                {mode !== 'c' && (
+                <Group x={mode === 'cd' ? stage.width() / 2 : 0}>
+                  <Rect {...divergentContainerRectProps}/>
+                  {memoList.map(n => <KMemo key={n.id} node={n} labelFocus={labelFocus} {...memoActionProps}/>)}
+                </Group>)}
               </Layer>
             </Stage>
+            {CreateBox}
             {ActionButtonBox}
             {Label}
             {TypeButton}
@@ -601,7 +755,7 @@ class NodeEditor extends React.Component<Props, State> {
 
           <Dialog open={deleteFlag} onClose={() => this.setState({deleteFlag: false})}>
             <DialogTitle>この項目を削除してもよろしいですか？</DialogTitle>
-            {Boolean(focusNode) && focusNode.children.length !== 0 &&
+            {focusNode !== undefined && focusNode.children.length !== 0 &&
             <DialogContent>
               <DialogContentText>この項目には詳細項目が含まれています。削除してもよろしいですか？</DialogContentText>
             </DialogContent>}

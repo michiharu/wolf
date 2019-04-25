@@ -22,9 +22,9 @@ export { default as Delete } from '@material-ui/icons/Delete';
 export { default as Close } from '@material-ui/icons/Close';
 export { default as More } from '@material-ui/icons/ExpandMore';
 export { default as Less } from '@material-ui/icons/ExpandLess';
-export { default as Divergent } from '@material-ui/icons/BlurOn';
-export { default as Convergent } from '@material-ui/icons/BlurCircular';
-// divergent thinking（発散思考）、 convergent thinking（収束思考）
+export { default as Divergent } from '@material-ui/icons/BlurOn';    // divergent  thinking（発散思考）、
+export { default as Convergent } from '@material-ui/icons/ClearAll'; // convergent thinking（収束思考）
+
 
 
 export const ks: KSize = {

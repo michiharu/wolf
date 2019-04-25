@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
-import { Tree } from '../data-types/tree-node';
+import { Tree, KTreeNode } from '../data-types/tree-node';
 import link from '../settings/path-list';
 import EditorStateManager from './editor/editor-state-manager';
 import Dashboard from './dashboard/dashboard';
@@ -9,7 +9,7 @@ interface Props {
   treeNodes: Tree[];
   selectedNodeList: Tree[];
   commonNodes: Tree[];
-
+  memoList: KTreeNode[];
   changeNode: (node: Tree) => void;
   addNode: (node: Tree) => void;
   deleteNode: (node: Tree) => void;
@@ -30,7 +30,7 @@ class PageRouter extends React.Component<Props, State> {
 
   render () {
     const {
-      treeNodes, selectedNodeList, commonNodes,
+      treeNodes, selectedNodeList, commonNodes, memoList,
       selectNode, changeNode, addNode, deleteNode, addCommonList, deleteCommonList,
     } = this.props;
     return (
@@ -62,6 +62,7 @@ class PageRouter extends React.Component<Props, State> {
                 treeNodes={treeNodes}
                 selectedNodeList={selectedNodeList}
                 commonNodes={commonNodes}
+                memoList={memoList}
                 changeNode={changeNode}
                 addNode={addNode}
               />

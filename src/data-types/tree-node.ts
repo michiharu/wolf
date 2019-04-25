@@ -32,6 +32,7 @@ export const baseTreeWithoutId: TreeWithoutId = {
 
 export interface Tree extends TreeWithoutId {
   id: string;
+  isMemo: boolean;
   children: Tree[];
 }
 
@@ -39,6 +40,7 @@ export const baseTree: Tree = {
   ...baseTreeWithoutId,
   children: [],
   id: '',
+  isMemo: false,
 };
 
 export interface TreeNode extends Tree {
@@ -125,5 +127,7 @@ export interface CheckRecord {
 export type Type = 'task' | 'switch' | 'case';
 export type Point = {x: number, y: number};
 export type Size = {w: number, h:number};
-export type FlatAction = 'moveToBrother' | 'moveInOut';
-export type Row = {node: KTreeNode, action: FlatAction} | undefined;
+export type DragAction = 'moveToBrother' | 'moveInOut';
+export type DropAction = 'insertBefore' | 'insertNext' | 'insertLast';
+export type DragRow = {node: KTreeNode, action: DragAction} | undefined;
+export type DropRow = {node: KTreeNode, action: DropAction} | undefined;

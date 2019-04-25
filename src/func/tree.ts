@@ -101,7 +101,7 @@ export default class TreeUtil {
   static _setId = (node: TreeWithoutId): Tree => {
     const id = 'rand:' + String(Math.random()).slice(2);
     const children = node.children.map(c => TreeUtil._setId(c));
-    return {...node, id, children};
+    return {...node, id, children, isMemo: false};
   }
 
   static getNewNode = <T extends Tree>(parentType: Type, base: T): T => ({

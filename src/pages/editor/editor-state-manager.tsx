@@ -7,8 +7,9 @@ import SaveIcon from '@material-ui/icons/Save';
 import Download from '@material-ui/icons/SaveAlt';
 import CloseIcon from '@material-ui/icons/Close';
 import ViewSettingsIcon from '@material-ui/icons/Settings';
+import { Divergent, Convergent } from '../../settings/layout' 
 
-import { Tree, TreeNode, baseTreeNode } from '../../data-types/tree-node';
+import { Tree, TreeNode, baseTreeNode, KTreeNode } from '../../data-types/tree-node';
 import NodeEditor, { NodeEditorProps } from './node-editor/node-editor';
 import { RouteComponentProps, withRouter } from 'react-router';
 import link from '../../settings/path-list';
@@ -16,6 +17,8 @@ import TreeUtil from '../../func/tree';
 import { fileDownload } from '../../func/file-download';
 import TextEditor, { TextEditorProps } from './text-editor/text-editor';
 import TreeNodeUtil from '../../func/tree-node';
+import { theme } from '../..';
+import { NodeEditMode } from '../../data-types/node-edit-mode';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -24,6 +27,9 @@ const styles = (theme: Theme) => createStyles({
     overflow: 'scroll',
   },
   toolbar: theme.mixins.toolbar,
+  convergent: {
+    transform: 'scale(1, -1)',
+  },
   close: {
     padding: theme.spacing.unit * 0.5,
   },
@@ -31,6 +37,7 @@ const styles = (theme: Theme) => createStyles({
 
 interface Props extends WithStyles<typeof styles>, RouteComponentProps {
   treeNodes: Tree[];
+  memoList: KTreeNode[];
   selectedNodeList: Tree[];
   commonNodes: Tree[];
   changeNode: (node: Tree) => void;
@@ -40,8 +47,9 @@ interface Props extends WithStyles<typeof styles>, RouteComponentProps {
 interface State {
   tabIndex: number; // 0: カード表示、1: テキスト表示
   // divergent thinking（発散思考）、 convergent thinking（収束思考）
-  mode: 'd' | 'dc' | 'cd' | 'c';
+  mode: NodeEditMode;
   node: TreeNode;
+  memoList: KTreeNode[];
   hasDifference: boolean;
   cannotSaveReason: CannotSaveReason;
   saved: boolean;
@@ -55,8 +63,8 @@ class EditorStateManager extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    const { selectedNodeList, commonNodes } = props;
-    this.state = EditorStateManager.getInitialState(selectedNodeList, commonNodes);
+    const { selectedNodeList, commonNodes, memoList } = props;
+    this.state = EditorStateManager.getInitialState(selectedNodeList, commonNodes, memoList);
   }
 
   componentDidMount() {
@@ -79,13 +87,14 @@ class EditorStateManager extends React.Component<Props, State> {
     this.differenceCheck(null);
   }
 
-  static getInitialState = (selectedNodeList: Tree[], commonNodes: Tree[]): State => {
+  static getInitialState = (selectedNodeList: Tree[], commonNodes: Tree[], memoList: KTreeNode[]): State => {
     var node = TreeUtil._get(selectedNodeList[selectedNodeList.length - 1], baseTreeNode);
     node = TreeNodeUtil._init(node);
     return {
       tabIndex: 0,
-      node,
       mode: 'd',
+      node,
+      memoList,
       hasDifference: false,
       cannotSaveReason: null,
       saved: false,
@@ -118,6 +127,17 @@ class EditorStateManager extends React.Component<Props, State> {
     this.setState({node: editNode});
   }
 
+  editMemo = (memo: KTreeNode) => {
+    const { memoList } = this.state;
+    this.setState({memoList: memoList.map(m => m.id === memo.id ? memo : m)});
+  }
+
+  deleteMemo = (memo: KTreeNode) => {
+    const { memoList } = this.state;
+    this.setState({memoList: memoList.filter(m => m.id !== memo.id)});
+    console.log('After "deleteMemo": ' + this.state.memoList.length);
+  }
+
   save = () => {
     const { changeNode } = this.props;
     const {node} = this.state;
@@ -145,13 +165,17 @@ class EditorStateManager extends React.Component<Props, State> {
 
   render() {
     const { commonNodes, addNode, classes } = this.props;
-    const { tabIndex, node, hasDifference, cannotSaveReason, saved, showViewSettings } = this.state;
+    const { tabIndex, mode, node, memoList, hasDifference, cannotSaveReason, saved, showViewSettings } = this.state;
   
     const nodeProps: NodeEditorProps = {
       commonNodes,
+      mode,
       node,
+      memoList,
       showViewSettings,
       edit: this.edit,
+      deleteMemo: this.deleteMemo,
+      editMemo: this.editMemo,
       addNode,
       closeViewSettings: () => this.setState({showViewSettings: false}),
     };
@@ -166,7 +190,9 @@ class EditorStateManager extends React.Component<Props, State> {
     const cannotSave: CannotSaveReason = cannotSaveReason !== null ? cannotSaveReason :
       !TreeUtil._isAllSwitchHasCase(node) ? 'switch' :
       !TreeUtil._isAllCaseHasItem(node)   ? 'case'   : null;
-    
+    const getStyle = (buttonMode: NodeEditMode) => {
+      return mode === buttonMode ? { backgroundColor: theme.palette.background.paper } : undefined;
+    };
     return (
       <div className={classes.root}>
         <AppBar color="default">
@@ -180,8 +206,10 @@ class EditorStateManager extends React.Component<Props, State> {
             <div style={{flexGrow: 1}} />
 
             {tabIndex === 0 && <>
-              <IconButton onClick={this.save}><SaveIcon/></IconButton>
-              <IconButton onClick={this.download}><Download/></IconButton>
+              <Button style={getStyle('d')}  onClick={() => this.setState({mode: 'd'})} ><Divergent/></Button>
+              <Button style={getStyle('dc')} onClick={() => this.setState({mode: 'dc'})}><Divergent/><Convergent className={classes.convergent}/></Button>
+              <Button style={getStyle('cd')} onClick={() => this.setState({mode: 'cd'})}><Convergent className={classes.convergent}/><Divergent/></Button>
+              <Button style={getStyle('c')}  onClick={() => this.setState({mode: 'c'})} ><Convergent className={classes.convergent}/></Button>
               <div style={{flexGrow: 1}} />
             </>}
 

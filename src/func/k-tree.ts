@@ -1,4 +1,4 @@
-import {TreeNode, Type, KTreeNode, Row, Tree, Point } from "../data-types/tree-node";
+import {TreeNode, Type, KTreeNode, DragRow, Tree, Point, DropRow } from "../data-types/tree-node";
 import KSize from "../data-types/k-size";
 import TreeNodeUtil from "./tree-node";
 
@@ -89,20 +89,20 @@ export default class KTreeUtil {
     return kNode;
   }
 
-  static makeBaseMap = <T extends KTreeNode>(node: T): Row[] => {
-    const base: Row[]= [];
+  static makeBaseDragMap = <T extends KTreeNode>(node: T): DragRow[] => {
+    const base: DragRow[]= [];
     for(var y = 0; y < node.point.y + node.self.h; y++) { base[y] = undefined; }
     return base;
   }
 
-  static makeMap = <T extends KTreeNode>(nodes: T[], ks: KSize): Row[] => {
+  static makeDragMap = <T extends KTreeNode>(nodes: T[], ks: KSize): DragRow[] => {
     const root = nodes[0];
     const sorted = nodes.sort((a, b) => a.depth.bottom < b.depth.bottom ? 1 : -1);
 
-    const selfBase = KTreeUtil.makeBaseMap(root);
+    const selfBase = KTreeUtil.makeBaseDragMap(root);
 
-    const map: Row[][] = [selfBase].concat(sorted.map(s => {
-      const result = KTreeUtil.makeBaseMap(s);
+    const map: DragRow[][] = [selfBase].concat(sorted.map(s => {
+      const result = KTreeUtil.makeBaseDragMap(s);
 
       if (s.open) {
         for(var y = s.point.y + s.self.h - ks.margin.h; y < s.point.y + s.self.h; y++) {
@@ -125,8 +125,51 @@ export default class KTreeUtil {
       return nextRow || beforeRow;
     }))
   }
+
+  static makeBaseDropMap = <T extends KTreeNode>(node: T): DropRow[] => {
+    const base: DropRow[]= [];
+    for(var y = 0; y < node.point.y + node.self.h; y++) { base[y] = undefined; }
+    return base;
+  }
+
+  static makeDropMap = <T extends KTreeNode>(nodes: T[], ks: KSize): DropRow[] => {
+    const root = nodes[0];
+    const sorted = nodes.sort((a, b) => a.depth.bottom < b.depth.bottom ? 1 : -1);
+
+    const selfBase = KTreeUtil.makeBaseDropMap(root);
+
+    const beforeMarginHalf = Math.ceil(ks.margin.h / 2);
+    const beforeRectHalf = Math.ceil(ks.rect.h / 2);
+
+    const map: DropRow[][] = [selfBase].concat(sorted.map(s => {
+      const result = KTreeUtil.makeBaseDropMap(s);
+
+      if (s.depth.top !== 0) {
+        for(var y = s.point.y - beforeMarginHalf; y < s.point.y + beforeRectHalf; y++) {
+          result[y] = { node: s, action: 'insertBefore' };
+        }
+        for(var y = s.point.y + beforeRectHalf; y < s.point.y + ks.rect.h + beforeMarginHalf; y++) {
+          result[y] = { node: s, action: 'insertNext' };
+        }
+      }
+
+      if (s.open) {
+        for(var y = s.point.y + s.self.h - ks.margin.h; y < s.point.y + s.self.h; y++) {
+          result[y] = { node: s, action: 'insertLast' };
+        }
+      }
+      
+      return result;
+    }));
+
+    return map.reduce((before, next) => before.map((beforeRow, r) => {
+      if (next.length - 1 < r) { return beforeRow; }
+      const nextRow = next[r];
+      return nextRow || beforeRow;
+    }))
+  }
   
-  static isEqualCell = (a: Row, b: Row): boolean => {
+  static isEqualRow = (a: DragRow | DropRow, b: DragRow | DropRow): boolean => {
     if (a === undefined && b === undefined) { return true; }
     if (a === undefined || b === undefined) { return false; }
     return a.action === b.action && a.node.id === b.node.id;

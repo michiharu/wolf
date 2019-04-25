@@ -5,6 +5,7 @@ const keys = {
   tes: 'tes',
   tree: 'tree',
   commonList: 'commonList',
+  memoList: 'memoList',
 }
 
 export default keys;

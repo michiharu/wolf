@@ -1,13 +1,15 @@
 import * as React from 'react';
-import { Tree } from '../data-types/tree-node';
+import { Tree, KTreeNode, baseKTreeNode } from '../data-types/tree-node';
 import TreeUtil from '../func/tree';
 import keys from '../settings/storage-keys';
 import PageRouter from './page-router';
+import { ks } from '../settings/layout';
 
 interface State {
   treeNodes: Tree[];
   selectedNodeList: Tree[]; // 選択されたNodeを最初の要素の深さを０として保持する
   commonNodes: Tree[];
+  memoList: KTreeNode[];
 }
 
 class DataManager extends React.Component<{}, State> {
@@ -21,10 +23,22 @@ class DataManager extends React.Component<{}, State> {
     const commonNodesFromStorage = localStorage.getItem(keys.commonList);
     const commonNodes = commonNodesFromStorage !== null ? JSON.parse(commonNodesFromStorage) : [];
 
+    const memoListFromStorage = localStorage.getItem(keys.memoList);
+    const memoList = memoListFromStorage !== null ? JSON.parse(memoListFromStorage) : [];
+    const testMemo: KTreeNode = {
+      ...baseKTreeNode,
+      label: 'test',
+      isMemo: true,
+      point: {x: 5, y: 10},
+      rect: ks.rect,
+    };
+    memoList.push(testMemo);
+
     this.state = {
       treeNodes,
       selectedNodeList: [],
       commonNodes,
+      memoList,
     };
   }
 
@@ -74,14 +88,26 @@ class DataManager extends React.Component<{}, State> {
     localStorage.setItem(keys.commonList, JSON.stringify(commonNodes));
   }
 
+  addMemo = (memo: KTreeNode) => {
+    const { memoList } = this.state;
+    memoList.push(memo);
+    this.setState({memoList});
+  }
+
+  deleteMemo = (memo: KTreeNode) => {
+    const { memoList } = this.state;
+    this.setState({memoList: memoList.filter(m => m.id !== memo.id)});
+  }
+
   render () {
-    const { treeNodes, selectedNodeList, commonNodes } = this.state;
+    const { treeNodes, selectedNodeList, commonNodes, memoList } = this.state;
 
     return (
       <PageRouter
         treeNodes={treeNodes}
         selectedNodeList={selectedNodeList}
         commonNodes={commonNodes}
+        memoList={memoList}
         selectNode={this.selectNode}
         changeNode={this.changeNode}
         addNode={this.addNode}
