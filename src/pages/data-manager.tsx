@@ -25,6 +25,7 @@ class DataManager extends React.Component<{}, State> {
 
     const memoListFromStorage = localStorage.getItem(keys.memoList);
     const memoList = memoListFromStorage !== null ? JSON.parse(memoListFromStorage) : [];
+    
     const testMemo: KTreeNode = {
       ...baseKTreeNode,
       label: 'test',

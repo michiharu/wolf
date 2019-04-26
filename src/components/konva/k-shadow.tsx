@@ -23,70 +23,18 @@ export interface KNodeProps {
   labelFocus: boolean;
   ks: KSize;
   ft: FlowType;
-  focus: (node: KWithArrow) => void;
-  expand: (node: KWithArrow) => void;
-  dragStart: (node: KTreeNode) => void;
-  dragMove: (node: KTreeNode, point: Point) => void;
-  dragEnd: (node: KTreeNode, point: Point) => void;
-  dragAnimationEnd: () => void;
-  deleteFocus: () => void;
 }
 
-class KNode extends React.Component<KNodeProps> {
+class KShadow extends React.Component<KNodeProps> {
   
-  baseRef = React.createRef<any>();
-  draggableRef = React.createRef<any>();
+  groupRef = React.createRef<any>();
 
   constructor(props: KNodeProps) {
     super(props);
   }
 
-  componentDidMount() {
-    process.nextTick(() => this.setState({}));
-  }
-
-  handleFocus = (e: any) => {
-    e.cancelBubble = true;
-    const {node, focus} = this.props;
-    focus(node);
-  }
-
-  handleExpand = (e: any) => {
-    e.cancelBubble = true;
-    const {node, expand} = this.props;
-    expand(node);
-  }
-
-  handleDragStart = (e: any) => {
-    const {node, dragStart} = this.props;
-    dragStart(node);
-  }
-
-  handleDragMove = (e: any) => {
-    const {node, ks, dragMove} = this.props;
-    const dragPoint = e.target.position();
-    dragMove(node, {
-      x: node.point.x * ks.unit + dragPoint.x,
-      y: node.point.y * ks.unit + dragPoint.y
-    });
-  }
-
-  handleDragEnd = (e: any) => {
-    const {node, ks, dragEnd, dragAnimationEnd} = this.props;
-    const dragPoint = e.target.position();
-    dragEnd(node, {
-      x: node.point.x * ks.unit + dragPoint.x,
-      y: node.point.y * ks.unit + dragPoint.y
-    });
-    e.target.to({
-      x: 0, y: 0, easing: Konva.Easings.EaseInOut,
-      onFinish: dragAnimationEnd,
-    });
-  }
-
-  handleDeleteFocus = (e: any) => {
-    e.cancelBubble = true;
-    this.props.deleteFocus();
+  componentWillUnmount() {
+    this.groupRef.current!.destroy();
   }
   
   render() {
@@ -123,39 +71,28 @@ class KNode extends React.Component<KNodeProps> {
       scale: node.type !== 'switch' ? undefined : {x: 1, y: -1},
     };
 
-    const rectGroupProps = {
-      x: 0, y:0,
-      ref: this.draggableRef,
-      onClick: this.handleFocus,
-      draggable: true,
-      onDragStart: this.handleDragStart,
-      onDragMove: this.handleDragMove,
-      onDragEnd: this.handleDragEnd,
-    };
-
-    const baseEl = this.baseRef.current;
-    const draggableEl = this.draggableRef.current;
+    const dragEl = this.groupRef.current;
     // dragElが要素の参照を持っていてもなぜか座標を持っていない場合があるため x の値をチェック
-    const willAnimation = baseEl !== null && draggableEl !== null &&
-    (baseEl.x() !== 0 && !draggableEl.isDragging());
+    const willAnimation = dragEl !== null && dragEl.x() !== 0;
 
     if (willAnimation) {
-      baseEl.to({
+      dragEl.to({
         x: node.point.x * ks.unit,
         y: node.point.y * ks.unit,
         easing: Konva.Easings.EaseInOut
       });
     }
 
-    const x = !willAnimation ? node.point.x * ks.unit : undefined;
-    const y = !willAnimation ? node.point.y * ks.unit : undefined;
+    const rectGroupProps = {
+      x: !willAnimation ? node.point.x * ks.unit : undefined,
+      y: !willAnimation ? node.point.y * ks.unit : undefined,
+    };
 
     const containerRectProps = {
       x: (ks.indent / 2 - ks.spr.w) * ks.unit,
       y: ks.spr.h * ks.unit,
       width: (node.self.w - (ks.indent / 2 - ks.spr.w)) * ks.unit,
       height: (node.self.h - ks.spr.h) * ks.unit,
-      onClick: this.handleDeleteFocus,
       cornerRadius: ks.cornerRadius * ks.unit,
       stroke: grey[500],
       fill: node.depth.top === 0 ? theme.palette.background.paper : '#00000009',
@@ -180,27 +117,23 @@ class KNode extends React.Component<KNodeProps> {
       x: (ks.rect.w - ks.rect.h) * ks.unit, y: 0,
       svg: node.open ? less : more,
       badgeContent: node.children.length,
-      onClick: this.handleExpand,
     };
 
     return (
-      <Group ref={this.baseRef} x={x} y={y} >
-        <Group {...rectGroupProps}>
-          
-          {node.open && <Rect {...containerRectProps}/>}
-          <Rect {...baseRectProps}/>
-          <Icon {...typeProps}/>
-          {!(node.focus && labelFocus) &&  <Text {...labelProps}/>}
-          <IconWithBadge {...expandProps}/>
-          {ft === 'arrow' && node.arrows.map((a, i) => {
-            const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
-            return <Arrow key={`${node.id}-arrow-${i}`} {...arrowBaseProps} points={points}/>;
-          })}
-          {node.arrows.length === 0 && node.depth.top !== 0 && <Icon {...endIconProps}/>}
-        </Group>
+      <Group ref={this.groupRef} {...rectGroupProps}>
+        {node.open && <Rect {...containerRectProps}/>}
+        <Rect {...baseRectProps}/>
+        <Icon {...typeProps}/>
+        {!(node.focus && labelFocus) &&  <Text {...labelProps}/>}
+        <IconWithBadge {...expandProps}/>
+        {ft === 'arrow' && node.arrows.map((a, i) => {
+          const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
+          return <Arrow key={`${node.id}-arrow-${i}`} {...arrowBaseProps} points={points}/>;
+        })}
+        {node.arrows.length === 0 && node.depth.top !== 0 && <Icon {...endIconProps}/>}
       </Group>
     );
   }
 }
 
-export default KNode;
+export default KShadow;

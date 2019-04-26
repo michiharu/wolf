@@ -19,6 +19,17 @@ export default class TreeNodeUtil {
     return {...node, children};
   }
 
+  static _drag = <T extends TreeNode>(node: T, id: string, isDragging: boolean): T => {
+    if (node.id === id) { return {...node, isDragging}; }
+    const children = node.children.map(c => (TreeNodeUtil._drag(c, id, isDragging)));
+    return {...node, children};
+  }
+
+  static _dragEnd = <T extends TreeNode>(node: T): T => {
+    const children = node.children.map(c => (TreeNodeUtil._dragEnd(c)));
+    return {...node, children, isDragging: false};
+  }
+
   static _focus = <T extends TreeNode>(node: T, id: string): T => {
     const children = node.children.map(c => (TreeNodeUtil._focus(c, id)));
     return {...node, children, focus: node.id === id};

@@ -127,6 +127,13 @@ class EditorStateManager extends React.Component<Props, State> {
     this.setState({node: editNode});
   }
 
+  addMemo = (memo: KTreeNode) => {
+    console.log('addMemo');
+    const { memoList } = this.state;
+    memoList.push(memo);
+    this.setState({memoList});
+  }
+
   editMemo = (memo: KTreeNode) => {
     const { memoList } = this.state;
     this.setState({memoList: memoList.map(m => m.id === memo.id ? memo : m)});
@@ -135,7 +142,6 @@ class EditorStateManager extends React.Component<Props, State> {
   deleteMemo = (memo: KTreeNode) => {
     const { memoList } = this.state;
     this.setState({memoList: memoList.filter(m => m.id !== memo.id)});
-    console.log('After "deleteMemo": ' + this.state.memoList.length);
   }
 
   save = () => {
@@ -175,6 +181,7 @@ class EditorStateManager extends React.Component<Props, State> {
       showViewSettings,
       edit: this.edit,
       deleteMemo: this.deleteMemo,
+      addMemo: this.addMemo,
       editMemo: this.editMemo,
       addNode,
       closeViewSettings: () => this.setState({showViewSettings: false}),
@@ -208,7 +215,6 @@ class EditorStateManager extends React.Component<Props, State> {
             {tabIndex === 0 && <>
               <Button style={getStyle('d')}  onClick={() => this.setState({mode: 'd'})} ><Divergent/></Button>
               <Button style={getStyle('dc')} onClick={() => this.setState({mode: 'dc'})}><Divergent/><Convergent className={classes.convergent}/></Button>
-              <Button style={getStyle('cd')} onClick={() => this.setState({mode: 'cd'})}><Convergent className={classes.convergent}/><Divergent/></Button>
               <Button style={getStyle('c')}  onClick={() => this.setState({mode: 'c'})} ><Convergent className={classes.convergent}/></Button>
               <div style={{flexGrow: 1}} />
             </>}

@@ -5,12 +5,13 @@ import { Rect, Group, Text } from 'react-konva';
 
 import { KTreeNode, Point } from '../../data-types/tree-node';
 
-import { sp } from '../../pages/editor/node-editor/node-editor';
 import Util from '../../func/util';
 import { phrase } from '../../settings/phrase';
 import KSize from '../../data-types/k-size';
+import { NodeEditMode } from '../../data-types/node-edit-mode';
 
 export interface KMemoProps {
+  mode: NodeEditMode;
   node: KTreeNode;
   labelFocus: boolean;
   ks: KSize;
@@ -31,17 +32,13 @@ class KMemo extends React.Component<KMemoProps> {
   }
 
   handleDragEnd = (e: any) => {
-    const { node, ks, dragEnd } = this.props;
-    const pointByDrag = e.target.position();
-    const point = {
-      x: Math.round(pointByDrag.x / ks.unit),
-      y: Math.round(pointByDrag.y / ks.unit),
-    };
+    const { mode, node, dragEnd } = this.props;
+    const point = { x: e.target.position().x / (mode === 'd' ? 2 : 1), y: e.target.position().y };
     dragEnd({...node, point});
   }
   
   render() {
-    const { node, ks, labelFocus, moveToConvergent } = this.props;
+    const { mode, node, ks, labelFocus, moveToConvergent } = this.props;
     const fill = node.type === 'task' ? lightBlue[50] : node.type === 'switch' ? amber[100] : yellow[100];
     const baseRectProps = {
       x: 0, y: 0,
@@ -67,20 +64,21 @@ class KMemo extends React.Component<KMemoProps> {
     };
 
     const dragEl = this.draggableRef.current;
-    const willAnimation = dragEl !== null && !dragEl.isDragging();
+    const willAnimation = dragEl !== null && (!dragEl.isDragging() || dragEl.x() !== 0);
+
+    const calcX = node.point.x * (mode === 'd' ? 2 : 1);
 
     if (willAnimation) {
-      console.log('willAnimation');
       dragEl!.to({
-        x: node.point.x * ks.unit,
-        y: node.point.y * ks.unit,
+        x: calcX,
+        y: node.point.y,
         easing: Konva.Easings.EaseInOut,
         onFinish: node.isMemo ? undefined : () => moveToConvergent(node),
       });
     }
 
-    const x = !willAnimation ? node.point.x * ks.unit : undefined;
-    const y = !willAnimation ? node.point.y * ks.unit : undefined;
+    const x = !willAnimation ? calcX : undefined;
+    const y = !willAnimation ? node.point.y : undefined;
     const rectGroupProps = {
       x, y,
       draggable: true,

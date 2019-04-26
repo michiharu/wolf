@@ -47,6 +47,7 @@ export interface TreeNode extends Tree {
   children: TreeNode[];
   open: boolean;
   focus: boolean;
+  isDragging: boolean;
 }
 
 export const baseTreeNode: TreeNode = {
@@ -54,6 +55,7 @@ export const baseTreeNode: TreeNode = {
   children: [],
   open: false,
   focus: false,
+  isDragging: false,
 };
 
 export interface NodeWithSimilarity extends Tree {

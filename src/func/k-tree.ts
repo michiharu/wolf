@@ -84,7 +84,7 @@ export default class KTreeUtil {
 
   static setCalcProps = <T extends KTreeNode>(node: T, ks: KSize): T => {
     var kNode = KTreeUtil._setSize(node, ks);
-    kNode = KTreeUtil._setPoint({x: 0, y: 0}, kNode, ks);
+    kNode = KTreeUtil._setPoint({x: ks.spr.w, y: ks.spr.h}, kNode, ks);
     kNode = KTreeUtil._setIndexAndDepth(0, 0, kNode);
     return kNode;
   }
@@ -138,14 +138,14 @@ export default class KTreeUtil {
 
     const selfBase = KTreeUtil.makeBaseDropMap(root);
 
-    const beforeMarginHalf = Math.ceil(ks.margin.h / 2);
-    const beforeRectHalf = Math.ceil(ks.rect.h / 2);
+    const beforeMarginHalf = Math.floor(ks.margin.h / 2);
+    const beforeRectHalf = Math.floor(ks.rect.h / 2);
 
     const map: DropRow[][] = [selfBase].concat(sorted.map(s => {
       const result = KTreeUtil.makeBaseDropMap(s);
 
       if (s.depth.top !== 0) {
-        for(var y = s.point.y - beforeMarginHalf; y < s.point.y + beforeRectHalf; y++) {
+        for(var y = s.point.y - ks.margin.h; y < s.point.y + beforeRectHalf; y++) {
           result[y] = { node: s, action: 'insertBefore' };
         }
         for(var y = s.point.y + beforeRectHalf; y < s.point.y + ks.rect.h + beforeMarginHalf; y++) {
