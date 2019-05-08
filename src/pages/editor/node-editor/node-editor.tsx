@@ -413,7 +413,7 @@ class NodeEditor extends React.Component<Props, State> {
 
   dragEndMemo = (memo: KTreeNode) => {
 
-    const { mode, node: tree, editMemo } = this.props;
+    const { mode, node: tree } = this.props;
     this.setState({dragMemo: null});
     const { ks } = this.state;
     const scrollContainer = this.mainRef.current;
@@ -461,16 +461,19 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   keepMemo = (memo: KTreeNode) => {
+    const { mode } = this.props;
     const { ks } = this.state;
     const stage = this.stageRef.current;
     if (stage === null) { throw 'Cannot find elements.'; }
 
-    if (stage.width() / 2 < memo.point.x + memo.rect.w * ks.unit) {
-      const point = { x: stage.width() / 2 - memo.rect.w * ks.unit, y: memo.point.y };
-      this.props.editMemo({...memo, point});
-    } else {
-      this.props.editMemo(memo);
-    }
+    const sw = stage.width(), rw = ks.rect.w * ks.unit;
+    var x = memo.point.x * (mode === 'd' ? (1 - sw / (2 * (sw - rw))) : 1);
+    const y = memo.point.y;
+
+    if (x < 0) { x = 0; }
+    if (sw / 2 < x + rw) { x = sw / 2 - rw; }
+
+    this.props.editMemo({...memo, point: {x, y}});
   }
 
   moveToConvergent = (memo: KTreeNode) => {
@@ -602,8 +605,8 @@ class NodeEditor extends React.Component<Props, State> {
       label: createBoxText,
       isMemo: true,
       point: {
-        x: (stage.width() - ks.rect.w * ks.unit * 2) / 2 * Math.random(),
-        y: 50 + stage.height() / 2 * Math.random()
+        x: (stage.width() / 2 - ks.rect.w * ks.unit) * Math.random(),
+        y: 50 + stage.height() * 4 / 5 * Math.random()
       },
       rect: ks.rect
     });
@@ -844,8 +847,6 @@ class NodeEditor extends React.Component<Props, State> {
       })();
     }
 
-
-
     const main = this.mainRef.current;
     const largeContainerStyle: React.CSSProperties | undefined = main !== null ?
     mode !== 'd' ? {
@@ -867,13 +868,17 @@ class NodeEditor extends React.Component<Props, State> {
       fill: theme.palette.background.default,
     } : undefined;
 
+    const sw = stage !== null ? stage.width() : 0, rw = ks.rect.w * ks.unit;
+
     const MemoGroup = (
       <Group>
         <Rect {...divergentContainerRectProps}/>
         {memoList.filter(m => dragMemo !== null && dragMemo.id !== m.id)
-          .map(n => <KMemo key={n.id} node={n} labelFocus={memoLabelFocus !== null && memoLabelFocus.id === n.id} {...memoActionProps}/>)}
+        .map(m => ({...m, point: {x: m.point.x * (mode === 'd' ? (1 + sw / (sw - 2 * rw)) : 1) , y: m.point.y}}))
+        .map(n => <KMemo key={n.id} node={n} labelFocus={memoLabelFocus !== null && memoLabelFocus.id === n.id} {...memoActionProps}/>)}
         {memoList.filter(m => dragMemo === null || dragMemo.id === m.id)
-          .map(n => <KMemo key={n.id} node={n} labelFocus={memoLabelFocus !== null && memoLabelFocus.id === n.id} {...memoActionProps}/>)}
+        .map(m => ({...m, point: {x: m.point.x * (mode === 'd' ? (1 + sw / (sw - 2 * rw)) : 1) , y: m.point.y}}))
+        .map(n => <KMemo key={n.id} node={n} labelFocus={memoLabelFocus !== null && memoLabelFocus.id === n.id} {...memoActionProps}/>)}
       </Group>);
 
     return (
