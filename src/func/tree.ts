@@ -1,4 +1,4 @@
-import {TreeNode, Parent, TreeWithoutId, Tree, Type, baseTreeNode } from "../data-types/tree-node";
+import {TreeNode, TreeWithoutId, Tree, Type } from "../data-types/tree-node";
 
 export default class TreeUtil {
 
@@ -188,10 +188,10 @@ export default class TreeUtil {
     if (index !== -1) {
       node.children.splice(index + (isNext ? 1 : 0), 0, target);
       return node;
+    } else {
+      const children = node.children.map(c => TreeUtil._insert(c, target, to, isNext));
+      return {...node, children};
     }
-
-    const children = node.children.map(c => TreeUtil._insert(c, target, to, isNext));
-    return {...node, children};
   }
 
   static moveInOut = <T extends Tree>(node: T, child: T, parentNode: T): T => {

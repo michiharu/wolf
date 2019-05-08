@@ -3,7 +3,7 @@ import { lightBlue, amber, yellow } from '@material-ui/core/colors';
 import Konva from 'konva';
 import { Rect, Group, Text } from 'react-konva';
 
-import { KTreeNode, Point } from '../../data-types/tree-node';
+import { KTreeNode } from '../../data-types/tree-node';
 
 import Util from '../../func/util';
 import { phrase } from '../../settings/phrase';
@@ -15,6 +15,8 @@ export interface KMemoProps {
   node: KTreeNode;
   labelFocus: boolean;
   ks: KSize;
+  focus: (node: KTreeNode) => void;
+  dragStart: (node: KTreeNode) => void;
   dragEnd: (node: KTreeNode) => void;
   moveToConvergent: (node: KTreeNode) => void;
 }
@@ -27,18 +29,25 @@ class KMemo extends React.Component<KMemoProps> {
     super(props);
   }
 
-  componentDidMount() {
-    process.nextTick(() => this.setState({}));
+  handleFocus = (e: any) => {
+    e.cancelBubble = true;
+    const {node, focus} = this.props;
+    focus(node);
+  }
+
+  handleDragStart = () => {
+    const { node, dragStart } = this.props;
+    dragStart(node);
   }
 
   handleDragEnd = (e: any) => {
-    const { mode, node, dragEnd } = this.props;
-    const point = { x: e.target.position().x / (mode === 'd' ? 2 : 1), y: e.target.position().y };
+    const { node, dragEnd } = this.props;
+    const point = { x: e.target.position().x, y: e.target.position().y };
     dragEnd({...node, point});
   }
   
   render() {
-    const { mode, node, ks, labelFocus, moveToConvergent } = this.props;
+    const { node, ks, labelFocus, moveToConvergent } = this.props;
     const fill = node.type === 'task' ? lightBlue[50] : node.type === 'switch' ? amber[100] : yellow[100];
     const baseRectProps = {
       x: 0, y: 0,
@@ -54,7 +63,7 @@ class KMemo extends React.Component<KMemoProps> {
       shadowOpacity: node.focus ? 1 : 0.2,
     };
 
-    const labelProps = {
+    const labelProps =  {
       text: Util.isEmpty(node.label)
         ? node.type === 'task' ? phrase.empty.task : node.type === 'switch' ? phrase.empty.switch : phrase.empty.case
         : node.label,
@@ -66,29 +75,29 @@ class KMemo extends React.Component<KMemoProps> {
     const dragEl = this.draggableRef.current;
     const willAnimation = dragEl !== null && (!dragEl.isDragging() || dragEl.x() !== 0);
 
-    const calcX = node.point.x * (mode === 'd' ? 2 : 1);
-
     if (willAnimation) {
       dragEl!.to({
-        x: calcX,
+        x: node.point.x,
         y: node.point.y,
         easing: Konva.Easings.EaseInOut,
         onFinish: node.isMemo ? undefined : () => moveToConvergent(node),
       });
     }
 
-    const x = !willAnimation ? calcX : undefined;
+    const x = !willAnimation ? node.point.x : undefined;
     const y = !willAnimation ? node.point.y : undefined;
     const rectGroupProps = {
       x, y,
+      onClick: this.handleFocus,
       draggable: true,
+      onDragStart: this.handleDragStart,
       onDragEnd: this.handleDragEnd,
     };
 
     return (
       <Group ref={this.draggableRef} {...rectGroupProps}>
         <Rect {...baseRectProps}/>
-        {!(node.focus && labelFocus) &&  <Text {...labelProps}/>}
+        {!labelFocus &&  <Text {...labelProps}/>}
       </Group>
   );
   }

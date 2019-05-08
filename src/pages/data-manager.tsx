@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { Tree, KTreeNode, baseKTreeNode } from '../data-types/tree-node';
+import { Tree, KTreeNode } from '../data-types/tree-node';
 import TreeUtil from '../func/tree';
 import keys from '../settings/storage-keys';
 import PageRouter from './page-router';
-import { ks } from '../settings/layout';
 
 interface State {
   treeNodes: Tree[];
@@ -25,15 +24,6 @@ class DataManager extends React.Component<{}, State> {
 
     const memoListFromStorage = localStorage.getItem(keys.memoList);
     const memoList = memoListFromStorage !== null ? JSON.parse(memoListFromStorage) : [];
-    
-    const testMemo: KTreeNode = {
-      ...baseKTreeNode,
-      label: 'test',
-      isMemo: true,
-      point: {x: 5, y: 10},
-      rect: ks.rect,
-    };
-    memoList.push(testMemo);
 
     this.state = {
       treeNodes,
@@ -89,15 +79,8 @@ class DataManager extends React.Component<{}, State> {
     localStorage.setItem(keys.commonList, JSON.stringify(commonNodes));
   }
 
-  addMemo = (memo: KTreeNode) => {
-    const { memoList } = this.state;
-    memoList.push(memo);
+  changeMemo = (memoList: KTreeNode[]) => {
     this.setState({memoList});
-  }
-
-  deleteMemo = (memo: KTreeNode) => {
-    const { memoList } = this.state;
-    this.setState({memoList: memoList.filter(m => m.id !== memo.id)});
   }
 
   render () {
@@ -111,6 +94,7 @@ class DataManager extends React.Component<{}, State> {
         memoList={memoList}
         selectNode={this.selectNode}
         changeNode={this.changeNode}
+        changeMemo={this.changeMemo}
         addNode={this.addNode}
         deleteNode={this.deleteNode}
         addCommonList={this.addCommonList}

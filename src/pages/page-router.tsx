@@ -11,6 +11,7 @@ interface Props {
   commonNodes: Tree[];
   memoList: KTreeNode[];
   changeNode: (node: Tree) => void;
+  changeMemo: (memoList: KTreeNode[]) => void;
   addNode: (node: Tree) => void;
   deleteNode: (node: Tree) => void;
   selectNode: (node: Tree | null) => void;
@@ -31,7 +32,7 @@ class PageRouter extends React.Component<Props, State> {
   render () {
     const {
       treeNodes, selectedNodeList, commonNodes, memoList,
-      selectNode, changeNode, addNode, deleteNode, addCommonList, deleteCommonList,
+      selectNode, changeNode, changeMemo, addNode, deleteNode, addCommonList, deleteCommonList,
     } = this.props;
     return (
       <BrowserRouter>
@@ -64,6 +65,7 @@ class PageRouter extends React.Component<Props, State> {
                 commonNodes={commonNodes}
                 memoList={memoList}
                 changeNode={changeNode}
+                changeMemo={changeMemo}
                 addNode={addNode}
               />
             )}

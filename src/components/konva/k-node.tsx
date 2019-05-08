@@ -17,8 +17,10 @@ import check from '../../resource/svg-icon/check';
 import Icon, { IconProps } from './icon';
 import more from '../../resource/svg-icon/expand/more';
 import less from '../../resource/svg-icon/expand/less';
+import { NodeEditMode } from '../../data-types/node-edit-mode';
 
 export interface KNodeProps {
+  mode: NodeEditMode;
   node: KWithArrow;
   labelFocus: boolean;
   ks: KSize;
@@ -72,16 +74,20 @@ class KNode extends React.Component<KNodeProps> {
   }
 
   handleDragEnd = (e: any) => {
-    const {node, ks, dragEnd, dragAnimationEnd} = this.props;
+    const {mode, node, ks, dragEnd, dragAnimationEnd} = this.props;
     const dragPoint = e.target.position();
-    dragEnd(node, {
-      x: node.point.x * ks.unit + dragPoint.x,
-      y: node.point.y * ks.unit + dragPoint.y
-    });
-    e.target.to({
-      x: 0, y: 0, easing: Konva.Easings.EaseInOut,
-      onFinish: dragAnimationEnd,
-    });
+    const x = node.point.x * ks.unit + dragPoint.x;
+    const y = node.point.y * ks.unit + dragPoint.y;
+    dragEnd(node, { x, y });
+    if (mode === 'dc' && x < 0) {
+      e.target.destroy();
+      process.nextTick(() => dragAnimationEnd());
+    } else {
+      e.target.to({
+        x: 0, y: 0, easing: Konva.Easings.EaseInOut,
+        onFinish: dragAnimationEnd,
+      });
+    }
   }
 
   handleDeleteFocus = (e: any) => {

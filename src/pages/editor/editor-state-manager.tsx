@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles, Grid, Fab, Snackbar, IconButton,
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Modal, Toolbar, AppBar, Paper, Tab, Tabs,
+  Theme, createStyles, WithStyles, withStyles, Snackbar, IconButton,
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Toolbar, AppBar, Tab, Tabs,
 } from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
 import Download from '@material-ui/icons/SaveAlt';
@@ -41,6 +41,7 @@ interface Props extends WithStyles<typeof styles>, RouteComponentProps {
   selectedNodeList: Tree[];
   commonNodes: Tree[];
   changeNode: (node: Tree) => void;
+  changeMemo: (memoList: KTreeNode[]) => void;
   addNode: (node: Tree) => void;
 }
 
@@ -128,7 +129,6 @@ class EditorStateManager extends React.Component<Props, State> {
   }
 
   addMemo = (memo: KTreeNode) => {
-    console.log('addMemo');
     const { memoList } = this.state;
     memoList.push(memo);
     this.setState({memoList});
@@ -136,7 +136,9 @@ class EditorStateManager extends React.Component<Props, State> {
 
   editMemo = (memo: KTreeNode) => {
     const { memoList } = this.state;
-    this.setState({memoList: memoList.map(m => m.id === memo.id ? memo : m)});
+    this.setState({
+      memoList: memoList.map(m => m.id === memo.id ? memo : m)
+    });
   }
 
   deleteMemo = (memo: KTreeNode) => {
@@ -145,8 +147,8 @@ class EditorStateManager extends React.Component<Props, State> {
   }
 
   save = () => {
-    const { changeNode } = this.props;
-    const {node} = this.state;
+    const { changeNode, changeMemo } = this.props;
+    const {node, memoList} = this.state;
     const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
     const isAllCaseHasItem = TreeUtil._isAllCaseHasItem(node);
     const cannotSaveReason: CannotSaveReason = !isAllSwitchHasCase ? 'switch' :
@@ -155,13 +157,15 @@ class EditorStateManager extends React.Component<Props, State> {
     if (cannotSaveReason === null) {
       this.setState({saved: true});
       changeNode(node);
+      changeMemo(memoList);
     }
   }
 
   saveAndGo = () => {
-    const { changeNode, history } = this.props;
-    const { node, nextLink } = this.state;
+    const { changeNode, changeMemo, history } = this.props;
+    const { node, memoList, nextLink } = this.state;
     changeNode(node);
+    changeMemo(memoList);
     if (nextLink !== null) {
       history.push(nextLink)
     } else {
