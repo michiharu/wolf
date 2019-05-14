@@ -3,10 +3,10 @@ import {
   Theme, createStyles, WithStyles, withStyles, Grid, Paper, Typography, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Button, FormGroup, Switch,
 } from '@material-ui/core';
 import Slider from '@material-ui/lab/Slider';
-import KSize from '../../../data-types/k-size';
-import { FlowType, flowType } from './node-editor';
-import { ks as defaultKS } from '../../../settings/layout';
-import ReadingSetting from '../../../data-types/reading-settings';
+import KSize from '../data-types/k-size';
+import { FlowType, flowType } from '../pages/manual/edit/node-editor/node-editor';
+import { ks as defaultKS } from '../settings/layout';
+import ReadingSetting from '../data-types/reading-settings';
 
 
 const styles = (theme: Theme) => createStyles({

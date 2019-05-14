@@ -4,12 +4,12 @@ import {
   Theme, createStyles, WithStyles, withStyles,
 } from '@material-ui/core';
 
-import { TreeNode, Tree } from '../../../data-types/tree-node';
-import { tes as defaultTES } from '../../../settings/layout';
+import { TreeNode, Tree } from '../../../../data-types/tree-node';
+import { tes as defaultTES } from '../../../../settings/layout';
 
-import TreeUtil from '../../../func/tree';
-import keys from '../../../settings/storage-keys';
-import TextEditSettings from '../../../data-types/text-edit-settings';
+import TreeUtil from '../../../../func/tree';
+import keys from '../../../../settings/storage-keys';
+import TextEditSettings from '../../../../data-types/text-edit-settings';
 import TextLineWithIcon, { TextLineWithIconProps } from './text-line-with-icon';
 
 const styles = (theme: Theme) => createStyles({
@@ -42,10 +42,9 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export interface TextEditorProps {
-  commonNodes: Tree[];
+  commons: Tree[];
   node: TreeNode;
   edit: (node: TreeNode) => void;
-  addNode: (node: TreeNode) => void;
 }
 
 interface Props extends TextEditorProps, WithStyles<typeof styles> {}
@@ -82,12 +81,12 @@ class TextEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const { node, commonNodes, classes } = this.props;
+    const { node, commons, classes } = this.props;
 
     const textLineWithIconProps: TextLineWithIconProps = {
       itemNumber: node.label,
       node,
-      commonNodes,
+      commons,
       changeNode: this.changeNode,
       deleteSelf: this.deleteSelf,
     };

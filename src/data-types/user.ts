@@ -1,6 +1,10 @@
+import Authority from "./authority";
+
 export default interface User {
   id: string;
-  password?: string;
   lastName: string;
   firstName: string;
+  userManagement: Authority;
+  groupManagement: Authority;
+  isOperationManager: boolean;
 }

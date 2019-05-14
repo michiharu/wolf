@@ -9,40 +9,37 @@ import AddNext from '@material-ui/icons/Forward';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
-import { TreeNode, Type, KTreeNode, DragRow, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode, KWithArrow } from '../../../data-types/tree-node';
-import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth, Task, Switch, Case, Delete, More, Less } from '../../../settings/layout';
-import { rs as defaultRS } from '../../../settings/reading';
+import { TreeNode, Type, KTreeNode, DragRow, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode, KWithArrow } from '../../../../data-types/tree-node';
+import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth, Task, Switch, Case, Delete, More, Less } from '../../../../settings/layout';
+import { rs as defaultRS } from '../../../../settings/reading';
 
-import TreeUtil from '../../../func/tree';
-import TreeNodeUtil from '../../../func/tree-node';
-import KTreeUtil from '../../../func/k-tree';
-import KSize from '../../../data-types/k-size';
-import keys from '../../../settings/storage-keys';
-import ViewSettings, { ViewSettingProps } from './view-settings';
-import { phrase } from '../../../settings/phrase';
-import ReadingSetting from '../../../data-types/reading-settings';
-import KNode from '../../../components/konva/k-node';
-import Util from '../../../func/util';
-import KArrowUtil from '../../../func/k-arrow';
-import { theme } from '../../..';
-import { NodeEditMode } from '../../../data-types/node-edit-mode';
+import TreeUtil from '../../../../func/tree';
+import TreeNodeUtil from '../../../../func/tree-node';
+import KTreeUtil from '../../../../func/k-tree';
+import KSize from '../../../../data-types/k-size';
+import keys from '../../../../settings/storage-keys';
+import ViewSettings, { ViewSettingProps } from '../../../../components/view-settings';
+import { phrase } from '../../../../settings/phrase';
+import ReadingSetting from '../../../../data-types/reading-settings';
+import KNode from '../../../../components/konva/k-node';
+import Util from '../../../../func/util';
+import KArrowUtil from '../../../../func/k-arrow';
+import { theme } from '../../../..';
+import { NodeEditMode } from '../../../../data-types/node-edit-mode';
 import { grey } from '@material-ui/core/colors';
-import KMemo from '../../../components/konva/k-memo';
-import KShadow from '../../../components/konva/k-shadow';
+import KMemo from '../../../../components/konva/k-memo';
+import KShadow from '../../../../components/konva/k-shadow';
 
 
 const styles = (theme: Theme) => createStyles({
   root: {
-    width: '100%',
-  },
-  toolbar: theme.mixins.toolbar,
-  main: {
     overflow: 'scroll',
-    height: `calc(100vh - ${toolbarHeight}px)`,
+    height: `calc(100vh - ${toolbarHeight * 2 + theme.spacing.unit}px)`,
     [theme.breakpoints.down('xs')]: {
-      height: `calc(100vh - ${toolbarMinHeight}px)`,
+      height: `calc(100vh - ${toolbarMinHeight * 2 + theme.spacing.unit}px)`,
     },
   },
+  toolbar: theme.mixins.toolbar,
   settingsButton: {
     position: 'fixed',
     right: theme.spacing.unit,
@@ -87,7 +84,7 @@ const styles = (theme: Theme) => createStyles({
 
 export interface NodeEditorProps {
   mode: NodeEditMode;
-  commonNodes: Tree[];
+  commons: Tree[];
   node: TreeNode;
   memoList: KTreeNode[];
   showViewSettings: boolean;
@@ -95,7 +92,6 @@ export interface NodeEditorProps {
   addMemo: (memo: KTreeNode) => void;
   editMemo: (memo: KTreeNode) => void;
   deleteMemo: (memo: KTreeNode) => void;
-  addNode: (node: Tree) => void;
   closeViewSettings: () => void;
 }
 
@@ -122,7 +118,7 @@ export const marginBottom = 40;
 
 class NodeEditor extends React.Component<Props, State> {
 
-  mainRef = React.createRef<HTMLMainElement>();
+  mainRef = React.createRef<HTMLDivElement>();
   stageRef = React.createRef<any>();
   convergentRef = React.createRef<any>();
   convergentShadowRef = React.createRef<any>();
@@ -545,8 +541,8 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   addFromCommon = (e: any) => {
-    const { node, edit, commonNodes } = this.props;
-    const common = commonNodes.find(c => c.id === e.target.value);
+    const { node, edit, commons } = this.props;
+    const common = commons.find(c => c.id === e.target.value);
     if (common === undefined) { return; }
     
     const setIdCommon = TreeUtil._setId(common);
@@ -556,9 +552,9 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   registAsCommon = (target: TreeNode) => {
-    const { addNode} = this.props;
-    const newNode = TreeUtil._setId(target);
-    addNode(newNode);
+    // const { addNode} = this.props;
+    // const newNode = TreeUtil._setId(target);
+    // addNode(newNode);
   }
 
   deleteSelf = () => {
@@ -882,21 +878,21 @@ class NodeEditor extends React.Component<Props, State> {
       </Group>);
 
     return (
-      <div className={classes.root}>
-        <main className={classes.main} ref={this.mainRef}>
+      <div className={classes.root} ref={this.mainRef}>
           <div style={largeContainerStyle}>
             <Stage ref={this.stageRef} onClick={this.deleteFocus}>
               <Layer>
-                {mode !== 'd' && (
+                {mode !== 'd' && stage !== null && (
                 <Group ref={this.convergentShadowRef} x={mode === 'dc' ? stage.width() / 2 : 0}>
                   {/* shadow */}
                   {flatNodes
                   .filter(n => dragParent !== null && !n.isDragging)
                   .map(n => <KShadow key={n.id} node={n} labelFocus={labelFocus} {...nodeActionProps}/>)}
                 </Group>)}
+
                 {mode !== 'c' && dragParent !== null && MemoGroup}
                 
-                {mode !== 'd' && (
+                {mode !== 'd' && stage !== null && (
                 <Group ref={this.convergentRef} x={mode === 'dc' ? stage.width() / 2 : 0}>
                   {/* dragging */}
                   {flatNodes
@@ -905,7 +901,7 @@ class NodeEditor extends React.Component<Props, State> {
                   {/* <DragMapForTree node={node} rows={rows} ks={ks} /> */}
                   {/* <DropMap node={node} flatNodes={flatNodes} ks={ks}/> */}
                 </Group>)}
-                {mode === 'dc' && (
+                {mode === 'dc' && stage !== null && (
                 <Rect
                   x={stage.width() / 2}
                   y={0}
@@ -945,8 +941,6 @@ class NodeEditor extends React.Component<Props, State> {
           >
             <ViewSettings {...viewSettingProps}/>
           </Modal>
-
-        </main>
       </div>
     );
   }

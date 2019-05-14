@@ -1,80 +1,131 @@
 import * as React from 'react';
-import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
+import {useState} from 'react';
+import { Route, Switch, Redirect, Link } from 'react-router-dom';
 import { Tree, KTreeNode } from '../data-types/tree-node';
-import link from '../settings/path-list';
-import EditorStateManager from './editor/editor-state-manager';
+import links from '../settings/links';
+import EditorStateManager from './manual/edit/editor-state-manager';
 import Dashboard from './dashboard/dashboard';
+import { Theme, createStyles, WithStyles, AppBar, Toolbar, Button, Tabs, Tab, InputBase, withStyles } from '@material-ui/core';
+import { Search } from '@material-ui/icons';
+import { fade } from '@material-ui/core/styles/colorManipulator';
+import Manual from './manual/manual';
 
-interface Props {
-  treeNodes: Tree[];
-  selectedNodeList: Tree[];
-  commonNodes: Tree[];
-  memoList: KTreeNode[];
-  changeNode: (node: Tree) => void;
+const styles = (theme: Theme) => createStyles({
+  search: {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: fade(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: fade(theme.palette.common.white, 0.25),
+    },
+    marginRight: theme.spacing.unit * 2,
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing.unit * 3,
+      width: 'auto',
+    },
+  },
+  searchIcon: {
+    width: theme.spacing.unit * 9,
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputRoot: {
+    color: 'inherit',
+    width: '100%',
+  },
+  inputInput: {
+    paddingTop: theme.spacing.unit,
+    paddingRight: theme.spacing.unit,
+    paddingBottom: theme.spacing.unit,
+    paddingLeft: theme.spacing.unit * 10,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      width: 200,
+    },
+  },
+  toolbar: theme.mixins.toolbar,
+  main: {},
+});
+
+export interface PageRouterProps {
+  manuals: Tree[];
+  commons: Tree[];
+  memos: KTreeNode[];
+  changeManuals: (node: Tree[]) => void;
   changeMemo: (memoList: KTreeNode[]) => void;
-  addNode: (node: Tree) => void;
-  deleteNode: (node: Tree) => void;
-  selectNode: (node: Tree | null) => void;
   addCommonList: (node: Tree) => void;
   deleteCommonList: (node: Tree) => void;
 }
 
-interface State {
+interface Props extends WithStyles<typeof styles>, PageRouterProps {}
 
-}
+const PageRouter: React.FC<Props> = (props) => {
+  const {
+    manuals, commons, memos,
+    changeManuals, changeMemo, addCommonList, deleteCommonList,
+    classes,
+  } = props;
 
-class PageRouter extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {node: null};
-  }
+  const [searchText, setSearchText] = useState('');
+  const LogoLink = (llp: any) => <Link to={links.dashboard} {...llp}/>;
+  return (
+    <div>
+      <AppBar>
+        <Toolbar>
+          <Button component={LogoLink} color="inherit" size="large">Flow Like</Button>
 
-  render () {
-    const {
-      treeNodes, selectedNodeList, commonNodes, memoList,
-      selectNode, changeNode, changeMemo, addNode, deleteNode, addCommonList, deleteCommonList,
-    } = this.props;
-    return (
-      <BrowserRouter>
+          <div className={classes.search}>
+            <div className={classes.searchIcon}>
+              <Search />
+            </div>
+            <InputBase
+              placeholder="Search…"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput,
+              }}
+              onChange={e => setSearchText(e.target.value)}
+            />
+          </div>
+          <Button color="inherit">フォロー</Button>
+          <Button color="inherit">お気に入り</Button>
+          <Button color="inherit">Item Three</Button>
+          <div style={{flexGrow: 1}} />
+        </Toolbar>
+      </AppBar>
+      <main className={classes.main}>
+        <div className={classes.toolbar}/>
         <Switch>
           <Route
             exact
-            path={link.dashboard}
+            path={links.dashboard}
             render={props => (
               <Dashboard
                 {...props}
-                treeNodes={treeNodes}
-                selectNode={selectNode}
-                commonNodes={commonNodes}
-                addNode={addNode}
-                deleteNode={deleteNode}
+                treeNodes={manuals}
+                commonNodes={commons}
+                changeManuals={changeManuals}
                 addCommonList={addCommonList}
                 deleteCommonList={deleteCommonList}
               />
             )}
           />
-          {selectedNodeList.length === 0 && <Redirect to={link.dashboard}/>}
           <Route
-            exact
-            path={link.edit}
-            render={props => (
-              <EditorStateManager
-                {...props}
-                treeNodes={treeNodes}
-                selectedNodeList={selectedNodeList}
-                commonNodes={commonNodes}
-                memoList={memoList}
-                changeNode={changeNode}
-                changeMemo={changeMemo}
-                addNode={addNode}
-              />
-            )}
+            path={'/manual/:id'}
+            render={routerProps => <Manual {...routerProps} {...props}/>}
           />
-          <Redirect to={link.dashboard}/>
+          <Redirect to={links.dashboard}/>
         </Switch>
-      </BrowserRouter>
-    );
-  }
-} 
+      </main>
+    </div>
+  );
+}
 
-export default PageRouter;
+export default withStyles(styles)(PageRouter);

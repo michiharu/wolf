@@ -6,7 +6,7 @@ import { task, switchSvg, flag } from '../../resource/svg-icon';
 
 import { KWithArrow, KTreeNode, Point } from '../../data-types/tree-node';
 
-import { FlowType } from '../../pages/editor/node-editor/node-editor';
+import { FlowType } from '../../pages/manual/edit/node-editor/node-editor';
 import { theme } from '../..';
 import Util from '../../func/util';
 import { phrase } from '../../settings/phrase';

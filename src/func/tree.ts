@@ -41,12 +41,12 @@ export default class TreeUtil {
     return {...node, children};
   }
 
-  static _findArray = <T extends Tree>(nodeList: T[], target: T): T | undefined => {
+  static _findArray = <T extends Tree>(nodeList: T[], targetId: string): T | undefined => {
     if (nodeList.length === 0) { return undefined; }
-    const findResult = nodeList.find(n => n.id === target.id);
+    const findResult = nodeList.find(n => n.id === targetId);
     if (findResult !== undefined) { return findResult; }
     return nodeList
-    .map(n => TreeUtil._findArray(n.children as T[], target))
+    .map(n => TreeUtil._findArray(n.children as T[], targetId))
     .reduce((a, b) => a || b || undefined);
   }
 

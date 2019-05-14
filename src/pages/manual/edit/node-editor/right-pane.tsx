@@ -12,14 +12,14 @@ import {
 import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
   WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Delete,
-} from '../../../settings/layout';
-import {TreeNode, Type, NodeWithSimilarity, Tree, KWithArrow, baseKWithArrow } from '../../../data-types/tree-node';
+} from '../../../../settings/layout';
+import {TreeNode, Type, NodeWithSimilarity, Tree, KWithArrow, baseKWithArrow } from '../../../../data-types/tree-node';
 import { ButtonProps } from '@material-ui/core/Button';
-import SimilarityTable from '../../../components/similarity-table/similarity-table';
-import SimilarityUtil from '../../../func/similarity';
-import TreeUtil from '../../../func/tree';
-import { phrase } from '../../../settings/phrase';
-import { ScrollableTextField } from '../../../components/custom-mui/scrollable-textfield';
+import SimilarityTable from '../../../../components/similarity-table/similarity-table';
+import SimilarityUtil from '../../../../func/similarity';
+import TreeUtil from '../../../../func/tree';
+import { phrase } from '../../../../settings/phrase';
+import { ScrollableTextField } from '../../../../components/custom-mui/scrollable-textfield';
 
 const styles = (theme: Theme) => createStyles({
   root: {

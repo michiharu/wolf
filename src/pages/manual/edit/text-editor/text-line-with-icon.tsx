@@ -11,12 +11,12 @@ import {
 import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
   WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Close,
-} from '../../../settings/layout';
-import { TreeNode, Type, NodeWithSimilarity, Tree, baseTreeNode } from '../../../data-types/tree-node';
+} from '../../../../settings/layout';
+import { TreeNode, Type, NodeWithSimilarity, Tree, baseTreeNode } from '../../../../data-types/tree-node';
 
-import SimilarityUtil from '../../../func/similarity';
-import TreeUtil from '../../../func/tree';
-import { phrase } from '../../../settings/phrase';
+import SimilarityUtil from '../../../../func/similarity';
+import TreeUtil from '../../../../func/tree';
+import { phrase } from '../../../../settings/phrase';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -70,7 +70,7 @@ const styles = (theme: Theme) => createStyles({
 export interface TextLineWithIconProps {
   itemNumber: string;
   node: TreeNode;
-  commonNodes: Tree[];
+  commons: Tree[];
   changeNode: (node: TreeNode) => void;
   // addDetails: () => void;
   // addFromCommon: (e: any) => void;
@@ -85,7 +85,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
   var fileName: string;
 
   const {
-    itemNumber, node, commonNodes, deleteSelf,
+    itemNumber, node, commons, deleteSelf,
     changeNode, classes
   } = props;
 
@@ -153,7 +153,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
   }
   const [filteredSimilarityList, setFilteredSimilarityList] = useState<NodeWithSimilarity[] | null>(null);
   const handleAddCommon = () => {
-    const similarityList = SimilarityUtil.get(node!, commonNodes);
+    const similarityList = SimilarityUtil.get(node!, commons);
     const filteredList = similarityList
     .filter(s => s._label === 100 && s._input === 100 && s._output === 100 && s._childrenLength === 100);
     console.log(similarityList);
