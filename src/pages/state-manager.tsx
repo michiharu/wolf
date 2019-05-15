@@ -3,7 +3,7 @@ import { Tree, KTreeNode } from '../data-types/tree-node';
 import TreeUtil from '../func/tree';
 import keys from '../settings/storage-keys';
 import User from '../data-types/user';
-import LoginRouter, { LoginRouterProps } from './login-router';
+import LoginRouter from './login-router';
 
 export interface RootState {
   user: User | null;
@@ -31,20 +31,6 @@ class StateManager extends React.Component<{}, RootState> {
 
   changeManuals = (manuals: Tree[]) => this.setState({manuals});
 
-
-  // addNode = (node: Tree) => {
-  //   const { manuals: treeNodes } = this.state;
-  //   treeNodes!.unshift(node);
-  //   this.setState({manuals: treeNodes}); 
-  // }
-
-  // deleteNode = (target: Tree) => {
-  //   const { manuals: treeNodes, commons: commonNodes } = this.state;
-  //   const newTreeNodes = treeNodes.filter(n => n.id !== target.id);
-  //   this.setState({manuals: newTreeNodes}); 
-  //   if (commonNodes.indexOf(target) !== -1) { this.deleteCommonList(target); }
-  // }
-
   addCommonList = (node: Tree) => {
     const { commons: commonNodes } = this.state;
     commonNodes.push(node);
@@ -64,14 +50,7 @@ class StateManager extends React.Component<{}, RootState> {
   }
 
   render () {
-    const { user, manuals, commons, memos } = this.state;
-    const loginRouterProps: LoginRouterProps = {
-      user, login: this.login,
-      manuals, changeManuals: this.changeManuals, 
-      commons, addCommonList: this.addCommonList, deleteCommonList: this.deleteCommonList,
-      memos, changeMemo: this.changeMemo
-    }
-    return <LoginRouter {...loginRouterProps}/>;
+    return <LoginRouter/>;
   }
 } 
 

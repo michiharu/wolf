@@ -1,17 +1,15 @@
 import * as React from 'react';
 import { useState } from 'react';
+import { connect } from 'react-redux';
+import { AppState } from '../../redux/store';
 import {
   Theme, createStyles, WithStyles, withStyles, Paper, TextField, FormControlLabel, Switch,
-  List, ListItem, ListItemIcon, ListItemText, ListSubheader,
+  List, ListItem, ListSubheader,
 } from '@material-ui/core';
 
-
-import { Tree } from '../../data-types/tree-node';
-
-import { Task } from '../../settings/layout';
 import TreeUtil from '../../func/tree';
-import { RouteComponentProps } from 'react-router-dom';
 import ExpansionTree from '../../components/expansion-tree/expansion-tree';
+import { ManualState } from '../../redux/states/manualState';
 
 const styles = (theme: Theme) => createStyles({
   switch: {
@@ -19,22 +17,17 @@ const styles = (theme: Theme) => createStyles({
   }
 });
 
-export interface ManualListProps extends RouteComponentProps {
-  treeNodes: Tree[];
-}
-
-interface Props extends ManualListProps, WithStyles<typeof styles> {}
+interface Props extends ManualState, WithStyles<typeof styles> {}
 
 const ManualList: React.FC<Props> = (props: Props) => {
 
-  const { treeNodes, classes } = props;
+  const { manuals, classes } = props;
   const [searchText, setSearchText] = useState('');
   const [open, setOpen] = useState(false);
   const changeLabel = (e: any) => setSearchText(e.target.value);
   const handleOpen = (e: any) => setOpen(e.target.checked);
-  const select = (node: Tree) => { props.history.push(`/manual/${node.id}`); }
   const words = TreeUtil.splitSearchWords(searchText);
-  const filteredNode = TreeUtil._searchAndFilter(words, treeNodes);
+  const filtered = TreeUtil._searchAndFilter(words, manuals);
   return (
     <Paper>
       <List dense subheader={<ListSubheader>マニュアル一覧</ListSubheader>}>
@@ -57,11 +50,14 @@ const ManualList: React.FC<Props> = (props: Props) => {
             label="すべてを展開"
           />
         </ListItem>
-        {filteredNode.map(n => 
-        <ExpansionTree key={n.id} node={n} open={open} depth={0} select={select}/>)}
+        {filtered.map(n => 
+        <ExpansionTree key={n.id} node={n} open={open} depth={0}/>)}
       </List>
     </Paper>
   );
 };
+function mapStateToProps(appState: AppState) {
+  return appState.manuals;
+}
 
-export default withStyles(styles)(ManualList);
+export default connect(mapStateToProps)(withStyles(styles)(ManualList));

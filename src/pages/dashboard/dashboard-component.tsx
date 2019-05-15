@@ -4,7 +4,7 @@ import { Grid, Theme, createStyles, WithStyles, withStyles
 } from '@material-ui/core';
 import { Tree } from '../../data-types/tree-node';
 
-import ManualList from './manual-list';
+import ManualList from './manual-list-component';
 
 const styles = (theme: Theme) => createStyles({
 
@@ -14,26 +14,16 @@ const styles = (theme: Theme) => createStyles({
 
 });
 
-export interface DashboardProps {
-  treeNodes: Tree[];
-  commonNodes: Tree[];
-  changeManuals: (node: Tree[]) => void;
-  addCommonList: (node: Tree) => void;
-  deleteCommonList: (node: Tree) => void;
-}
-
-interface Props extends DashboardProps, RouteComponentProps, WithStyles<typeof styles> {}
+interface Props extends WithStyles<typeof styles> {}
 
 const Dashboard: React.FC<Props> = (props: Props) => {
-  const {
-    classes, ...otherProps
-  } = props;
+  const { classes } = props;
   
   return (
     <Grid container>
       <Grid item xs={12} md={6}>
         <div className={classes.container}>
-          <ManualList {...otherProps}/>
+          <ManualList/>
         </div>
       </Grid>
       <Grid item xs={12} md={6}>

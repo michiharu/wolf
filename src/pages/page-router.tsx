@@ -4,7 +4,7 @@ import { Route, Switch, Redirect, Link } from 'react-router-dom';
 import { Tree, KTreeNode } from '../data-types/tree-node';
 import links from '../settings/links';
 import EditorStateManager from './manual/edit/editor-state-manager';
-import Dashboard from './dashboard/dashboard';
+import Dashboard from './dashboard/dashboard-component';
 import { Theme, createStyles, WithStyles, AppBar, Toolbar, Button, Tabs, Tab, InputBase, withStyles } from '@material-ui/core';
 import { Search } from '@material-ui/icons';
 import { fade } from '@material-ui/core/styles/colorManipulator';
@@ -54,24 +54,10 @@ const styles = (theme: Theme) => createStyles({
   main: {},
 });
 
-export interface PageRouterProps {
-  manuals: Tree[];
-  commons: Tree[];
-  memos: KTreeNode[];
-  changeManuals: (node: Tree[]) => void;
-  changeMemo: (memoList: KTreeNode[]) => void;
-  addCommonList: (node: Tree) => void;
-  deleteCommonList: (node: Tree) => void;
-}
-
-interface Props extends WithStyles<typeof styles>, PageRouterProps {}
+interface Props extends WithStyles<typeof styles> {}
 
 const PageRouter: React.FC<Props> = (props) => {
-  const {
-    manuals, commons, memos,
-    changeManuals, changeMemo, addCommonList, deleteCommonList,
-    classes,
-  } = props;
+  const { classes } = props;
 
   const [searchText, setSearchText] = useState('');
   const LogoLink = (llp: any) => <Link to={links.dashboard} {...llp}/>;
@@ -103,23 +89,11 @@ const PageRouter: React.FC<Props> = (props) => {
       <main className={classes.main}>
         <div className={classes.toolbar}/>
         <Switch>
-          <Route
-            exact
-            path={links.dashboard}
-            render={props => (
-              <Dashboard
-                {...props}
-                treeNodes={manuals}
-                commonNodes={commons}
-                changeManuals={changeManuals}
-                addCommonList={addCommonList}
-                deleteCommonList={deleteCommonList}
-              />
-            )}
-          />
+          <Route exact path={links.dashboard} render={() => <Dashboard/>}/>
           <Route
             path={'/manual/:id'}
-            render={routerProps => <Manual {...routerProps} {...props}/>}
+            render={routerProps => <p>まにゅある</p>// <Manual {...routerProps} {...props}/>
+          }
           />
           <Redirect to={links.dashboard}/>
         </Switch>

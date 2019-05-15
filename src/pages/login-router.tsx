@@ -1,30 +1,29 @@
 import * as React from 'react';
+import { connect } from 'react-redux';
+import { AppState } from '../redux/store';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import User from '../data-types/user';
-import Login from './login/login';
 import { RootState } from './state-manager';
 import links from '../settings/links';
-import PageRouter, { PageRouterProps } from './page-router';
+import PageRouter from './page-router';
+import LoginContainer from './login/login-container';
+import { LoginState } from '../redux/states/loginState';
 
-export interface LoginRouterProps extends PageRouterProps {
-  user: User | null;
-  login: (rootState: RootState) => void;
-}
 
-const LoginRouter: React.SFC<LoginRouterProps> = (props) => (
+interface Props extends LoginState {}
+
+const LoginRouter: React.SFC<Props> = (props) => (
   <BrowserRouter>
     <Switch>
-      {props.user === null &&
-      <Route exact path={links.login} render={() => <Login login={props.login}/>}/>}
-      {props.user === null &&
-      <Redirect to={links.login}/>}
-      <Route
-        render={routerProps =>
-          <PageRouter {...routerProps} {...props}/>
-        }
-      />
+      {props.user === null && <Route exact path={links.login} render={() => <LoginContainer/>}/>}
+      {props.user === null && <Redirect to={links.login}/>}
+      <Route render={() => <PageRouter />}/>
     </Switch>
   </BrowserRouter>
 );
 
-export default LoginRouter;
+function mapStateToProps(appState: AppState) {
+  return appState.login;
+}
+
+export default connect(mapStateToProps)(LoginRouter);
