@@ -9,7 +9,7 @@ import AddNext from '@material-ui/icons/Forward';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
-import { TreeNode, Type, KTreeNode, DragRow, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode, KWithArrow } from '../../../../data-types/tree-node';
+import { TreeNode, Type, KTreeNode, DragRow, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode, KWithArrow } from '../../../../data-types/tree';
 import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth, Task, Switch, Case, Delete, More, Less } from '../../../../settings/layout';
 import { rs as defaultRS } from '../../../../settings/reading';
 
@@ -84,7 +84,6 @@ const styles = (theme: Theme) => createStyles({
 
 export interface NodeEditorProps {
   mode: NodeEditMode;
-  commons: Tree[];
   node: TreeNode;
   memoList: KTreeNode[];
   showViewSettings: boolean;
@@ -540,16 +539,16 @@ class NodeEditor extends React.Component<Props, State> {
     process.nextTick(() => {this.resize(); this.scrollToNew(addNextBrotherResult)});
   }
 
-  addFromCommon = (e: any) => {
-    const { node, edit, commons } = this.props;
-    const common = commons.find(c => c.id === e.target.value);
-    if (common === undefined) { return; }
+  // addFromCommon = (e: any) => {
+  //   const { node, edit, commons } = this.props;
+  //   const common = commons.find(c => c.id === e.target.value);
+  //   if (common === undefined) { return; }
     
-    const setIdCommon = TreeUtil._setId(common);
-    const focusNode = TreeNodeUtil._getFocusNode(node)!;
-    edit(TreeNodeUtil.addFromCommon(node, focusNode, setIdCommon, baseTreeNode));
-    process.nextTick(() => this.resize());
-  }
+  //   const setIdCommon = TreeUtil._setId(common);
+  //   const focusNode = TreeNodeUtil._getFocusNode(node)!;
+  //   edit(TreeNodeUtil.addFromCommon(node, focusNode, setIdCommon, baseTreeNode));
+  //   process.nextTick(() => this.resize());
+  // }
 
   registAsCommon = (target: TreeNode) => {
     // const { addNode} = this.props;

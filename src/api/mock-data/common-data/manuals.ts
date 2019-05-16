@@ -1,13 +1,20 @@
-import { Tree } from "../../../data-types/tree-node";
+import { Manual, baseTree } from "../../../data-types/tree";
 
 export const manual1 = {
+  ...baseTree,
   "id": "1",
   "type": "task",
   "label": "ケアマネ送付関連月初作業手順",
   "input": "",
   "output": "",
+  "ownerId": "オーナーID",
+  "collaboratorIds": ["collaboratorId1", "collaboratorId2", "collaboratorId3"],
+  "inOperation": false,
+  "reviewer": null,
+  "pullRequests": [],
   "children": [
     {
+      ...baseTree,
       "id": "2",
       "type": "task",
       "label": "実績作成",
@@ -15,6 +22,7 @@ export const manual1 = {
       "output": "",
       "children": [
         {
+          ...baseTree,
           "id": "3",
           "type": "task",
           "label": "キャロッツメインメニューのヘルパーをクリック",
@@ -23,6 +31,7 @@ export const manual1 = {
           "children": []
         },
         {
+          ...baseTree,
           "id": "4",
           "type": "task",
           "label": "提供済みのサービス実施記録書を用意する",
@@ -31,6 +40,7 @@ export const manual1 = {
           "children": []
         },
         {
+          ...baseTree,
           "id": "5",
           "type": "task",
           "label": "チェック用ファイルを印刷する",
@@ -39,6 +49,7 @@ export const manual1 = {
           "children": []
         },
         {
+          ...baseTree,
           "id": "6",
           "type": "task",
           "label": "利用者変更をクリック",
@@ -47,6 +58,7 @@ export const manual1 = {
           "children": []
         },
         {
+          ...baseTree,
           "id": "7",
           "type": "task",
           "label": "利用者を選択する",
@@ -55,6 +67,7 @@ export const manual1 = {
           "children": []
         },
         {
+          ...baseTree,
           "id": "8",
           "type": "switch",
           "label": "記録書の到着を確認する",
@@ -62,6 +75,7 @@ export const manual1 = {
           "output": "",
           "children": [
             {
+              ...baseTree,
               "id": "9",
               "type": "case",
               "label": "到着している",
@@ -69,6 +83,7 @@ export const manual1 = {
               "output": "",
               "children": [
                 {
+                  ...baseTree,
                   "id": "10",
                   "type": "switch",
                   "label": "記録書の時間変更の有無",
@@ -76,6 +91,7 @@ export const manual1 = {
                   "output": "",
                   "children": [
                     {
+                      ...baseTree,
                       "id": "11",
                       "type": "case",
                       "label": "時間変更がある",
@@ -83,6 +99,7 @@ export const manual1 = {
                       "output": "",
                       "children": [
                         {
+                          ...baseTree,
                           "id": "12",
                           "type": "switch",
                           "label": "責任者（山口）に連絡する",
@@ -90,6 +107,7 @@ export const manual1 = {
                           "output": "",
                           "children": [
                             {
+                              ...baseTree,
                               "id": "13",
                               "type": "case",
                               "label": "連絡がつく",
@@ -97,6 +115,7 @@ export const manual1 = {
                               "output": "",
                               "children": [
                                 {
+                                  ...baseTree,
                                   "id": "14",
                                   "type": "task",
                                   "label": "時間変更の内容からサービスコードを確認する",
@@ -107,6 +126,7 @@ export const manual1 = {
                               ]
                             },
                             {
+                              ...baseTree,
                               "id": "15",
                               "type": "case",
                               "label": "連絡がつかない",
@@ -114,6 +134,7 @@ export const manual1 = {
                               "output": "",
                               "children": [
                                 {
+                                  ...baseTree,
                                   "id": "16",
                                   "type": "task",
                                   "label": "利用者の担当ケアマネに相談する",
@@ -128,6 +149,7 @@ export const manual1 = {
                       ]
                     },
                     {
+                      ...baseTree,
                       "id": "17",
                       "type": "case",
                       "label": "時間変更がない",
@@ -135,6 +157,7 @@ export const manual1 = {
                       "output": "",
                       "children": [
                         {
+                          ...baseTree,
                           "id": "18",
                           "type": "task",
                           "label": "利用者変更をクリック",
@@ -143,6 +166,7 @@ export const manual1 = {
                           "children": []
                         },
                         {
+                          ...baseTree,
                           "id": "19",
                           "type": "task",
                           "label": "利用者を選択する",
@@ -151,6 +175,7 @@ export const manual1 = {
                           "children": []
                         },
                         {
+                          ...baseTree,
                           "id": "20",
                           "type": "task",
                           "label": "実績を入力する",
@@ -165,6 +190,7 @@ export const manual1 = {
               ]
             },
             {
+              ...baseTree,
               "id": "21",
               "type": "case",
               "label": "到着していない",
@@ -172,6 +198,7 @@ export const manual1 = {
               "output": "",
               "children": [
                 {
+                  ...baseTree,
                   "id": "22",
                   "type": "task",
                   "label": "新しい作業",
@@ -186,6 +213,7 @@ export const manual1 = {
       ]
     },
     {
+      ...baseTree,
       "id": "23",
       "type": "task",
       "label": "利用者状況報告書",
@@ -194,6 +222,7 @@ export const manual1 = {
       "children": []
     },
     {
+      ...baseTree,
       "id": "24",
       "type": "task",
       "label": "ケアマネ送付文",
@@ -202,4 +231,4 @@ export const manual1 = {
       "children": []
     }
   ]
-} as Tree;
+} as Manual;

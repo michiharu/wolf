@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
-import { Tree } from '../../data-types/tree-node';
+import { Tree } from '../../data-types/tree';
 import { Task, Switch, Case, Delete } from '../../settings/layout';
 
 export interface ExpansionTreeProps {
@@ -17,7 +17,7 @@ const paddingLeft = 16;
 const ExpansionTree: React.FC<Props> = props => {
 
   const { node, depth, open } = props;
-  const LinkEdit = (le: any) => <Link to={`/manual/${node.id}/edit`} {...le}/>;
+  const LinkEdit = (le: any) => <Link to={`/manual/${node.id}`} {...le}/>;
 
   return (
     <>

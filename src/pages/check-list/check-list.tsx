@@ -13,7 +13,7 @@ import Undo from '@material-ui/icons/Undo';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
-import { TreeNode, Type, CheckNode, CheckRecord } from '../../data-types/tree-node';
+import { TreeNode, Type, CheckNode, CheckRecord } from '../../data-types/tree';
 import { toolbarHeight, toolbarMinHeight, ks } from '../../settings/layout';
 
 import ToolContainer from '../../components/tool-container/tool-container';

@@ -3,7 +3,7 @@ import { lightBlue, amber, yellow } from '@material-ui/core/colors';
 import Konva from 'konva';
 import { Rect, Group, Text } from 'react-konva';
 
-import { KTreeNode } from '../../data-types/tree-node';
+import { KTreeNode } from '../../data-types/tree';
 
 import Util from '../../func/util';
 import { phrase } from '../../settings/phrase';

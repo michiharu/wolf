@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
 import { NodeGetResponse } from '../../data-types/api';
-import { Tree } from '../../data-types/tree-node';
+import { Tree } from '../../data-types/tree';
 
 export const nodeList: Tree[] = [];
 

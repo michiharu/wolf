@@ -1,4 +1,4 @@
-import { Size } from "./tree-node";
+import { Size } from "./tree";
 
 export default interface KSize {
   unit: number,

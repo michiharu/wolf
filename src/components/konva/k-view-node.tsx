@@ -4,7 +4,7 @@ import Konva from 'konva';
 import { Rect, Group, Text, Arrow } from 'react-konva';
 import { task, switchSvg, flag } from '../../resource/svg-icon';
 
-import { KWithArrow, KTreeNode, Point } from '../../data-types/tree-node';
+import { KWithArrow, KTreeNode, Point } from '../../data-types/tree';
 
 import { FlowType } from '../../pages/manual/edit/node-editor/node-editor';
 import { theme } from '../..';

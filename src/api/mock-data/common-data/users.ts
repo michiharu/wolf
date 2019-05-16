@@ -7,6 +7,7 @@ export const user1: User = {
   userManagement: {canCreate: true, canEdit: true, canDelete: true},
   groupManagement: {canCreate: true, canEdit: true, canDelete: true},
   isOperationManager: true,
+  canPullRequest: true,
 };
 
 export const user2: User = {
@@ -16,6 +17,7 @@ export const user2: User = {
   userManagement: {canCreate: true, canEdit: true, canDelete: false},
   groupManagement: {canCreate: true, canEdit: true, canDelete: true},
   isOperationManager: true,
+  canPullRequest: true,
 };
 
 export const user3: User = {
@@ -25,6 +27,7 @@ export const user3: User = {
   userManagement: {canCreate: true, canEdit: true, canDelete: true},
   groupManagement: {canCreate: true, canEdit: true, canDelete: false},
   isOperationManager: true,
+  canPullRequest: true,
 };
 
 export const user4: User = {
@@ -34,4 +37,5 @@ export const user4: User = {
   userManagement: {canCreate: false, canEdit: false, canDelete: false},
   groupManagement: {canCreate: false, canEdit: false, canDelete: false},
   isOperationManager: true,
+  canPullRequest: true,
 };

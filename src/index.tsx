@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import Store from './redux/store';
 import { MuiThemeProvider, CssBaseline, createMuiTheme } from '@material-ui/core';
 import { pink, blue } from '@material-ui/core/colors';
-import StateManager from './pages/state-manager';
+import LoginRouter from './pages/login-router';
 
 export const theme = createMuiTheme({
   palette: {
@@ -20,7 +20,7 @@ const Providers: React.SFC<{}> = () => (
   <Provider store={Store}>
     <MuiThemeProvider theme={theme}>
       <CssBaseline/>
-      <StateManager/>
+      <LoginRouter/>
     </MuiThemeProvider>
   </Provider>
   

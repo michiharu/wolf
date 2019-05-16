@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TreeNode } from '../../data-types/tree-node';
+import { TreeNode } from '../../data-types/tree';
 import CheckList, { CheckListProps } from './check-list';
 
 interface Props {

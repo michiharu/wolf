@@ -1,9 +1,9 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 import { manualActions } from '../actions/manualAction';
-import { Tree } from '../../data-types/tree-node';
+import { Manual } from '../../data-types/tree';
 
 export interface ManualState {
-  manuals: Tree[];
+  manuals: Manual[];
 }
 
 const initialState: ManualState = {

@@ -1,4 +1,4 @@
-import {TreeNode, TreeWithoutId, Tree, Type } from "../data-types/tree-node";
+import {Tree, Type } from "../data-types/tree";
 
 export default class TreeUtil {
 
@@ -79,29 +79,10 @@ export default class TreeUtil {
 
   static splitSearchWords = (text: string) => text.split(/\s|　/).map(s => s.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&'));
 
-  static _removeId = (node: TreeNode): TreeWithoutId => {
-    const children = node.children.map(c => TreeUtil._removeId(c));
-    return {
-      type: node.type,
-      label: node.label,
-      input: node.input,
-      output: node.output,
-      preConditions: node.preConditions,
-      postConditions: node.postConditions,
-      workerInCharge: node.workerInCharge,
-      remarks: node.remarks,
-      necessaryTools: node.necessaryTools,
-      exceptions: node.exceptions,
-      imageName: node.imageName,
-      imageBlob: node.imageBlob,
-      children
-    };
-  }
-
-  static _setId = (node: TreeWithoutId): Tree => {
+  static _setId = (node: Tree): Tree => {
     const id = 'rand:' + String(Math.random()).slice(2);
     const children = node.children.map(c => TreeUtil._setId(c));
-    return {...node, id, children, isMemo: false};
+    return {...node, id, children};
   }
 
   static getNewNode = <T extends Tree>(parentType: Type, base: T): T => ({

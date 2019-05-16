@@ -1,5 +1,5 @@
-import { RootState } from "../pages/state-manager";
 import User from "../data-types/user";
+import { Tree, KTreeNode, Manual } from "../data-types/tree";
 
 /* Login */
 export const loginURL = '/api/v1/login';
@@ -8,7 +8,12 @@ export interface LoginPostRequest {
   id: string;
   password: string;
 }
-export type LoginPostResponse = RootState;
+export interface LoginPostResponse {
+  user: User | null;
+  manuals: Manual[];
+  commons: Tree[];
+  memos: KTreeNode[];
+}
 // DELETE -> ステータスコード200でログアウト
 
 /* Users */

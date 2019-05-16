@@ -1,14 +1,13 @@
 import * as React from 'react';
 import {useState} from 'react';
 import { Route, Switch, Redirect, Link } from 'react-router-dom';
-import { Tree, KTreeNode } from '../data-types/tree-node';
 import links from '../settings/links';
-import EditorStateManager from './manual/edit/editor-state-manager';
 import Dashboard from './dashboard/dashboard-component';
 import { Theme, createStyles, WithStyles, AppBar, Toolbar, Button, Tabs, Tab, InputBase, withStyles } from '@material-ui/core';
 import { Search } from '@material-ui/icons';
 import { fade } from '@material-ui/core/styles/colorManipulator';
-import Manual from './manual/manual';
+import View from './manual/view/view';
+import EditorFrameContainer from './manual/edit/editor-frame-container';
 
 const styles = (theme: Theme) => createStyles({
   search: {
@@ -90,11 +89,8 @@ const PageRouter: React.FC<Props> = (props) => {
         <div className={classes.toolbar}/>
         <Switch>
           <Route exact path={links.dashboard} render={() => <Dashboard/>}/>
-          <Route
-            path={'/manual/:id'}
-            render={routerProps => <p>まにゅある</p>// <Manual {...routerProps} {...props}/>
-          }
-          />
+          <Route path={'/manual/:id/edit'} render={props => <EditorFrameContainer {...props}/>}/>
+          <Route path={'/manual/:id'}      render={props => <View {...props}/>}/>
           <Redirect to={links.dashboard}/>
         </Switch>
       </main>

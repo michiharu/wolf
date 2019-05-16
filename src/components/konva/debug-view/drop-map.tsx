@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import * as React from 'react';
 import { Group, Rect, Text } from 'react-konva';
-import { KWithArrow } from '../../../data-types/tree-node';
+import { KWithArrow } from '../../../data-types/tree';
 import KSize from '../../../data-types/k-size';
 import KTreeUtil from '../../../func/k-tree';
 import { blue } from '@material-ui/core/colors';

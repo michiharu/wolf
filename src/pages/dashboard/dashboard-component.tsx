@@ -2,7 +2,7 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { Grid, Theme, createStyles, WithStyles, withStyles
 } from '@material-ui/core';
-import { Tree } from '../../data-types/tree-node';
+import { Tree } from '../../data-types/tree';
 
 import ManualList from './manual-list-component';
 

@@ -1,4 +1,4 @@
-import { NodeWithSimilarity, Tree } from "../data-types/tree-node";
+import { NodeWithSimilarity, Tree } from "../data-types/tree";
 import textDistPercent from "./text-dist";
 
 export default class SimilarityUtil {

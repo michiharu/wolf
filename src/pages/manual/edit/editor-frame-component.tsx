@@ -1,4 +1,7 @@
 import * as React from 'react';
+import { connect } from 'react-redux';
+import { AppState } from '../../../redux/store';
+import { ManualState } from '../../../redux/states/manualState';
 import {
   Theme, createStyles, WithStyles, withStyles, Snackbar, IconButton,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Toolbar, AppBar, Tab, Tabs,
@@ -9,7 +12,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import ViewSettingsIcon from '@material-ui/icons/Settings';
 import { Divergent, Convergent } from '../../../settings/layout' 
 
-import { Tree, TreeNode, baseTreeNode, KTreeNode } from '../../../data-types/tree-node';
+import { Tree, TreeNode, baseTreeNode, KTreeNode, Manual } from '../../../data-types/tree';
 import NodeEditor, { NodeEditorProps } from './node-editor/node-editor';
 import { RouteComponentProps, withRouter } from 'react-router';
 import links from '../../../settings/links';
@@ -19,8 +22,10 @@ import TextEditor, { TextEditorProps } from './text-editor/text-editor';
 import TreeNodeUtil from '../../../func/tree-node';
 import { theme } from '../../..';
 import { NodeEditMode } from '../../../data-types/node-edit-mode';
+import { MemoState } from '../../../redux/states/memoState';
+import { EditorFrameActions } from './editor-frame-container';
 
-const styles = (theme: Theme) => createStyles({
+export const styles = (theme: Theme) => createStyles({
   root: {
     // position: 'relative',
     // width: '100%',
@@ -44,15 +49,12 @@ const styles = (theme: Theme) => createStyles({
   }
 });
 
-export interface EditorStateManagerProps {
-  manuals: Tree[];
-  commons: Tree[];
-  memos: KTreeNode[];
-  changeManuals: (node: Tree[]) => void;
-  changeMemo: (memoList: KTreeNode[]) => void;
-}
-
-interface Props extends EditorStateManagerProps, WithStyles<typeof styles>, RouteComponentProps<{id: string}> {}
+interface Props extends
+  ManualState,
+  MemoState,
+  EditorFrameActions,
+  WithStyles<typeof styles>,
+  RouteComponentProps<{id: string}> {}
 
 interface State {
   tabIndex: number; // 0: カード表示、1: テキスト表示
@@ -63,19 +65,18 @@ interface State {
   hasDifference: boolean;
   cannotSaveReason: CannotSaveReason;
   saved: boolean;
-  nextLink: string | null;
   showViewSettings: boolean;
 }
 
 export type CannotSaveReason = 'switch' | 'case' | null;
 
-class EditorStateManager extends React.Component<Props, State> {
+class EditorFrameComponent extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    const { manuals, commons, memos, match } = props;
+    const { manuals, memos, match } = props;
     const nodeId = match.params.id;
-    this.state = EditorStateManager.getInitialState(manuals, nodeId, commons, memos);
+    this.state = EditorFrameComponent.getInitialState(manuals, nodeId, memos);
   }
 
   componentDidMount() {
@@ -95,11 +96,11 @@ class EditorStateManager extends React.Component<Props, State> {
 
   popstate = (e: any) => {
     e.preventDefault();
-    this.differenceCheck(null);
+    this.differenceCheck();
   }
 
-  static getInitialState = (trees: Tree[], id: string, commonNodes: Tree[], memoList: KTreeNode[]): State => {
-    const foundNode = TreeUtil._findArray(trees, id)!;
+  static getInitialState = (manuals: Tree[], id: string, memoList: KTreeNode[]): State => {
+    const foundNode = TreeUtil._findArray(manuals, id)!;
     var node = TreeUtil._get(foundNode, baseTreeNode);
     node = TreeNodeUtil._init(node);
     return {
@@ -110,22 +111,18 @@ class EditorStateManager extends React.Component<Props, State> {
       hasDifference: false,
       cannotSaveReason: null,
       saved: false,
-      nextLink: null,
       showViewSettings: false,
     };
   }
 
-  differenceCheck = (nextLink: string | null) => {
+  differenceCheck = () => {
     const { manuals, match, history } = this.props;
     const node = TreeUtil._findArray(manuals, match.params.id)!;
-    if (TreeUtil._hasDifference(node, this.state.node)) {
-      this.setState({hasDifference: true, nextLink});
+
+    if (TreeUtil._hasDifference<Tree>(node, this.state.node)) {
+      this.setState({hasDifference: true});
     } else {
-      if (nextLink !== null) {
-        history.push(nextLink)
-      } else {
-        history.goBack();
-      }
+      history.goBack();
     }
   }
 
@@ -152,7 +149,7 @@ class EditorStateManager extends React.Component<Props, State> {
   }
 
   save = () => {
-    const { manuals, changeManuals, changeMemo, history } = this.props;
+    const { manuals, changeManuals, changeMemos, history } = this.props;
     const {node, memoList} = this.state;
     const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
     const isAllCaseHasItem = TreeUtil._isAllCaseHasItem(node);
@@ -161,32 +158,27 @@ class EditorStateManager extends React.Component<Props, State> {
     this.setState({cannotSaveReason});
     if (cannotSaveReason === null) {
       this.setState({saved: true});
-      const newManuals = TreeUtil._replaceArray(manuals, node);
+      const newManuals = TreeUtil._replaceArray<Tree>(manuals, node) as Manual[];
       changeManuals(newManuals);
-      changeMemo(memoList);
+      changeMemos(memoList);
       history.goBack();
     }
   }
 
   saveAndGo = () => {
-    const { manuals, changeManuals, changeMemo, history } = this.props;
-    const { node, memoList, nextLink } = this.state;
-    const newManuals = TreeUtil._replaceArray(manuals, node);
+    const { manuals, changeManuals, changeMemos, history } = this.props;
+    const { node, memoList } = this.state;
+    const newManuals = TreeUtil._replaceArray<Tree>(manuals, node) as Manual[];
     changeManuals(newManuals);
-    changeMemo(memoList);
-    if (nextLink !== null) {
-      history.push(nextLink)
-    } else {
-      history.goBack();
-    }
+    changeMemos(memoList);
+    history.goBack();
   }
 
   render() {
-    const { commons, classes } = this.props;
+    const { classes } = this.props;
     const { tabIndex, mode, node, memoList, hasDifference, cannotSaveReason, saved, showViewSettings } = this.state;
   
     const nodeProps: NodeEditorProps = {
-      commons,
       mode,
       node,
       memoList,
@@ -199,7 +191,6 @@ class EditorStateManager extends React.Component<Props, State> {
     };
 
     const textProps: TextEditorProps = {
-      commons,
       node,
       edit: this.edit,
     };
@@ -243,7 +234,7 @@ class EditorStateManager extends React.Component<Props, State> {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => this.setState({hasDifference: false, nextLink: null})}>いいえ</Button>
+            <Button onClick={() => this.setState({hasDifference: false})}>いいえ</Button>
             {cannotSave === null &&
             <Button onClick={this.saveAndGo} color="primary" autoFocus>保存して移動</Button>}
             <Button onClick={() => this.props.history.push(links.dashboard)} color="primary">保存せずに移動</Button>
@@ -286,4 +277,4 @@ class EditorStateManager extends React.Component<Props, State> {
   }
 }
 
-export default withRouter(withStyles(styles)(EditorStateManager));
+export default EditorFrameComponent;

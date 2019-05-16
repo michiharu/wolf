@@ -1,4 +1,4 @@
-import {TreeNode, Type, KTreeNode, DragRow, Tree, Point, DropRow } from "../data-types/tree-node";
+import {TreeNode, Type, KTreeNode, DragRow, Tree, Point, DropRow } from "../data-types/tree";
 import KSize from "../data-types/k-size";
 import TreeNodeUtil from "./tree-node";
 

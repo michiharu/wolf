@@ -2,8 +2,6 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { AppState } from '../redux/store';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
-import User from '../data-types/user';
-import { RootState } from './state-manager';
 import links from '../settings/links';
 import PageRouter from './page-router';
 import LoginContainer from './login/login-container';

@@ -4,7 +4,7 @@ import {
   Theme, createStyles, WithStyles, withStyles,
 } from '@material-ui/core';
 
-import { TreeNode, Tree } from '../../../../data-types/tree-node';
+import { TreeNode, Tree } from '../../../../data-types/tree';
 import { tes as defaultTES } from '../../../../settings/layout';
 
 import TreeUtil from '../../../../func/tree';
@@ -42,7 +42,6 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export interface TextEditorProps {
-  commons: Tree[];
   node: TreeNode;
   edit: (node: TreeNode) => void;
 }
@@ -81,12 +80,11 @@ class TextEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const { node, commons, classes } = this.props;
+    const { node, classes } = this.props;
 
     const textLineWithIconProps: TextLineWithIconProps = {
       itemNumber: node.label,
       node,
-      commons,
       changeNode: this.changeNode,
       deleteSelf: this.deleteSelf,
     };

@@ -1,4 +1,7 @@
-export interface TreeWithoutId {
+import User from "./user";
+
+export interface Tree {
+  id: string;
   type: Type;
   label: string;
   input: string;
@@ -11,10 +14,11 @@ export interface TreeWithoutId {
   exceptions: string;
   imageName: string;
   imageBlob: string;
-  children: TreeWithoutId[];
+  children: Tree[];
 }
 
-export const baseTreeWithoutId: TreeWithoutId = {
+export const baseTree: Tree = {
+  id: '',
   type: 'task',
   label: '',
   input: '',
@@ -27,27 +31,36 @@ export const baseTreeWithoutId: TreeWithoutId = {
   exceptions: '',
   imageName: '',
   imageBlob: '',
-  children: []
+  children: [],
 };
 
-export interface Tree extends TreeWithoutId {
-  id: string;
-  isMemo: boolean;
-  children: Tree[];
+export interface Manual extends Tree {
+  ownerId: string;
+  collaboratorIds: string[];
+  inOperation: boolean;
+  reviewer: string | null;
+  pullRequests: PullRequest[];
 }
 
-export const baseTree: Tree = {
-  ...baseTreeWithoutId,
-  children: [],
-  id: '',
-  isMemo: false,
+export const baseManual: Manual = {
+  ...baseTree,
+  ownerId: '',
+  collaboratorIds: [],
+  inOperation: false,
+  reviewer: null,
+  pullRequests: [],
 };
+
+export interface PullRequest extends Tree {
+  writerId: string; 
+}
 
 export interface TreeNode extends Tree {
   children: TreeNode[];
   open: boolean;
   focus: boolean;
   isDragging: boolean;
+  isMemo: boolean;
 }
 
 export const baseTreeNode: TreeNode = {
@@ -56,6 +69,7 @@ export const baseTreeNode: TreeNode = {
   open: false,
   focus: false,
   isDragging: false,
+  isMemo: false,
 };
 
 export interface NodeWithSimilarity extends Tree {

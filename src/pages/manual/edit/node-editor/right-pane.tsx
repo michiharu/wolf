@@ -13,7 +13,7 @@ import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
   WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Delete,
 } from '../../../../settings/layout';
-import {TreeNode, Type, NodeWithSimilarity, Tree, KWithArrow, baseKWithArrow } from '../../../../data-types/tree-node';
+import {TreeNode, Type, NodeWithSimilarity, Tree, KWithArrow, baseKWithArrow } from '../../../../data-types/tree';
 import { ButtonProps } from '@material-ui/core/Button';
 import SimilarityTable from '../../../../components/similarity-table/similarity-table';
 import SimilarityUtil from '../../../../func/similarity';

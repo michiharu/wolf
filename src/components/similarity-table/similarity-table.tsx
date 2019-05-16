@@ -1,6 +1,6 @@
 import * as React from 'react';
 import MUIDataTable, { MUIDataTableOptions, MUIDataTableColumn } from 'mui-datatables';
-import { Tree } from '../../data-types/tree-node';
+import { Tree } from '../../data-types/tree';
 
 interface Props {
   target: Tree;

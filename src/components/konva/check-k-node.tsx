@@ -3,7 +3,7 @@ import { lightBlue, amber, yellow, grey } from '@material-ui/core/colors';
 
 import { Rect, Group, Text } from 'react-konva';
 
-import { CheckNode } from '../../data-types/tree-node';
+import { CheckNode } from '../../data-types/tree';
 
 import Util from '../../func/util';
 import CheckBox, { CheckBoxProps } from './check-box';

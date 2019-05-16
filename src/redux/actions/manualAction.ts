@@ -1,8 +1,8 @@
 import actionCreatorFactory from 'typescript-fsa';
-import { Tree } from '../../data-types/tree-node';
+import { Manual } from '../../data-types/tree';
 
 const actionCreator = actionCreatorFactory();
 
 export const manualActions = {
-  change: actionCreator<Tree[]>('ACTIONS_CHANGE')
+  change: actionCreator<Manual[]>('ACTIONS_MANUAL_CHANGE')
 };

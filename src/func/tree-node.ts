@@ -1,4 +1,4 @@
-import {TreeNode, Tree, baseTreeNode } from "../data-types/tree-node";
+import {TreeNode, Tree, baseTreeNode } from "../data-types/tree";
 import TreeUtil from "./tree";
 
 export default class TreeNodeUtil {

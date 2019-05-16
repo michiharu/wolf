@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import * as React from 'react';
 import { Stage, Layer, Group, Rect, Text } from 'react-konva';
-import { DragRow, KWithArrow } from '../../../data-types/tree-node';
+import { DragRow, KWithArrow } from '../../../data-types/tree';
 import KSize from '../../../data-types/k-size';
 
 interface Props {

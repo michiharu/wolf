@@ -7,4 +7,5 @@ export default interface User {
   userManagement: Authority;
   groupManagement: Authority;
   isOperationManager: boolean;
+  canPullRequest: boolean;
 }

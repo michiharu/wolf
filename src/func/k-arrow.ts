@@ -1,4 +1,4 @@
-import {KTreeNode, KWithArrow, Point, TreeNode } from "../data-types/tree-node";
+import {KTreeNode, KWithArrow, Point, TreeNode } from "../data-types/tree";
 import KSize from "../data-types/k-size";
 import { buttonArea } from "./k-tree";
 

@@ -1,4 +1,4 @@
-import {TreeNode, Type, CheckNode, Point } from "../data-types/tree-node";
+import {TreeNode, Type, CheckNode, Point } from "../data-types/tree";
 import { ks } from "../settings/layout";
 import Util from "./util";
 import { checked } from "../resource/svg-icon";

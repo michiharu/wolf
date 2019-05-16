@@ -8,8 +8,7 @@ import { VisibilityOff, Visibility } from '@material-ui/icons';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import withStyles, { WithStyles } from '@material-ui/core/styles/withStyles';
 import axios from '../../api/axios';
-import { loginURL } from '../../api/definitions';
-import { RootState } from '../state-manager';
+import { loginURL, LoginPostResponse } from '../../api/definitions';
 import { LoginActions } from './login-container';
 
 const styles = (theme: Theme) =>
@@ -58,7 +57,7 @@ const LoginComponent: React.FC<Props> = props => {
   const handleLogin = () => {
     axios.post(loginURL, {id, password})
     .then(res => {
-      const rootState = res.data as RootState;
+      const rootState = res.data as LoginPostResponse;
       login(rootState.user!);
       changeManuals(rootState.manuals);
     });    
