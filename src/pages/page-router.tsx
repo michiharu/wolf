@@ -8,6 +8,7 @@ import { Search } from '@material-ui/icons';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import View from './manual/view/view';
 import EditorFrameContainer from './manual/edit/editor-frame-container';
+import RequestContainer from './manual/request/request-container';
 
 const styles = (theme: Theme) => createStyles({
   search: {
@@ -90,6 +91,7 @@ const PageRouter: React.FC<Props> = (props) => {
         <Switch>
           <Route exact path={links.dashboard} render={() => <Dashboard/>}/>
           <Route path={'/manual/:id/edit'} render={props => <EditorFrameContainer {...props}/>}/>
+          <Route path={'/manual/:id/request/:requestId'} render={props => <RequestContainer {...props}/>}/>
           <Route path={'/manual/:id'}      render={props => <View {...props}/>}/>
           <Redirect to={links.dashboard}/>
         </Switch>

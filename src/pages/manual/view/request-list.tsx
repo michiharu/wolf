@@ -1,10 +1,11 @@
 import * as React from 'react';
 import {useState} from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles, Paper, Table, TableHead, TableRow, TableBody, TableCell
+  Theme, createStyles, WithStyles, withStyles, Paper, Table, TableHead, TableRow, TableBody, TableCell, Button
 
 } from '@material-ui/core';
 import { Manual } from '../../../data-types/tree';
+import { Link } from 'react-router-dom';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -35,9 +36,19 @@ const RequestList: React.FC<Props> = props => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {/* <TableRow>
-
-            </TableRow> */}
+            {manual.pullRequests.map(p => (
+            <TableRow>
+              <TableCell>{p.requestMessage}</TableCell>
+              <TableCell>{p.writerId}</TableCell>
+              <TableCell>
+                <Button
+                  component={(le: any) => <Link to={`/manual/${manual.id}/request/${p.id}`} {...le}/>}
+                  color="primary"
+                >
+                  編集する
+                </Button>
+              </TableCell>
+            </TableRow>))}
           </TableBody>
         </Table>
       </Paper>

@@ -52,7 +52,9 @@ export const baseManual: Manual = {
 };
 
 export interface PullRequest extends Tree {
-  writerId: string; 
+  writerId: string;
+  requestMessage: string;
+  responseMessage: string | null;
 }
 
 export interface TreeNode extends Tree {
