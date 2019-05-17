@@ -6,7 +6,7 @@ import Dashboard from './dashboard/dashboard-component';
 import { Theme, createStyles, WithStyles, AppBar, Toolbar, Button, Tabs, Tab, InputBase, withStyles } from '@material-ui/core';
 import { Search } from '@material-ui/icons';
 import { fade } from '@material-ui/core/styles/colorManipulator';
-import View from './manual/view/view';
+import ViewContainer from './manual/view/view-container';
 import EditorFrameContainer from './manual/edit/editor-frame-container';
 import RequestContainer from './manual/request/request-container';
 
@@ -92,7 +92,7 @@ const PageRouter: React.FC<Props> = (props) => {
           <Route exact path={links.dashboard} render={() => <Dashboard/>}/>
           <Route path={'/manual/:id/edit'} render={props => <EditorFrameContainer {...props}/>}/>
           <Route path={'/manual/:id/request/:requestId'} render={props => <RequestContainer {...props}/>}/>
-          <Route path={'/manual/:id'}      render={props => <View {...props}/>}/>
+          <Route path={'/manual/:id'}      render={props => <ViewContainer {...props}/>}/>
           <Redirect to={links.dashboard}/>
         </Switch>
       </main>

@@ -13,7 +13,8 @@ import { Tree, TreeNode, baseTreeNode, KTreeNode, Manual } from '../../../data-t
 import { RouteComponentProps, withRouter } from 'react-router';
 import TreeUtil from '../../../func/tree';
 import { RequestActions } from './request-container';
-import NodeViewer from '../view/node-viewer';
+import NodeViewerContainer from '../view/node-viewer/node-viewer-container';
+import RequestViewerContainer from '../view/node-viewer/request-viewer-container';
 import TreeNodeUtil from '../../../func/tree-node';
 
 export const styles = (theme: Theme) => createStyles({
@@ -79,23 +80,22 @@ const RequestComponent: React.FC<Props> = props => {
         <IconButton onClick={() => setShowVS(!showVS)}><ViewSettingsIcon/></IconButton>
 
         <Button variant="contained" color="primary" size="small" className={classes.editFinishButton}>リクエストの却下</Button>
-        <Button variant="contained" color="primary" size="small" className={classes.editFinishButton}>手動でマージする</Button>
         <Button variant="contained" color="primary" size="small" className={classes.editFinishButton}>リクエストの採用</Button>
       </div>
       <Grid container>
         {node !== null &&
         <Grid item xs={6}>
           <div style={{position: 'relative'}}>
-            <NodeViewer node={node} showViewSettings={showVS} edit={() => {}} closeViewSettings={() => {}}/>
+            <NodeViewerContainer/>
             <Paper style={{position: 'absolute', top: 0, right: 0, padding: 8}}>
               オリジナル
             </Paper>
           </div>
         </Grid>}
-        {reqNode !== null &&
+        {reqNode !== null && // プルリクエストは
         <Grid item xs={6}>
           <div style={{position: 'relative'}}>
-            <NodeViewer node={reqNode} showViewSettings={showVS} edit={() => {}} closeViewSettings={() => {}}/>
+            <RequestViewerContainer node={reqNode}/>
             <Paper style={{position: 'absolute', top: 0, right: 0, padding: 8}}>
               {request.requestMessage}
             </Paper>

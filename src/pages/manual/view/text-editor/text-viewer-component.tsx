@@ -11,11 +11,11 @@ import {
 import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
   WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Close,
-} from '../../../settings/layout';
-import { TreeNode, Type, NodeWithSimilarity, Tree, baseTreeNode } from '../../../data-types/tree';
+} from '../../../../settings/layout';
+import { TreeNode, Type, NodeWithSimilarity, Tree, baseTreeNode } from '../../../../data-types/tree';
 
-import TreeUtil from '../../../func/tree';
-import { phrase } from '../../../settings/phrase';
+import TreeUtil from '../../../../func/tree';
+import { phrase } from '../../../../settings/phrase';
 
 const styles = (theme: Theme) => createStyles({
   root: {

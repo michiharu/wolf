@@ -1,33 +1,25 @@
 import * as React from 'react';
 import {
   Theme, createStyles, WithStyles, withStyles,
-  Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText,
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Modal, Badge, TextField, Fab, Paper, MuiThemeProvider, createMuiTheme, 
 } from '@material-ui/core';
-import Add from '@material-ui/icons/Add';
-import AddNext from '@material-ui/icons/Forward';
 
-import { Stage, Layer, Group, Rect } from 'react-konva';
+import { Stage, Layer, Group } from 'react-konva';
 
-import { TreeNode, Type, KTreeNode, DragRow, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode, KWithArrow } from '../../../data-types/tree';
-import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth, Task, Switch, Case, Delete, More, Less } from '../../../settings/layout';
-import { rs as defaultRS } from '../../../settings/reading';
+import { TreeNode, KTreeNode, DragRow, baseKTreeNode, baseKWithArrow, KWithArrow } from '../../../../data-types/tree';
+import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth } from '../../../../settings/layout';
+import { rs as defaultRS } from '../../../../settings/reading';
 
-import TreeUtil from '../../../func/tree';
-import TreeNodeUtil from '../../../func/tree-node';
-import KTreeUtil from '../../../func/k-tree';
-import KSize from '../../../data-types/k-size';
-import keys from '../../../settings/storage-keys';
-import ViewSettings, { ViewSettingProps } from '../../../components/view-settings';
-import { phrase } from '../../../settings/phrase';
-import ReadingSetting from '../../../data-types/reading-settings';
-import KNode from '../../../components/konva/k-node';
-import Util from '../../../func/util';
-import KArrowUtil from '../../../func/k-arrow';
-import { theme } from '../../../index';
-import { NodeEditMode } from '../../../data-types/node-edit-mode';
-import { grey } from '@material-ui/core/colors';
-import KViewNode from '../../../components/konva/k-view-node';
+import TreeUtil from '../../../../func/tree';
+import TreeNodeUtil from '../../../../func/tree-node';
+import KTreeUtil from '../../../../func/k-tree';
+import KSize from '../../../../data-types/k-size';
+import keys from '../../../../settings/storage-keys';
+import { ViewSettingProps } from '../../../../components/view-settings';
+import ReadingSetting from '../../../../data-types/reading-settings';
+import KArrowUtil from '../../../../func/k-arrow';
+import { theme } from '../../../../index';
+import KViewNode from '../../../../components/konva/k-view-node';
+import { NodeViewerActions } from './node-viewer-container';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -65,29 +57,15 @@ const styles = (theme: Theme) => createStyles({
   extendedIcon: {
     marginLeft: theme.spacing.unit,
   },
-  viewSettingModal: {
-    backgroundColor: '#0002',
-  },
-  viewSettingPaper: {
-    position: 'absolute',
-    top: '75vh',
-    left: '50vw',
-    width: '90vw',
-    maxHeight: '45vh',
-    transform: 'translate(-50%, -50%)',
-    padding: theme.spacing.unit * 2,
-    outline: 'none',
-  },
 });
 
 export interface NodeEditorProps {
   node: TreeNode;
-  showViewSettings: boolean;
-  edit: (node: TreeNode) => void;
-  closeViewSettings: () => void;
 }
 
-interface Props extends NodeEditorProps, WithStyles<typeof styles> {}
+interface Props extends NodeViewerActions, WithStyles<typeof styles> {
+  node: TreeNode;
+}
 
 interface State {
   didRender: boolean;
@@ -100,7 +78,7 @@ export type FlowType = 'rect' | 'arrow';
 export const flowType = {rect: 'rect', arrow: 'arrow'};
 export const marginBottom = 40;
 
-class NodeViewer extends React.Component<Props, State> {
+class NodeViewerComponent extends React.Component<Props, State> {
 
   mainRef = React.createRef<HTMLDivElement>();
   stageRef = React.createRef<any>();
@@ -112,7 +90,7 @@ class NodeViewer extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    const state = NodeViewer.getInitialState();
+    const state = NodeViewerComponent.getInitialState();
     this.state = state;
     const kTree = TreeUtil._get(props.node, baseKTreeNode);
     this.kTree = KTreeUtil.setCalcProps(kTree, state.ks);
@@ -166,7 +144,7 @@ class NodeViewer extends React.Component<Props, State> {
   }
 
   scroll = () => {
-    const { node, edit } = this.props;
+    const { node, setNode } = this.props;
     const { ks } = this.state;
     const scrollContainer = this.mainRef.current;
     const stage = this.stageRef.current;
@@ -187,15 +165,15 @@ class NodeViewer extends React.Component<Props, State> {
     const f = TreeNodeUtil._getFocusNode(this.kTree)!;
     if (f !== undefined) {
       if (f.point.x * ks.unit < dx || stage.width() / 2 + dx < (f.point.x + f.rect.w) * ks.unit) {
-        edit(TreeNodeUtil._deleteFocus(node));
+        setNode(TreeNodeUtil._deleteFocus(node));
       }
     }
   }
 
   expand = (target: KWithArrow, open: boolean) => {
-    const { node, edit } = this.props;
+    const { node, setNode } = this.props;
     var newNode = TreeNodeUtil._open(node, target.id, open);
-    edit(newNode);
+    setNode(newNode);
     process.nextTick(() => this.resize());
   }
 
@@ -225,7 +203,7 @@ class NodeViewer extends React.Component<Props, State> {
   }
 
   render() {
-    const { node: tree, showViewSettings, closeViewSettings, classes } = this.props;
+    const { node: tree, classes } = this.props;
     const {
       ks, ft, rs,
     } = this.state;
@@ -240,11 +218,6 @@ class NodeViewer extends React.Component<Props, State> {
       ks,
       ft,
       expand: (target: KWithArrow) => this.expand(target, !target.open)
-    };
-
-    const viewSettingProps: ViewSettingProps = {
-      ks, ft, rs,
-      changeKS: this.changeKS, changeFT: this.changeFT, changeRS: this.changeRS, reset: this.reset
     };
 
     const main = this.mainRef.current;
@@ -270,18 +243,9 @@ class NodeViewer extends React.Component<Props, State> {
             </Layer>
           </Stage>
         </div>
-
-        <Modal
-          open={showViewSettings}
-          onClose={closeViewSettings}
-          BackdropProps={{className: classes.viewSettingModal}}
-          disableAutoFocus
-        >
-          <ViewSettings {...viewSettingProps}/>
-        </Modal>
       </div>
     );
   }
 }
 
-export default withStyles(styles)(NodeViewer);
+export default withStyles(styles)(NodeViewerComponent);
