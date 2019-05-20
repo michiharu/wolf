@@ -10,6 +10,7 @@ export interface LoginPostRequest {
 }
 export interface LoginPostResponse {
   user: User | null;
+  users: User[];
   manuals: Manual[];
   commons: Tree[];
   memos: KTreeNode[];

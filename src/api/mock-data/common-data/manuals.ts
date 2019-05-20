@@ -7,8 +7,8 @@ export const manual1 = {
   "label": "ケアマネ送付関連月初作業手順",
   "input": "",
   "output": "",
-  "ownerId": "オーナーID",
-  "collaboratorIds": ["collaboratorId1", "collaboratorId2", "collaboratorId3"],
+  "ownerId": "1",
+  "collaboratorIds": ["2", "3"],
   "inOperation": false,
   "reviewer": null,
   "pullRequests": [
@@ -17,7 +17,7 @@ export const manual1 = {
       "id": "1",
       "type": "task",
       "label": "ケアマネ送付関連月初作業手順",
-      "writerId": "プルリク書いた人",
+      "writerId": "4",
       "requestMessage": "キャロッツメインメニューのクリックは連打が必要",
       "responseMessage": null,
       "children": [

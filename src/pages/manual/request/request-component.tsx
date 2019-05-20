@@ -70,7 +70,7 @@ const RequestComponent: React.FC<Props> = props => {
         <Grid item xs={6}>
           <div style={{position: 'relative'}}>
             <NodeViewerContainer/>
-            <Paper style={{position: 'absolute', top: 0, right: 0, padding: 8}}>
+            <Paper style={{position: 'absolute', top: 8, right: 0, padding: 8}}>
               オリジナル
             </Paper>
           </div>
@@ -78,7 +78,7 @@ const RequestComponent: React.FC<Props> = props => {
         <Grid item xs={6}>
           <div style={{position: 'relative'}}>
             <RequestViewerComponent reqNode={reqNode} setReqNode={setReqNode} ks={ks} rs={rs} />
-            <Paper style={{position: 'absolute', top: 0, right: 0, padding: 8}}>
+            <Paper style={{position: 'absolute', top: 8, right: 0, padding: 8}}>
               {request.requestMessage}
             </Paper>
           </div>

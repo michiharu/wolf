@@ -9,6 +9,7 @@ const postLogin = (config: AxiosRequestConfig) => {
 
   const data: LoginPostResponse = {
     user: req.id === '1' ? user1 : req.id === '2' ? user2 : req.id === '3' ? user3 : user4,
+    users: [user1, user2, user3, user4],
     manuals: [manual1],
     commons: [],
     memos: [],

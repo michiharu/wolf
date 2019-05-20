@@ -24,10 +24,10 @@ export const user3: User = {
   id: '3',
   lastName: '江戸川',
   firstName: 'コナン',
-  userManagement: {canCreate: true, canEdit: true, canDelete: true},
-  groupManagement: {canCreate: true, canEdit: true, canDelete: false},
-  isOperationManager: true,
-  canPullRequest: true,
+  userManagement: {canCreate: false, canEdit: false, canDelete: false},
+  groupManagement: {canCreate: false, canEdit: false, canDelete: false},
+  isOperationManager: false,
+  canPullRequest: false,
 };
 
 export const user4: User = {
