@@ -20,6 +20,8 @@ interface Props extends WithStyles<typeof styles> {
 
 const Collaborators: React.FC<Props> = props => {
   const { manual, classes } =  props;
+  const [collaborator, setCollaborator] = useState("");
+  const handleSelect = (e: any) => setCollaborator(e.target.value);
 
   return (
     <div className={classes.root}>
@@ -29,14 +31,14 @@ const Collaborators: React.FC<Props> = props => {
       </div>
       <div className={classes.container}>
         <Typography variant="caption">コラボレーター</Typography>
-        {manual.collaboratorIds.map(c => <Chip className={classes.chip} label={c} onDelete={() => {}}/>)}
+        {manual.collaboratorIds.map(c => <Chip key={c} className={classes.chip} label={c} onDelete={() => {}}/>)}
       </div>
       <div className={classes.container}>
         <Grid container alignItems="flex-end" spacing={24}>
           <Grid item xs={6}>
             <FormControl fullWidth>
               <InputLabel>コラボレーターの追加</InputLabel>
-              <Select>
+              <Select value={collaborator} onChange={handleSelect}>
                 <MenuItem value="">
                   <em>None</em>
                 </MenuItem>

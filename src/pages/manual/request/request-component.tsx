@@ -4,18 +4,20 @@ import { connect } from 'react-redux';
 import { AppState } from '../../../redux/store';
 import { ManualState } from '../../../redux/states/manualState';
 import {
-  Theme, createStyles, WithStyles, IconButton, Button, Tab, Tabs, Grid, Paper,
+  Theme, createStyles, WithStyles, IconButton, Button, Tab, Tabs, Grid, Paper, withStyles,
 } from '@material-ui/core';
 
 import ViewSettingsIcon from '@material-ui/icons/Settings';
 
-import { Tree, TreeNode, baseTreeNode, KTreeNode, Manual } from '../../../data-types/tree';
+import { Tree, TreeNode, baseTreeNode, KTreeNode, Manual, PullRequest } from '../../../data-types/tree';
 import { RouteComponentProps, withRouter } from 'react-router';
 import TreeUtil from '../../../func/tree';
 import { RequestActions } from './request-container';
 import NodeViewerContainer from '../view/node-viewer/node-viewer-container';
-import RequestViewerContainer from '../view/node-viewer/request-viewer-container';
-import TreeNodeUtil from '../../../func/tree-node';
+import RequestViewerComponent from '../view/request-node-viewer/request-node-viewer';
+import { Action } from 'typescript-fsa';
+import { KSState } from '../../../redux/states/ksState';
+import { RSState } from '../../../redux/states/rsState';
 
 export const styles = (theme: Theme) => createStyles({
   root: {
@@ -41,49 +43,30 @@ export const styles = (theme: Theme) => createStyles({
 });
 
 interface Props extends
-  ManualState,
-  RequestActions,
-  WithStyles<typeof styles>,
-  RouteComponentProps<{id: string, requestId: string}> {}
+  KSState,
+  RSState,
+  WithStyles<typeof styles> {
+  manuals: Manual[];
+  manual: Manual;
+  node: TreeNode;
+  request: PullRequest;
+  reqNode: TreeNode;
+  changeManuals: (manuals: Manual[]) => Action<Manual[]>;
+  setNode:   (node: TreeNode) => Action<TreeNode>;
+  setReqNode: (reqNode: TreeNode) => Action<TreeNode>;
+}
 
 export type CannotSaveReason = 'switch' | 'case' | null;
 
 const RequestComponent: React.FC<Props> = props => {
 
-  const { manuals, match, classes } = props;
-  const [node, setNode] = useState<TreeNode | null>(null);
-  const [reqNode, setReqNode] = useState<TreeNode | null>(null);
-
-  const manual = TreeUtil._findArray(manuals, match.params.id)!;
-  if (node === null) {
-    const tree = TreeUtil._get<Tree, TreeNode>(manual, baseTreeNode);
-    setNode(TreeNodeUtil._init(tree));
-  }
-
-  const request = manual.pullRequests.find(p => p.id === match.params.requestId)!
-  if (reqNode === null) {
-    const tree = TreeUtil._get<Tree, TreeNode>(request, baseTreeNode);
-    setReqNode(TreeNodeUtil._init(tree));
-  }
+  const { manuals, node, request, reqNode, setReqNode, ks, rs, classes } = props;
   
   const [tabIndex, setTabIndex] = useState(0);
   const [showVS, setShowVS] = useState(false);
   return (
     <div className={classes.root}>
-      <div className={classes.toolbar}>
-        <Tabs indicatorColor="primary" value={tabIndex} onChange={(_, i) => setTabIndex(i)}>
-          <Tab label="ツリー表示" />
-          <Tab label="テキスト表示" />
-        </Tabs>
-
-        <div style={{flexGrow: 1}} />
-        <IconButton onClick={() => setShowVS(!showVS)}><ViewSettingsIcon/></IconButton>
-
-        <Button variant="contained" color="primary" size="small" className={classes.editFinishButton}>リクエストの却下</Button>
-        <Button variant="contained" color="primary" size="small" className={classes.editFinishButton}>リクエストの採用</Button>
-      </div>
       <Grid container>
-        {node !== null &&
         <Grid item xs={6}>
           <div style={{position: 'relative'}}>
             <NodeViewerContainer/>
@@ -91,16 +74,15 @@ const RequestComponent: React.FC<Props> = props => {
               オリジナル
             </Paper>
           </div>
-        </Grid>}
-        {reqNode !== null && // プルリクエストは
+        </Grid>
         <Grid item xs={6}>
           <div style={{position: 'relative'}}>
-            <RequestViewerContainer node={reqNode}/>
+            <RequestViewerComponent reqNode={reqNode} setReqNode={setReqNode} ks={ks} rs={rs} />
             <Paper style={{position: 'absolute', top: 0, right: 0, padding: 8}}>
               {request.requestMessage}
             </Paper>
           </div>
-        </Grid>}
+        </Grid>
       </Grid>
     </div>
   );

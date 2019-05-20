@@ -6,7 +6,6 @@ import { task, switchSvg, flag } from '../../resource/svg-icon';
 
 import { KWithArrow, KTreeNode, Point } from '../../data-types/tree';
 
-import { FlowType } from '../../pages/manual/edit/node-editor/node-editor';
 import { theme } from '../..';
 import Util from '../../func/util';
 import { phrase } from '../../settings/phrase';
@@ -24,7 +23,6 @@ export interface KNodeProps {
   node: KWithArrow;
   labelFocus: boolean;
   ks: KSize;
-  ft: FlowType;
   focus: (node: KWithArrow) => void;
   expand: (node: KWithArrow) => void;
   dragStart: (node: KTreeNode) => void;
@@ -96,7 +94,7 @@ class KNode extends React.Component<KNodeProps> {
   }
   
   render() {
-    const { node, ks, ft, labelFocus } = this.props;
+    const { node, ks, labelFocus } = this.props;
     const fill = node.type === 'task' ? lightBlue[50] :
                node.type === 'switch' ? amber[100] : yellow[100];
     const baseRectProps = {
@@ -165,7 +163,7 @@ class KNode extends React.Component<KNodeProps> {
       cornerRadius: ks.cornerRadius * ks.unit,
       stroke: grey[500],
       fill: node.depth.top === 0 ? theme.palette.background.paper : '#00000009',
-      strokeWidth: ft === 'rect' ? 1 : 0,
+      strokeWidth: ks.hasArrow ? 0 : 1,
     };
 
     const arrowBaseProps = {
@@ -198,7 +196,7 @@ class KNode extends React.Component<KNodeProps> {
           <Icon {...typeProps}/>
           {!(node.focus && labelFocus) &&  <Text {...labelProps}/>}
           <IconWithBadge {...expandProps}/>
-          {ft === 'arrow' && node.arrows.map((a, i) => {
+          {ks.hasArrow && node.arrows.map((a, i) => {
             const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
             return <Arrow key={`${node.id}-arrow-${i}`} {...arrowBaseProps} points={points}/>;
           })}

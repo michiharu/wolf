@@ -6,16 +6,16 @@ import {
 import { Stage, Layer, Group } from 'react-konva';
 
 import { TreeNode, KTreeNode, DragRow, baseKTreeNode, baseKWithArrow, KWithArrow } from '../../../../data-types/tree';
-import { toolbarHeight, toolbarMinHeight, defaultKS, rightPainWidth } from '../../../../settings/layout';
+import { toolbarHeight, toolbarMinHeight, rightPainWidth } from '../../../../settings/layout';
 import TreeUtil from '../../../../func/tree';
 import TreeNodeUtil from '../../../../func/tree-node';
 import KTreeUtil from '../../../../func/k-tree';
 import KArrowUtil from '../../../../func/k-arrow';
 import { theme } from '../../../../index';
 import KViewNode from '../../../../components/konva/k-view-node';
-import { NodeViewerActions } from './node-viewer-container';
 import { RSState } from '../../../../redux/states/rsState';
 import { KSState } from '../../../../redux/states/ksState';
+import { Action } from 'typescript-fsa';
 
 const headerHeight = 96;
 const styles = (theme: Theme) => createStyles({
@@ -60,8 +60,9 @@ export interface NodeEditorProps {
   node: TreeNode;
 }
 
-interface Props extends KSState, RSState, NodeViewerActions, WithStyles<typeof styles> {
-  node: TreeNode;
+interface Props extends KSState, RSState, WithStyles<typeof styles> {
+  reqNode: TreeNode;
+  setReqNode: (reqNode: TreeNode) => Action<TreeNode>;
 }
 
 interface State {
@@ -72,7 +73,7 @@ export type FlowType = 'rect' | 'arrow';
 export const flowType = {rect: 'rect', arrow: 'arrow'};
 export const marginBottom = 40;
 
-class NodeViewerComponent extends React.Component<Props, State> {
+class RequestNodeViewer extends React.Component<Props, State> {
 
   mainRef = React.createRef<HTMLDivElement>();
   stageRef = React.createRef<any>();
@@ -84,9 +85,9 @@ class NodeViewerComponent extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    const state = NodeViewerComponent.getInitialState();
+    const state = RequestNodeViewer.getInitialState();
     this.state = state;
-    const kTree = TreeUtil._get(props.node, baseKTreeNode);
+    const kTree = TreeUtil._get(props.reqNode, baseKTreeNode);
     this.kTree = KTreeUtil.setCalcProps(kTree, props.ks);
   }
 
@@ -129,7 +130,7 @@ class NodeViewerComponent extends React.Component<Props, State> {
   }
 
   scroll = () => {
-    const { node, ks, setNode } = this.props;
+    const { reqNode, ks, setReqNode } = this.props;
     const scrollContainer = this.mainRef.current;
     const stage = this.stageRef.current;
     if (scrollContainer === null || stage === null) { throw 'Cannot find elements.'; }
@@ -149,20 +150,20 @@ class NodeViewerComponent extends React.Component<Props, State> {
     const f = TreeNodeUtil._getFocusNode(this.kTree)!;
     if (f !== undefined) {
       if (f.point.x * ks.unit < dx || stage.width() / 2 + dx < (f.point.x + f.rect.w) * ks.unit) {
-        setNode(TreeNodeUtil._deleteFocus(node));
+        setReqNode(TreeNodeUtil._deleteFocus(reqNode));
       }
     }
   }
 
   expand = (target: KWithArrow, open: boolean) => {
-    const { node, setNode } = this.props;
-    var newNode = TreeNodeUtil._open(node, target.id, open);
-    setNode(newNode);
+    const { reqNode, setReqNode } = this.props;
+    var newNode = TreeNodeUtil._open(reqNode, target.id, open);
+    setReqNode(newNode);
     process.nextTick(() => this.resize());
   }
 
   render() {
-    const { node: tree, ks, rs, classes } = this.props;
+    const { reqNode: tree, ks, rs, classes } = this.props;
     const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
     const node = KArrowUtil.setArrow(kTreeNode, ks);
     this.kTree = node;
@@ -203,4 +204,4 @@ class NodeViewerComponent extends React.Component<Props, State> {
   }
 }
 
-export default withStyles(styles)(NodeViewerComponent);
+export default withStyles(styles)(RequestNodeViewer);

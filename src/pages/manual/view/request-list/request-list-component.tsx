@@ -4,8 +4,11 @@ import {
   Theme, createStyles, WithStyles, withStyles, Paper, Table, TableHead, TableRow, TableBody, TableCell, Button
 
 } from '@material-ui/core';
-import { Manual } from '../../../data-types/tree';
+import { Manual, PullRequest, baseTreeNode, Tree, TreeNode } from '../../../../data-types/tree';
 import { Link } from 'react-router-dom';
+import { RequestListActions } from './request-list-container';
+import TreeUtil from '../../../../func/tree';
+import TreeNodeUtil from '../../../../func/tree-node';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -17,13 +20,17 @@ const styles = (theme: Theme) => createStyles({
   chip: { margin: theme.spacing.unit },
 });
 
-interface Props extends WithStyles<typeof styles> {
+interface Props extends RequestListActions, WithStyles<typeof styles> {
   manual: Manual;
 }
 
-const RequestList: React.FC<Props> = props => {
-  const { manual, classes } = props;
-
+const RequestListComponent: React.FC<Props> = props => {
+  const { manual, setRequest, setReqNode, classes } = props;
+  const selectRequest = (request: PullRequest) => () => {
+    setRequest(request);
+    const tree = TreeUtil._get<Tree, TreeNode>(request, baseTreeNode);
+    setReqNode(TreeNodeUtil._init(tree));
+  }
   return (
     <div className={classes.root}>
       <Paper>
@@ -37,16 +44,11 @@ const RequestList: React.FC<Props> = props => {
           </TableHead>
           <TableBody>
             {manual.pullRequests.map(p => (
-            <TableRow>
+            <TableRow key={p.id}>
               <TableCell>{p.requestMessage}</TableCell>
               <TableCell>{p.writerId}</TableCell>
               <TableCell>
-                <Button
-                  component={(le: any) => <Link to={`/manual/${manual.id}/request/${p.id}`} {...le}/>}
-                  color="primary"
-                >
-                  編集する
-                </Button>
+                <Button color="primary" onClick={selectRequest(p)}>表示</Button>
               </TableCell>
             </TableRow>))}
           </TableBody>
@@ -55,4 +57,4 @@ const RequestList: React.FC<Props> = props => {
     </div>
   );
 }
-export default withStyles(styles)(RequestList);
+export default withStyles(styles)(RequestListComponent);

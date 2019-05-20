@@ -10,7 +10,7 @@ import { Stage, Layer } from 'react-konva';
 import CheckBox from '../components/konva/check-box';
 import IconWithBadge from '../components/konva/icon-with-badge';
 import task from '../resource/svg-icon/task';
-import { ks } from '../settings/layout';
+import { defaultKS as ks } from '../settings/layout';
 
 storiesOf('Material-UI', module)
 .addDecorator(muiTheme())

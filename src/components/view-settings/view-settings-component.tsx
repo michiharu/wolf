@@ -3,10 +3,11 @@ import {
   Theme, createStyles, WithStyles, withStyles, Grid, Paper, Typography, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Button, FormGroup, Switch,
 } from '@material-ui/core';
 import Slider from '@material-ui/lab/Slider';
-import KSize from '../data-types/k-size';
-import { FlowType, flowType } from '../pages/manual/edit/node-editor/node-editor';
-import { ks as defaultKS } from '../settings/layout';
-import ReadingSetting from '../data-types/reading-settings';
+import KSize from '../../data-types/k-size';
+import ReadingSetting from '../../data-types/reading-settings';
+import { KSState } from '../../redux/states/ksState';
+import { RSState } from '../../redux/states/rsState';
+import { ViewSettingsActions } from './view-settings-container';
 
 
 const styles = (theme: Theme) => createStyles({
@@ -41,21 +42,15 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
-export interface ViewSettingProps {
-  ks: KSize;
-  ft: FlowType;
-  rs: ReadingSetting;
-  changeKS: (ks: KSize) => void;
-  changeFT: (flowType: FlowType) => void;
-  changeRS: (rs: ReadingSetting) => void;
-  reset: () => void;
-}
-
-interface Props extends ViewSettingProps, WithStyles<typeof styles> {}
+interface Props extends KSState, RSState, ViewSettingsActions, WithStyles<typeof styles> {}
 
 
-const ViewSettings: React.SFC<Props> = (props: Props) => {
-  const { ks, ft, rs, changeKS, changeFT, changeRS, reset, classes } = props;
+const ViewSettingsComponent: React.SFC<Props> = (props: Props) => {
+  const { ks, rs, changeKS, changeRS, resetKS, resetRS, classes } = props;
+  const reset = () => {
+    resetKS();
+    resetRS();
+  }
 
   return (
     <Paper className={classes.root}>
@@ -64,11 +59,14 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
           <FormControl>
             <FormLabel>フローの表現</FormLabel>
             <RadioGroup
-              value={ft}
-              onChange={(e: any) => changeFT(e.target.value as FlowType)}
+              value={ks.hasArrow ? 'arrow' : 'rect'}
+              onChange={(e: any) => {
+                const newKS: KSize = {...ks, hasArrow: e.target.value === 'arrow'};
+                changeKS(newKS);
+              }}
             >
-              <FormControlLabel value={flowType.arrow} control={<Radio />} label="フローチャート" />
-              <FormControlLabel value={flowType.rect}  control={<Radio />} label="包含関係図（オイラー図）" />
+              <FormControlLabel value="arrow" control={<Radio />} label="フローチャート" />
+              <FormControlLabel value="rect"  control={<Radio />} label="包含関係図（オイラー図）" />
             </RadioGroup>
           </FormControl>
         </Grid>
@@ -210,4 +208,4 @@ const ViewSettings: React.SFC<Props> = (props: Props) => {
   );
 }
 
-export default withStyles(styles)(ViewSettings);
+export default withStyles(styles)(ViewSettingsComponent);

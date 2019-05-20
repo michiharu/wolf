@@ -21,7 +21,7 @@ export interface IconWithBadgeProps {
 }
 
 const IconWithBadge: React.FC<IconWithBadgeProps> = (props: IconWithBadgeProps) => {
-  const {ks, x, y, svg, color, backgroundColor, badgeContent, rotate, scale} = props;
+  const {ks, x, y, badgeContent, onClick} = props;
   const iconProps: IconProps = {
     ...props, ks, x: 0, y: 0
   };
@@ -36,6 +36,7 @@ const IconWithBadge: React.FC<IconWithBadgeProps> = (props: IconWithBadgeProps) 
     height: bl * ks.unit,
     fill: theme.palette.primary.main,
     cornerRadius: bl / 2 * ks.unit,
+    onClick,
   };
 
   const textProps = {
@@ -44,6 +45,7 @@ const IconWithBadge: React.FC<IconWithBadgeProps> = (props: IconWithBadgeProps) 
     text: badgeContent,
     fontSize: ks.badgeFontSize * ks.unit,
     fill: '#fff',
+    onClick
   };
 
   return (

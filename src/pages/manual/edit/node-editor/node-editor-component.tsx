@@ -10,15 +10,13 @@ import AddNext from '@material-ui/icons/Forward';
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
 import { TreeNode, Type, KTreeNode, DragRow, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode, KWithArrow } from '../../../../data-types/tree';
-import { toolbarHeight, toolbarMinHeight, ks as defaultKS, rightPainWidth, Task, Switch, Case, Delete, More, Less } from '../../../../settings/layout';
-import { rs as defaultRS } from '../../../../settings/reading';
+import { toolbarHeight, toolbarMinHeight, defaultKS, rightPainWidth, Task, Switch, Case, Delete, More, Less } from '../../../../settings/layout';
 
 import TreeUtil from '../../../../func/tree';
 import TreeNodeUtil from '../../../../func/tree-node';
 import KTreeUtil from '../../../../func/k-tree';
 import KSize from '../../../../data-types/k-size';
 import keys from '../../../../settings/storage-keys';
-import ViewSettings, { ViewSettingProps } from '../../../../components/view-settings';
 import { phrase } from '../../../../settings/phrase';
 import ReadingSetting from '../../../../data-types/reading-settings';
 import KNode from '../../../../components/konva/k-node';
@@ -29,9 +27,11 @@ import { NodeEditMode } from '../../../../data-types/node-edit-mode';
 import { grey } from '@material-ui/core/colors';
 import KMemo from '../../../../components/konva/k-memo';
 import KShadow from '../../../../components/konva/k-shadow';
+import { KSState } from '../../../../redux/states/ksState';
+import { RSState } from '../../../../redux/states/rsState';
 
 
-const styles = (theme: Theme) => createStyles({
+export const styles = (theme: Theme) => createStyles({
   root: {
     overflow: 'scroll',
     height: `calc(100vh - ${toolbarHeight * 2 + theme.spacing.unit}px)`,
@@ -86,21 +86,16 @@ export interface NodeEditorProps {
   mode: NodeEditMode;
   node: TreeNode;
   memoList: KTreeNode[];
-  showViewSettings: boolean;
   edit: (node: TreeNode) => void;
   addMemo: (memo: KTreeNode) => void;
   editMemo: (memo: KTreeNode) => void;
   deleteMemo: (memo: KTreeNode) => void;
-  closeViewSettings: () => void;
 }
 
-interface Props extends NodeEditorProps, WithStyles<typeof styles> {}
+interface Props extends KSState, RSState, NodeEditorProps, WithStyles<typeof styles> {}
 
 interface State {
   didRender: boolean;
-  ks: KSize;
-  ft: FlowType;
-  rs: ReadingSetting;
   dragParent: TreeNode | null;
   dragMemo: KTreeNode | null;
   labelFocus: boolean;
@@ -111,11 +106,9 @@ interface State {
   createBoxText: string;
 }
 
-export type FlowType = 'rect' | 'arrow';
-export const flowType = {rect: 'rect', arrow: 'arrow'};
 export const marginBottom = 40;
 
-class NodeEditor extends React.Component<Props, State> {
+class NodeEditorComponent extends React.Component<Props, State> {
 
   mainRef = React.createRef<HTMLDivElement>();
   stageRef = React.createRef<any>();
@@ -133,24 +126,15 @@ class NodeEditor extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    const state = NodeEditor.getInitialState();
+    const state = NodeEditorComponent.getInitialState();
     this.state = state;
     const kTree = TreeUtil._get(props.node, baseKTreeNode);
-    this.kTree = KTreeUtil.setCalcProps(kTree, state.ks);
+    this.kTree = KTreeUtil.setCalcProps(kTree, props.ks);
   }
 
   static getInitialState = (): State => {
-    const ksFromStorage = localStorage.getItem(keys.ks);
-    const ks = ksFromStorage !== null ? JSON.parse(ksFromStorage) as KSize : defaultKS;
-    const ftFromStorage = localStorage.getItem(keys.ft);
-    const ft = ftFromStorage !== null ? JSON.parse(ftFromStorage) as FlowType : 'arrow';
-    const rsFromStorage = localStorage.getItem(keys.rs);
-    const rs = rsFromStorage !== null ? JSON.parse(rsFromStorage) as ReadingSetting : defaultRS;
     return {
       didRender: false,
-      ks,
-      ft,
-      rs,
       dragParent: null,
       dragMemo: null,
       labelFocus: false,
@@ -195,8 +179,7 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   scroll = () => {
-    const { mode, node, edit } = this.props;
-    const { ks } = this.state;
+    const { mode, node, ks, edit } = this.props;
     const scrollContainer = this.mainRef.current;
     const stage = this.stageRef.current;
     if (scrollContainer === null || stage === null) { throw 'Cannot find elements.'; }
@@ -235,8 +218,7 @@ class NodeEditor extends React.Component<Props, State> {
     const stage = this.stageRef.current;
     if (main === null || stage === null) { throw 'Cannot find elements.'; }
 
-    const { edit } = this.props;
-    const { ks } = this.state;
+    const { ks, edit } = this.props;
     var  kTree = TreeUtil._get(result.node, baseKTreeNode);
     kTree = KTreeUtil.setCalcProps(kTree, ks);
     const focusNode = TreeUtil._find(kTree, result.newNode.id)!;
@@ -267,8 +249,7 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   focus = (target: KTreeNode) => {
-    const { node, edit } = this.props;
-    const { rs, ks } = this.state;
+    const { node, ks, rs, edit } = this.props;
     if (!target.focus && rs.playOnClick) {
       const ssu = new SpeechSynthesisUtterance();
       ssu.text = !Util.isEmpty(target.label) ? target.label :
@@ -301,8 +282,8 @@ class NodeEditor extends React.Component<Props, State> {
 
   focusMemo = (target: KTreeNode) => {
     console.log('focusMemo');
+    const { rs } = this.props;
     const { memoLabelFocus } = this.state;
-    const { rs } = this.state;
     if (!target.focus && rs.playOnClick) {
       const ssu = new SpeechSynthesisUtterance();
       ssu.text = !Util.isEmpty(target.label) ? target.label :
@@ -337,8 +318,8 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   dragMove = (target: KTreeNode, p: Point) => {
-    const { node: tree, edit } = this.props;
-    const {dragParent, ks} = this.state;
+    const { node: tree, ks, edit } = this.props;
+    const {dragParent} = this.state;
     const pointX = Math.round(p.x / ks.unit + ks.rect.w / 2);
     const pointY = Math.round(p.y / ks.unit + ks.rect.h / 2);
 
@@ -377,8 +358,7 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   dragEnd = (target: KTreeNode, p: Point) => {
-    const { mode, node, edit, addMemo } = this.props;
-    const { ks } = this.state;
+    const { mode, node, ks, edit, addMemo } = this.props;
     if (mode === 'dc' && p.x < 0) {
       const scrollContainer = this.mainRef.current;
       const stage = this.stageRef.current;
@@ -408,9 +388,8 @@ class NodeEditor extends React.Component<Props, State> {
 
   dragEndMemo = (memo: KTreeNode) => {
 
-    const { mode, node: tree } = this.props;
+    const { mode, node: tree, ks } = this.props;
     this.setState({dragMemo: null});
-    const { ks } = this.state;
     const scrollContainer = this.mainRef.current;
     const stage = this.stageRef.current;
     if (scrollContainer === null || stage === null) { throw 'Cannot find elements.'; }
@@ -456,8 +435,7 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   keepMemo = (memo: KTreeNode) => {
-    const { mode } = this.props;
-    const { ks } = this.state;
+    const { mode, ks } = this.props;
     const stage = this.stageRef.current;
     if (stage === null) { throw 'Cannot find elements.'; }
 
@@ -472,9 +450,8 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   moveToConvergent = (memo: KTreeNode) => {
-    const { mode, node: tree, memoList, edit, deleteMemo } = this.props;
+    const { mode, node: tree, memoList, ks, edit, deleteMemo } = this.props;
     if (memoList.find(m => m.id === memo.id) === undefined) { return; }
-    const { ks } = this.state;
     const scrollContainer = this.mainRef.current;
     const stage = this.stageRef.current;
     if (scrollContainer === null || stage === null) { throw 'Cannot find elements.'; }
@@ -564,34 +541,9 @@ class NodeEditor extends React.Component<Props, State> {
     process.nextTick(() => this.resize());
   }
 
-  changeKS = (ks: KSize) => {
-    this.setState({ks});
-    localStorage.setItem(keys.ks, JSON.stringify(ks));
-    process.nextTick(() => this.resize());
-  }
-
-  changeFT = (ft: FlowType) => {
-    this.setState({ft});
-    localStorage.setItem(keys.ft, JSON.stringify(ft));
-    process.nextTick(() => this.resize());
-  }
-
-  changeRS = (rs: ReadingSetting) => {
-    this.setState({rs});
-    localStorage.setItem(keys.rs, JSON.stringify(rs));
-  }
-
-  reset = () => {
-    this.setState({ks: defaultKS, ft: 'arrow', rs: defaultRS});
-    localStorage.setItem(keys.ks, JSON.stringify(defaultKS));
-    localStorage.setItem(keys.ft, JSON.stringify('arrow'));
-    localStorage.setItem(keys.rs, JSON.stringify(defaultRS));
-    process.nextTick(() => this.resize());
-  }
-
   createMemo = () => {
-    const { addMemo } = this.props;
-    const { createBoxText, ks } = this.state;
+    const { ks, addMemo } = this.props;
+    const { createBoxText } = this.state;
     const newMemo = TreeUtil.getNewNode('task', baseKTreeNode);
     const stage = this.stageRef.current;
     if (stage === null) { throw 'Cannot find elements.'; }
@@ -617,9 +569,9 @@ class NodeEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const { mode, node: tree, memoList, editMemo, showViewSettings, closeViewSettings, classes } = this.props;
+    const { mode, node: tree, memoList, ks, editMemo, classes } = this.props;
     const {
-      ks, ft, rs, labelFocus, memoLabelFocus, typeAnchorEl, deleteFlag, dragParent, dragMemo, createBoxText
+      labelFocus, memoLabelFocus, typeAnchorEl, deleteFlag, dragParent, dragMemo, createBoxText
     } = this.state;
     const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
     const node = KArrowUtil.setArrow(kTreeNode, ks);
@@ -631,7 +583,6 @@ class NodeEditor extends React.Component<Props, State> {
     const stage = this.stageRef.current;
     const nodeActionProps = {
       ks,
-      ft,
       focus: this.focus,
       expand: (target: KWithArrow) => this.expand(target, !target.open),
       dragStart: this.dragStart,
@@ -643,7 +594,6 @@ class NodeEditor extends React.Component<Props, State> {
 
     const memoActionProps = {
       ks,
-      ft,
       mode,
       focus: this.focusMemo,
       dragStart: this.dragStartMemo,
@@ -651,10 +601,6 @@ class NodeEditor extends React.Component<Props, State> {
       moveToConvergent: this.moveToConvergent,
     };
 
-    const viewSettingProps: ViewSettingProps = {
-      ks, ft, rs,
-      changeKS: this.changeKS, changeFT: this.changeFT, changeRS: this.changeRS, reset: this.reset
-    };
     var CreateBox:        JSX.Element | undefined = undefined;
     var ActionButtonBox:  JSX.Element | undefined = undefined;
     var TypeButton:       JSX.Element | undefined = undefined;
@@ -931,18 +877,9 @@ class NodeEditor extends React.Component<Props, State> {
               <Button onClick={this.deleteSelf} color="primary" autoFocus>削除</Button>
             </DialogActions>
           </Dialog>
-          
-          <Modal
-            open={showViewSettings}
-            onClose={closeViewSettings}
-            BackdropProps={{className: classes.viewSettingModal}}
-            disableAutoFocus
-          >
-            <ViewSettings {...viewSettingProps}/>
-          </Modal>
       </div>
     );
   }
 }
 
-export default withStyles(styles)(NodeEditor);
+export default NodeEditorComponent;

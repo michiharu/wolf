@@ -20,7 +20,7 @@ import { phrase } from '../../../../settings/phrase';
 const styles = (theme: Theme) => createStyles({
   root: {
     position: 'relative',
-    marginTop: theme.spacing.unit * 2,
+    padding: theme.spacing.unit * 2,
     width: '100%',
   },
   select: {

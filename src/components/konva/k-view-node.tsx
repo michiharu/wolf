@@ -6,7 +6,6 @@ import { task, switchSvg, flag } from '../../resource/svg-icon';
 
 import { KWithArrow, KTreeNode, Point } from '../../data-types/tree';
 
-import { FlowType } from '../../pages/manual/edit/node-editor/node-editor';
 import { theme } from '../..';
 import Util from '../../func/util';
 import { phrase } from '../../settings/phrase';
@@ -22,12 +21,11 @@ import { NodeEditMode } from '../../data-types/node-edit-mode';
 export interface KNodeProps {
   node: KWithArrow;
   ks: KSize;
-  ft: FlowType;
   expand: (node: KWithArrow) => void;
 }
 
 const KViewNode: React.FC<KNodeProps> = props => {
-  const { node, ks, ft } = props;
+  const { node, ks, expand } = props;
   const fill = node.type === 'task' ? lightBlue[50] :
               node.type === 'switch' ? amber[100] : yellow[100];
   const baseRectProps = {
@@ -72,7 +70,7 @@ const KViewNode: React.FC<KNodeProps> = props => {
     cornerRadius: ks.cornerRadius * ks.unit,
     stroke: grey[500],
     fill: node.depth.top === 0 ? theme.palette.background.paper : '#00000009',
-    strokeWidth: ft === 'rect' ? 1 : 0,
+    strokeWidth: ks.hasArrow ? 0 : 1,
   };
 
   const arrowBaseProps = {
@@ -93,6 +91,7 @@ const KViewNode: React.FC<KNodeProps> = props => {
     x: (ks.rect.w - ks.rect.h) * ks.unit, y: 0,
     svg: node.open ? less : more,
     badgeContent: node.children.length,
+    onClick: () => expand(node)
   };
 
   return (
@@ -102,8 +101,8 @@ const KViewNode: React.FC<KNodeProps> = props => {
         <Rect {...baseRectProps}/>
         <Icon {...typeProps}/>
         <Text {...labelProps}/>
-        <IconWithBadge {...expandProps}/>
-        {ft === 'arrow' && node.arrows.map((a, i) => {
+        {node.children.length !== 0 && <IconWithBadge {...expandProps}/>}
+        {ks.hasArrow && node.arrows.map((a, i) => {
           const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
           return <Arrow key={`${node.id}-arrow-${i}`} {...arrowBaseProps} points={points}/>;
         })}

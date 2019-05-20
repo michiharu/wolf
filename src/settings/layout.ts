@@ -27,7 +27,7 @@ export { default as Convergent } from '@material-ui/icons/ClearAll'; // converge
 
 
 
-export const ks: KSize = {
+export const defaultKS: KSize = {
   unit: 20,
   rect: {w: 24, h: 3},
   margin: {w: 1, h: 2},
@@ -40,6 +40,7 @@ export const ks: KSize = {
   badgeFontSize: 0.7,
   badgeFontHeight: 0.6,
   cornerRadius: 0.5,
+  hasArrow: true,
   pointerSpace: 0.2,
   pointerLength: 0.4,
   pointerWidth: 0.4

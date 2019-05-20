@@ -12,7 +12,7 @@ export interface NodeViewerActions {
 }
 
 function mapStateToProps(appState: AppState) {
-  return {node: appState.select.node!};
+  return {node: appState.select.node!, ...appState.ks, ...appState.rs};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {

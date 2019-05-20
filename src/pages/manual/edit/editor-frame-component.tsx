@@ -1,10 +1,8 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
-import { AppState } from '../../../redux/store';
 import { ManualState } from '../../../redux/states/manualState';
 import {
   Theme, createStyles, WithStyles, withStyles, Snackbar, IconButton,
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Toolbar, AppBar, Tab, Tabs,
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Tab, Tabs, Modal,
 } from '@material-ui/core';
 import SaveIcon from '@material-ui/icons/Save';
 import Download from '@material-ui/icons/SaveAlt';
@@ -13,17 +11,19 @@ import ViewSettingsIcon from '@material-ui/icons/Settings';
 import { Divergent, Convergent } from '../../../settings/layout' 
 
 import { Tree, TreeNode, baseTreeNode, KTreeNode, Manual } from '../../../data-types/tree';
-import NodeEditor, { NodeEditorProps } from './node-editor/node-editor';
 import { RouteComponentProps, withRouter } from 'react-router';
 import links from '../../../settings/links';
 import TreeUtil from '../../../func/tree';
 import { fileDownload } from '../../../func/file-download';
+import NodeEditorContainer from './node-editor/node-editor-container';
 import TextEditor, { TextEditorProps } from './text-editor/text-editor';
 import TreeNodeUtil from '../../../func/tree-node';
 import { theme } from '../../..';
 import { NodeEditMode } from '../../../data-types/node-edit-mode';
 import { MemoState } from '../../../redux/states/memoState';
 import { EditorFrameActions } from './editor-frame-container';
+import ViewSettingsContainer from '../../../components/view-settings/view-settings-container';
+import { NodeEditorProps } from './node-editor/node-editor-component';
 
 export const styles = (theme: Theme) => createStyles({
   root: {
@@ -46,7 +46,20 @@ export const styles = (theme: Theme) => createStyles({
   },
   editFinishButton: {
     marginLeft: theme.spacing.unit,
-  }
+  },
+  viewSettingModal: {
+    backgroundColor: '#0002',
+  },
+  viewSettingPaper: {
+    position: 'absolute',
+    top: '75vh',
+    left: '50vw',
+    width: '90vw',
+    maxHeight: '45vh',
+    transform: 'translate(-50%, -50%)',
+    padding: theme.spacing.unit * 2,
+    outline: 'none',
+  },
 });
 
 interface Props extends
@@ -65,7 +78,7 @@ interface State {
   hasDifference: boolean;
   cannotSaveReason: CannotSaveReason;
   saved: boolean;
-  showViewSettings: boolean;
+  showVS: boolean;
 }
 
 export type CannotSaveReason = 'switch' | 'case' | null;
@@ -111,7 +124,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
       hasDifference: false,
       cannotSaveReason: null,
       saved: false,
-      showViewSettings: false,
+      showVS: false,
     };
   }
 
@@ -174,20 +187,20 @@ class EditorFrameComponent extends React.Component<Props, State> {
     history.goBack();
   }
 
+  handleShowVS = (showVS: boolean) => () => this.setState({showVS});
+
   render() {
     const { classes } = this.props;
-    const { tabIndex, mode, node, memoList, hasDifference, cannotSaveReason, saved, showViewSettings } = this.state;
+    const { tabIndex, mode, node, memoList, hasDifference, cannotSaveReason, saved, showVS } = this.state;
   
     const nodeProps: NodeEditorProps = {
       mode,
       node,
       memoList,
-      showViewSettings,
       edit: this.edit,
       deleteMemo: this.deleteMemo,
       addMemo: this.addMemo,
       editMemo: this.editMemo,
-      closeViewSettings: () => this.setState({showViewSettings: false}),
     };
 
     const textProps: TextEditorProps = {
@@ -216,14 +229,23 @@ class EditorFrameComponent extends React.Component<Props, State> {
             <Button style={getStyle('dc')} onClick={() => this.setState({mode: 'dc'})}><Divergent/><Convergent className={classes.convergent}/></Button>
             <Button style={getStyle('c')}  onClick={() => this.setState({mode: 'c'})} ><Convergent className={classes.convergent}/></Button>
             <div style={{flexGrow: 1}} />
-            <IconButton onClick={() => this.setState({showViewSettings: true})}><ViewSettingsIcon/></IconButton>
+            <IconButton onClick={this.handleShowVS(true)}><ViewSettingsIcon/></IconButton>
           </>}
 
           <Button variant="contained" color="primary" size="small" onClick={this.save} className={classes.editFinishButton}>編集完了</Button>
         </div>
 
-        {tabIndex === 0 && <NodeEditor {...nodeProps}/>}
+        {tabIndex === 0 && <NodeEditorContainer {...nodeProps}/>}
         {tabIndex === 1 && <TextEditor {...textProps}/>}
+
+        <Modal
+          open={showVS}
+          onClose={this.handleShowVS(false)}
+          BackdropProps={{className: classes.viewSettingModal}}
+          disableAutoFocus
+        >
+          <ViewSettingsContainer />
+        </Modal>
         
         <Dialog open={hasDifference} onClose={() => this.setState({hasDifference: false})}>
           <DialogTitle>マニュアルを保存せずに画面を移動してもよろしいですか？</DialogTitle>

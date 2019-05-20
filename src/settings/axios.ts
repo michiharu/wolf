@@ -4,8 +4,7 @@ import * as env from './env.json';
 import {
   loginURL, nodeURL
 } from '../data-types/api';
-import postLogin from '../mock-data/login/post';
-import getNode from '../mock-data/node/get';
+import postLogin from '../api/mock-data/login/post';
 
 export const baseURL = 'http://localhost:51391';
 
@@ -13,7 +12,6 @@ const axios = env.useMock
   ? (() => {
     const mock = new MockAdapter(axiosbase, { delayResponse: 500 });
     mock.onPost(loginURL).reply(postLogin);
-    mock.onGet (nodeURL) .reply(getNode);
 
     // mock.onGet   (url.organizations).reply(getOrganization);
     // mock.onPost  (url.organizations).reply(postOrganization);

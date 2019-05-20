@@ -7,17 +7,14 @@ import {
 import ViewSettingsIcon from '@material-ui/icons/Settings';
 
 import { Link } from 'react-router-dom';
-import { Manual } from '../../../data-types/tree';
+import { Manual, PullRequest } from '../../../data-types/tree';
 import NodeViewer from './node-viewer/node-viewer-container';
 import TextViewer from './text-editor/text-viewer-container';
 import ManualSettings from './settings/settings';
-import RequestList from './request-list';
-import ViewSettings, { ViewSettingProps } from '../../../components/view-settings';
-import { ks as defaultKS } from '../../../settings/layout';
-import { FlowType } from '../edit/node-editor/node-editor';
-import { rs as defaultRS } from '../../../settings/reading';
-import KSize from '../../../data-types/k-size';
-import ReadingSetting from '../../../data-types/reading-settings';
+import ViewSettingsContainer from '../../../components/view-settings/view-settings-container';
+import RequestContainer from '../request/request-container';
+import RequestListContainer from './request-list/request-list-container';
+import { Action } from 'typescript-fsa';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -52,55 +49,40 @@ const styles = (theme: Theme) => createStyles({
     padding: theme.spacing.unit * 2,
     outline: 'none',
   },
+  viewSettingButton: {
+    marginLeft: theme.spacing.unit
+  }
 });
 
 interface Props extends WithStyles<typeof styles> {
   manual: Manual;
+  request: PullRequest | null;
+  clearRequest: () => Action<void>;
 }
 
 const ViewComponent: React.FC<Props> = props => {
-  const { manual, classes } =  props;
+  const { manual, request, clearRequest, classes } =  props;
 
   const [tabIndex, setTabIndex] = useState(0);
   const [showVS, setShowVS] = useState(false);
 
-  const [ks, setKS] = useState(defaultKS);
-  const [ft, setFT] = useState<FlowType>('arrow');
-  const [rs, setRS] = useState(defaultRS);
-  if (tabIndex !== 0 && showVS) { setShowVS(false); }
-
-  const handleChangeTab = (_: any, i: number) => setTabIndex(i);
+  const handleChangeTab = (_: any, i: number) => {
+    setTabIndex(i);
+    clearRequest();
+  }
   const handleShowVS = () => setShowVS(!showVS);
   const handleCloseVS = () => setShowVS(false);
   const LinkEdit = (le: any) => <Link to={`/manual/${manual.id}/edit`} {...le}/>;
 
-  const changeKS = (ks: KSize) => setKS(ks);
-
-  const changeFT = (ft: FlowType) => setFT(ft);
-
-  const changeRS = (rs: ReadingSetting) => setRS(rs);
-
-  const reset = () => {
-    setKS(defaultKS);
-    setFT('arrow');
-    setRS(rs);
-  }
-
-  const viewSettingProps: ViewSettingProps = {
-    ks, ft, rs,
-    changeKS, changeFT, changeRS, reset
-  };
+  const Request = request === null ? <RequestListContainer/> : <RequestContainer/>;
 
   return (
     <div className={classes.root}>
       <div className={classes.header}>
         <div style={{display: 'flex', height: 48}}>
           <Typography variant="h4">{manual.label}</Typography>
-          <div style={{flexGrow: 1}} />
-          {(tabIndex === 0 || tabIndex === 1) &&
-          <Button component={LinkEdit} variant="contained" color="primary" size="small" style={{height: 48}}>編集する</Button>}
         </div>
-        <div>
+        <div style={{display: 'flex', height: 48}}>
           <Tabs value={tabIndex} onChange={handleChangeTab}>
             <Tab label="ツリー表示"/>
             <Tab label="テキスト表示"/>
@@ -108,14 +90,23 @@ const ViewComponent: React.FC<Props> = props => {
             <Tab label="設定"/>
           </Tabs>
           <div style={{flexGrow: 1}} />
-          <IconButton onClick={handleShowVS}><ViewSettingsIcon/></IconButton>
+          {(tabIndex === 0 || tabIndex === 1) &&
+          <Button component={LinkEdit} color="primary">編集する</Button>}
+
+          {tabIndex === 2 && request !== null && <>
+            <Button  color="primary">採用</Button>
+            <Button color="primary">却下</Button>
+            <Button>キャンセル</Button>
+          </>}
+          {(tabIndex === 0 || (tabIndex === 2 && request !== null)) &&
+          <IconButton className={classes.viewSettingButton} onClick={handleShowVS}><ViewSettingsIcon/></IconButton>}
         </div>
       </div>
       <Divider/>
       <div>
         {tabIndex === 0 && <NodeViewer/>}
         {tabIndex === 1 && <TextViewer itemNumber={manual.label} />}
-        {tabIndex === 2 && <RequestList manual={manual}/>}
+        {tabIndex === 2 && Request}
         {tabIndex === 3 && <ManualSettings manual={manual}/>}
       </div>
       <Modal
@@ -124,7 +115,7 @@ const ViewComponent: React.FC<Props> = props => {
         BackdropProps={{className: classes.viewSettingModal}}
         disableAutoFocus
       >
-        <ViewSettings {...viewSettingProps}/>
+        <ViewSettingsContainer/>
       </Modal>
     </div>
   );
