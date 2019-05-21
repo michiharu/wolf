@@ -7,6 +7,7 @@ import {
 import { Manual } from '../../../../data-types/tree';
 import Collaborators from './collaborators';
 import Operation from './operation';
+import Copy from './copy';
 import DeleteForm from './delete';
 
 const styles = (theme: Theme) => createStyles({
@@ -38,6 +39,9 @@ const ManualSettings: React.FC<Props> = props => {
                 <ListItemText>運用</ListItemText>
               </ListItem>
               <ListItem button selected={selected === 2} onClick={handleSelect(2)}>
+                <ListItemText>マニュアルの複製</ListItemText>
+              </ListItem>
+              <ListItem button selected={selected === 3} onClick={handleSelect(3)}>
                 <ListItemText>マニュアルの非公開・削除</ListItemText>
               </ListItem>
             </List>
@@ -46,7 +50,8 @@ const ManualSettings: React.FC<Props> = props => {
         <Grid item sm={8}>
           {selected === 0 && <Collaborators manual={manual}/>}
           {selected === 1 && <Operation manual={manual}/>}
-          {selected === 2 && <DeleteForm manual={manual}/>}          
+          {selected === 2 && <Copy manual={manual}/>}
+          {selected === 3 && <DeleteForm manual={manual}/>}
         </Grid>
       </Grid>
     </div>

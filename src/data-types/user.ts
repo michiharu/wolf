@@ -4,9 +4,9 @@ export default interface User {
   id: string;
   lastName: string;
   firstName: string;
-  userManagement: Authority;
-  groupManagement: Authority;
-  isOperationManager: boolean;
-  canPullRequest: boolean;
-  followIds: string[];
+  userManagement: Authority;   // ユーザー管理権限
+  groupManagement: Authority;  // グループ管理権限
+  isOperationManager: boolean; // 運用権限
+  canPullRequest: boolean;     // プルリク権限
+  followIds: string[];         // フォローしているID
 }

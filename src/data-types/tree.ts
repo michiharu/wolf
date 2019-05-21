@@ -41,7 +41,8 @@ export interface Manual extends Tree {
   inOperation: boolean;
   reviewer: string | null;
   pullRequests: PullRequest[];
-  userIds: string[];
+  assignIds: string[];
+  followIds: string[];
 }
 
 export const baseManual: Manual = {
@@ -52,7 +53,8 @@ export const baseManual: Manual = {
   inOperation: false,
   reviewer: null,
   pullRequests: [],
-  userIds: [],
+  assignIds: [],
+  followIds: [],
 };
 
 export interface PullRequest extends Tree {
