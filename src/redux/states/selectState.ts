@@ -18,6 +18,7 @@ const initialState: SelectState = {
 
 export const selectReducer = reducerWithInitialState(initialState)
 .case(selectActions.setManual, (state, manual) => ({...state, manual}))
+.case(selectActions.clearManual, (state) => ({...state, manual: null}))
 .case(selectActions.setNode,   (state, node) => ({...state, node}))
 .case(selectActions.setRequest,   (state, request) => ({...state, request}))
 .case(selectActions.clearRequest,   (state) => ({...state, request: null}))

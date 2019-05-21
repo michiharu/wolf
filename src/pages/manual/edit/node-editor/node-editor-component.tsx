@@ -824,59 +824,59 @@ class NodeEditorComponent extends React.Component<Props, State> {
 
     return (
       <div className={classes.root} ref={this.mainRef}>
-          <div style={largeContainerStyle}>
-            <Stage ref={this.stageRef} onClick={this.deleteFocus}>
-              <Layer>
-                {mode !== 'd' && stage !== null && (
-                <Group ref={this.convergentShadowRef} x={mode === 'dc' ? stage.width() / 2 : 0}>
-                  {/* shadow */}
-                  {flatNodes
-                  .filter(n => dragParent !== null && !n.isDragging)
-                  .map(n => <KShadow key={n.id} node={n} labelFocus={labelFocus} {...nodeActionProps}/>)}
-                </Group>)}
+        <div style={largeContainerStyle}>
+          <Stage ref={this.stageRef} onClick={this.deleteFocus}>
+            <Layer>
+              {mode !== 'd' && stage !== null && (
+              <Group ref={this.convergentShadowRef} x={mode === 'dc' ? stage.width() / 2 : 0}>
+                {/* shadow */}
+                {flatNodes
+                .filter(n => dragParent !== null && !n.isDragging)
+                .map(n => <KShadow key={n.id} node={n} labelFocus={labelFocus} {...nodeActionProps}/>)}
+              </Group>)}
 
-                {mode !== 'c' && dragParent !== null && MemoGroup}
-                
-                {mode !== 'd' && stage !== null && (
-                <Group ref={this.convergentRef} x={mode === 'dc' ? stage.width() / 2 : 0}>
-                  {/* dragging */}
-                  {flatNodes
-                  .filter(n => dragParent === null ? true : n.isDragging)
-                  .map(n => <KNode key={n.id} mode={mode} node={n} labelFocus={labelFocus} {...nodeActionProps}/>)}
-                  {/* <DragMapForTree node={node} rows={rows} ks={ks} /> */}
-                  {/* <DropMap node={node} flatNodes={flatNodes} ks={ks}/> */}
-                </Group>)}
-                {mode === 'dc' && stage !== null && (
-                <Rect
-                  x={stage.width() / 2}
-                  y={0}
-                  width={2}
-                  height={stage.height()}
-                  fill={grey[300]}
-                />)}
-                {mode !== 'c' && dragParent === null && MemoGroup}
-              </Layer>
-            </Stage>
-            {CreateBox}
-            {ActionButtonBox}
-            {Label}
-            {TypeButton}
-            {ExpandButton}
-            {MemoLabel}
-          </div>
+              {mode !== 'c' && dragParent !== null && MemoGroup}
+              
+              {mode !== 'd' && stage !== null && (
+              <Group ref={this.convergentRef} x={mode === 'dc' ? stage.width() / 2 : 0}>
+                {/* dragging */}
+                {flatNodes
+                .filter(n => dragParent === null ? true : n.isDragging)
+                .map(n => <KNode key={n.id} mode={mode} node={n} labelFocus={labelFocus} {...nodeActionProps}/>)}
+                {/* <DragMapForTree node={node} rows={rows} ks={ks} /> */}
+                {/* <DropMap node={node} flatNodes={flatNodes} ks={ks}/> */}
+              </Group>)}
+              {mode === 'dc' && stage !== null && (
+              <Rect
+                x={stage.width() / 2}
+                y={0}
+                width={2}
+                height={stage.height()}
+                fill={grey[300]}
+              />)}
+              {mode !== 'c' && dragParent === null && MemoGroup}
+            </Layer>
+          </Stage>
+          {CreateBox}
+          {ActionButtonBox}
+          {Label}
+          {TypeButton}
+          {ExpandButton}
+          {MemoLabel}
+        </div>
 
-          <Dialog open={deleteFlag} onClose={() => this.setState({deleteFlag: false})}>
-            <DialogTitle>この項目を削除してもよろしいですか？</DialogTitle>
-            {focusNode !== undefined && focusNode.children.length !== 0 &&
-            <DialogContent>
-              <DialogContentText>この項目には詳細項目が含まれています。削除してもよろしいですか？</DialogContentText>
-            </DialogContent>}
-            
-            <DialogActions>
-              <Button onClick={() => this.setState({deleteFlag: false})}>キャンセル</Button>
-              <Button onClick={this.deleteSelf} color="primary" autoFocus>削除</Button>
-            </DialogActions>
-          </Dialog>
+        <Dialog open={deleteFlag} onClose={() => this.setState({deleteFlag: false})}>
+          <DialogTitle>この項目を削除してもよろしいですか？</DialogTitle>
+          {focusNode !== undefined && focusNode.children.length !== 0 &&
+          <DialogContent>
+            <DialogContentText>この項目には詳細項目が含まれています。削除してもよろしいですか？</DialogContentText>
+          </DialogContent>}
+          
+          <DialogActions>
+            <Button onClick={() => this.setState({deleteFlag: false})}>キャンセル</Button>
+            <Button onClick={this.deleteSelf} color="primary" autoFocus>削除</Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }

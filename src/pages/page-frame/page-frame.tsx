@@ -1,16 +1,18 @@
 import * as React from 'react';
 import {useState} from 'react';
 import { Route, Switch, Redirect, Link } from 'react-router-dom';
-import links from '../settings/links';
-import Dashboard from './dashboard/dashboard-component';
-import { Theme, createStyles, WithStyles, AppBar, Toolbar, Button, Tabs, Tab, InputBase, withStyles } from '@material-ui/core';
-import { Search } from '@material-ui/icons';
+import links from '../../settings/links';
+import Dashboard from '../dashboard/dashboard-component';
+import { Theme, createStyles, WithStyles, Toolbar, Button, Tabs, Tab, InputBase, withStyles, IconButton, Badge, Typography } from '@material-ui/core';
+import { Search, Notifications } from '@material-ui/icons';
 import { fade } from '@material-ui/core/styles/colorManipulator';
-import ViewContainer from './manual/view/view-container';
-import EditorFrameContainer from './manual/edit/editor-frame-container';
-import RequestContainer from './manual/request/request-container';
+import AppBarContainer from './app-bar/app-bar-container';
+import ViewContainer from '../manual/view/view-container';
+import EditorFrameContainer from '../manual/edit/editor-frame-container';
+import RequestContainer from '../manual/request/request-container';
+import User from '../../data-types/user';
 
-const styles = (theme: Theme) => createStyles({
+export const styles = (theme: Theme) => createStyles({
   search: {
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
@@ -56,36 +58,14 @@ const styles = (theme: Theme) => createStyles({
 
 interface Props extends WithStyles<typeof styles> {}
 
-const PageRouter: React.FC<Props> = (props) => {
+const PageFrame: React.FC<Props> = (props) => {
   const { classes } = props;
 
   const [searchText, setSearchText] = useState('');
   const LogoLink = (llp: any) => <Link to={links.dashboard} {...llp}/>;
   return (
     <div>
-      <AppBar>
-        <Toolbar>
-          <Button component={LogoLink} color="inherit" size="large">Flow Like</Button>
-
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <Search />
-            </div>
-            <InputBase
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
-              }}
-              onChange={e => setSearchText(e.target.value)}
-            />
-          </div>
-          <Button color="inherit">フォロー</Button>
-          <Button color="inherit">お気に入り</Button>
-          <Button color="inherit">Item Three</Button>
-          <div style={{flexGrow: 1}} />
-        </Toolbar>
-      </AppBar>
+      <AppBarContainer/>
       <main className={classes.main}>
         <div className={classes.toolbar}/>
         <Switch>
@@ -100,4 +80,4 @@ const PageRouter: React.FC<Props> = (props) => {
   );
 }
 
-export default withStyles(styles)(PageRouter);
+export default withStyles(styles)(PageFrame);

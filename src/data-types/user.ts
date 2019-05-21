@@ -8,4 +8,5 @@ export default interface User {
   groupManagement: Authority;
   isOperationManager: boolean;
   canPullRequest: boolean;
+  followIds: string[];
 }

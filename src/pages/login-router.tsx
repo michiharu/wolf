@@ -3,9 +3,10 @@ import { connect } from 'react-redux';
 import { AppState } from '../redux/store';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import links from '../settings/links';
-import PageRouter from './page-router';
 import LoginContainer from './login/login-container';
 import { LoginState } from '../redux/states/loginState';
+import PageFrame from './page-frame/page-frame';
+import { user1 } from '../api/mock-data/common-data/users';
 
 
 interface Props extends LoginState {}
@@ -15,7 +16,7 @@ const LoginRouter: React.SFC<Props> = (props) => (
     <Switch>
       {props.user === null && <Route exact path={links.login} render={() => <LoginContainer/>}/>}
       {props.user === null && <Redirect to={links.login}/>}
-      <Route render={() => <PageRouter />}/>
+      <Route render={() => <PageFrame/>}/>
     </Switch>
   </BrowserRouter>
 );

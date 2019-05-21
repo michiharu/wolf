@@ -34,12 +34,12 @@ const KViewNode: React.FC<KNodeProps> = props => {
     height: node.rect.h * ks.unit,
     cornerRadius: 4,
     fill,
-    stroke: node.focus ? '#80bdff' : '#0000',
+    stroke: '#0000',
     strokeWidth: 6,
-    shadowColor: node.focus ? '#80bdff' : 'black',
+    shadowColor: 'black',
     shadowBlur: 6,
-    shadowOffsetY: node.focus ? 0 : 3,
-    shadowOpacity: node.focus ? 1 : 0.2,
+    shadowOffsetY: 3,
+    shadowOpacity: 0.2,
   };
 
   const labelProps = {

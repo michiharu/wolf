@@ -21,12 +21,12 @@ const Dashboard: React.FC<Props> = (props: Props) => {
   
   return (
     <Grid container>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} lg={5}>
         <div className={classes.container}>
           <ManualList/>
         </div>
       </Grid>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} lg={7}>
       
       </Grid>
     </Grid>

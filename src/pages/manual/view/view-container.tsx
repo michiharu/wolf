@@ -18,9 +18,9 @@ import { ksActions } from '../../../redux/actions/ksAction';
 import ReadingSetting from '../../../data-types/reading-settings';
 import { rsActions } from '../../../redux/actions/rsAction';
 
-
 export interface ViewActions {
   setManual: (manual: Manual) => Action<Manual>;
+  clearManual: () => Action<void>;
   setNode:   (node: TreeNode) => Action<TreeNode>;
   clearRequest: () => Action<void>;
 }
@@ -31,21 +31,17 @@ interface Props extends
   ViewActions, RouteComponentProps<{id: string}> {}
 
 const ViewContainer: React.FC<Props> = props => {
-  const {
-    manuals, manual, request, setManual, setNode, clearRequest,
-    match
-  } =  props;
+  const { manuals, manual, request, setManual, clearManual, setNode, clearRequest, match } =  props;
 
-  const manualId = match.params.id;
-  if (manual === null || manual.id !== manualId) {
+  if (manual === null || manual.id !== match.params.id) {
     const selected = TreeUtil._findArray(manuals, match.params.id)!
     setManual(selected);
     const tree = TreeUtil._get<Tree, TreeNode>(selected, baseTreeNode);
     setNode(TreeNodeUtil._init(tree));
     return <p>loading...</p>
   }
-
-  return <ViewComponent manual={manual} request={request} clearRequest={clearRequest}/>;
+  const componentProps = {manual, request, clearManual, clearRequest};
+  return <ViewComponent {...componentProps}/>;
 }
 
 function mapStateToProps(appState: AppState) {
@@ -55,6 +51,7 @@ function mapStateToProps(appState: AppState) {
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
     setManual: (manual: Manual) => dispatch(selectActions.setManual(manual)),
+    clearManual: () => dispatch(selectActions.clearManual()),
     setNode:   (node: TreeNode) => dispatch(selectActions.setNode(node)),
     clearRequest: () => dispatch(selectActions.clearRequest()),
     changeKS:  (ks: KSize) => dispatch(ksActions.change(ks)),

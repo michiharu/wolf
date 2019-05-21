@@ -8,6 +8,7 @@ export const user1: User = {
   groupManagement: {canCreate: true, canEdit: true, canDelete: true},
   isOperationManager: true,
   canPullRequest: true,
+  followIds: [],
 };
 
 export const user2: User = {
@@ -18,6 +19,7 @@ export const user2: User = {
   groupManagement: {canCreate: true, canEdit: true, canDelete: true},
   isOperationManager: true,
   canPullRequest: true,
+  followIds: [],
 };
 
 export const user3: User = {
@@ -28,6 +30,7 @@ export const user3: User = {
   groupManagement: {canCreate: false, canEdit: false, canDelete: false},
   isOperationManager: false,
   canPullRequest: false,
+  followIds: [],
 };
 
 export const user4: User = {
@@ -36,6 +39,7 @@ export const user4: User = {
   firstName: '小五郎',
   userManagement: {canCreate: false, canEdit: false, canDelete: false},
   groupManagement: {canCreate: false, canEdit: false, canDelete: false},
-  isOperationManager: true,
+  isOperationManager: false,
   canPullRequest: true,
+  followIds: [],
 };

@@ -38,7 +38,7 @@ const ManualSettings: React.FC<Props> = props => {
                 <ListItemText>運用</ListItemText>
               </ListItem>
               <ListItem button selected={selected === 2} onClick={handleSelect(2)}>
-                <ListItemText>マニュアルの削除</ListItemText>
+                <ListItemText>マニュアルの非公開・削除</ListItemText>
               </ListItem>
             </List>
           </Paper>

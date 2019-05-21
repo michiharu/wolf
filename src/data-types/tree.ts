@@ -37,18 +37,22 @@ export const baseTree: Tree = {
 export interface Manual extends Tree {
   ownerId: string;
   collaboratorIds: string[];
+  isPublic: boolean;
   inOperation: boolean;
   reviewer: string | null;
   pullRequests: PullRequest[];
+  userIds: string[];
 }
 
 export const baseManual: Manual = {
   ...baseTree,
   ownerId: '',
   collaboratorIds: [],
+  isPublic: true,
   inOperation: false,
   reviewer: null,
   pullRequests: [],
+  userIds: [],
 };
 
 export interface PullRequest extends Tree {
