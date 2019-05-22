@@ -4,12 +4,12 @@ import { AppState } from '../redux/store';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import links from '../settings/links';
 import LoginContainer from './login/login-container';
-import { LoginState } from '../redux/states/loginState';
+import { LoginUserState } from '../redux/states/loginUserState';
 import PageFrame from './page-frame/page-frame';
 import { user1 } from '../api/mock-data/common-data/users';
 
 
-interface Props extends LoginState {}
+interface Props extends LoginUserState {}
 
 const LoginRouter: React.SFC<Props> = (props) => (
   <BrowserRouter>
@@ -22,7 +22,7 @@ const LoginRouter: React.SFC<Props> = (props) => (
 );
 
 function mapStateToProps(appState: AppState) {
-  return appState.login;
+  return appState.loginUser;
 }
 
 export default connect(mapStateToProps)(LoginRouter);

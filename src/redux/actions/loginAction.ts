@@ -1,9 +1,14 @@
 import actionCreatorFactory, { ActionCreator, Success, Failure } from 'typescript-fsa';
-import User from '../../data-types/user';
 
-const actionCreator = actionCreatorFactory();
+export interface LoginInfo {
+  id: string;
+  password: string;
+}
+export const actionCreator = actionCreatorFactory();
+export const ACTIONS_LOGIN = 'ACTIONS_LOGIN';
+export const ACTIONS_LOGOUT = 'ACTIONS_LOGOUT';
 
 export const loginActions = {
-  login:  actionCreator<User>('ACTIONS_LOGIN'),
-  logout: actionCreator<void>('ACTIONS_LOGOUT'),
+  login:  actionCreator<LoginInfo>(ACTIONS_LOGIN),
+  logout: actionCreator<void>(ACTIONS_LOGOUT),
 };

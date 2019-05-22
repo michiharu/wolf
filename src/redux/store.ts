@@ -1,13 +1,15 @@
-import { createStore, combineReducers } from 'redux';
-import { LoginState,  loginReducer }    from './states/loginState'
+import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
+import { LoginUserState,  loginUserReducer }    from './states/loginUserState';
 import { ManualState, manualReducer }   from './states/manualState';
 import { MemoState, memoReducer } from './states/memoState';
 import { SelectState, selectReducer } from './states/selectState';
 import { KSState, ksReducer } from './states/ksState';
 import { RSState, rsReducer } from './states/rsState';
+import createSagaMiddleware from '@redux-saga/core';
+import { rootSaga } from './saga';
 
 export type AppState = {
-  login: LoginState,
+  loginUser: LoginUserState,
   manuals: ManualState,
   select: SelectState,
   memos: MemoState,
@@ -15,17 +17,21 @@ export type AppState = {
   rs: RSState,
 };
 
+const sagaMiddleware = createSagaMiddleware();
+const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
 const store = createStore(
   combineReducers<AppState>({
-    login: loginReducer,
+    loginUser: loginUserReducer,
     manuals: manualReducer,
     select: selectReducer,
     memos: memoReducer,
     ks: ksReducer,
     rs: rsReducer,
   }),
-  (window as any).__REDUX_DEVTOOLS_EXTENSION__ &&
-    (window as any).__REDUX_DEVTOOLS_EXTENSION__()
+  composeEnhancers(applyMiddleware(sagaMiddleware))
 );
+
+sagaMiddleware.run(rootSaga)
 
 export default store;

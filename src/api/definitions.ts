@@ -1,5 +1,6 @@
 import User from "../data-types/user";
 import { Tree, KTreeNode, Manual } from "../data-types/tree";
+import Feed from "../data-types/feed";
 
 /* Login */
 export const loginURL = '/api/v1/login';
@@ -8,10 +9,15 @@ export interface LoginPostRequest {
   id: string;
   password: string;
 }
+
 export interface LoginPostResponse {
   user: User | null;
   users: User[];
-  manuals: Manual[];
+  owers: Manual[]; // 片方向参照
+  collabos: Manual[]; // 両方向参照
+  follows: Manual[]; // 両方向参照
+  stars: Manual[];  // 片方向参照＋参照カウンター
+  feeds: Feed[];
   commons: Tree[];
   memos: KTreeNode[];
 }

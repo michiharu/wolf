@@ -8,7 +8,7 @@ import {
 
 import TreeUtil from '../../../func/tree';
 import { ManualState } from '../../../redux/states/manualState';
-import { LoginState } from '../../../redux/states/loginState';
+import { LoginUserState } from '../../../redux/states/loginUserState';
 import { CreateManualActions } from './create-manual-container';
 import { baseManual, Manual } from '../../../data-types/tree';
 import User from '../../../data-types/user';

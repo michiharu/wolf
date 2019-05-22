@@ -12,7 +12,7 @@ export interface CreateManualActions {
 }
 
 function mapStateToProps(appState: AppState) {
-  return {user: appState.login.user!, ...appState.manuals};
+  return {user: appState.loginUser.user!, ...appState.manuals};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {

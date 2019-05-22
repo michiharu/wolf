@@ -7,7 +7,7 @@ import User from '../../../data-types/user';
 import appBarComponent from './app-bar-component';
 
 function mapStateToProps(appState: AppState) {
-  return {user: appState.login.user!};
+  return {user: appState.loginUser.user!};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {

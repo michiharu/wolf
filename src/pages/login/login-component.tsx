@@ -46,7 +46,7 @@ const styles = (theme: Theme) =>
 interface Props extends LoginActions, WithStyles<typeof styles> {}
 
 const LoginComponent: React.FC<Props> = props => {
-  const { login, changeManuals, classes } = props;
+  const { login, classes } = props;
   const [id, setId] = useState('1');
   const [password, setPassword] = useState('1');
   const [showPassword, setShowPassword] = useState(false);
@@ -55,12 +55,7 @@ const LoginComponent: React.FC<Props> = props => {
   const handleChangeShowPassword = () => setShowPassword(!showPassword);
 
   const handleLogin = () => {
-    axios.post(loginURL, {id, password})
-    .then(res => {
-      const rootState = res.data as LoginPostResponse;
-      login(rootState.user!);
-      changeManuals(rootState.manuals);
-    });    
+    login({id, password});
   }
 
   return (
