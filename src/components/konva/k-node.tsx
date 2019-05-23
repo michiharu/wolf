@@ -46,6 +46,7 @@ class KNode extends React.Component<KNodeProps> {
   }
 
   handleFocus = (e: any) => {
+    console.log('handleFocus')
     e.cancelBubble = true;
     const {node, focus} = this.props;
     focus(node);

@@ -1,6 +1,6 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 import { LoginUserState,  loginUserReducer }    from './states/loginUserState';
-import { ManualState, manualReducer }   from './states/manualState';
+import { ManualsState, manualsReducer }   from './states/manualsState';
 import { MemoState, memoReducer } from './states/memoState';
 import { SelectState, selectReducer } from './states/selectState';
 import { KSState, ksReducer } from './states/ksState';
@@ -10,7 +10,7 @@ import { rootSaga } from './saga';
 
 export type AppState = {
   loginUser: LoginUserState,
-  manuals: ManualState,
+  manuals: ManualsState,
   select: SelectState,
   memos: MemoState,
   ks: KSState,
@@ -23,7 +23,7 @@ const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ||
 const store = createStore(
   combineReducers<AppState>({
     loginUser: loginUserReducer,
-    manuals: manualReducer,
+    manuals: manualsReducer,
     select: selectReducer,
     memos: memoReducer,
     ks: ksReducer,

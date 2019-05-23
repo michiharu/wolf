@@ -9,7 +9,7 @@ import {
 
 import TreeUtil from '../../func/tree';
 import ExpansionTree from '../../components/expansion-tree/expansion-tree';
-import { ManualState } from '../../redux/states/manualState';
+import { ManualsState } from '../../redux/states/manualsState';
 import { Add } from '@material-ui/icons';
 import CreateManualContainer from './create-manual/create-manual-container';
 
@@ -20,7 +20,7 @@ const styles = (theme: Theme) => createStyles({
   }
 });
 
-interface Props extends ManualState, WithStyles<typeof styles> {}
+interface Props extends ManualsState, WithStyles<typeof styles> {}
 
 const ManualList: React.FC<Props> = (props: Props) => {
 

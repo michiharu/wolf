@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core';
 
 import TreeUtil from '../../../func/tree';
-import { ManualState } from '../../../redux/states/manualState';
+import { ManualsState } from '../../../redux/states/manualsState';
 import { LoginUserState } from '../../../redux/states/loginUserState';
 import { CreateManualActions } from './create-manual-container';
 import { baseManual, Manual } from '../../../data-types/tree';
@@ -22,7 +22,7 @@ export const styles = (theme: Theme) => createStyles({
   }
 });
 
-interface Props extends ManualState, CreateManualActions, WithStyles<typeof styles> {
+interface Props extends ManualsState, CreateManualActions, WithStyles<typeof styles> {
   user: User;
   willCreate: boolean;
   handleWillCreate: () => void;

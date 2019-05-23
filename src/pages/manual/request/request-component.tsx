@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useState} from 'react';
 import { connect } from 'react-redux';
 import { AppState } from '../../../redux/store';
-import { ManualState } from '../../../redux/states/manualState';
+import { ManualsState } from '../../../redux/states/manualsState';
 import {
   Theme, createStyles, WithStyles, IconButton, Button, Tab, Tabs, Grid, Paper, withStyles,
 } from '@material-ui/core';

@@ -45,7 +45,7 @@ const styles = (theme: Theme) => createStyles({
 interface Props extends KSState, RSState, ViewSettingsActions, WithStyles<typeof styles> {}
 
 
-const ViewSettingsComponent: React.SFC<Props> = (props: Props) => {
+const ViewSettingsComponent: React.FC<Props> = (props: Props) => {
   const { ks, rs, changeKS, changeRS, resetKS, resetRS, classes } = props;
   const reset = () => {
     resetKS();

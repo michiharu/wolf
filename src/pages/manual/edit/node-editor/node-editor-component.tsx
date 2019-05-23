@@ -249,7 +249,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
   }
 
   focus = (target: KTreeNode) => {
-    const { node, ks, rs, edit } = this.props;
+    const { node, rs, edit } = this.props;
     if (!target.focus && rs.playOnClick) {
       const ssu = new SpeechSynthesisUtterance();
       ssu.text = !Util.isEmpty(target.label) ? target.label :
@@ -261,13 +261,6 @@ class NodeEditorComponent extends React.Component<Props, State> {
       speechSynthesis.cancel();
       speechSynthesis.speak(ssu);
     }
-
-    const stage = this.stageRef.current!;
-    const scrollContainer = this.mainRef.current!;
-    const dx = scrollContainer.scrollLeft;
-    const targetLeft = target.point.x * ks.unit;
-    const targetRight = (target.point.x + target.rect.w) * ks.unit;
-    if (targetLeft < dx || stage.width() / 2 + dx < targetRight) { return; }
 
     if (!target.focus) {
       const newNode = TreeNodeUtil._focus(node, target.id);
@@ -281,7 +274,6 @@ class NodeEditorComponent extends React.Component<Props, State> {
   }
 
   focusMemo = (target: KTreeNode) => {
-    console.log('focusMemo');
     const { rs } = this.props;
     const { memoLabelFocus } = this.state;
     if (!target.focus && rs.playOnClick) {

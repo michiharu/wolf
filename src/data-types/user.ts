@@ -8,5 +8,4 @@ export default interface User {
   groupManagement: Authority;  // グループ管理権限
   isOperationManager: boolean; // 運用権限
   canPullRequest: boolean;     // プルリク権限
-  starIds: string[];           // お気に入り登録しているID
 }

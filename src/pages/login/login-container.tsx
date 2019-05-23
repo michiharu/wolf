@@ -3,7 +3,7 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { AppState } from '../../redux/store';
 import { loginActions, LoginInfo } from '../../redux/actions/loginAction';
-import { manualActions } from '../../redux/actions/manualAction';
+import { manualsAction } from '../../redux/actions/manualsAction';
 import LoginComponent from './login-component';
 import User from '../../data-types/user';
 import { Manual } from '../../data-types/tree';

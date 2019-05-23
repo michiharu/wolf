@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ManualState } from '../../../redux/states/manualState';
+import { ManualsState } from '../../../redux/states/manualsState';
 import {
   Theme, createStyles, WithStyles, withStyles, Snackbar, IconButton,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Tab, Tabs, Modal,
@@ -63,7 +63,7 @@ export const styles = (theme: Theme) => createStyles({
 });
 
 interface Props extends
-  ManualState,
+  ManualsState,
   MemoState,
   EditorFrameActions,
   WithStyles<typeof styles>,
@@ -140,6 +140,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 
   edit = (editNode: TreeNode) => {
+    console.log('edit')
     this.setState({node: editNode});
   }
 

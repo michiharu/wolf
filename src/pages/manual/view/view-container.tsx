@@ -3,7 +3,7 @@ import { Action } from 'typescript-fsa';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { AppState } from '../../../redux/store';
-import { ManualState } from       '../../../redux/states/manualState';
+import { ManualsState } from       '../../../redux/states/manualsState';
 import { SelectState } from '../../../redux/states/selectState';
 import { selectActions } from '../../../redux/actions/selectAction';
 
@@ -26,7 +26,7 @@ export interface ViewActions {
 }
 
 interface Props extends
-  ManualState,
+  ManualsState,
   SelectState,
   ViewActions, RouteComponentProps<{id: string}> {}
 

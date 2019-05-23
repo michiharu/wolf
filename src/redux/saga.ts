@@ -1,23 +1,24 @@
 import { put, call, fork, take } from 'redux-saga/effects';
-import { Action } from 'typescript-fsa';
-import * as API from '../api/axios-func/axios';
-import { ACTIONS_LOGIN, LoginInfo } from './actions/loginAction';
-import { loginUserActions } from './actions/loginUserAction';
+import * as API from '../api/axios-func/login';
+import { ACTIONS_LOGIN } from './actions/loginAction';
+import { loginUserAction } from './actions/loginUserAction';
+import { LoginPostResponse } from '../api/definitions';
+import { manualsAction } from './actions/manualsAction';
+import { usersAction } from './actions/usersAction';
 
 function* handleRequestLogin() {
   while (true) {
-    console.log('This is handleRequestLogin().')
     const action = yield take(ACTIONS_LOGIN);
-    const { user } = yield call(API.login, action.payload);
-    console.log('This is payload after call.')
-    console.log(user)
-    if (user) {
-      yield put(loginUserActions.set(user));
+    const data = yield call(API.login, action.payload);
+    if (data.error === undefined) {
+      const { user, users, manuals } = data as LoginPostResponse;
+      yield put(loginUserAction.set(user));
+      yield put(usersAction.change(users));
+      yield put(manualsAction.change(manuals));
     }
   }
 }
 
 export function* rootSaga() {
-  console.log('This is rootSaga().')
   yield fork(handleRequestLogin);
 }

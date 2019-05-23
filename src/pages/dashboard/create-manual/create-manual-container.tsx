@@ -2,7 +2,7 @@ import { Action } from 'typescript-fsa';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { AppState } from '../../../redux/store';
-import { manualActions } from '../../../redux/actions/manualAction';
+import { manualsAction } from '../../../redux/actions/manualsAction';
 import { Manual } from '../../../data-types/tree';
 import CreateManualComponent, { styles } from './create-manual-component';
 import { withStyles } from '@material-ui/core';
@@ -17,7 +17,7 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    changeManuals: (manuals: Manual[]) => dispatch(manualActions.change(manuals)),
+    changeManuals: (manuals: Manual[]) => dispatch(manualsAction.change(manuals)),
   };
 }
 

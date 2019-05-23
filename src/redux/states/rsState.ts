@@ -13,4 +13,4 @@ const initialState: RSState = {
 
 export const rsReducer = reducerWithInitialState(initialState)
 .case(rsActions.change, (state, rs) => ({...state, rs}))
-.case(rsActions.reset, (state) => ({...state, ks: defaultRS}))
+.case(rsActions.reset, (state) => ({...state, rs: defaultRS}))

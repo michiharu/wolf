@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { withStyles } from '@material-ui/core';
 import { AppState } from '../../../redux/store';
 import { Tree, KTreeNode, Manual } from '../../../data-types/tree';
-import { manualActions } from '../../../redux/actions/manualAction';
+import { manualsAction } from '../../../redux/actions/manualsAction';
 import { memoActions } from '../../../redux/actions/memoAction';
 import EditorFrameComponent, { styles } from './editor-frame-component';
 
@@ -19,7 +19,7 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    changeManuals: (manuals: Manual[]) => dispatch(manualActions.change(manuals)),
+    changeManuals: (manuals: Manual[]) => dispatch(manualsAction.change(manuals)),
     changeMemos:   (memos: KTreeNode[]) => dispatch(memoActions.change(memos)),
   };
 }

@@ -11,10 +11,9 @@ export interface LoginPostRequest {
 }
 
 export interface LoginPostResponse {
-  user: User | null;
+  user: User;
   users: User[];
-  owers: Manual[]; // 片方向参照
-  collabos: Manual[]; // 両方向参照
+  manuals: Manual[]; // owerなら片方向参照、collaboなら両方向参照
   follows: Manual[]; // 両方向参照
   stars: Manual[];  // 片方向参照＋参照カウンター
   feeds: Feed[];
