@@ -94,6 +94,11 @@ export interface NodeWithSimilarity extends Tree {
 
 export type Parent = {id: string, label: string};
 
+export interface Memo extends Tree {
+  point: Point;
+  children: Tree[];
+}
+
 export interface KTreeNode extends TreeNode {
   children: KTreeNode[];
   

@@ -1,0 +1,579 @@
+FORMAT: 1A
+
+# Group Login
+## ログイン [/api/v1/login]
+### ログイン [POST]
+ログイン時のレスポンスとして受け取るデータのうち、
+共通マニュアル（）は現在アプリで使用していないので、
+データの内容は考慮していない。
+
++ Request  (application/json)
+
+        {
+            "id": "user1234",
+            "password": "pass1234"
+        },
+
++ Response 200 (application/json)
+
+        {
+            "user": {
+                "id": "user1234",
+                "lastName": "テスト",
+                "firstName": "太郎",
+                "userManagement": {
+                    "canCreate": true,
+                    "canEdit": true,
+                    "canDelete": true
+                },
+                "groupManagement": {
+                    "canCreate": true,
+                    "canEdit": true,
+                    "canDelete": true
+                },
+                "isOperationManager": true,
+                "canPullRequest": true
+            },
+            "users": [
+                {
+                    "id": "user1234",
+                    "lastName": "テスト",
+                    "firstName": "太郎",
+                    "userManagement": {
+                        "canCreate": true,
+                        "canEdit": true,
+                        "canDelete": true
+                    },
+                    "groupManagement": {
+                        "canCreate": true,
+                        "canEdit": true,
+                        "canDelete": true
+                    },
+                    "isOperationManager": true,
+                    "canPullRequest": true
+                },
+                {
+                    "id": "user2222",
+                    "lastName": "テスト",
+                    "firstName": "太郎2",
+                    "userManagement": {
+                        "canCreate": true,
+                        "canEdit": true,
+                        "canDelete": true
+                    },
+                    "groupManagement": {
+                        "canCreate": true,
+                        "canEdit": true,
+                        "canDelete": true
+                    },
+                    "isOperationManager": true,
+                    "canPullRequest": true
+                },
+                {
+                    "id": "user3333",
+                    "lastName": "テスト",
+                    "firstName": "太郎3",
+                    "userManagement": {
+                        "canCreate": true,
+                        "canEdit": true,
+                        "canDelete": true
+                    },
+                    "groupManagement": {
+                        "canCreate": true,
+                        "canEdit": true,
+                        "canDelete": true
+                    },
+                    "isOperationManager": true,
+                    "canPullRequest": true
+                }
+            ],
+            "manuals": [
+                {
+                    "id": "1",
+                    "label": "マニュアル１",
+                    "ownerId": "user1234",
+                    "collaboratorIds": ["user2222"],
+                    "isPublic": true,
+                    "inOperation": false,
+                    "reviewer": null,
+                    "pullRequests": [],
+                    "assignIds": [],
+                    "followIds": [],
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": [
+                        {
+                            "id": "1-1",
+                            "label": "マニュアル１−１",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        },
+                        {
+                            "id": "1-2",
+                            "label": "マニュアル１−２",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        },
+                        {
+                            "id": "1-3",
+                            "label": "マニュアル１−３",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "2",
+                    "label": "マニュアル2",
+                    "ownerId": "user1234",
+                    "collaboratorIds": [],
+                    "isPublic": true,
+                    "inOperation": false,
+                    "reviewer": null,
+                    "pullRequests": [],
+                    "assignIds": [],
+                    "followIds": [],
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": [
+                        {
+                            "id": "2-1",
+                            "label": "マニュアル2−1",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        },
+                        {
+                            "id": "2-2",
+                            "label": "マニュアル2-2",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        },
+                        {
+                            "id": "2-3",
+                            "label": "マニュアル2-3",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        }
+                    ]
+                }
+            ],
+            "assigns": [
+                {
+                    "id": "1",
+                    "label": "マニュアル１",
+                    "ownerId": "user1234",
+                    "collaboratorIds": ["user2222"],
+                    "isPublic": true,
+                    "inOperation": false,
+                    "reviewer": null,
+                    "pullRequests": [],
+                    "assignIds": [],
+                    "followIds": [],
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": [
+                        {
+                            "id": "1-1",
+                            "label": "マニュアル１−１",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        },
+                        {
+                            "id": "1-2",
+                            "label": "マニュアル１−２",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        },
+                        {
+                            "id": "1-3",
+                            "label": "マニュアル１−３",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "2",
+                    "label": "マニュアル2",
+                    "ownerId": "user1234",
+                    "collaboratorIds": [],
+                    "isPublic": true,
+                    "inOperation": false,
+                    "reviewer": null,
+                    "pullRequests": [],
+                    "assignIds": [],
+                    "followIds": [],
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": [
+                        {
+                            "id": "2-1",
+                            "label": "マニュアル2−1",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        },
+                        {
+                            "id": "2-2",
+                            "label": "マニュアル2-2",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        },
+                        {
+                            "id": "2-3",
+                            "label": "マニュアル2-3",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        }
+                    ]
+                }
+            ],
+            "follows": [
+                {
+                    "id": "3",
+                    "label": "マニュアル3",
+                    "ownerId": "user2222",
+                    "collaboratorIds": [],
+                    "isPublic": true,
+                    "inOperation": false,
+                    "reviewer": null,
+                    "pullRequests": [],
+                    "assignIds": [],
+                    "followIds": [],
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": [
+                        {
+                            "id": "3-1",
+                            "label": "マニュアル3−1",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        },
+                        {
+                            "id": "3-2",
+                            "label": "マニュアル3-2",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        },
+                        {
+                            "id": "3-3",
+                            "label": "マニュアル3-3",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        }
+                    ]
+                }
+            ],
+            "stars": [
+                {
+                    "id": "3",
+                    "label": "マニュアル3",
+                    "ownerId": "user2222",
+                    "collaboratorIds": [],
+                    "isPublic": true,
+                    "inOperation": false,
+                    "reviewer": null,
+                    "pullRequests": [],
+                    "assignIds": [],
+                    "followIds": [],
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": [
+                        {
+                            "id": "3-1",
+                            "label": "マニュアル3−1",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        },
+                        {
+                            "id": "3-2",
+                            "label": "マニュアル3-2",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        },
+                        {
+                            "id": "3-3",
+                            "label": "マニュアル3-3",
+                            "input": "",
+                            "output": "",
+                            "preConditions": "",
+                            "postConditions": "",
+                            "workerInCharge": "",
+                            "remarks": "",
+                            "necessaryTools": "",
+                            "exceptions": "",
+                            "imageName": "",
+                            "imageBlob": "",
+                            "children": []
+                        }
+                    ]
+                }
+            ],
+            "feeds": [
+                {
+                    "id": "1",
+                    "title": "◯◯さんがマニュアル運用申請を承認しました",
+                    "isAlreadyRead": false,
+                    "manualId": "3"
+                },
+                {
+                    "id": "1",
+                    "title": "◯◯さんがマニュアル運用を中止しました",
+                    "isAlreadyRead": false,
+                    "manualId": "3"
+                }
+            ],
+            "commons": [],
+            "memos": [
+                {
+                    "id": "4",
+                    "label": "マニュアル4のメモ",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "point": {
+                        "x": 200,
+                        "y": 300
+                    },
+                    "children": []
+                }
+            ],
+        }
+
+### 生徒記録更新API [PUT]
+編集した生徒記録を送信し、保存後の全データを取得する。
+
++ Parameters
+    + studentId: 91706010002 (string, required) - 生徒ID
+    + subjectId:    GUID1234 (string, required) - 教科ID
+    + memoId:      000000003 (string, required) - 記録ID
+
++ Request  (application/json)
+
+        {
+            "type": 1,
+            "title": "夏休みの諸注意",
+            "body": "水分をしっかり摂ろう。夜更かしにも注意すること。"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "000000003",
+            "type": 1,
+            "user": {
+                "id": "1234",
+                "name": "講師　太郎"
+            },
+            "date": "2018/7/15 20:00:12",
+            "title": "夏休みの諸注意",
+            "body": "水分をしっかり摂ろう。夜更かしにも注意すること。",
+            "comments": []
+        }
