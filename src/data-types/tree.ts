@@ -57,10 +57,15 @@ export const baseManual: Manual = {
   followIds: [],
 };
 
-export interface PullRequest extends Tree {
+export interface PullRequest extends PullRequestTree {
   writerId: string;
   requestMessage: string;
   responseMessage: string | null;
+}
+
+export interface PullRequestTree extends Tree {
+  originalId: string;
+  children: PullRequestTree[];
 }
 
 export interface TreeNode extends Tree {
