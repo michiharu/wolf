@@ -547,33 +547,220 @@ FORMAT: 1A
             ],
         }
 
-### 生徒記録更新API [PUT]
-編集した生徒記録を送信し、保存後の全データを取得する。
+### ログアウト [DELETE]
++ Response 200
 
-+ Parameters
-    + studentId: 91706010002 (string, required) - 生徒ID
-    + subjectId:    GUID1234 (string, required) - 教科ID
-    + memoId:      000000003 (string, required) - 記録ID
+# Group Manual
+## マニュアル [/api/v1/manual/{id}]
+DB未保存のデータはidを"tmp:~"で始めるルールとする。
+おそらく親となるレコードのIDを子が持つデータ設計となると思うが、
+レコードの削除はrootとなるマニュアルデータ以外は明示的なAPIを持たないため、
+編集時に削除されたデータがあるかどうかをチェックし、
+あれば該当レコードを削除するロジックをサーバーサイドで組む必要がある。
+
+### マニュアル作成API [POST]
 
 + Request  (application/json)
 
         {
-            "type": 1,
-            "title": "夏休みの諸注意",
-            "body": "水分をしっかり摂ろう。夜更かしにも注意すること。"
+            "id": "tmp:123",
+            "label": "マニュアル１",
+            "ownerId": "user1234",
+            "collaboratorIds": [],
+            "isPublic": true,
+            "inOperation": false,
+            "reviewer": null,
+            "pullRequests": [],
+            "assignIds": [],
+            "followIds": [],
+            "input": "",
+            "output": "",
+            "preConditions": "",
+            "postConditions": "",
+            "workerInCharge": "",
+            "remarks": "",
+            "necessaryTools": "",
+            "exceptions": "",
+            "imageName": "",
+            "imageBlob": "",
+            "children": []
         }
 
 + Response 200 (application/json)
 
         {
-            "id": "000000003",
-            "type": 1,
-            "user": {
-                "id": "1234",
-                "name": "講師　太郎"
-            },
-            "date": "2018/7/15 20:00:12",
-            "title": "夏休みの諸注意",
-            "body": "水分をしっかり摂ろう。夜更かしにも注意すること。",
-            "comments": []
+            "id": "123",
+            "label": "マニュアル１",
+            "ownerId": "user1234",
+            "collaboratorIds": [],
+            "isPublic": true,
+            "inOperation": false,
+            "reviewer": null,
+            "pullRequests": [],
+            "assignIds": [],
+            "followIds": [],
+            "input": "",
+            "output": "",
+            "preConditions": "",
+            "postConditions": "",
+            "workerInCharge": "",
+            "remarks": "",
+            "necessaryTools": "",
+            "exceptions": "",
+            "imageName": "",
+            "imageBlob": "",
+            "children": []
         }
+
+### マニュアル編集API [PUT]
+
++ Request  (application/json)
+
+        {
+            "id": "123",
+            "label": "マニュアル１",
+            "ownerId": "user1234",
+            "collaboratorIds": ["user2222"],
+            "isPublic": true,
+            "inOperation": false,
+            "reviewer": null,
+            "pullRequests": [],
+            "assignIds": [],
+            "followIds": [],
+            "input": "",
+            "output": "",
+            "preConditions": "",
+            "postConditions": "",
+            "workerInCharge": "",
+            "remarks": "",
+            "necessaryTools": "",
+            "exceptions": "",
+            "imageName": "",
+            "imageBlob": "",
+            "children": [
+                {
+                    "id": "1231",
+                    "label": "マニュアル１−１",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                },
+                {
+                    "id": "tmp:1",
+                    "label": "マニュアル１−２",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                },
+                {
+                    "id": "tmp:2",
+                    "label": "マニュアル１−３",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                }
+            ]
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "123",
+            "label": "マニュアル１",
+            "ownerId": "user1234",
+            "collaboratorIds": ["user2222"],
+            "isPublic": true,
+            "inOperation": false,
+            "reviewer": null,
+            "pullRequests": [],
+            "assignIds": [],
+            "followIds": [],
+            "input": "",
+            "output": "",
+            "preConditions": "",
+            "postConditions": "",
+            "workerInCharge": "",
+            "remarks": "",
+            "necessaryTools": "",
+            "exceptions": "",
+            "imageName": "",
+            "imageBlob": "",
+            "children": [
+                {
+                    "id": "1231",
+                    "label": "マニュアル１−１",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                },
+                {
+                    "id": "1232",
+                    "label": "マニュアル１−２",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                },
+                {
+                    "id": "1233",
+                    "label": "マニュアル１−３",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                }
+            ]
+        }
+
+### マニュアル削除API [DELETE]
++ Parameters
+    + id: 123 (string, required) - manualId
+
++ Response 200 (application/json)
+
