@@ -19,6 +19,7 @@ export interface LoginPostResponse {
   user: User;
   users: User[];
   manuals: Manual[]; // owerなら片方向参照、collaboなら両方向参照
+  assigns: Manual[]; // 両方向参照
   follows: Manual[]; // 両方向参照
   stars: Manual[];  // 片方向参照＋参照カウンター
   feeds: Feed[];
@@ -72,3 +73,24 @@ export type PullRequestPostResponse = PullRequest;
 export type PullRequestPutRequest = PullRequest;
 export type PullRequestPutResponse = PullRequest;
 // DELETE
+
+/* Assign */
+export const assignURL = '/api/v1/assign/';
+// POST(/api/v1/assign/:manualId/:userId)
+export type AssignPostRequest = void;
+export type AssignPostResponse = Manual;
+// DELETE(/api/v1/assign/:manualId/:userId)
+
+/* Follow */
+export const followURL = '/api/v1/follow/';
+// POST(/api/v1/follow/:manualId)
+export type FollowPostRequest = void;
+export type FollowPostResponse = Manual;
+// DELETE(/api/v1/follow/:manualId)
+
+/* Star */
+export const starURL = '/api/v1/star/';
+// POST(/api/v1/star/:manualId)
+export type StarPostRequest = void;
+export type StarPostResponse = Manual;
+// DELETE(/api/v1/star/:manualId)
