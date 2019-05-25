@@ -104,7 +104,7 @@ export default class KTreeUtil {
     const map: DragRow[][] = [selfBase].concat(sorted.map(s => {
       const result = KTreeUtil.makeBaseDragMap(s);
 
-      if (s.open) {
+      if (s.open && s.depth.top !== 0) {
         for(var y = s.point.y + s.self.h - ks.margin.h; y < s.point.y + s.self.h; y++) {
           result[y] = { node: s, action: 'moveInOut' };
         }

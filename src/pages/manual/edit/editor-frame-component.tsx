@@ -140,7 +140,6 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 
   edit = (editNode: TreeNode) => {
-    console.log('edit')
     this.setState({node: editNode});
   }
 

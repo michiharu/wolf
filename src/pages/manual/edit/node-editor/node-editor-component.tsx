@@ -2,23 +2,20 @@ import * as React from 'react';
 import {
   Theme, createStyles, WithStyles, withStyles,
   Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText,
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Modal, Badge, TextField, Fab, Paper, MuiThemeProvider, createMuiTheme, 
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField, Paper, MuiThemeProvider, createMuiTheme, 
 } from '@material-ui/core';
 import Add from '@material-ui/icons/Add';
 import AddNext from '@material-ui/icons/Forward';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
-import { TreeNode, Type, KTreeNode, DragRow, Point, Tree, baseKTreeNode, baseKWithArrow, baseTreeNode, KWithArrow } from '../../../../data-types/tree';
-import { toolbarHeight, toolbarMinHeight, defaultKS, rightPainWidth, Task, Switch, Case, Delete, More, Less } from '../../../../settings/layout';
+import { TreeNode, Type, KTreeNode, DragRow, Point, baseKTreeNode, baseKWithArrow,  KWithArrow } from '../../../../data-types/tree';
+import { toolbarHeight, toolbarMinHeight, rightPainWidth, Task, Switch, Case, Delete, More, Less } from '../../../../settings/layout';
 
 import TreeUtil from '../../../../func/tree';
 import TreeNodeUtil from '../../../../func/tree-node';
 import KTreeUtil from '../../../../func/k-tree';
-import KSize from '../../../../data-types/k-size';
-import keys from '../../../../settings/storage-keys';
 import { phrase } from '../../../../settings/phrase';
-import ReadingSetting from '../../../../data-types/reading-settings';
 import KNode from '../../../../components/konva/k-node';
 import Util from '../../../../func/util';
 import KArrowUtil from '../../../../func/k-arrow';
@@ -29,6 +26,7 @@ import KMemo from '../../../../components/konva/k-memo';
 import KShadow from '../../../../components/konva/k-shadow';
 import { KSState } from '../../../../redux/states/ksState';
 import { RSState } from '../../../../redux/states/rsState';
+import DragMap from '../../../../components/konva/debug-view/drag-map';
 
 
 export const styles = (theme: Theme) => createStyles({
@@ -835,7 +833,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
                 {flatNodes
                 .filter(n => dragParent === null ? true : n.isDragging)
                 .map(n => <KNode key={n.id} mode={mode} node={n} labelFocus={labelFocus} {...nodeActionProps}/>)}
-                {/* <DragMapForTree node={node} rows={rows} ks={ks} /> */}
+                <DragMap node={node} rows={rows} ks={ks} />
                 {/* <DropMap node={node} flatNodes={flatNodes} ks={ks}/> */}
               </Group>)}
               {mode === 'dc' && stage !== null && (
