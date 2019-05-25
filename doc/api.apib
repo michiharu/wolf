@@ -553,7 +553,7 @@ FORMAT: 1A
 # Group Manual
 ## マニュアル [/api/v1/manual/{id}]
 DB未保存のデータはidを"tmp:~"で始めるルールとする。
-おそらく親となるレコードのIDを子が持つデータ設計となると思うが、
+おそらく親となるレコードのIDを子が持つDB設計になると思うが、
 レコードの削除はrootとなるマニュアルデータ以外は明示的なAPIを持たないため、
 編集時に削除されたデータがあるかどうかをチェックし、
 あれば該当レコードを削除するロジックをサーバーサイドで組む必要がある。
@@ -764,3 +764,223 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
 
 + Response 200 (application/json)
 
+# Group PullRequest
+## プルリクエスト [/api/v1/pull-requests]
+プルリクエストのデータ構造は、通常のマニュアルツリーで持つデータに加えて、
+元のnodeのidを持つ（originalId）。
+このためどのマニュアルのリクエストであるかをサーバーサイドで探すには
+プルリクエストのrootのoriginalIdで探せる。
+
+元のnodeがオリジナルマニュアルに存在しない場合は
+idは"tmp:~"で始まる。その場合のoriginalIdはnullの値を持つ。
+
+### プルリクエスト作成API [POST]
++ Request  (application/json)
+
+        {
+            "writerId": "user2222",
+            "requestMessage": "タイトルを編集したのでよろしくお願いします。",
+            "responseMessage": null,
+            "originalId": "123",
+            "id": "tmp:1111",
+            "label": "マニュアル（営業用）１",
+            "ownerId": "user1234",
+            "collaboratorIds": ["user2222"],
+            "isPublic": true,
+            "inOperation": false,
+            "reviewer": null,
+            "pullRequests": [],
+            "assignIds": [],
+            "followIds": [],
+            "input": "",
+            "output": "",
+            "preConditions": "",
+            "postConditions": "",
+            "workerInCharge": "",
+            "remarks": "",
+            "necessaryTools": "",
+            "exceptions": "",
+            "imageName": "",
+            "imageBlob": "",
+            "children": [
+                {
+                    "originalId": "1231",
+                    "id": "tmp:2222",
+                    "label": "マニュアル１−１",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                },
+                {
+                    "originalId": null,
+                    "id": "tmp:3333",
+                    "label": "マニュアル１−２",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                },
+                {
+                    "originalId": null,
+                    "id": "tmp:4444",
+                    "label": "マニュアル１−３",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                }
+            ]
+        }
+
++ Response 200 (application/json)
+
+        {
+            "writerId": "user2222",
+            "requestMessage": "タイトルを編集したのでよろしくお願いします。",
+            "responseMessage": null,
+            "originalId": "123",
+            "id": "tmp:1111",
+            "label": "マニュアル（営業用）１",
+            "ownerId": "user1234",
+            "collaboratorIds": ["user2222"],
+            "isPublic": true,
+            "inOperation": false,
+            "reviewer": null,
+            "pullRequests": [],
+            "assignIds": [],
+            "followIds": [],
+            "input": "",
+            "output": "",
+            "preConditions": "",
+            "postConditions": "",
+            "workerInCharge": "",
+            "remarks": "",
+            "necessaryTools": "",
+            "exceptions": "",
+            "imageName": "",
+            "imageBlob": "",
+            "children": [
+                {
+                    "originalId": "1231",
+                    "id": "5555",
+                    "label": "マニュアル１−１",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                },
+                {
+                    "originalId": null,
+                    "id": "5678",
+                    "label": "マニュアル１−２",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                },
+                {
+                    "originalId": null,
+                    "id": "6666",
+                    "label": "マニュアル１−３",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                }
+            ]
+        }
+
+# Group Assign
+## マニュアル割り当て [/api/v1/assign/{manualId}/{userId}]
+マニュアルの割り当て操作は運用権限があるユーザーのみ
+
+### 割り当て [POST]
+
++ Parameters
+    + manualId: 123 (string, required) - manualId
+    + userId: user1234 (string, required) - userId
+
++ Response 200 (application/json)
+
+### 割り当て解除 [DELETE]
+
++ Parameters
+    + manualId: 123 (string, required) - manualId
+    + userId: user1234 (string, required) - userId
+
++ Response 200 (application/json)
+
+# Group Follow
+## フォロー [/api/v1/follow/{id}]
+### フォロー [POST]
+
++ Parameters
+    + id: 123 (string, required) - manualId
+
++ Response 200 (application/json)
+
+### フォロー解除 [DELETE]
+
++ Parameters
+    + id: 123 (string, required) - manualId
+
++ Response 200 (application/json)
+
+# Group Star
+## お気に入り [/api/v1/star/{id}]
+### お気に入り登録 [POST]
+
++ Parameters
+    + id: 123 (string, required) - manualId
+
++ Response 200 (application/json)
+
+### お気に入り解除 [DELETE]
+
++ Parameters
+    + id: 123 (string, required) - manualId
+
++ Response 200 (application/json)

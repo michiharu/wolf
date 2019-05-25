@@ -64,7 +64,7 @@ export interface PullRequest extends PullRequestTree {
 }
 
 export interface PullRequestTree extends Tree {
-  originalId: string;
+  originalId: string | null;
   children: PullRequestTree[];
 }
 
