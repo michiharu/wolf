@@ -34,9 +34,9 @@ const postLogin = (config: AxiosRequestConfig) => {
   const data3: LoginPostResponse = {
     user: user3,
     users: [user1, user2, user3, user4],
-    manuals: [manual1],
+    manuals: [],
     assigns: [],
-    follows: [],
+    follows: [manual1, manual2],
     stars: [],
     feeds: [],
     commons: [],

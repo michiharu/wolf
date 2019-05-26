@@ -18,17 +18,17 @@ const styles = (theme: Theme) => createStyles({
     width: '90vw',
     maxHeight: '45vh',
     transform: 'translate(-50%, -50%)',
-    padding: theme.spacing.unit * 4,
-    paddingBottom: theme.spacing.unit * 2,
+    padding: theme.spacing(4),
+    paddingBottom: theme.spacing(2),
     outline: 'none',
     overflow: 'scroll',
   },
   speechLabel: {
-    marginTop: theme.spacing.unit * 3.8,
+    marginTop: theme.spacing(3.8),
   },
   cardSettingLabel: {
-    paddingTop: theme.spacing.unit * 3,
-    paddingBottom: theme.spacing.unit * 3,
+    paddingTop: theme.spacing(3),
+    paddingBottom: theme.spacing(3),
   },
   longSetter: {
     width: 200,
@@ -37,8 +37,8 @@ const styles = (theme: Theme) => createStyles({
     width: 100,
   },
   slider: {
-    paddingTop: theme.spacing.unit * 3,
-    paddingBottom: theme.spacing.unit * 3,
+    paddingTop: theme.spacing(3),
+    paddingBottom: theme.spacing(3),
   },
 });
 
@@ -54,7 +54,7 @@ const ViewSettingsComponent: React.FC<Props> = (props: Props) => {
 
   return (
     <Paper className={classes.root}>
-      <Grid container spacing={32}>
+      <Grid container spacing={4}>
         <Grid item xs={12} md={4}>
           <FormControl>
             <FormLabel>フローの表現</FormLabel>
@@ -71,7 +71,7 @@ const ViewSettingsComponent: React.FC<Props> = (props: Props) => {
           </FormControl>
         </Grid>
         <Grid item xs={12} md>
-          <Grid container spacing={40}>
+          <Grid container spacing={5}>
             <Grid item>
               <FormControl>
                 <FormLabel>音声読み上げ</FormLabel>
@@ -117,7 +117,7 @@ const ViewSettingsComponent: React.FC<Props> = (props: Props) => {
       </Grid>
 
       <FormLabel className={classes.cardSettingLabel}>カード表示設定</FormLabel>
-      <Grid container justify="space-between" spacing={32}>
+      <Grid container justify="space-between" spacing={4}>
         <Grid item xs={12} md={4}>
           <div className={classes.longSetter}>
             <Typography>表示の大きさ</Typography>

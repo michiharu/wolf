@@ -14,7 +14,7 @@ const styles = (theme: Theme) => createStyles({
   root: {
     maxWidth: theme.breakpoints.width('md'),
     margin: 'auto',
-    paddingTop: theme.spacing.unit * 3,
+    paddingTop: theme.spacing(3),
   },
 });
 
@@ -28,7 +28,7 @@ const ManualSettings: React.FC<Props> = props => {
   const handleSelect = (i: number) => () => setSelected(i);
   return (
     <div className={classes.root}>
-      <Grid container spacing={24}>
+      <Grid container spacing={3}>
         <Grid item sm={4}>
           <Paper>
             <List>

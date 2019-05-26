@@ -11,8 +11,8 @@ const styles = (theme: Theme) => createStyles({
   root: {
 
   },
-  container: { padding: theme.spacing.unit * 2 },
-  chip: { margin: theme.spacing.unit },
+  container: { padding: theme.spacing(2) },
+  chip: { margin: theme.spacing(1) },
 });
 
 interface Props extends WithStyles<typeof styles> {
@@ -28,7 +28,7 @@ const Copy: React.FC<Props> = props => {
       </div>
 
       <div className={classes.container}>
-        <Grid container alignItems="flex-end" spacing={24}>
+        <Grid container alignItems="flex-end" spacing={3}>
           <Grid item xs={6}>
             <TextField
               placeholder="複製後のマニュアルタイトルを入力"

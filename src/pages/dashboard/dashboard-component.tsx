@@ -9,7 +9,7 @@ import ManualList from './manual-list-component';
 const styles = (theme: Theme) => createStyles({
 
   container: {
-    padding: theme.spacing.unit
+    padding: theme.spacing(1),
   }
 
 });

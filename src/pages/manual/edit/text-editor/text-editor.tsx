@@ -15,16 +15,16 @@ import TextLineWithIcon, { TextLineWithIconProps } from './text-line-with-icon';
 const styles = (theme: Theme) => createStyles({
   root: {
     width: '100%',
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
   },
   saveButton: {
     minWidth: 100,
   },
   extendedIcon: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   },
   close: {
-    padding: theme.spacing.unit * 0.5,
+    padding: theme.spacing(0.5),
   },
   viewSettingModal: {
     backgroundColor: '#0002',
@@ -36,7 +36,7 @@ const styles = (theme: Theme) => createStyles({
     width: '90vw',
     maxHeight: '45vh',
     transform: 'translate(-50%, -50%)',
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
     outline: 'none',
   },
 });

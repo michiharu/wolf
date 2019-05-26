@@ -16,7 +16,6 @@ import { Stage, Layer, Group, Rect } from 'react-konva';
 import { TreeNode, Type, CheckNode, CheckRecord } from '../../data-types/tree';
 import { toolbarHeight, toolbarMinHeight, defaultKS as ks } from '../../settings/layout';
 
-import ToolContainer from '../../components/tool-container/tool-container';
 import CheckNodeUtil from '../../func/check-node-util';
 import CheckKNode from '../../components/konva/check-k-node';
 import { fileDownload } from '../../func/file-download';
@@ -41,7 +40,7 @@ const styles = (theme: Theme) => createStyles({
     minWidth: 100,
   },
   extendedIcon: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   },
 });
 
@@ -173,8 +172,7 @@ class CheckList extends React.Component<Props, CheckListState> {
 
     return (
       <div className={classes.root} ref={this.stageContainerRef}>
-        <ToolContainer containerRef={toolRef}>
-          <Grid container spacing={16}>
+          <Grid container spacing={2}>
             <Grid item>
               <Fab color="primary" onClick={back} size="medium"><ArrowBack/></Fab>
             </Grid>
@@ -220,7 +218,6 @@ class CheckList extends React.Component<Props, CheckListState> {
             </Grid>}
             
           </Grid>
-        </ToolContainer>
 
         <Stage ref={this.stageRef} draggable>
           <Layer>

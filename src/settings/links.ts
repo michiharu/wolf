@@ -1,5 +1,6 @@
 const links = {
   dashboard: '/',
+  follows: '/follows',
   login: '/login',
   
   edit: '/edit',

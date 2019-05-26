@@ -21,24 +21,24 @@ import { RSState } from '../../../redux/states/rsState';
 
 export const styles = (theme: Theme) => createStyles({
   root: {
-    paddingLeft: theme.spacing.unit,
-    paddingRight: theme.spacing.unit,
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
   },
   toolbar: {
     display: 'flex',
     width: theme.breakpoints.width('md'),
     margin: 'auto',
-    paddingTop: theme.spacing.unit * 2,
-    marginBottom: theme.spacing.unit,
+    paddingTop: theme.spacing(2),
+    marginBottom: theme.spacing(1),
   },
   convergent: {
     transform: 'scale(1, -1)',
   },
   close: {
-    padding: theme.spacing.unit * 0.5,
+    padding: theme.spacing(0.5),
   },
   editFinishButton: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   }
 });
 

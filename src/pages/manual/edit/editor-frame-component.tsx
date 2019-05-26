@@ -1,11 +1,11 @@
 import * as React from 'react';
+import { createBrowserHistory } from 'history';
 import { ManualsState } from '../../../redux/states/manualsState';
 import {
   Theme, createStyles, WithStyles, withStyles, Snackbar, IconButton,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Tab, Tabs, Modal,
 } from '@material-ui/core';
-import SaveIcon from '@material-ui/icons/Save';
-import Download from '@material-ui/icons/SaveAlt';
+
 import CloseIcon from '@material-ui/icons/Close';
 import ViewSettingsIcon from '@material-ui/icons/Settings';
 import { Divergent, Convergent } from '../../../settings/layout' 
@@ -35,17 +35,17 @@ export const styles = (theme: Theme) => createStyles({
     display: 'flex',
     width: theme.breakpoints.width('md'),
     margin: 'auto',
-    paddingTop: theme.spacing.unit * 2,
-    marginBottom: theme.spacing.unit,
+    paddingTop: theme.spacing(2),
+    marginBottom: theme.spacing(1),
   },
   convergent: {
     transform: 'scale(1, -1)',
   },
   close: {
-    padding: theme.spacing.unit * 0.5,
+    padding: theme.spacing(0.5),
   },
   editFinishButton: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   },
   viewSettingModal: {
     backgroundColor: '#0002',
@@ -57,7 +57,7 @@ export const styles = (theme: Theme) => createStyles({
     width: '90vw',
     maxHeight: '45vh',
     transform: 'translate(-50%, -50%)',
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
     outline: 'none',
   },
 });
@@ -98,7 +98,8 @@ class EditorFrameComponent extends React.Component<Props, State> {
       browserのhistoryはreactの読み込み時点から変化しておらずreact-routerが別にhistory管理を行なっているため、
       空のstateを追加（history.pushState）することでブラウザーの戻るボタンでpopstateイベントが発火するようにする。
     */
-    history.pushState('', '', null);
+    const history = createBrowserHistory();
+    history.push('', null);
     window.onpopstate = this.popstate;
     
   }

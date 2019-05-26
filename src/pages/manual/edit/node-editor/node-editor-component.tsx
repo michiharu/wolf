@@ -2,8 +2,9 @@ import * as React from 'react';
 import {
   Theme, createStyles, WithStyles, withStyles,
   Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText,
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField, Paper, MuiThemeProvider, createMuiTheme, 
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField, Paper, createMuiTheme, 
 } from '@material-ui/core';
+import { MuiThemeProvider } from '@material-ui/core/styles'
 import Add from '@material-ui/icons/Add';
 import AddNext from '@material-ui/icons/Forward';
 
@@ -32,18 +33,18 @@ import DragMap from '../../../../components/konva/debug-view/drag-map';
 export const styles = (theme: Theme) => createStyles({
   root: {
     overflow: 'scroll',
-    height: `calc(100vh - ${toolbarHeight * 2 + theme.spacing.unit}px)`,
+    height: `calc(100vh - ${toolbarHeight * 2 + theme.spacing(1)}px)`,
     [theme.breakpoints.down('xs')]: {
-      height: `calc(100vh - ${toolbarMinHeight * 2 + theme.spacing.unit}px)`,
+      height: `calc(100vh - ${toolbarMinHeight * 2 + theme.spacing(1)}px)`,
     },
   },
   toolbar: theme.mixins.toolbar,
   settingsButton: {
     position: 'fixed',
-    right: theme.spacing.unit,
-    top: toolbarHeight + theme.spacing.unit,
+    right: theme.spacing(1),
+    top: toolbarHeight + theme.spacing(1),
     [theme.breakpoints.down('xs')]: {
-      top: toolbarMinHeight + theme.spacing.unit,
+      top: toolbarMinHeight + theme.spacing(1),
     },
   },
   rightPaneContainer: {
@@ -51,7 +52,7 @@ export const styles = (theme: Theme) => createStyles({
     width: '40vw',
     minWidth: rightPainWidth,
     right: 0,
-    padding: theme.spacing.unit,
+    padding: theme.spacing(1),
     top: toolbarHeight,
     height: `calc(100vh - ${toolbarHeight}px)`,
     [theme.breakpoints.down('xs')]: {
@@ -63,7 +64,7 @@ export const styles = (theme: Theme) => createStyles({
     minWidth: 100,
   },
   extendedIcon: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   },
   viewSettingModal: {
     backgroundColor: '#0002',
@@ -75,7 +76,7 @@ export const styles = (theme: Theme) => createStyles({
     width: '90vw',
     maxHeight: '45vh',
     transform: 'translate(-50%, -50%)',
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
     outline: 'none',
   },
 });
@@ -170,8 +171,8 @@ class NodeEditorComponent extends React.Component<Props, State> {
     const mref = this.mainRef.current;
     const stage = this.stageRef.current;
     if (mref === null || stage === null) { throw 'Cannot find elements.'; }
-    stage.width(mref.offsetWidth - theme.spacing.unit * 2);
-    stage.height(mref.offsetHeight - theme.spacing.unit * 2);
+    stage.width(mref.offsetWidth - theme.spacing(2));
+    stage.height(mref.offsetHeight - theme.spacing(2));
     stage.draw();
     this.setState({didRender: true});
   }
@@ -603,14 +604,14 @@ class NodeEditorComponent extends React.Component<Props, State> {
       const boxPosition: React.CSSProperties | undefined = stage !== null ? {
         position: 'absolute',
         left: mode === 'd' ? stage.width() / 2 : mode === 'dc' ? stage.width() / 4 : stage.width() * 3 / 4,
-        top: theme.spacing.unit * 2,
+        top: theme.spacing(2),
         transform: 'translateX(-50%)',
       } : undefined;
 
       const boxStyle: React.CSSProperties | undefined = stage !== null ? {
         backgroundColor: theme.palette.background.paper,
         borderRadius: theme.shape.borderRadius,
-        padding: theme.spacing.unit,
+        padding: theme.spacing(1),
       } : undefined;
 
       CreateBox = (
@@ -623,7 +624,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
                 if (e.keyCode === 13) { this.createMemo(); }
               }}
             />
-            <Button style={{marginLeft: theme.spacing.unit}} onClick={this.createMemo}>作成</Button>
+            <Button style={{marginLeft: theme.spacing(1)}} onClick={this.createMemo}>作成</Button>
           </div>
         </div>
       );
@@ -672,7 +673,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
         };
         ActionButtonBox = (
           <Paper style={boxStyle}>
-            <MuiThemeProvider theme={createMuiTheme({typography: {useNextVariants: true}, palette: {type: 'dark'}})}>
+            <MuiThemeProvider theme={createMuiTheme({palette: {type: 'dark'}})}>
               {!isRoot && <Button onClick={this.addNextBrother}>
                 次の項目を追加<AddNext style={{transform: 'rotate(90deg)'}} /><Add/>
               </Button>}
@@ -833,7 +834,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
                 {flatNodes
                 .filter(n => dragParent === null ? true : n.isDragging)
                 .map(n => <KNode key={n.id} mode={mode} node={n} labelFocus={labelFocus} {...nodeActionProps}/>)}
-                <DragMap node={node} rows={rows} ks={ks} />
+                {/* <DragMap node={node} rows={rows} ks={ks} /> */}
                 {/* <DropMap node={node} flatNodes={flatNodes} ks={ks}/> */}
               </Group>)}
               {mode === 'dc' && stage !== null && (

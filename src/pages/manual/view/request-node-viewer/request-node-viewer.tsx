@@ -21,18 +21,18 @@ const headerHeight = 96;
 const styles = (theme: Theme) => createStyles({
   root: {
     overflow: 'scroll',
-    height: `calc(100vh - ${toolbarHeight + theme.spacing.unit * 2 + headerHeight}px)`,
+    height: `calc(100vh - ${toolbarHeight + theme.spacing(2) + headerHeight}px)`,
     [theme.breakpoints.down('xs')]: {
-      height: `calc(100vh - ${toolbarMinHeight + theme.spacing.unit * 2 + headerHeight}px)`,
+      height: `calc(100vh - ${toolbarMinHeight + theme.spacing(2) + headerHeight}px)`,
     },
   },
   toolbar: theme.mixins.toolbar,
   settingsButton: {
     position: 'fixed',
-    right: theme.spacing.unit,
-    top: toolbarHeight + theme.spacing.unit,
+    right: theme.spacing(1),
+    top: toolbarHeight + theme.spacing(1),
     [theme.breakpoints.down('xs')]: {
-      top: toolbarMinHeight + theme.spacing.unit,
+      top: toolbarMinHeight + theme.spacing(1),
     },
   },
   rightPaneContainer: {
@@ -40,7 +40,7 @@ const styles = (theme: Theme) => createStyles({
     width: '40vw',
     minWidth: rightPainWidth,
     right: 0,
-    padding: theme.spacing.unit,
+    padding: theme.spacing(1),
     top: toolbarHeight,
     height: `calc(100vh - ${toolbarHeight}px)`,
     [theme.breakpoints.down('xs')]: {
@@ -52,7 +52,7 @@ const styles = (theme: Theme) => createStyles({
     minWidth: 100,
   },
   extendedIcon: {
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   },
 });
 
@@ -123,8 +123,8 @@ class RequestNodeViewer extends React.Component<Props, State> {
     const mref = this.mainRef.current;
     const stage = this.stageRef.current;
     if (mref === null || stage === null) { throw 'Cannot find elements.'; }
-    stage.width(mref.offsetWidth - theme.spacing.unit * 2);
-    stage.height(mref.offsetHeight - theme.spacing.unit * 2);
+    stage.width(mref.offsetWidth - theme.spacing(2));
+    stage.height(mref.offsetHeight - theme.spacing(2));
     stage.draw();
     this.setState({didRender: true});
   }

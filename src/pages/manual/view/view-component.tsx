@@ -18,7 +18,7 @@ import { Action } from 'typescript-fsa';
 
 const styles = (theme: Theme) => createStyles({
   root: {
-    paddingTop: theme.spacing.unit * 2,
+    paddingTop: theme.spacing(2),
   },
   header: {
     maxWidth: theme.breakpoints.width('md'),
@@ -34,7 +34,7 @@ const styles = (theme: Theme) => createStyles({
     transform: 'scale(1, -1)',
   },
   close: {
-    padding: theme.spacing.unit * 0.5,
+    padding: theme.spacing(0.5),
   },
   viewSettingModal: {
     backgroundColor: '#0002',
@@ -46,11 +46,11 @@ const styles = (theme: Theme) => createStyles({
     width: '90vw',
     maxHeight: '45vh',
     transform: 'translate(-50%, -50%)',
-    padding: theme.spacing.unit * 2,
+    padding: theme.spacing(2),
     outline: 'none',
   },
   viewSettingButton: {
-    marginLeft: theme.spacing.unit
+    marginLeft: theme.spacing(1)
   }
 });
 

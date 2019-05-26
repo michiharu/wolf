@@ -39,7 +39,7 @@ export interface Manual extends Tree {
   collaboratorIds: string[];
   isPublic: boolean;
   inOperation: boolean;
-  reviewer: string | null;
+  reviewerId: string | null;
   pullRequests: PullRequest[];
   assignIds: string[];
   followIds: string[];
@@ -51,11 +51,18 @@ export const baseManual: Manual = {
   collaboratorIds: [],
   isPublic: true,
   inOperation: false,
-  reviewer: null,
+  reviewerId: null,
   pullRequests: [],
   assignIds: [],
   followIds: [],
 };
+
+export interface ManualWithUser extends Manual {
+  owner: User;
+  collaborators: User[];
+  reviewer: User | null;
+  assignUsers: User[];
+}
 
 export interface PullRequest extends PullRequestTree {
   writerId: string;

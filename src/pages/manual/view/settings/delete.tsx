@@ -9,10 +9,10 @@ const styles = (theme: Theme) => createStyles({
   root: {
 
   },
-  container: { padding: theme.spacing.unit * 2 },
+  container: { padding: theme.spacing(2) },
   switch: {
     width: 200,
-    margin: theme.spacing.unit
+    margin: theme.spacing(1)
   },
 });
 
@@ -36,7 +36,7 @@ const DeleteForm: React.FC<Props> = props => {
         />
       </div>
       <div className={classes.container}>
-        <Grid container alignItems="flex-end" spacing={24}>
+        <Grid container alignItems="flex-end" spacing={3}>
           <Grid item xs={9}>
             <TextField placeholder="マニュアル名を入力してください" fullWidth/>
           </Grid>

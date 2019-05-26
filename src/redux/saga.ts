@@ -5,16 +5,18 @@ import { loginUserAction } from './actions/loginUserAction';
 import { LoginPostResponse } from '../api/definitions';
 import { manualsAction } from './actions/manualsAction';
 import { usersAction } from './actions/usersAction';
+import { followsAction } from './actions/followsAction';
 
 function* handleRequestLogin() {
   while (true) {
     const action = yield take(ACTIONS_LOGIN);
     const data = yield call(API.login, action.payload);
     if (data.error === undefined) {
-      const { user, users, manuals } = data as LoginPostResponse;
+      const { user, users, manuals, follows } = data as LoginPostResponse;
       yield put(loginUserAction.set(user));
       yield put(usersAction.change(users));
       yield put(manualsAction.change(manuals));
+      yield put(followsAction.change(follows));
     }
   }
 }

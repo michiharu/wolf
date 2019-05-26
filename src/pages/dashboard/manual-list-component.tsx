@@ -16,7 +16,7 @@ import CreateManualContainer from './create-manual/create-manual-container';
 const styles = (theme: Theme) => createStyles({
   switch: {
     minWidth: 150,
-    marginLeft: theme.spacing.unit,
+    marginLeft: theme.spacing(1),
   }
 });
 

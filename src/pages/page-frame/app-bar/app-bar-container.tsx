@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { AppState } from '../../../redux/store';
 import { withStyles } from '@material-ui/core';
 import User from '../../../data-types/user';
-import appBarComponent from './app-bar-component';
+import AppBarComponent from './app-bar-component';
 
 function mapStateToProps(appState: AppState) {
   return {user: appState.loginUser.user!};
@@ -16,4 +16,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(appBarComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(AppBarComponent);

@@ -21,14 +21,14 @@ import { phrase } from '../../../../settings/phrase';
 const styles = (theme: Theme) => createStyles({
   root: {
     position: 'relative',
-    marginTop: theme.spacing.unit * 2,
+    marginTop: theme.spacing(2),
     width: '100%',
   },
   select: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
   },
   selectType: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing(1),
   },
   switchIcon: {
     transform: 'scale(1, -1)',
@@ -36,10 +36,10 @@ const styles = (theme: Theme) => createStyles({
   title: {
     fontSize: 40,
   },
-  imageIcon: {marginRight: theme.spacing.unit},
+  imageIcon: {marginRight: theme.spacing(1)},
   imageFormContainer: {
-    marginTop: -theme.spacing.unit * 2,
-    marginBottom: -theme.spacing.unit,
+    marginTop: -theme.spacing(2),
+    marginBottom: -theme.spacing(1),
     width: '100%',
     paddingLeft: 68
   },
@@ -62,8 +62,8 @@ const styles = (theme: Theme) => createStyles({
   },
   deleteButton: {
     position: 'absolute',
-    top: -theme.spacing.unit,
-    right: -theme.spacing.unit,
+    top: -theme.spacing(1),
+    right: -theme.spacing(1),
   }
 });
 
@@ -167,7 +167,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
 
   return (
     <div className={classes.root}>
-      <Grid container spacing={16}>
+      <Grid container spacing={2}>
         <Grid item xs={12} lg={8}>
           <Grid container alignItems="flex-end" spacing={8}>
             <Grid item>

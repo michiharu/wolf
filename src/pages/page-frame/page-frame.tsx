@@ -11,6 +11,7 @@ import ViewContainer from '../manual/view/view-container';
 import EditorFrameContainer from '../manual/edit/editor-frame-container';
 import RequestContainer from '../manual/request/request-container';
 import User from '../../data-types/user';
+import FollowsContainer from '../follows/follows-container';
 
 export const styles = (theme: Theme) => createStyles({
   search: {
@@ -20,16 +21,16 @@ export const styles = (theme: Theme) => createStyles({
     '&:hover': {
       backgroundColor: fade(theme.palette.common.white, 0.25),
     },
-    marginRight: theme.spacing.unit * 2,
+    marginRight: theme.spacing(2),
     marginLeft: 0,
     width: '100%',
     [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing.unit * 3,
+      marginLeft: theme.spacing(3),
       width: 'auto',
     },
   },
   searchIcon: {
-    width: theme.spacing.unit * 9,
+    width: theme.spacing(9),
     height: '100%',
     position: 'absolute',
     pointerEvents: 'none',
@@ -42,10 +43,10 @@ export const styles = (theme: Theme) => createStyles({
     width: '100%',
   },
   inputInput: {
-    paddingTop: theme.spacing.unit,
-    paddingRight: theme.spacing.unit,
-    paddingBottom: theme.spacing.unit,
-    paddingLeft: theme.spacing.unit * 10,
+    paddingTop: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+    paddingLeft: theme.spacing(10),
     transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('md')]: {
@@ -70,6 +71,7 @@ const PageFrame: React.FC<Props> = (props) => {
         <div className={classes.toolbar}/>
         <Switch>
           <Route exact path={links.dashboard} render={() => <Dashboard/>}/>
+          <Route exact path={links.follows} render={() => <FollowsContainer/>}/>
           <Route path={'/manual/:id/edit'} render={props => <EditorFrameContainer {...props}/>}/>
           <Route path={'/manual/:id/request/:requestId'} render={props => <RequestContainer {...props}/>}/>
           <Route path={'/manual/:id'}      render={props => <ViewContainer {...props}/>}/>

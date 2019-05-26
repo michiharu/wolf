@@ -10,8 +10,8 @@ const styles = (theme: Theme) => createStyles({
   root: {
 
   },
-  container: { padding: theme.spacing.unit * 2 },
-  chip: { margin: theme.spacing.unit },
+  container: { padding: theme.spacing(2) },
+  chip: { margin: theme.spacing(1) },
 });
 
 interface Props extends WithStyles<typeof styles> {
@@ -34,7 +34,7 @@ const Collaborators: React.FC<Props> = props => {
         {manual.collaboratorIds.map(c => <Chip key={c} className={classes.chip} label={c} onDelete={() => {}}/>)}
       </div>
       <div className={classes.container}>
-        <Grid container alignItems="flex-end" spacing={24}>
+        <Grid container alignItems="flex-end" spacing={3}>
           <Grid item xs={6}>
             <FormControl fullWidth>
               <InputLabel>コラボレーターの追加</InputLabel>

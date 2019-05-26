@@ -17,7 +17,7 @@ import Util from '../../../func/util';
 export const styles = (theme: Theme) => createStyles({
   switch: {
     minWidth: 150,
-    margin: theme.spacing.unit,
+    margin: theme.spacing(1),
     marginBottom: 0,
   }
 });

@@ -14,10 +14,10 @@ const styles = (theme: Theme) => createStyles({
   root: {
     maxWidth: theme.breakpoints.width('md'),
     margin: 'auto',
-    paddingTop: theme.spacing.unit * 3,
+    paddingTop: theme.spacing(3),
   },
-  container: { padding: theme.spacing.unit * 2 },
-  chip: { margin: theme.spacing.unit },
+  container: { padding: theme.spacing(2) },
+  chip: { margin: theme.spacing(1) },
 });
 
 interface Props extends RequestListActions, WithStyles<typeof styles> {
