@@ -5,8 +5,7 @@ import { AppState } from '../../../redux/store';
 import { selectActions } from '../../../redux/actions/selectAction';
 
 import { Manual, TreeNode, PullRequest } from '../../../data-types/tree';
-import RequestComponent, { styles } from './request-component';
-import { withStyles } from '@material-ui/core';
+import RequestComponent from './request-component';
 import { manualsAction } from '../../../redux/actions/manualsAction';
 
 export interface RequestActions {
@@ -38,4 +37,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
   };
 }
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(RequestComponent));
+export default connect(mapStateToProps, mapDispatchToProps)(RequestComponent);

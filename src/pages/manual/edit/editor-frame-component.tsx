@@ -3,7 +3,7 @@ import { createBrowserHistory } from 'history';
 import { ManualsState } from '../../../redux/states/manualsState';
 import {
   Theme, createStyles, WithStyles, Snackbar, IconButton,
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Tab, Tabs, Modal,
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Tab, Tabs, Modal, withStyles,
 } from '@material-ui/core';
 
 import CloseIcon from '@material-ui/icons/Close';
@@ -301,4 +301,4 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 }
 
-export default EditorFrameComponent;
+export default withStyles(styles)(EditorFrameComponent);

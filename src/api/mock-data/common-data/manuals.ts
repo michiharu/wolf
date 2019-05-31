@@ -5,7 +5,33 @@ export const manual1: Manual = {
   id: '1',
   label: 'マニュアル１',
   ownerId: '1',
-  collaboratorIds:['2', '3'],
+  collaboratorIds:['2'],
+  pullRequests: [
+    {
+      ...baseTree,
+      id: '2',
+      originalId: '1',
+      writerId: '3',
+      requestMessage: 'お願いします',
+      responseMessage: null,
+      children: [
+        {
+          ...baseTree,
+          id: '2-1',
+          originalId: '1-1',
+          label: 'マニュ',
+          children: []
+        },
+        {
+          ...baseTree,
+          id: '2-2',
+          originalId: '1-2',
+          label: 'マニュ2',
+          children: []
+        },
+      ]
+    }
+  ],
   children: [
     {...baseTree, id: '1-1', label: 'マニュアル１−１'},
     {...baseTree, id: '1-2', label: 'マニュアル１−２'},

@@ -1,12 +1,11 @@
 import { Action } from 'typescript-fsa';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { withStyles } from '@material-ui/core';
 import { AppState } from '../../../redux/store';
 import { KTreeNode, Manual } from '../../../data-types/tree';
 import { manualsAction } from '../../../redux/actions/manualsAction';
 import { memoActions } from '../../../redux/actions/memoAction';
-import EditorFrameComponent, { styles } from './editor-frame-component';
+import EditorFrameComponent from './editor-frame-component';
 import { selectActions } from '../../../redux/actions/selectAction';
 
 export interface EditorFrameActions {
@@ -27,4 +26,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
   };
 }
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(EditorFrameComponent));
+export default connect(mapStateToProps, mapDispatchToProps)(EditorFrameComponent);

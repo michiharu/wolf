@@ -4,7 +4,7 @@ import {
   Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField, Paper, createMuiTheme, 
 } from '@material-ui/core';
-import { MuiThemeProvider } from '@material-ui/core/styles'
+import { MuiThemeProvider, withStyles } from '@material-ui/core/styles'
 import Add from '@material-ui/icons/Add';
 import AddNext from '@material-ui/icons/Forward';
 
@@ -871,4 +871,4 @@ class NodeEditorComponent extends React.Component<Props, State> {
   }
 }
 
-export default NodeEditorComponent;
+export default withStyles(styles)(NodeEditorComponent);

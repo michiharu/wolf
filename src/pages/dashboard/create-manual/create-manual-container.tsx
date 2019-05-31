@@ -4,8 +4,7 @@ import { connect } from 'react-redux';
 import { AppState } from '../../../redux/store';
 import { manualsAction } from '../../../redux/actions/manualsAction';
 import { Manual } from '../../../data-types/tree';
-import CreateManualComponent, { styles } from './create-manual-component';
-import { withStyles } from '@material-ui/core';
+import CreateManualComponent from './create-manual-component';
 
 export interface CreateManualActions {
   changeManuals: (manuals: Manual[]) => Action<Manual[]>;
@@ -21,4 +20,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
   };
 }
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(CreateManualComponent));
+export default connect(mapStateToProps, mapDispatchToProps)(CreateManualComponent);

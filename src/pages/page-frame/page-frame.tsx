@@ -67,7 +67,8 @@ const PageFrame: React.FC<Props> = (props) => {
           <Route exact path={links.dashboard} render={() => <Dashboard/>}/>
           <Route exact path={links.follows} render={() => <FollowsContainer/>}/>
           <Route path={'/manual/:id/edit'} render={props => <EditorFrameContainer {...props}/>}/>
-          <Route path={'/manual/:id/request/:requestId'} render={props => <RequestContainer {...props}/>}/>
+          <Route path={'/manual/:id/request/:requestId'} component={RequestContainer}/>
+          <Route path={'/manual/:id/request/create'} component={RequestContainer}/>
           <Route path={'/manual/:id'}      render={props => <ViewContainer {...props}/>}/>
           <Redirect to={links.dashboard}/>
         </Switch>

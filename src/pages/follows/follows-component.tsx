@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {
-  Theme, createStyles, WithStyles, Paper,
+  Theme, createStyles, WithStyles, Paper, withStyles,
 } from '@material-ui/core';
 import { FollowsState } from '../../redux/states/followsState';
 import { ManualWithUser } from '../../data-types/tree';
@@ -38,4 +38,4 @@ const FollowsComponent: React.FC<Props> = props => {
   );
 }
 
-export default FollowsComponent;
+export default withStyles(styles)(FollowsComponent);

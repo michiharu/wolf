@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import {
   Theme, createStyles, WithStyles, TextField, FormControlLabel, Switch,
-  Button, Dialog, DialogTitle, DialogContent, DialogActions,
+  Button, Dialog, DialogTitle, DialogContent, DialogActions, withStyles,
 } from '@material-ui/core';
 
 import { ManualsState } from '../../../redux/states/manualsState';
@@ -71,4 +71,4 @@ const CreateManualComponent: React.FC<Props> = props => {
   );
 };
 
-export default CreateManualComponent;
+export default withStyles(styles)(CreateManualComponent);

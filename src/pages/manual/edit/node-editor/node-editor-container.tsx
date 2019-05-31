@@ -1,8 +1,7 @@
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { AppState } from '../../../../redux/store';
-import NodeEditorComponent, { styles } from './node-editor-component';
-import { withStyles } from '@material-ui/core';
+import NodeEditorComponent from './node-editor-component';
 
 export interface NodeEditorActions {
   
@@ -16,4 +15,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
   return {};
 }
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(NodeEditorComponent));
+export default connect(mapStateToProps, mapDispatchToProps)(NodeEditorComponent);

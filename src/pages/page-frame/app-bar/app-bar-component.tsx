@@ -1,11 +1,11 @@
 import * as React from 'react';
 import {useState} from 'react';
-import { Link } from 'react-router-dom';
 import { Theme, createStyles, WithStyles, AppBar as MUIAppBar, Toolbar, Button, InputBase, withStyles, Typography } from '@material-ui/core';
 import { Search } from '@material-ui/icons';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import User from '../../../data-types/user';
 import links from '../../../settings/links';
+import AdapterLink from '../../../components/custom-mui/adapter-link';
 
 export const styles = (theme: Theme) => createStyles({
   search: {
@@ -56,12 +56,11 @@ interface Props extends WithStyles<typeof styles> {
 const AppBarComponent: React.FC<Props> = (props) => {
   const { user, classes } = props;
   const [searchText, setSearchText] = useState('');
-  const LogoLink = (llp: any) => <Link to={links.dashboard} {...llp}/>;
-  const FollowsLink = (llp: any) => <Link to={links.follows} {...llp}/>;
+  
   return (
     <MUIAppBar>
       <Toolbar>
-        <Button component={LogoLink} color="inherit" size="large">Flow Like</Button>
+        <Button to={links.dashboard} component={AdapterLink} color="inherit" size="large">Flow Like</Button>
 
         <div className={classes.search}>
           <div className={classes.searchIcon}>
@@ -77,7 +76,7 @@ const AppBarComponent: React.FC<Props> = (props) => {
             onChange={e => setSearchText(e.target.value)}
           />
         </div>
-        <Button component={FollowsLink} color="inherit">フォロー</Button>
+        <Button to={links.follows} component={AdapterLink} color="inherit">フォロー</Button>
         <Button color="inherit">お気に入り</Button>
         {user.isOperationManager && <Button color="inherit">レビューリスト</Button>}
         

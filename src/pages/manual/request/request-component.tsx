@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {
-  Theme, createStyles, WithStyles, Grid, Paper,
+  Theme, createStyles, WithStyles, Grid, Paper, withStyles,
 } from '@material-ui/core';
 
 import { TreeNode, Manual, PullRequest } from '../../../data-types/tree';
@@ -77,4 +77,4 @@ const RequestComponent: React.FC<Props> = props => {
   );
 }
 
-export default RequestComponent;
+export default withStyles(styles)(RequestComponent);

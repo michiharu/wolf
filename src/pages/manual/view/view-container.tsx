@@ -18,6 +18,7 @@ import { ksActions } from '../../../redux/actions/ksAction';
 import ReadingSetting from '../../../data-types/reading-settings';
 import { rsActions } from '../../../redux/actions/rsAction';
 import { FollowsState } from '../../../redux/states/followsState';
+import User from '../../../data-types/user';
 
 export interface ViewActions {
   setManual: (manual: Manual) => Action<Manual>;
@@ -29,10 +30,12 @@ interface Props extends
   ManualsState,
   FollowsState,
   SelectState,
-  ViewActions, RouteComponentProps<{id: string}> {}
+  ViewActions, RouteComponentProps<{id: string}> {
+    user: User;
+  }
 
 const ViewContainer: React.FC<Props> = props => {
-  const { manuals, follows, manual, request, setManual, setNode, clearRequest, match } =  props;
+  const { user, manuals, follows, manual, request, setManual, setNode, clearRequest, match } =  props;
 
   if (manual === null || manual.id !== match.params.id) {
     var selected;
@@ -46,12 +49,12 @@ const ViewContainer: React.FC<Props> = props => {
     setNode(TreeNodeUtil._init(tree));
     return <p>loading...</p>
   }
-  const componentProps = {manual, request, clearRequest};
+  const componentProps = {user, manual, request, clearRequest};
   return <ViewComponent {...componentProps}/>;
 }
 
 function mapStateToProps(appState: AppState) {
-  return {...appState.manuals, ...appState.follows, ...appState.select, ...appState.ks};
+  return {user: appState.loginUser.user!, ...appState.manuals, ...appState.follows, ...appState.select, ...appState.ks};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {

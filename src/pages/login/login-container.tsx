@@ -2,9 +2,14 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { loginActions, LoginInfo } from '../../redux/actions/loginAction';
 import LoginComponent from './login-component';
+import { AppState } from '../../redux/store';
 
 export interface LoginActions {
   login: (loginInfo: LoginInfo) => void;
+}
+
+function mapStateToProps(appState: AppState) {
+  return {};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
@@ -13,4 +18,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
   };
 }
 
-export default connect(() => {}, mapDispatchToProps)(LoginComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(LoginComponent);

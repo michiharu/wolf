@@ -6,7 +6,6 @@ import {
 } from '@material-ui/core';
 import ViewSettingsIcon from '@material-ui/icons/Settings';
 
-import { Link } from 'react-router-dom';
 import { Manual, PullRequest } from '../../../data-types/tree';
 import NodeViewer from './node-viewer/node-viewer-container';
 import TextViewer from './text-editor/text-viewer-container';
@@ -15,6 +14,8 @@ import ViewSettingsContainer from '../../../components/view-settings/view-settin
 import RequestContainer from '../request/request-container';
 import RequestListContainer from './request-list/request-list-container';
 import { Action } from 'typescript-fsa';
+import AdapterLink from '../../../components/custom-mui/adapter-link';
+import User from '../../../data-types/user';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -55,13 +56,14 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface Props extends WithStyles<typeof styles> {
+  user: User;
   manual: Manual;
   request: PullRequest | null;
   clearRequest: () => Action<void>;
 }
 
 const ViewComponent: React.FC<Props> = props => {
-  const { manual, request, clearRequest, classes } =  props;
+  const { user, manual, request, clearRequest, classes } =  props;
 
   const [tabIndex, setTabIndex] = useState(0);
   const [showVS, setShowVS] = useState(false);
@@ -73,10 +75,9 @@ const ViewComponent: React.FC<Props> = props => {
 
   const handleShowVS = () => setShowVS(!showVS);
   const handleCloseVS = () => setShowVS(false);
-  const LinkEdit = (le: any) => <Link to={`/manual/${manual.id}/edit`} {...le}/>;
 
   const Request = request === null ? <RequestListContainer/> : <RequestContainer/>;
-
+  const isCommiter = manual.ownerId === user.id || manual.collaboratorIds.find(cid => cid === user.id) !== undefined;
   return (
     <div className={classes.root}>
       <div className={classes.header}>
@@ -91,8 +92,9 @@ const ViewComponent: React.FC<Props> = props => {
             <Tab label="設定"/>
           </Tabs>
           <div style={{flexGrow: 1}} />
-          {(tabIndex === 0 || tabIndex === 1) &&
-          <Button component={LinkEdit} color="primary">編集する</Button>}
+          {(tabIndex === 0 || tabIndex === 1) && (isCommiter ?
+          <Button to={`/manual/${manual.id}/edit`} component={AdapterLink} color="primary">編集する</Button> :
+          <Button to={`/manual/${manual.id}/create-request`} component={AdapterLink} color="primary">リクエストの作成</Button>)}
 
           {tabIndex === 2 && request !== null && <>
             <Button  color="primary">採用</Button>
