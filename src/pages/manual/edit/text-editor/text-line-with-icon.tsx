@@ -12,9 +12,8 @@ import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
   WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Close,
 } from '../../../../settings/layout';
-import { TreeNode, Type, NodeWithSimilarity, Tree, baseTreeNode } from '../../../../data-types/tree';
+import { TreeNode, Type, baseTreeNode } from '../../../../data-types/tree';
 
-import SimilarityUtil from '../../../../func/similarity';
 import TreeUtil from '../../../../func/tree';
 import { phrase } from '../../../../settings/phrase';
 
@@ -108,9 +107,9 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
   };
 
   const selectIsCommonRef = useRef(null);
-  const [selectIsCommonWidth, setSelectIsCommonWidth] = useState(0);
+  const [, setSelectIsCommonWidth] = useState(0);
   const selectTypeRef = useRef(null);
-  const [selectTypeWidth, setSelectTypeWidth] = useState(0);
+  const [, setSelectTypeWidth] = useState(0);
 
   if (node !== null) {
     process.nextTick(() => {
@@ -140,13 +139,13 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
   const focusType: Type = node === null ? 'task' : node.type;
 
   const [deleteFlag, setDeleteFlag] = useState(false);
-  const handleClickDelete = () => {
-    if (node!.children.length !== 0) {
-      setDeleteFlag(true);
-    } else {
-      deleteSelf(node);
-    }
-  }
+  // const handleClickDelete = () => {
+  //   if (node!.children.length !== 0) {
+  //     setDeleteFlag(true);
+  //   } else {
+  //     deleteSelf(node);
+  //   }
+  // }
 
   const handleFileRead = () => {
     const content = fileReader.result as string;

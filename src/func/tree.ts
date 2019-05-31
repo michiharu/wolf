@@ -11,7 +11,7 @@ export default class TreeUtil {
   static getGenealogy = (nodeList: Tree[], target: Tree): Tree[] => {
 
     const genealogy = TreeUtil.getGeneOrFalse(nodeList, target);
-    if (genealogy === false) { throw 'Target is not found.' }
+    if (genealogy === false) { throw new Error('Target is not found.'); }
 
     return genealogy;
   }

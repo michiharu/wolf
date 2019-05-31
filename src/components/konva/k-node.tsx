@@ -9,7 +9,6 @@ import { KWithArrow, KTreeNode, Point } from '../../data-types/tree';
 import { theme } from '../..';
 import Util from '../../func/util';
 import { phrase } from '../../settings/phrase';
-import { add } from '../../resource/svg-icon/add';
 import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
 import KSize from '../../data-types/k-size';
 import check from '../../resource/svg-icon/check';

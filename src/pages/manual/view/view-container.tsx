@@ -8,7 +8,7 @@ import { SelectState } from '../../../redux/states/selectState';
 import { selectActions } from '../../../redux/actions/selectAction';
 
 import { RouteComponentProps } from 'react-router-dom';
-import { baseTreeNode, TreeNode, Tree, Manual, PullRequest } from '../../../data-types/tree';
+import { baseTreeNode, TreeNode, Tree, Manual } from '../../../data-types/tree';
 import TreeUtil from '../../../func/tree';
 import TreeNodeUtil from '../../../func/tree-node';
 
@@ -41,7 +41,7 @@ const ViewContainer: React.FC<Props> = props => {
     if (selected === undefined) {
       selected = TreeUtil._findArray(follows, match.params.id)
     }
-    if (selected === undefined) { throw "Not found the manual."; }
+    if (selected === undefined) { throw new Error('Not found the manual.'); }
     setManual(selected);
     const tree = TreeUtil._get<Tree, TreeNode>(selected, baseTreeNode);
     setNode(TreeNodeUtil._init(tree));

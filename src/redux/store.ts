@@ -9,7 +9,6 @@ import createSagaMiddleware from '@redux-saga/core';
 import { rootSaga } from './saga';
 import { FollowsState, followsReducer } from './states/followsState';
 import { UsersState, usersReducer } from './states/usersState';
-import { usersAction } from './actions/usersAction';
 
 export type AppState = {
   loginUser: LoginUserState,
