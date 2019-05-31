@@ -292,7 +292,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
           <Grid container justify="center">
             <Grid item>
               <Paper className={classes.imageContainer}>
-                <img src={node.imageBlob} className={classes.img}/>
+                <img src={node.imageBlob} className={classes.img} alt={node.imageName}/>
                 <IconButton className={classes.deleteButton} onClick={() => changeNode({...node!, imageName: '', imageBlob: ''})}>
                   <Close/>
                 </IconButton>

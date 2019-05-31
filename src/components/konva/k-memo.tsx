@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useRef } from 'react';
 import { lightBlue, amber, yellow } from '@material-ui/core/colors';
 import Konva from 'konva';
 import { Rect, Group, Text } from 'react-konva';
@@ -21,86 +22,80 @@ export interface KMemoProps {
   moveToConvergent: (node: KTreeNode) => void;
 }
 
-class KMemo extends React.Component<KMemoProps> {
+const KMemo: React.FC<KMemoProps> = props => {
   
-  draggableRef = React.createRef<any>();
+  const draggableRef = useRef<any>(null);
 
-  constructor(props: KMemoProps) {
-    super(props);
-  }
-
-  handleFocus = (e: any) => {
+  const handleFocus = (e: any) => {
     e.cancelBubble = true;
-    const {node, focus} = this.props;
+    const {node, focus} = props;
     focus(node);
   }
 
-  handleDragStart = () => {
-    const { node, dragStart } = this.props;
+  const handleDragStart = () => {
+    const { node, dragStart } = props;
     dragStart(node);
   }
 
-  handleDragEnd = (e: any) => {
-    const { node, dragEnd } = this.props;
+  const handleDragEnd = (e: any) => {
+    const { node, dragEnd } = props;
     const point = { x: e.target.position().x, y: e.target.position().y };
     dragEnd({...node, point});
   }
   
-  render() {
-    const { node, ks, labelFocus, moveToConvergent } = this.props;
-    const fill = node.type === 'task' ? lightBlue[50] : node.type === 'switch' ? amber[100] : yellow[100];
-    const baseRectProps = {
-      x: 0, y: 0,
-      width: node.rect.w * ks.unit,
-      height: node.rect.h * ks.unit,
-      cornerRadius: 4,
-      fill,
-      stroke: node.focus ? '#80bdff' : '#0000',
-      strokeWidth: 6,
-      shadowColor: node.focus ? '#80bdff' : 'black',
-      shadowBlur: 6,
-      shadowOffsetY: node.focus ? 0 : 3,
-      shadowOpacity: node.focus ? 1 : 0.2,
-    };
+  const { node, ks, labelFocus, moveToConvergent } = props;
+  const fill = node.type === 'task' ? lightBlue[50] : node.type === 'switch' ? amber[100] : yellow[100];
+  const baseRectProps = {
+    x: 0, y: 0,
+    width: node.rect.w * ks.unit,
+    height: node.rect.h * ks.unit,
+    cornerRadius: 4,
+    fill,
+    stroke: node.focus ? '#80bdff' : '#0000',
+    strokeWidth: 6,
+    shadowColor: node.focus ? '#80bdff' : 'black',
+    shadowBlur: 6,
+    shadowOffsetY: node.focus ? 0 : 3,
+    shadowOpacity: node.focus ? 1 : 0.2,
+  };
 
-    const labelProps =  {
-      text: Util.isEmpty(node.label)
-        ? node.type === 'task' ? phrase.empty.task : node.type === 'switch' ? phrase.empty.switch : phrase.empty.case
-        : node.label,
-      fontSize: ks.fontSize * ks.unit,
-      x: (ks.rect.h + ks.fontSize / 2) * ks.unit,
-      y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit
-    };
+  const labelProps =  {
+    text: Util.isEmpty(node.label)
+      ? node.type === 'task' ? phrase.empty.task : node.type === 'switch' ? phrase.empty.switch : phrase.empty.case
+      : node.label,
+    fontSize: ks.fontSize * ks.unit,
+    x: (ks.rect.h + ks.fontSize / 2) * ks.unit,
+    y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit
+  };
 
-    const dragEl = this.draggableRef.current;
-    const willAnimation = dragEl !== null && (!dragEl.isDragging() || dragEl.x() !== 0);
+  const dragEl = draggableRef.current;
+  const willAnimation = dragEl !== null && (!dragEl.isDragging() || dragEl.x() !== 0);
 
-    if (willAnimation) {
-      dragEl!.to({
-        x: node.point.x,
-        y: node.point.y,
-        easing: Konva.Easings.EaseInOut,
-        onFinish: node.isMemo ? undefined : () => moveToConvergent(node),
-      });
-    }
-
-    const x = !willAnimation ? node.point.x : undefined;
-    const y = !willAnimation ? node.point.y : undefined;
-    const rectGroupProps = {
-      x, y,
-      onClick: this.handleFocus,
-      draggable: true,
-      onDragStart: this.handleDragStart,
-      onDragEnd: this.handleDragEnd,
-    };
-
-    return (
-      <Group ref={this.draggableRef} {...rectGroupProps}>
-        <Rect {...baseRectProps}/>
-        {!labelFocus &&  <Text {...labelProps}/>}
-      </Group>
-  );
+  if (willAnimation) {
+    dragEl!.to({
+      x: node.point.x,
+      y: node.point.y,
+      easing: Konva.Easings.EaseInOut,
+      onFinish: node.isMemo ? undefined : () => moveToConvergent(node),
+    });
   }
+
+  const x = !willAnimation ? node.point.x : undefined;
+  const y = !willAnimation ? node.point.y : undefined;
+  const rectGroupProps = {
+    x, y,
+    onClick: handleFocus,
+    draggable: true,
+    onDragStart: handleDragStart,
+    onDragEnd: handleDragEnd,
+  };
+
+  return (
+    <Group ref={draggableRef} {...rectGroupProps}>
+      <Rect {...baseRectProps}/>
+      {!labelFocus &&  <Text {...labelProps}/>}
+    </Group>
+  );
 }
 
 export default KMemo;

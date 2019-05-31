@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {useState} from 'react';
 import {
   Theme, createStyles, WithStyles, withStyles, Typography, Button, Grid, TextField, Switch, FormControlLabel
 } from '@material-ui/core';
@@ -21,7 +20,7 @@ interface Props extends WithStyles<typeof styles> {
 }
 
 const DeleteForm: React.FC<Props> = props => {
-  const { manual, classes } =  props;
+  const { classes } =  props;
 
   return (
     <div className={classes.root}>

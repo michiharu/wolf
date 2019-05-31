@@ -56,7 +56,7 @@ export default class TreeNodeUtil {
 
   static addNextBrother = <T extends TreeNode>(tree: T, to: T): {node: T, newNode: T} => {
     const parentNode = TreeUtil._getPrent(tree, to);
-    if (parentNode === null) { throw 'cannot find a parent.' }
+    if (parentNode === null) { throw new Error('cannot find a parent.'); }
     const newNode = TreeUtil.getNewNode(parentNode.type, baseTreeNode) as T;
     var node = TreeNodeUtil._deleteFocus(tree);
     node = TreeUtil._insert(node, newNode, to, true);

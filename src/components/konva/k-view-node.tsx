@@ -1,22 +1,19 @@
 import * as React from 'react';
 import { lightBlue, amber, yellow, grey } from '@material-ui/core/colors';
-import Konva from 'konva';
 import { Rect, Group, Text, Arrow } from 'react-konva';
 import { task, switchSvg, flag } from '../../resource/svg-icon';
 
-import { KWithArrow, KTreeNode, Point } from '../../data-types/tree';
+import { KWithArrow } from '../../data-types/tree';
 
 import { theme } from '../..';
 import Util from '../../func/util';
 import { phrase } from '../../settings/phrase';
-import { add } from '../../resource/svg-icon/add';
 import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
 import KSize from '../../data-types/k-size';
 import check from '../../resource/svg-icon/check';
 import Icon, { IconProps } from './icon';
 import more from '../../resource/svg-icon/expand/more';
 import less from '../../resource/svg-icon/expand/less';
-import { NodeEditMode } from '../../data-types/node-edit-mode';
 
 export interface KNodeProps {
   node: KWithArrow;
@@ -56,10 +53,6 @@ const KViewNode: React.FC<KNodeProps> = props => {
     x: 0, y: 0,
     svg: node.type === 'task' ? task : node.type === 'switch' ? switchSvg : check,
     scale: node.type !== 'switch' ? undefined : {x: 1, y: -1},
-  };
-
-  const rectGroupProps = {
-    x: 0, y:0,
   };
 
   const containerRectProps = {

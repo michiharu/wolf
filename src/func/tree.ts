@@ -70,8 +70,8 @@ export default class TreeUtil {
       ? true
       : searchWords
         .map(w => (
-          n.label .match(new RegExp(`${w}`)) !== null ||
-          n.input .match(new RegExp(`${w}`)) !== null ||
+          n.label.match(new RegExp(`${w}`)) !== null ||
+          n.input.match(new RegExp(`${w}`)) !== null ||
           n.output.match(new RegExp(`${w}`)) !== null
         ))
         .reduce((a, b) => a === true && b === true));
@@ -95,8 +95,8 @@ export default class TreeUtil {
     if (words.length === 0) { return true; }
     return words
     .map(w => (
-      node.label .match(new RegExp(`${w}`)) !== null ||
-      node.input .match(new RegExp(`${w}`)) !== null ||
+      node.label.match(new RegExp(`${w}`)) !== null ||
+      node.input.match(new RegExp(`${w}`)) !== null ||
       node.output.match(new RegExp(`${w}`)) !== null
     ))
     .reduce((a, b) => a === true && b === true);

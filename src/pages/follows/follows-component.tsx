@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles, Paper,
+  Theme, createStyles, WithStyles, Paper,
 } from '@material-ui/core';
 import { FollowsState } from '../../redux/states/followsState';
 import { ManualWithUser } from '../../data-types/tree';

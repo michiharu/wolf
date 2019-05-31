@@ -1,5 +1,4 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
-import { manualsAction } from '../actions/manualsAction';
 import User from '../../data-types/user';
 import { usersAction } from '../actions/usersAction';
 

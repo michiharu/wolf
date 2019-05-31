@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Dispatch, Action } from 'redux';
 import { connect } from 'react-redux';
 import { AppState } from '../../../../redux/store';

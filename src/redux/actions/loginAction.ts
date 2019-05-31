@@ -1,4 +1,4 @@
-import actionCreatorFactory, { ActionCreator, Success, Failure } from 'typescript-fsa';
+import actionCreatorFactory from 'typescript-fsa';
 
 export interface LoginInfo {
   id: string;

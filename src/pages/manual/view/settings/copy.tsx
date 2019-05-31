@@ -1,8 +1,7 @@
 import * as React from 'react';
-import {useState} from 'react';
 import {
   Theme, createStyles, WithStyles, withStyles,
-  Typography, Button, FormControl, FormControlLabel, InputLabel, Select, MenuItem, Switch, Grid, TextField
+  Typography, Button, Grid, TextField
 
 } from '@material-ui/core';
 import { Manual } from '../../../../data-types/tree';
@@ -20,7 +19,7 @@ interface Props extends WithStyles<typeof styles> {
 }
 
 const Copy: React.FC<Props> = props => {
-  const { manual, classes } =  props;
+  const { classes } =  props;
   return (
     <div className={classes.root}>
       <div className={classes.container}>

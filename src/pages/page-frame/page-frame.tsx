@@ -1,16 +1,13 @@
 import * as React from 'react';
-import {useState} from 'react';
-import { Route, Switch, Redirect, Link } from 'react-router-dom';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import links from '../../settings/links';
 import Dashboard from '../dashboard/dashboard-component';
-import { Theme, createStyles, WithStyles, Toolbar, Button, Tabs, Tab, InputBase, withStyles, IconButton, Badge, Typography } from '@material-ui/core';
-import { Search, Notifications } from '@material-ui/icons';
+import { Theme, createStyles, WithStyles, withStyles } from '@material-ui/core';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import AppBarContainer from './app-bar/app-bar-container';
 import ViewContainer from '../manual/view/view-container';
 import EditorFrameContainer from '../manual/edit/editor-frame-container';
 import RequestContainer from '../manual/request/request-container';
-import User from '../../data-types/user';
 import FollowsContainer from '../follows/follows-container';
 
 export const styles = (theme: Theme) => createStyles({
@@ -61,9 +58,6 @@ interface Props extends WithStyles<typeof styles> {}
 
 const PageFrame: React.FC<Props> = (props) => {
   const { classes } = props;
-
-  const [searchText, setSearchText] = useState('');
-  const LogoLink = (llp: any) => <Link to={links.dashboard} {...llp}/>;
   return (
     <div>
       <AppBarContainer/>

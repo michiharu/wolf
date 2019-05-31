@@ -4,12 +4,11 @@ import Konva from 'konva';
 import { Rect, Group, Text, Arrow } from 'react-konva';
 import { task, switchSvg, flag } from '../../resource/svg-icon';
 
-import { KWithArrow, KTreeNode, Point } from '../../data-types/tree';
+import { KWithArrow } from '../../data-types/tree';
 
 import { theme } from '../..';
 import Util from '../../func/util';
 import { phrase } from '../../settings/phrase';
-import { add } from '../../resource/svg-icon/add';
 import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
 import KSize from '../../data-types/k-size';
 import check from '../../resource/svg-icon/check';
@@ -26,10 +25,6 @@ export interface KNodeProps {
 class KShadow extends React.Component<KNodeProps> {
   
   groupRef = React.createRef<any>();
-
-  constructor(props: KNodeProps) {
-    super(props);
-  }
 
   componentWillUnmount() {
     this.groupRef.current!.destroy();

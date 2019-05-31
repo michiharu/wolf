@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {useState} from 'react';
-import { Route, Switch, Redirect, Link } from 'react-router-dom';
-import { Theme, createStyles, WithStyles, AppBar as MUIAppBar, Toolbar, Button, Tabs, Tab, InputBase, withStyles, IconButton, Badge, Typography } from '@material-ui/core';
-import { Search, Notifications } from '@material-ui/icons';
+import { Link } from 'react-router-dom';
+import { Theme, createStyles, WithStyles, AppBar as MUIAppBar, Toolbar, Button, InputBase, withStyles, Typography } from '@material-ui/core';
+import { Search } from '@material-ui/icons';
 import { fade } from '@material-ui/core/styles/colorManipulator';
 import User from '../../../data-types/user';
 import links from '../../../settings/links';

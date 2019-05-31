@@ -1,10 +1,9 @@
-import _ from 'lodash';
 import * as React from 'react';
 import {
   Theme, createStyles, WithStyles, withStyles,
 } from '@material-ui/core';
 
-import { TreeNode, Tree } from '../../../../data-types/tree';
+import { TreeNode } from '../../../../data-types/tree';
 import { tes as defaultTES } from '../../../../settings/layout';
 
 import TreeUtil from '../../../../func/tree';

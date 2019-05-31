@@ -1,8 +1,5 @@
 import * as React from 'react';
-import { RouteComponentProps } from 'react-router';
-import { Grid, Theme, createStyles, WithStyles, withStyles
-} from '@material-ui/core';
-import { Tree } from '../../data-types/tree';
+import { Grid, Theme, createStyles, WithStyles, withStyles} from '@material-ui/core';
 
 import ManualList from './manual-list-component';
 
@@ -22,9 +19,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
   return (
     <Grid container>
       <Grid item xs={12} lg={5}>
-        <div className={classes.container}>
-          <ManualList/>
-        </div>
+        <div className={classes.container}><ManualList/></div>
       </Grid>
       <Grid item xs={12} lg={7}>
       

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { AppState } from '../../redux/store';
 import {
   Theme, createStyles, WithStyles, withStyles, Paper, TextField, FormControlLabel, Switch,
-  List, ListItem, Button, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
+  List, ListItem, Button, Typography,
 } from '@material-ui/core';
 
 import TreeUtil from '../../func/tree';

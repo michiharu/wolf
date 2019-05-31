@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import { Tree } from '../../data-types/tree';
-import { Task, Switch, Case, Delete } from '../../settings/layout';
+import { Task, Switch, Case } from '../../settings/layout';
 
 export interface ExpansionTreeProps {
   node: Tree;

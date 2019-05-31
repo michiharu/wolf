@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles,
+  Theme, createStyles, WithStyles,
   Button, IconButton, Menu, MenuItem, ListItemIcon, ListItemText,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField, Paper, createMuiTheme, 
 } from '@material-ui/core';
@@ -27,8 +27,6 @@ import KMemo from '../../../../components/konva/k-memo';
 import KShadow from '../../../../components/konva/k-shadow';
 import { KSState } from '../../../../redux/states/ksState';
 import { RSState } from '../../../../redux/states/rsState';
-import DragMap from '../../../../components/konva/debug-view/drag-map';
-
 
 export const styles = (theme: Theme) => createStyles({
   root: {
@@ -156,21 +154,21 @@ class NodeEditorComponent extends React.Component<Props, State> {
 
   addScrollEventListener = () => {
     const scrollContainer = this.mainRef.current;
-    if (scrollContainer === null) { throw 'Cannot find elements.'; }
+    if (scrollContainer === null) { throw new Error('Cannot find elements.'); }
     scrollContainer.addEventListener('scroll', this.scroll);
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
     const scrollContainer = this.mainRef.current;
-    if (scrollContainer === null) { throw 'Cannot find elements.'; }
+    if (scrollContainer === null) { throw new Error('Cannot find elements.'); }
     scrollContainer.removeEventListener('scroll', this.scroll);
   }
 
   resize = () => {
     const mref = this.mainRef.current;
     const stage = this.stageRef.current;
-    if (mref === null || stage === null) { throw 'Cannot find elements.'; }
+    if (mref === null || stage === null) { throw new Error('Cannot find elements.'); }
     stage.width(mref.offsetWidth - theme.spacing(2));
     stage.height(mref.offsetHeight - theme.spacing(2));
     stage.draw();
@@ -181,7 +179,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
     const { mode, node, ks, edit } = this.props;
     const scrollContainer = this.mainRef.current;
     const stage = this.stageRef.current;
-    if (scrollContainer === null || stage === null) { throw 'Cannot find elements.'; }
+    if (scrollContainer === null || stage === null) { throw new Error('Cannot find elements.'); }
     // canvasをmainと一致するよう移動
     const dx = scrollContainer.scrollLeft;
     const dy = scrollContainer.scrollTop;
@@ -189,7 +187,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
 
     if (mode !== 'c') {
       const createBox = this.createBoxRef.current;
-      if (createBox === null) { throw 'Cannot find elements.'; }
+      if (createBox === null) { throw new Error('Cannot find elements.'); }
       createBox.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
     }
 
@@ -215,7 +213,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
   scrollToNew = (result: { node: TreeNode, newNode: TreeNode }) => {
     const main = this.mainRef.current;
     const stage = this.stageRef.current;
-    if (main === null || stage === null) { throw 'Cannot find elements.'; }
+    if (main === null || stage === null) { throw new Error('Cannot find elements.'); }
 
     const { ks, edit } = this.props;
     var  kTree = TreeUtil._get(result.node, baseKTreeNode);
@@ -353,7 +351,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
     if (mode === 'dc' && p.x < 0) {
       const scrollContainer = this.mainRef.current;
       const stage = this.stageRef.current;
-      if (scrollContainer === null || stage === null) { throw 'Cannot find elements.'; }
+      if (scrollContainer === null || stage === null) { throw new Error('Cannot find elements.'); }
       const dx = scrollContainer.scrollLeft;
       const dy = scrollContainer.scrollTop;
       var x = stage.width() / 2 - Math.max(-p.x, target.rect.w) - dx;
@@ -383,7 +381,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
     this.setState({dragMemo: null});
     const scrollContainer = this.mainRef.current;
     const stage = this.stageRef.current;
-    if (scrollContainer === null || stage === null) { throw 'Cannot find elements.'; }
+    if (scrollContainer === null || stage === null) { throw new Error('Cannot find elements.'); }
     
     if (mode === 'dc') {
       const memoX = memo.point.x + (memo.rect.w / 2 * ks.unit);
@@ -428,7 +426,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
   keepMemo = (memo: KTreeNode) => {
     const { mode, ks } = this.props;
     const stage = this.stageRef.current;
-    if (stage === null) { throw 'Cannot find elements.'; }
+    if (stage === null) { throw new Error('Cannot find elements.'); }
 
     const sw = stage.width(), rw = ks.rect.w * ks.unit;
     var x = memo.point.x * (mode === 'd' ? (1 - sw / (2 * (sw - rw))) : 1);
@@ -445,7 +443,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
     if (memoList.find(m => m.id === memo.id) === undefined) { return; }
     const scrollContainer = this.mainRef.current;
     const stage = this.stageRef.current;
-    if (scrollContainer === null || stage === null) { throw 'Cannot find elements.'; }
+    if (scrollContainer === null || stage === null) { throw new Error('Cannot find elements.'); }
     if (mode === 'dc') {
       const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
       const flatNodes = TreeNodeUtil.toArrayWithoutClose(kTreeNode);
@@ -537,7 +535,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
     const { createBoxText } = this.state;
     const newMemo = TreeUtil.getNewNode('task', baseKTreeNode);
     const stage = this.stageRef.current;
-    if (stage === null) { throw 'Cannot find elements.'; }
+    if (stage === null) { throw new Error('Cannot find elements.'); }
     addMemo({
       ...newMemo,
       label: createBoxText,
@@ -560,7 +558,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { mode, node: tree, memoList, ks, editMemo, classes } = this.props;
+    const { mode, node: tree, memoList, ks, classes } = this.props;
     const {
       labelFocus, memoLabelFocus, typeAnchorEl, deleteFlag, dragParent, dragMemo, createBoxText
     } = this.state;

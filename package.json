@@ -50,7 +50,7 @@
     "@types/react-swipeable-views": "^0.13.0",
     "axios-mock-adapter": "^1.16.0",
     "redux-devtools-extension": "^2.13.8",
-    "typescript": "latest"
+    "typescript": "3.4.5"
   },
   "scripts": {
     "start": "react-scripts start",

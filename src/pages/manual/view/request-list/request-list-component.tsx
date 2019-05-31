@@ -1,11 +1,9 @@
 import * as React from 'react';
-import {useState} from 'react';
 import {
   Theme, createStyles, WithStyles, withStyles, Paper, Table, TableHead, TableRow, TableBody, TableCell, Button
 
 } from '@material-ui/core';
 import { Manual, PullRequest, baseTreeNode, Tree, TreeNode } from '../../../../data-types/tree';
-import { Link } from 'react-router-dom';
 import { RequestListActions } from './request-list-container';
 import TreeUtil from '../../../../func/tree';
 import TreeNodeUtil from '../../../../func/tree-node';

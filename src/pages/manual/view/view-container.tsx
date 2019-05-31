@@ -21,7 +21,6 @@ import { FollowsState } from '../../../redux/states/followsState';
 
 export interface ViewActions {
   setManual: (manual: Manual) => Action<Manual>;
-  clearManual: () => Action<void>;
   setNode:   (node: TreeNode) => Action<TreeNode>;
   clearRequest: () => Action<void>;
 }
@@ -33,7 +32,7 @@ interface Props extends
   ViewActions, RouteComponentProps<{id: string}> {}
 
 const ViewContainer: React.FC<Props> = props => {
-  const { manuals, follows, manual, request, setManual, clearManual, setNode, clearRequest, match } =  props;
+  const { manuals, follows, manual, request, setManual, setNode, clearRequest, match } =  props;
 
   if (manual === null || manual.id !== match.params.id) {
     var selected;
@@ -47,7 +46,7 @@ const ViewContainer: React.FC<Props> = props => {
     setNode(TreeNodeUtil._init(tree));
     return <p>loading...</p>
   }
-  const componentProps = {manual, request, clearManual, clearRequest};
+  const componentProps = {manual, request, clearRequest};
   return <ViewComponent {...componentProps}/>;
 }
 
@@ -58,7 +57,6 @@ function mapStateToProps(appState: AppState) {
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
     setManual: (manual: Manual) => dispatch(selectActions.setManual(manual)),
-    clearManual: () => dispatch(selectActions.clearManual()),
     setNode:   (node: TreeNode) => dispatch(selectActions.setNode(node)),
     clearRequest: () => dispatch(selectActions.clearRequest()),
     changeKS:  (ks: KSize) => dispatch(ksActions.change(ks)),

@@ -4,7 +4,6 @@ import {
 } from '@material-ui/core';
 import Slider from '@material-ui/lab/Slider';
 import KSize from '../../data-types/k-size';
-import ReadingSetting from '../../data-types/reading-settings';
 import { KSState } from '../../redux/states/ksState';
 import { RSState } from '../../redux/states/rsState';
 import { ViewSettingsActions } from './view-settings-container';

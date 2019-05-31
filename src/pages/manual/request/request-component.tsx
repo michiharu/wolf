@@ -1,18 +1,9 @@
 import * as React from 'react';
-import {useState} from 'react';
-import { connect } from 'react-redux';
-import { AppState } from '../../../redux/store';
-import { ManualsState } from '../../../redux/states/manualsState';
 import {
-  Theme, createStyles, WithStyles, IconButton, Button, Tab, Tabs, Grid, Paper, withStyles,
+  Theme, createStyles, WithStyles, Grid, Paper,
 } from '@material-ui/core';
 
-import ViewSettingsIcon from '@material-ui/icons/Settings';
-
-import { Tree, TreeNode, baseTreeNode, KTreeNode, Manual, PullRequest } from '../../../data-types/tree';
-import { RouteComponentProps, withRouter } from 'react-router';
-import TreeUtil from '../../../func/tree';
-import { RequestActions } from './request-container';
+import { TreeNode, Manual, PullRequest } from '../../../data-types/tree';
 import NodeViewerContainer from '../view/node-viewer/node-viewer-container';
 import RequestViewerComponent from '../view/request-node-viewer/request-node-viewer';
 import { Action } from 'typescript-fsa';
@@ -60,10 +51,8 @@ export type CannotSaveReason = 'switch' | 'case' | null;
 
 const RequestComponent: React.FC<Props> = props => {
 
-  const { manuals, node, request, reqNode, setReqNode, ks, rs, classes } = props;
-  
-  const [tabIndex, setTabIndex] = useState(0);
-  const [showVS, setShowVS] = useState(false);
+  const { request, reqNode, setReqNode, ks, rs, classes } = props
+
   return (
     <div className={classes.root}>
       <Grid container>

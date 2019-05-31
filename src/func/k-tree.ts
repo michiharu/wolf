@@ -1,6 +1,5 @@
-import {TreeNode, Type, KTreeNode, DragRow, Tree, Point, DropRow } from "../data-types/tree";
+import {KTreeNode, DragRow, Point, DropRow } from "../data-types/tree";
 import KSize from "../data-types/k-size";
-import TreeNodeUtil from "./tree-node";
 
 export default class KTreeUtil {
 
@@ -105,15 +104,19 @@ export default class KTreeUtil {
       const result = KTreeUtil.makeBaseDragMap(s);
 
       if (s.open && s.depth.top !== 0) {
-        for(var y = s.point.y + s.self.h - ks.margin.h; y < s.point.y + s.self.h; y++) {
-          result[y] = { node: s, action: 'moveInOut' };
-        }
+        (() => {
+          for(var y = s.point.y + s.self.h - ks.margin.h; y < s.point.y + s.self.h; y++) {
+            result[y] = { node: s, action: 'moveInOut' };
+          }
+        })();
       }
       
       if (s.depth.top !== 0) {
-        for(var y = s.point.y; y < s.point.y + s.rect.h; y++) {
-          result[y] = { node: s, action: 'moveToBrother' };
-        }
+        (() => {
+          for(var y = s.point.y; y < s.point.y + s.rect.h; y++) {
+            result[y] = { node: s, action: 'moveToBrother' };
+          }
+        })();
       }
       
       return result;
@@ -145,12 +148,16 @@ export default class KTreeUtil {
       const result = KTreeUtil.makeBaseDropMap(s);
 
       if (s.depth.top !== 0) {
-        for(var y = s.point.y - ks.margin.h; y < s.point.y + beforeRectHalf; y++) {
-          result[y] = { node: s, action: 'insertBefore' };
-        }
-        for(var y = s.point.y + beforeRectHalf; y < s.point.y + ks.rect.h + beforeMarginHalf; y++) {
-          result[y] = { node: s, action: 'insertNext' };
-        }
+        (() => {
+          for(var y = s.point.y - ks.margin.h; y < s.point.y + beforeRectHalf; y++) {
+            result[y] = { node: s, action: 'insertBefore' };
+          }
+        })();
+        (() => {
+          for(var y = s.point.y + beforeRectHalf; y < s.point.y + ks.rect.h + beforeMarginHalf; y++) {
+            result[y] = { node: s, action: 'insertNext' };
+          }
+        })();
       }
 
       if (s.open) {

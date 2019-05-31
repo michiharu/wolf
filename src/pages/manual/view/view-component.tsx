@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import {
   Theme, createStyles, WithStyles, withStyles,
   Tabs, Tab, Typography, Divider, Button, IconButton, Modal,
@@ -58,15 +58,10 @@ interface Props extends WithStyles<typeof styles> {
   manual: Manual;
   request: PullRequest | null;
   clearRequest: () => Action<void>;
-  clearManual: () => void;
 }
 
 const ViewComponent: React.FC<Props> = props => {
-  const { manual, request, clearManual, clearRequest, classes } =  props;
-
-  useEffect(() => {
-    return () => clearManual();
-  }, [])
+  const { manual, request, clearRequest, classes } =  props;
 
   const [tabIndex, setTabIndex] = useState(0);
   const [showVS, setShowVS] = useState(false);

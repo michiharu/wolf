@@ -6,7 +6,7 @@ import {
 import { Stage, Layer, Group } from 'react-konva';
 
 import { TreeNode, KTreeNode, DragRow, baseKTreeNode, baseKWithArrow, KWithArrow } from '../../../../data-types/tree';
-import { toolbarHeight, toolbarMinHeight, defaultKS, rightPainWidth } from '../../../../settings/layout';
+import { toolbarHeight, toolbarMinHeight, rightPainWidth } from '../../../../settings/layout';
 import TreeUtil from '../../../../func/tree';
 import TreeNodeUtil from '../../../../func/tree-node';
 import KTreeUtil from '../../../../func/k-tree';
@@ -107,21 +107,21 @@ class NodeViewerComponent extends React.Component<Props, State> {
 
   addScrollEventListener = () => {
     const scrollContainer = this.mainRef.current;
-    if (scrollContainer === null) { throw 'Cannot find elements.'; }
+    if (scrollContainer === null) { throw new Error('Cannot find elements.'); }
     scrollContainer.addEventListener('scroll', this.scroll);
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
     const scrollContainer = this.mainRef.current;
-    if (scrollContainer === null) { throw 'Cannot find elements.'; }
+    if (scrollContainer === null) { throw  new Error('Cannot find elements.'); }
     scrollContainer.removeEventListener('scroll', this.scroll);
   }
 
   resize = () => {
     const mref = this.mainRef.current;
     const stage = this.stageRef.current;
-    if (mref === null || stage === null) { throw 'Cannot find elements.'; }
+    if (mref === null || stage === null) { throw  new Error('Cannot find elements.'); }
     stage.width(mref.offsetWidth - theme.spacing(2));
     stage.height(mref.offsetHeight - theme.spacing(2));
     stage.draw();
@@ -132,7 +132,7 @@ class NodeViewerComponent extends React.Component<Props, State> {
     const { node, ks, setNode } = this.props;
     const scrollContainer = this.mainRef.current;
     const stage = this.stageRef.current;
-    if (scrollContainer === null || stage === null) { throw 'Cannot find elements.'; }
+    if (scrollContainer === null || stage === null) { throw  new Error('Cannot find elements.'); }
     // canvasをmainと一致するよう移動
     const dx = scrollContainer.scrollLeft;
     const dy = scrollContainer.scrollTop;
@@ -162,7 +162,7 @@ class NodeViewerComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { node: tree, ks, rs, classes } = this.props;
+    const { node: tree, ks, classes } = this.props;
     const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
     const node = KArrowUtil.setArrow(kTreeNode, ks);
     this.kTree = node;

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { createBrowserHistory } from 'history';
 import { ManualsState } from '../../../redux/states/manualsState';
 import {
-  Theme, createStyles, WithStyles, withStyles, Snackbar, IconButton,
+  Theme, createStyles, WithStyles, Snackbar, IconButton,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Tab, Tabs, Modal,
 } from '@material-ui/core';
 
@@ -11,10 +11,9 @@ import ViewSettingsIcon from '@material-ui/icons/Settings';
 import { Divergent, Convergent } from '../../../settings/layout' 
 
 import { Tree, TreeNode, baseTreeNode, KTreeNode, Manual } from '../../../data-types/tree';
-import { RouteComponentProps, withRouter } from 'react-router';
+import { RouteComponentProps } from 'react-router';
 import links from '../../../settings/links';
 import TreeUtil from '../../../func/tree';
-import { fileDownload } from '../../../func/file-download';
 import NodeEditorContainer from './node-editor/node-editor-container';
 import TextEditor, { TextEditorProps } from './text-editor/text-editor';
 import TreeNodeUtil from '../../../func/tree-node';
@@ -163,7 +162,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 
   save = () => {
-    const { manuals, changeManuals, changeMemos, history } = this.props;
+    const { manuals, changeManuals, changeMemos, clearManual, history } = this.props;
     const {node, memoList} = this.state;
     const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
     const isAllCaseHasItem = TreeUtil._isAllCaseHasItem(node);
@@ -175,16 +174,18 @@ class EditorFrameComponent extends React.Component<Props, State> {
       const newManuals = TreeUtil._replaceArray<Tree>(manuals, node) as Manual[];
       changeManuals(newManuals);
       changeMemos(memoList);
+      clearManual();
       history.goBack();
     }
   }
 
   saveAndGo = () => {
-    const { manuals, changeManuals, changeMemos, history } = this.props;
+    const { manuals, changeManuals, changeMemos, clearManual, history } = this.props;
     const { node, memoList } = this.state;
     const newManuals = TreeUtil._replaceArray<Tree>(manuals, node) as Manual[];
     changeManuals(newManuals);
     changeMemos(memoList);
+    clearManual();
     history.goBack();
   }
 

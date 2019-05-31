@@ -36,10 +36,6 @@ class KNode extends React.Component<KNodeProps> {
   baseRef = React.createRef<any>();
   draggableRef = React.createRef<any>();
 
-  constructor(props: KNodeProps) {
-    super(props);
-  }
-
   componentDidMount() {
     process.nextTick(() => this.setState({}));
   }

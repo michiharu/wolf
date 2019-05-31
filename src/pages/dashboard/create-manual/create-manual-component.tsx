@@ -2,13 +2,11 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import {
-  Theme, createStyles, WithStyles, withStyles, TextField, FormControlLabel, Switch,
-  Button, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
+  Theme, createStyles, WithStyles, TextField, FormControlLabel, Switch,
+  Button, Dialog, DialogTitle, DialogContent, DialogActions,
 } from '@material-ui/core';
 
-import TreeUtil from '../../../func/tree';
 import { ManualsState } from '../../../redux/states/manualsState';
-import { LoginUserState } from '../../../redux/states/loginUserState';
 import { CreateManualActions } from './create-manual-container';
 import { baseManual, Manual } from '../../../data-types/tree';
 import User from '../../../data-types/user';

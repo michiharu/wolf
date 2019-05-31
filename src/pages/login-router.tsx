@@ -6,7 +6,6 @@ import links from '../settings/links';
 import LoginContainer from './login/login-container';
 import { LoginUserState } from '../redux/states/loginUserState';
 import PageFrame from './page-frame/page-frame';
-import { user1 } from '../api/mock-data/common-data/users';
 
 
 interface Props extends LoginUserState {}

@@ -1,20 +1,16 @@
 import * as React from 'react';
-import { useState, useRef } from 'react';
-import ReactDOM from 'react-dom';
 import classnames from 'classnames';
 
 import {
   Theme, createStyles, WithStyles, withStyles, TextField, Grid,
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
-  InputAdornment, FormControl, Select, MenuItem, Button, IconButton, Typography, Paper
+  InputAdornment, FormControl, Select, MenuItem, Typography, Paper
 } from '@material-ui/core';
 import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
-  WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Close,
+  WorkerInCharge, Remarks, NecessaryTools, Exceptions,
 } from '../../../../settings/layout';
-import { TreeNode, Type, NodeWithSimilarity, Tree, baseTreeNode } from '../../../../data-types/tree';
+import { TreeNode, Type } from '../../../../data-types/tree';
 
-import TreeUtil from '../../../../func/tree';
 import { phrase } from '../../../../settings/phrase';
 
 const styles = (theme: Theme) => createStyles({
@@ -74,26 +70,10 @@ export interface TextLineWithIconProps {
 interface Props extends TextLineWithIconProps, WithStyles<typeof styles> {}
 
 const TextViewer: React.FC<Props> = (props: Props) => {
-  var fileReader: FileReader;
-  var fileName: string;
 
   const {
     itemNumber, node, classes
   } = props;
-
-  const selectIsCommonRef = useRef(null);
-  const [selectIsCommonWidth, setSelectIsCommonWidth] = useState(0);
-  const selectTypeRef = useRef(null);
-  const [selectTypeWidth, setSelectTypeWidth] = useState(0);
-
-  if (node !== null) {
-    process.nextTick(() => {
-      const commonEl = ReactDOM.findDOMNode(selectIsCommonRef.current) as HTMLElement | null;
-      if (commonEl !== null) { setSelectIsCommonWidth(commonEl.offsetWidth); }
-      const typeEl = ReactDOM.findDOMNode(selectTypeRef.current) as HTMLElement | null;
-      if (typeEl !== null) { setSelectTypeWidth(typeEl.offsetWidth); }
-    });      
-  }
 
   const InputIcon = <InputAdornment position="start"><Input/></InputAdornment>;
 
@@ -127,7 +107,6 @@ const TextViewer: React.FC<Props> = (props: Props) => {
                       : classnames(classes.selectType, classes.switchIcon),
                     select: classes.select
                   }}
-                  // input={<OutlinedInput labelWidth={selectTypeWidth}/>}
                   value={node.type}
                   IconComponent={
                     p => focusType === 'task' ?   <Task {...p}/> :
@@ -233,7 +212,7 @@ const TextViewer: React.FC<Props> = (props: Props) => {
           <Grid container justify="center">
             <Grid item>
               <Paper className={classes.imageContainer}>
-                <img src={node.imageBlob} className={classes.img}/>
+                <img src={node.imageBlob} className={classes.img} alt={node.imageName}/>
               </Paper>
             </Grid>
           </Grid>}

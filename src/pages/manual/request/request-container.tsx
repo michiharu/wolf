@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { Action } from 'typescript-fsa';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
