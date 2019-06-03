@@ -71,12 +71,39 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
             "<span class="hljs-attribute">isOperationManager</span>": <span class="hljs-value"><span class="hljs-literal">true</span>
         </span>}
     ]</span>,
+    "<span class="hljs-attribute">categories</span>": <span class="hljs-value">[
+        {
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1"</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"未分類カテゴリー"</span></span>,
+        },
+        {
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"2"</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"営業"</span></span>,
+        },
+        {
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"3"</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"ソフトウェア"</span></span>,
+        },
+        {
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"4"</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"経理"</span></span>,
+        },
+        {
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"5"</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"法務"</span></span>,
+        },
+        {
+            "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"6"</span></span>,
+            "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"教育"</span></span>,
+        },
+    ]</span>,
     "<span class="hljs-attribute">manuals</span>": <span class="hljs-value">[
         {
             "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"1"</span></span>,
-            "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"マニュアル1"</span></span>,
+            "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"営業マニュアル"</span></span>,
             "<span class="hljs-attribute">ownerId</span>": <span class="hljs-value"><span class="hljs-string">"user1234"</span></span>,
             "<span class="hljs-attribute">collaboratorIds</span>": <span class="hljs-value">[<span class="hljs-string">"user2222"</span>]</span>,
+            "<span class="hljs-attribute">category</span>": <span class="hljs-value"><span class="hljs-string">"2"</span></span>,
             "<span class="hljs-attribute">isPublic</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
             "<span class="hljs-attribute">visible</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
             "<span class="hljs-attribute">favorites</span>": <span class="hljs-value">[]</span>,
@@ -85,9 +112,10 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
         },
         {
             "<span class="hljs-attribute">id</span>": <span class="hljs-value"><span class="hljs-string">"2"</span></span>,
-            "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"マニュアル2"</span></span>,
+            "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"ソフトウェアマニュアル"</span></span>,
             "<span class="hljs-attribute">ownerId</span>": <span class="hljs-value"><span class="hljs-string">"user1234"</span></span>,
             "<span class="hljs-attribute">collaboratorIds</span>": <span class="hljs-value">[<span class="hljs-string">"user2222"</span>]</span>,
+            "<span class="hljs-attribute">category</span>": <span class="hljs-value"><span class="hljs-string">"3"</span></span>,
             "<span class="hljs-attribute">isPublic</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
             "<span class="hljs-attribute">visible</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
             "<span class="hljs-attribute">favorites</span>": <span class="hljs-value">[]</span>,
@@ -162,6 +190,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
   "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"マニュアル1"</span></span>,
   "<span class="hljs-attribute">ownerId</span>": <span class="hljs-value"><span class="hljs-string">"user1234"</span></span>,
   "<span class="hljs-attribute">collaboratorIds</span>": <span class="hljs-value">[]</span>,
+  "<span class="hljs-attribute">category</span>": <span class="hljs-value"><span class="hljs-string">"3"</span></span>,
   "<span class="hljs-attribute">isPublic</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
   "<span class="hljs-attribute">visible</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
   "<span class="hljs-attribute">favorites</span>": <span class="hljs-value">[]</span>,
@@ -187,6 +216,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
   "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"マニュアル1"</span></span>,
   "<span class="hljs-attribute">ownerId</span>": <span class="hljs-value"><span class="hljs-string">"user1234"</span></span>,
   "<span class="hljs-attribute">collaboratorIds</span>": <span class="hljs-value">[]</span>,
+  "<span class="hljs-attribute">category</span>": <span class="hljs-value"><span class="hljs-string">"3"</span></span>,
   "<span class="hljs-attribute">isPublic</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
   "<span class="hljs-attribute">visible</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
   "<span class="hljs-attribute">favorites</span>": <span class="hljs-value">[]</span>,
@@ -213,6 +243,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
     "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"マニュアル1"</span></span>,
     "<span class="hljs-attribute">ownerId</span>": <span class="hljs-value"><span class="hljs-string">"user1234"</span></span>,
     "<span class="hljs-attribute">collaboratorIds</span>": <span class="hljs-value">[]</span>,
+    "<span class="hljs-attribute">category</span>": <span class="hljs-value"><span class="hljs-string">"3"</span></span>,
     "<span class="hljs-attribute">isPublic</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
     "<span class="hljs-attribute">visible</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
     "<span class="hljs-attribute">favorites</span>": <span class="hljs-value">[]</span>,
@@ -253,6 +284,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
     "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"マニュアル1"</span></span>,
     "<span class="hljs-attribute">ownerId</span>": <span class="hljs-value"><span class="hljs-string">"user1234"</span></span>,
     "<span class="hljs-attribute">collaboratorIds</span>": <span class="hljs-value">[]</span>,
+    "<span class="hljs-attribute">category</span>": <span class="hljs-value"><span class="hljs-string">"3"</span></span>,
     "<span class="hljs-attribute">isPublic</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
     "<span class="hljs-attribute">visible</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
     "<span class="hljs-attribute">favorites</span>": <span class="hljs-value">[]</span>,

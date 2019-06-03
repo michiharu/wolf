@@ -83,12 +83,39 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
                     "isOperationManager": true
                 }
             ],
+            "categories": [
+                {
+                    "id": "1",
+                    "name": "未分類カテゴリー",
+                },
+                {
+                    "id": "2",
+                    "name": "営業",
+                },
+                {
+                    "id": "3",
+                    "name": "ソフトウェア",
+                },
+                {
+                    "id": "4",
+                    "name": "経理",
+                },
+                {
+                    "id": "5",
+                    "name": "法務",
+                },
+                {
+                    "id": "6",
+                    "name": "教育",
+                },
+            ],
             "manuals": [
                 {
                     "id": "1",
-                    "label": "マニュアル1",
+                    "label": "営業マニュアル",
                     "ownerId": "user1234",
                     "collaboratorIds": ["user2222"],
+                    "category": "2",
                     "isPublic": true,
                     "visible": true,
                     "favorites": [],
@@ -97,9 +124,10 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
                 },
                 {
                     "id": "2",
-                    "label": "マニュアル2",
+                    "label": "ソフトウェアマニュアル",
                     "ownerId": "user1234",
                     "collaboratorIds": ["user2222"],
+                    "category": "3",
                     "isPublic": true,
                     "visible": true,
                     "favorites": [],
@@ -195,6 +223,7 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
             "label": "マニュアル1",
             "ownerId": "user1234",
             "collaboratorIds": [],
+            "category": "3",
             "isPublic": true,
             "visible": true,
             "favorites": [],
@@ -224,6 +253,7 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
             "label": "マニュアル1",
             "ownerId": "user1234",
             "collaboratorIds": [],
+            "category": "3",
             "isPublic": true,
             "visible": true,
             "favorites": [],
@@ -258,6 +288,7 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
             "label": "マニュアル1",
             "ownerId": "user1234",
             "collaboratorIds": [],
+            "category": "3",
             "isPublic": true,
             "visible": true,
             "favorites": [],
@@ -302,6 +333,7 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
             "label": "マニュアル1",
             "ownerId": "user1234",
             "collaboratorIds": [],
+            "category": "3",
             "isPublic": true,
             "visible": true,
             "favorites": [],
