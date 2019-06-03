@@ -51,3 +51,16 @@ export const manual2: Manual = {
     {...baseTree, id: '2-3', label: 'マニュアル２−３'},
   ]
 };
+
+export const manual3: Manual = {
+  ...baseManual,
+  id: '3',
+  label: 'マニュアル３',
+  ownerId: '3',
+  collaboratorIds:[],
+  children: [
+    {...baseTree, id: '3-1', label: 'マニュアル3−１'},
+    {...baseTree, id: '3-2', label: 'マニュアル3−２'},
+    {...baseTree, id: '3-3', label: 'マニュアル3−３'},
+  ]
+};

@@ -3,9 +3,9 @@ FORMAT: 1A
 # Group Login
 ## ログイン [/api/v1/login]
 ### ログイン [POST]
-ログイン時のレスポンスとして受け取るデータのうち、
-共通マニュアル（）は現在アプリで使用していないので、
-データの内容は考慮していない。
+ログイン時のレスポンスとして受け取るデータのうち、manualsは全件取得する。
+ただしrootTreeはnullの状態とする。
+favorites, likes はマニュアルidを保持する。(マニュアルのプロパティー内の favorites, likes はユーザーidを保持する。)
 
 + Request  (application/json)
 
@@ -31,8 +31,7 @@ FORMAT: 1A
                     "canEdit": true,
                     "canDelete": true
                 },
-                "isOperationManager": true,
-                "canPullRequest": true
+                "isOperationManager": true
             },
             "users": [
                 {
@@ -49,8 +48,7 @@ FORMAT: 1A
                         "canEdit": true,
                         "canDelete": true
                     },
-                    "isOperationManager": true,
-                    "canPullRequest": true
+                    "isOperationManager": true
                 },
                 {
                     "id": "user2222",
@@ -66,8 +64,7 @@ FORMAT: 1A
                         "canEdit": true,
                         "canDelete": true
                     },
-                    "isOperationManager": true,
-                    "canPullRequest": true
+                    "isOperationManager": true
                 },
                 {
                     "id": "user3333",
@@ -83,447 +80,35 @@ FORMAT: 1A
                         "canEdit": true,
                         "canDelete": true
                     },
-                    "isOperationManager": true,
-                    "canPullRequest": true
+                    "isOperationManager": true
                 }
             ],
             "manuals": [
                 {
                     "id": "1",
-                    "label": "マニュアル１",
+                    "label": "マニュアル1",
                     "ownerId": "user1234",
                     "collaboratorIds": ["user2222"],
                     "isPublic": true,
-                    "inOperation": false,
-                    "reviewerId": null,
-                    "pullRequests": [],
-                    "assignIds": [],
-                    "followIds": [],
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": [
-                        {
-                            "id": "1-1",
-                            "label": "マニュアル１−１",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        },
-                        {
-                            "id": "1-2",
-                            "label": "マニュアル１−２",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        },
-                        {
-                            "id": "1-3",
-                            "label": "マニュアル１−３",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        }
-                    ]
+                    "visible": true,
+                    "favorites": [],
+                    "likes": [],
+                    "rootTree": null,
                 },
                 {
                     "id": "2",
                     "label": "マニュアル2",
                     "ownerId": "user1234",
-                    "collaboratorIds": [],
-                    "isPublic": true,
-                    "inOperation": false,
-                    "reviewerId": null,
-                    "pullRequests": [],
-                    "assignIds": [],
-                    "followIds": [],
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": [
-                        {
-                            "id": "2-1",
-                            "label": "マニュアル2−1",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        },
-                        {
-                            "id": "2-2",
-                            "label": "マニュアル2-2",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        },
-                        {
-                            "id": "2-3",
-                            "label": "マニュアル2-3",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        }
-                    ]
-                }
-            ],
-            "assigns": [
-                {
-                    "id": "1",
-                    "label": "マニュアル１",
-                    "ownerId": "user1234",
                     "collaboratorIds": ["user2222"],
                     "isPublic": true,
-                    "inOperation": false,
-                    "reviewerId": null,
-                    "pullRequests": [],
-                    "assignIds": [],
-                    "followIds": [],
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": [
-                        {
-                            "id": "1-1",
-                            "label": "マニュアル１−１",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        },
-                        {
-                            "id": "1-2",
-                            "label": "マニュアル１−２",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        },
-                        {
-                            "id": "1-3",
-                            "label": "マニュアル１−３",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        }
-                    ]
-                },
-                {
-                    "id": "2",
-                    "label": "マニュアル2",
-                    "ownerId": "user1234",
-                    "collaboratorIds": [],
-                    "isPublic": true,
-                    "inOperation": false,
-                    "reviewerId": null,
-                    "pullRequests": [],
-                    "assignIds": [],
-                    "followIds": [],
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": [
-                        {
-                            "id": "2-1",
-                            "label": "マニュアル2−1",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        },
-                        {
-                            "id": "2-2",
-                            "label": "マニュアル2-2",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        },
-                        {
-                            "id": "2-3",
-                            "label": "マニュアル2-3",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        }
-                    ]
+                    "visible": true,
+                    "favorites": [],
+                    "likes": [],
+                    "rootTree": null,
                 }
             ],
-            "follows": [
-                {
-                    "id": "3",
-                    "label": "マニュアル3",
-                    "ownerId": "user2222",
-                    "collaboratorIds": [],
-                    "isPublic": true,
-                    "inOperation": false,
-                    "reviewerId": null,
-                    "pullRequests": [],
-                    "assignIds": [],
-                    "followIds": [],
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": [
-                        {
-                            "id": "3-1",
-                            "label": "マニュアル3−1",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        },
-                        {
-                            "id": "3-2",
-                            "label": "マニュアル3-2",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        },
-                        {
-                            "id": "3-3",
-                            "label": "マニュアル3-3",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        }
-                    ]
-                }
-            ],
-            "stars": [
-                {
-                    "id": "3",
-                    "label": "マニュアル3",
-                    "ownerId": "user2222",
-                    "collaboratorIds": [],
-                    "isPublic": true,
-                    "inOperation": false,
-                    "reviewerId": null,
-                    "pullRequests": [],
-                    "assignIds": [],
-                    "followIds": [],
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": [
-                        {
-                            "id": "3-1",
-                            "label": "マニュアル3−1",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        },
-                        {
-                            "id": "3-2",
-                            "label": "マニュアル3-2",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        },
-                        {
-                            "id": "3-3",
-                            "label": "マニュアル3-3",
-                            "input": "",
-                            "output": "",
-                            "preConditions": "",
-                            "postConditions": "",
-                            "workerInCharge": "",
-                            "remarks": "",
-                            "necessaryTools": "",
-                            "exceptions": "",
-                            "imageName": "",
-                            "imageBlob": "",
-                            "children": []
-                        }
-                    ]
-                }
-            ],
-            "feeds": [
-                {
-                    "id": "1",
-                    "title": "◯◯さんがマニュアル運用申請を承認しました",
-                    "isAlreadyRead": false,
-                    "manualId": "3"
-                },
-                {
-                    "id": "1",
-                    "title": "◯◯さんがマニュアル運用を中止しました",
-                    "isAlreadyRead": false,
-                    "manualId": "3"
-                }
-            ],
-            "commons": [],
+            "favorites": [],
+            "likes": [],
             "memos": [
                 {
                     "id": "4",
@@ -558,89 +143,143 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
 編集時に削除されたデータがあるかどうかをチェックし、
 あれば該当レコードを削除するロジックをサーバーサイドで組む必要がある。
 
+### マニュアル取得API [GET]
+リクエストパラメーターでmanualIdを渡し、rootTree以下のNodeを返す。
+
++ Parameters
+    + id: 123 (string, required) - manualId
+
++ Response 200 (application/json)
+
+        {
+            "id": "1231",
+            "label": "マニュアル１",
+            "type": "task",
+            "input": "",
+            "output": "",
+            "preConditions": "",
+            "postConditions": "",
+            "workerInCharge": "",
+            "remarks": "",
+            "necessaryTools": "",
+            "exceptions": "",
+            "imageName": "",
+            "imageBlob": "",
+            "children": [
+                {
+                    "id": "1232",
+                    "label": "マニュアル１−１",
+                    "type": "task",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                }
+            ]
+        }
+
+
 ### マニュアル作成API [POST]
 
 + Request  (application/json)
 
         {
-            "id": "tmp:123",
-            "label": "マニュアル１",
+            "id": "tmp:1",
+            "label": "マニュアル1",
             "ownerId": "user1234",
             "collaboratorIds": [],
             "isPublic": true,
-            "inOperation": false,
-            "reviewerId": null,
-            "pullRequests": [],
-            "assignIds": [],
-            "followIds": [],
-            "input": "",
-            "output": "",
-            "preConditions": "",
-            "postConditions": "",
-            "workerInCharge": "",
-            "remarks": "",
-            "necessaryTools": "",
-            "exceptions": "",
-            "imageName": "",
-            "imageBlob": "",
-            "children": []
+            "visible": true,
+            "favorites": [],
+            "likes": [],
+            "rootTree": {
+                "id": "tmp:12",
+                "label": "",
+                "type": "task",
+                "input": "",
+                "output": "",
+                "preConditions": "",
+                "postConditions": "",
+                "workerInCharge": "",
+                "remarks": "",
+                "necessaryTools": "",
+                "exceptions": "",
+                "imageName": "",
+                "imageBlob": "",
+                "children": []
+            }
         }
 
 + Response 200 (application/json)
 
         {
-            "id": "123",
-            "label": "マニュアル１",
+            "id": "1",
+            "label": "マニュアル1",
             "ownerId": "user1234",
             "collaboratorIds": [],
             "isPublic": true,
-            "inOperation": false,
-            "reviewerId": null,
-            "pullRequests": [],
-            "assignIds": [],
-            "followIds": [],
-            "input": "",
-            "output": "",
-            "preConditions": "",
-            "postConditions": "",
-            "workerInCharge": "",
-            "remarks": "",
-            "necessaryTools": "",
-            "exceptions": "",
-            "imageName": "",
-            "imageBlob": "",
-            "children": []
+            "visible": true,
+            "favorites": [],
+            "likes": [],
+            "rootTree": {
+                "id": "12",
+                "label": "",
+                "type": "task",
+                "input": "",
+                "output": "",
+                "preConditions": "",
+                "postConditions": "",
+                "workerInCharge": "",
+                "remarks": "",
+                "necessaryTools": "",
+                "exceptions": "",
+                "imageName": "",
+                "imageBlob": "",
+                "children": []
+            }
         }
 
 ### マニュアル編集API [PUT]
 
++ Parameters
+    + id: 123 (string, required) - manualId
+
 + Request  (application/json)
 
         {
-            "id": "123",
-            "label": "マニュアル１",
+            "id": "1",
+            "label": "マニュアル1",
             "ownerId": "user1234",
-            "collaboratorIds": ["user2222"],
+            "collaboratorIds": [],
             "isPublic": true,
-            "inOperation": false,
-            "reviewerId": null,
-            "pullRequests": [],
-            "assignIds": [],
-            "followIds": [],
-            "input": "",
-            "output": "",
-            "preConditions": "",
-            "postConditions": "",
-            "workerInCharge": "",
-            "remarks": "",
-            "necessaryTools": "",
-            "exceptions": "",
-            "imageName": "",
-            "imageBlob": "",
-            "children": [
-                {
-                    "id": "1231",
+            "visible": true,
+            "favorites": [],
+            "likes": [],
+            "rootTree": {
+                "id": "12",
+                "label": "マニュアル１−１",
+                "type": "task",
+                "input": "",
+                "output": "",
+                "preConditions": "",
+                "postConditions": "",
+                "workerInCharge": "",
+                "remarks": "",
+                "necessaryTools": "",
+                "exceptions": "",
+                "imageName": "",
+                "imageBlob": "",
+                "children": [
+                    "id": "tmp:12",
                     "label": "マニュアル１−１",
+                    "type": "task",
                     "input": "",
                     "output": "",
                     "preConditions": "",
@@ -652,67 +291,39 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
                     "imageName": "",
                     "imageBlob": "",
                     "children": []
-                },
-                {
-                    "id": "tmp:1",
-                    "label": "マニュアル１−２",
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": []
-                },
-                {
-                    "id": "tmp:2",
-                    "label": "マニュアル１−３",
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": []
-                }
-            ]
+                ]
+            }
         }
 
 + Response 200 (application/json)
 
         {
-            "id": "123",
-            "label": "マニュアル１",
+            "id": "1",
+            "label": "マニュアル1",
             "ownerId": "user1234",
-            "collaboratorIds": ["user2222"],
+            "collaboratorIds": [],
             "isPublic": true,
-            "inOperation": false,
-            "reviewerId": null,
-            "pullRequests": [],
-            "assignIds": [],
-            "followIds": [],
-            "input": "",
-            "output": "",
-            "preConditions": "",
-            "postConditions": "",
-            "workerInCharge": "",
-            "remarks": "",
-            "necessaryTools": "",
-            "exceptions": "",
-            "imageName": "",
-            "imageBlob": "",
-            "children": [
-                {
-                    "id": "1231",
+            "visible": true,
+            "favorites": [],
+            "likes": [],
+            "rootTree": {
+                "id": "12",
+                "label": "マニュアル１−１",
+                "type": "task",
+                "input": "",
+                "output": "",
+                "preConditions": "",
+                "postConditions": "",
+                "workerInCharge": "",
+                "remarks": "",
+                "necessaryTools": "",
+                "exceptions": "",
+                "imageName": "",
+                "imageBlob": "",
+                "children": [
+                    "id": "123",
                     "label": "マニュアル１−１",
+                    "type": "task",
                     "input": "",
                     "output": "",
                     "preConditions": "",
@@ -724,38 +335,8 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
                     "imageName": "",
                     "imageBlob": "",
                     "children": []
-                },
-                {
-                    "id": "1232",
-                    "label": "マニュアル１−２",
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": []
-                },
-                {
-                    "id": "1233",
-                    "label": "マニュアル１−３",
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": []
-                }
-            ]
+                ]
+            }
         }
 
 ### マニュアル削除API [DELETE]
@@ -764,221 +345,48 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
 
 + Response 200 (application/json)
 
-# Group PullRequest
-## プルリクエスト [/api/v1/pull-requests]
-プルリクエストのデータ構造は、通常のマニュアルツリーで持つデータに加えて、
-元のnodeのidを持つ（originalId）。
-このためどのマニュアルのリクエストであるかをサーバーサイドで探すには
-プルリクエストのrootのoriginalIdで探せる。
-
-元のnodeがオリジナルマニュアルに存在しない場合は
-idは"tmp:~"で始まる。その場合のoriginalIdはnullの値を持つ。
-
-### プルリクエスト作成API [POST]
-+ Request  (application/json)
-
-        {
-            "writerId": "user2222",
-            "requestMessage": "タイトルを編集したのでよろしくお願いします。",
-            "responseMessage": null,
-            "originalId": "123",
-            "id": "tmp:1111",
-            "label": "マニュアル（営業用）１",
-            "ownerId": "user1234",
-            "collaboratorIds": ["user2222"],
-            "isPublic": true,
-            "inOperation": false,
-            "reviewerId": null,
-            "pullRequests": [],
-            "assignIds": [],
-            "followIds": [],
-            "input": "",
-            "output": "",
-            "preConditions": "",
-            "postConditions": "",
-            "workerInCharge": "",
-            "remarks": "",
-            "necessaryTools": "",
-            "exceptions": "",
-            "imageName": "",
-            "imageBlob": "",
-            "children": [
-                {
-                    "originalId": "1231",
-                    "id": "tmp:2222",
-                    "label": "マニュアル１−１",
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": []
-                },
-                {
-                    "originalId": null,
-                    "id": "tmp:3333",
-                    "label": "マニュアル１−２",
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": []
-                },
-                {
-                    "originalId": null,
-                    "id": "tmp:4444",
-                    "label": "マニュアル１−３",
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": []
-                }
-            ]
-        }
-
-+ Response 200 (application/json)
-
-        {
-            "writerId": "user2222",
-            "requestMessage": "タイトルを編集したのでよろしくお願いします。",
-            "responseMessage": null,
-            "originalId": "123",
-            "id": "tmp:1111",
-            "label": "マニュアル（営業用）１",
-            "ownerId": "user1234",
-            "collaboratorIds": ["user2222"],
-            "isPublic": true,
-            "inOperation": false,
-            "reviewerId": null,
-            "pullRequests": [],
-            "assignIds": [],
-            "followIds": [],
-            "input": "",
-            "output": "",
-            "preConditions": "",
-            "postConditions": "",
-            "workerInCharge": "",
-            "remarks": "",
-            "necessaryTools": "",
-            "exceptions": "",
-            "imageName": "",
-            "imageBlob": "",
-            "children": [
-                {
-                    "originalId": "1231",
-                    "id": "5555",
-                    "label": "マニュアル１−１",
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": []
-                },
-                {
-                    "originalId": null,
-                    "id": "5678",
-                    "label": "マニュアル１−２",
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": []
-                },
-                {
-                    "originalId": null,
-                    "id": "6666",
-                    "label": "マニュアル１−３",
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": []
-                }
-            ]
-        }
-
-# Group Assign
-## マニュアル割り当て [/api/v1/assign/{manualId}/{userId}]
-マニュアルの割り当て操作は運用権限があるユーザーのみ
-
-### 割り当て [POST]
-
-+ Parameters
-    + manualId: 123 (string, required) - manualId
-    + userId: user1234 (string, required) - userId
-
-+ Response 200 (application/json)
-
-### 割り当て解除 [DELETE]
-
-+ Parameters
-    + manualId: 123 (string, required) - manualId
-    + userId: user1234 (string, required) - userId
-
-+ Response 200 (application/json)
-
-# Group Follow
-## フォロー [/api/v1/follow/{id}]
-### フォロー [POST]
-
-+ Parameters
-    + id: 123 (string, required) - manualId
-
-+ Response 200 (application/json)
-
-### フォロー解除 [DELETE]
-
-+ Parameters
-    + id: 123 (string, required) - manualId
-
-+ Response 200 (application/json)
-
-# Group Star
-## お気に入り [/api/v1/star/{id}]
+# Group Favorite
+## お気に入り [/api/v1/favorites/{manualId}/{userId}]
 ### お気に入り登録 [POST]
 
 + Parameters
-    + id: 123 (string, required) - manualId
+    + manualId: 123 (string, required) - manualId
+    + userId: user1234 (string, required) - userId
+
++ Response 200 (application/json)
+
+### お気に入り編集 [PUT]
+
++ Parameters
+    + manualId: 123 (string, required) - manualId
+    + userId: user1234 (string, required) - userId
+
++ Request  (application/json)
+
+        {
+            "follow": true
+        }
 
 + Response 200 (application/json)
 
 ### お気に入り解除 [DELETE]
+
++ Parameters
+    + manualId: 123 (string, required) - manualId
+    + userId: user1234 (string, required) - userId
+
++ Response 200 (application/json)
+
+# Group Like
+## いいね [/api/v1/likes/{id}]
+### いいね登録 [POST]
+
++ Parameters
+    + id: 123 (string, required) - manualId
+
++ Response 200 (application/json)
+
+### いいね解除 [DELETE]
 
 + Parameters
     + id: 123 (string, required) - manualId

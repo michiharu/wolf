@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 import { LoginPostResponse } from '../../definitions';
 import { user1, user2, user3, user4 } from '../common-data/users';
-import { manual1, manual2 } from '../common-data/manuals';
+import { manual1, manual2, manual3 } from '../common-data/manuals';
 
 const postLogin = (config: AxiosRequestConfig) => {
   const { method, url, data: requestJson } = config;
@@ -34,7 +34,7 @@ const postLogin = (config: AxiosRequestConfig) => {
   const data3: LoginPostResponse = {
     user: user3,
     users: [user1, user2, user3, user4],
-    manuals: [],
+    manuals: [manual3],
     assigns: [],
     follows: [manual1, manual2],
     stars: [],
