@@ -17,7 +17,7 @@ import KSize from '../../../data-types/k-size';
 import { ksActions } from '../../../redux/actions/ksAction';
 import ReadingSetting from '../../../data-types/reading-settings';
 import { rsActions } from '../../../redux/actions/rsAction';
-import { FollowsState } from '../../../redux/states/followsState';
+import { CategoriesState } from '../../../redux/states/categoriesState';
 import User from '../../../data-types/user';
 
 export interface ViewActions {
@@ -28,21 +28,18 @@ export interface ViewActions {
 
 interface Props extends
   ManualsState,
-  FollowsState,
+  CategoriesState,
   SelectState,
   ViewActions, RouteComponentProps<{id: string}> {
     user: User;
   }
 
 const ViewContainer: React.FC<Props> = props => {
-  const { user, manuals, follows, manual, request, setManual, setNode, clearRequest, match } =  props;
+  const { user, manuals, manual, request, setManual, setNode, clearRequest, match } =  props;
 
   if (manual === null || manual.id !== match.params.id) {
     var selected;
     selected = TreeUtil._findArray(manuals, match.params.id)
-    if (selected === undefined) {
-      selected = TreeUtil._findArray(follows, match.params.id)
-    }
     if (selected === undefined) { throw new Error('Not found the manual.'); }
     setManual(selected);
     const tree = TreeUtil._get<Tree, TreeNode>(selected, baseTreeNode);
@@ -54,7 +51,7 @@ const ViewContainer: React.FC<Props> = props => {
 }
 
 function mapStateToProps(appState: AppState) {
-  return {user: appState.loginUser.user!, ...appState.manuals, ...appState.follows, ...appState.select, ...appState.ks};
+  return {user: appState.loginUser.user!, ...appState.manuals, ...appState.categories, ...appState.select, ...appState.ks};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {

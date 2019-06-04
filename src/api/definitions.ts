@@ -4,8 +4,8 @@
  * そのためフロントからサーバーに送られるIDの値については無視すること。
  */
 import User from "../data-types/user";
-import { Tree, KTreeNode, Manual, PullRequest } from "../data-types/tree";
-import Feed from "../data-types/feed";
+import { KTreeNode, Manual } from "../data-types/tree";
+import Category from "../data-types/category";
 
 /* Login */
 export const loginURL = '/api/v1/login';
@@ -18,12 +18,10 @@ export interface LoginPostRequest {
 export interface LoginPostResponse {
   user: User;
   users: User[];
-  manuals: Manual[]; // owerなら片方向参照、collaboなら両方向参照
-  assigns: Manual[]; // 両方向参照
-  follows: Manual[]; // 両方向参照
-  stars: Manual[];  // 片方向参照＋参照カウンター
-  feeds: Feed[];
-  commons: Tree[];
+  categories: Category[];
+  manuals: Manual[];
+  favorites: string[];
+  likes: string[];
   memos: KTreeNode[];
 }
 // DELETE -> ステータスコード200でログアウト
@@ -63,34 +61,16 @@ export type ManualPutRequest = Manual;
 export type ManualPutResponse = Manual;
 // DELETE
 
-/* PullRequests */
-export const pullRequestsURL = '/api/v1/pull-requests/';
-// GET
-// POST(/api/v1/pull-requests/)
-export type PullRequestPostRequest = PullRequest;
-export type PullRequestPostResponse = PullRequest;
-// PUT(/api/v1/pull-requests/:id)
-export type PullRequestPutRequest = PullRequest;
-export type PullRequestPutResponse = PullRequest;
-// DELETE
+/* Favorite */
+export const favoriteURL = '/api/v1/favorites/';
+// POST(/api/v1/favorites/:manualId)
+export type FollowPostRequest = { follow: boolean };
+export type FollowPostResponse = void;
+// DELETE(/api/v1/favorites/:manualId)
 
-/* Assign */
-export const assignURL = '/api/v1/assign/';
-// POST(/api/v1/assign/:manualId/:userId)
-export type AssignPostRequest = void;
-export type AssignPostResponse = Manual;
-// DELETE(/api/v1/assign/:manualId/:userId)
-
-/* Follow */
-export const followURL = '/api/v1/follow/';
-// POST(/api/v1/follow/:manualId)
-export type FollowPostRequest = void;
-export type FollowPostResponse = Manual;
-// DELETE(/api/v1/follow/:manualId)
-
-/* Star */
-export const starURL = '/api/v1/star/';
-// POST(/api/v1/star/:manualId)
+/* Like */
+export const likeURL = '/api/v1/likes/';
+// POST(/api/v1/likes/:manualId)
 export type StarPostRequest = void;
-export type StarPostResponse = Manual;
-// DELETE(/api/v1/star/:manualId)
+export type StarPostResponse = void;
+// DELETE(/api/v1/likes/:manualId)

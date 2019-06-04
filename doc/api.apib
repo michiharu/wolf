@@ -180,37 +180,48 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
 + Response 200 (application/json)
 
         {
-            "id": "1231",
-            "label": "マニュアル１",
-            "type": "task",
-            "input": "",
-            "output": "",
-            "preConditions": "",
-            "postConditions": "",
-            "workerInCharge": "",
-            "remarks": "",
-            "necessaryTools": "",
-            "exceptions": "",
-            "imageName": "",
-            "imageBlob": "",
-            "children": [
-                {
-                    "id": "1232",
-                    "label": "マニュアル１−１",
-                    "type": "task",
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": []
-                }
-            ]
+            "id": "1",
+            "label": "営業マニュアル",
+            "ownerId": "user1234",
+            "collaboratorIds": ["user2222"],
+            "category": "2",
+            "isPublic": true,
+            "visible": true,
+            "favorites": [],
+            "likes": [],
+            "rootTree": {
+                "id": "1231",
+                "label": "マニュアル１",
+                "type": "task",
+                "input": "",
+                "output": "",
+                "preConditions": "",
+                "postConditions": "",
+                "workerInCharge": "",
+                "remarks": "",
+                "necessaryTools": "",
+                "exceptions": "",
+                "imageName": "",
+                "imageBlob": "",
+                "children": [
+                    {
+                        "id": "1232",
+                        "label": "マニュアル１−１",
+                        "type": "task",
+                        "input": "",
+                        "output": "",
+                        "preConditions": "",
+                        "postConditions": "",
+                        "workerInCharge": "",
+                        "remarks": "",
+                        "necessaryTools": "",
+                        "exceptions": "",
+                        "imageName": "",
+                        "imageBlob": "",
+                        "children": []
+                    }
+                ]
+            }
         }
 
 

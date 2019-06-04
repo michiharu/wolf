@@ -1,31 +1,181 @@
 import * as React from 'react';
-import { Grid, Theme, createStyles, WithStyles, withStyles} from '@material-ui/core';
+import { connect } from 'react-redux';
+import { LoginUserState } from '../../redux/states/loginUserState';
+import { ManualsState } from '../../redux/states/manualsState';
+import { AppState } from '../../redux/store';
+import MUIDataTable, { MUIDataTableOptions, MUIDataTableColumn } from 'mui-datatables';
+import { Star, StarBorder, ThumbUpAlt, ThumbUpAltOutlined } from '@material-ui/icons';
+import { TableCell, TableSortLabel, createMuiTheme, Badge } from '@material-ui/core';
+import { MuiThemeProvider } from '@material-ui/core/styles';
+import { theme } from '../..';
 
-import ManualList from './manual-list-component';
+interface Props extends ManualsState, LoginUserState { }
 
-const styles = (theme: Theme) => createStyles({
-
-  container: {
-    padding: theme.spacing(1),
+const getMuiTheme = () => createMuiTheme({
+  ...theme,
+  overrides: {
+    MuiTableCell: {
+      root: {
+        padding: 8,
+        paddingTop: 10
+      }
+    },
+    MuiTableSortLabel: {
+      root: {
+        marginRight: -10
+      }
+    }
   }
-
 });
 
-interface Props extends WithStyles<typeof styles> {}
-
 const Dashboard: React.FC<Props> = (props: Props) => {
-  const { classes } = props;
-  
+  const { manuals } = props;
+  const columns: MUIDataTableColumn[] = [
+    {
+      name: "favoriteForColumn",
+      options: {
+        filter: false,
+        sort: true,
+        customHeadRender: (o, updateDirection) =>
+        <TableCell
+          align="left"
+          sortDirection={o.sortDirection}
+          onClick={() =>  updateDirection(o.index)}
+        >
+          <TableSortLabel
+            active={o.sortDirection !== null}
+            direction={o.sortDirection || "asc"}
+          >
+            {o.sortDirection !== null ? <Star/> : <StarBorder/>}
+          </TableSortLabel>
+        </TableCell>,
+        customBodyRender: (value, tableMeta, updateValue) => 
+        <Badge color="primary" badgeContent={value.sum}>
+          {value.checked ? <Star/> : <StarBorder/>}
+        </Badge>
+      }
+    },
+    {
+      name: "favorite",
+      options: {
+        display: "false",
+        filter: true,
+      }
+    },
+    {
+      name: "likeForColumn",
+      options: {
+        filter: false,
+        sort: true,
+        customHeadRender: (o, updateDirection) =>
+        <TableCell
+          align="left"
+          sortDirection={o.sortDirection}
+          onClick={() =>  updateDirection(o.index)}
+        >
+          <TableSortLabel
+            active={o.sortDirection !== null}
+            direction={o.sortDirection || "asc"}
+          >
+            {o.sortDirection !== null ? <ThumbUpAlt/> : <ThumbUpAltOutlined/>}
+          </TableSortLabel>
+        </TableCell>,
+        customBodyRender: (value, tableMeta, updateValue) =>
+        <Badge color="primary" badgeContent={value.sum}>
+          {value.checked ? <ThumbUpAlt/> : <ThumbUpAltOutlined/>}
+        </Badge>
+      }
+    },
+    {
+      name: "like",
+      options: {
+        display: "false",
+        filter: true,
+      }
+    },
+    {
+      name: "title",
+      label: "タイトル",
+      options: {
+        filter: false,
+        sort: false,
+      }
+    },
+    {
+      name: "description",
+      label: "説明",
+      options: {
+        filter: false,
+        sort: false,
+      }
+    },
+    {
+      name: "ower",
+      label: "オーナー",
+      options: {
+        filter: true,
+        sort: false,
+      }
+    },
+  ];
+
+  interface CellData {
+    favoriteForColumn: {
+        checked: boolean;
+        sum: number;
+    };
+    favorite: string;
+    likeForColumn: {
+      checked: boolean;
+      sum: number;
+    };
+    like: string;
+    title: string;
+    description: string;
+    ower: string;
+    updateAt: string;
+}
+
+  const data: CellData[] = manuals.map((m, i) => ({
+    favoriteForColumn: {checked: i % 2 === 0, sum: i * 13},
+    favorite: i % 2 === 0 ? 'true' : 'false',
+    likeForColumn: {checked: i % 2 === 0, sum: i * 9},
+    like: i % 2 === 1 ? 'true' : 'false',
+    title: m.label,
+    description: 'ここにはマニュアルの説明。ここにはマニュアルの説明。ここにはマニュアルの説明。',
+    ower: m.ownerId,
+    updateAt: `2019/6/${i + 1}`
+  }));
+
+  const options: MUIDataTableOptions = {
+    print: false,
+    download: false,
+    sortFilterList: false,
+    selectableRows: false,
+    elevation: 0,
+    rowsPerPageOptions: [10,20,50],
+    customSort: (d: {index: number; data: any[]}[], colIndex: number, order: string): {index: number; data: any[]}[] => {
+      console.log(order)
+      return d.sort(
+        (colIndex === 0 || colIndex === 2)
+          ? (a, b) => (a.data[colIndex].sum < b.data[colIndex].sum ? -1 : 1) * (order === 'asc' ? 1 : -1)
+          : (a, b) => (a.data[colIndex].localeCompare(b.data[colIndex]) ? -1 : 1) * (order === 'asc' ? 1 : -1))
+    }
+  };
   return (
-    <Grid container>
-      <Grid item xs={12} lg={5}>
-        <div className={classes.container}><ManualList/></div>
-      </Grid>
-      <Grid item xs={12} lg={7}>
-      
-      </Grid>
-    </Grid>
+    <MuiThemeProvider theme={getMuiTheme()}>
+      <MUIDataTable
+        title="マニュアル一覧"
+        data={data}
+        columns={columns}
+        options={options}
+      />
+    </MuiThemeProvider>
   );
 };
 
-export default withStyles(styles)(Dashboard);
+function mapStateToProps(appState: AppState) {
+  return {user: appState.loginUser.user!, ...appState.manuals};
+}
+
+export default connect(mapStateToProps)(Dashboard);

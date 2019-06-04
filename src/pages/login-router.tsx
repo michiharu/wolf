@@ -5,7 +5,7 @@ import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import links from '../settings/links';
 import LoginContainer from './login/login-container';
 import { LoginUserState } from '../redux/states/loginUserState';
-import PageFrame from './page-frame/page-frame';
+import LayoutContainer from './layout/layout-container';
 
 
 interface Props extends LoginUserState {}
@@ -15,7 +15,7 @@ const LoginRouter: React.SFC<Props> = (props) => (
     <Switch>
       {props.user === null && <Route exact path={links.login} render={() => <LoginContainer/>}/>}
       {props.user === null && <Redirect to={links.login}/>}
-      <Route render={() => <PageFrame/>}/>
+      <Route render={() => <LayoutContainer/>}/>
     </Switch>
   </BrowserRouter>
 );

@@ -7,14 +7,14 @@ import { KSState, ksReducer } from './states/ksState';
 import { RSState, rsReducer } from './states/rsState';
 import createSagaMiddleware from '@redux-saga/core';
 import { rootSaga } from './saga';
-import { FollowsState, followsReducer } from './states/followsState';
+import { CategoriesState, categoriesReducer } from './states/categoriesState';
 import { UsersState, usersReducer } from './states/usersState';
 
 export type AppState = {
   loginUser: LoginUserState,
   users: UsersState,
   manuals: ManualsState,
-  follows: FollowsState,
+  categories: CategoriesState,
   select: SelectState,
   memos: MemoState,
   ks: KSState,
@@ -29,7 +29,7 @@ const store = createStore(
     loginUser: loginUserReducer,
     users: usersReducer,
     manuals: manualsReducer,
-    follows: followsReducer,
+    categories: categoriesReducer,
     select: selectReducer,
     memos: memoReducer,
     ks: ksReducer,

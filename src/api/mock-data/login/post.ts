@@ -10,12 +10,10 @@ const postLogin = (config: AxiosRequestConfig) => {
   const data1: LoginPostResponse = {
     user: user1,
     users: [user1, user2, user3, user4],
-    manuals: [manual1, manual2],
-    assigns: [],
-    follows: [],
-    stars: [],
-    feeds: [],
-    commons: [],
+    manuals: [manual1, manual2, manual3],
+    categories: [],
+    favorites: [],
+    likes: [],
     memos: [],
   };
 
@@ -23,11 +21,9 @@ const postLogin = (config: AxiosRequestConfig) => {
     user: user2,
     users: [user1, user2, user3, user4],
     manuals: [manual1],
-    assigns: [],
-    follows: [],
-    stars: [],
-    feeds: [],
-    commons: [],
+    categories: [],
+    favorites: [],
+    likes: [],
     memos: [],
   };
 
@@ -35,11 +31,9 @@ const postLogin = (config: AxiosRequestConfig) => {
     user: user3,
     users: [user1, user2, user3, user4],
     manuals: [manual3],
-    assigns: [],
-    follows: [manual1, manual2],
-    stars: [],
-    feeds: [],
-    commons: [],
+    categories: [],
+    favorites: [],
+    likes: [],
     memos: [],
   };
 
@@ -47,11 +41,9 @@ const postLogin = (config: AxiosRequestConfig) => {
     user: user4,
     users: [user1, user2, user3, user4],
     manuals: [manual2],
-    assigns: [],
-    follows: [],
-    stars: [],
-    feeds: [],
-    commons: [],
+    categories: [],
+    favorites: [],
+    likes: [],
     memos: [],
   };
 
