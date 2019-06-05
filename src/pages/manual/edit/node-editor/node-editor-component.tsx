@@ -215,27 +215,30 @@ class NodeEditorComponent extends React.Component<Props, State> {
     const stage = this.stageRef.current;
     if (main === null || stage === null) { throw new Error('Cannot find elements.'); }
 
-    const { ks, edit } = this.props;
+    const { mode, ks, edit } = this.props;
     var  kTree = TreeUtil._get(result.node, baseKTreeNode);
     kTree = KTreeUtil.setCalcProps(kTree, ks);
     const focusNode = TreeUtil._find(kTree, result.newNode.id)!;
-    if ((focusNode.point.y + ks.rect.h) * ks.unit < main.scrollTop + main.offsetHeight) {
-      setTimeout(() => edit(TreeNodeUtil._focus(kTree, result.newNode.id)), 300);
-      return;
+    setTimeout(() => edit(TreeNodeUtil._focus(kTree, result.newNode.id)), 300);
+
+    if (main.scrollTop + main.offsetHeight < (focusNode.point.y + ks.rect.h) * ks.unit) {
+      const largeContainerHeight = (kTree.self.h + ks.spr.h * 2) * ks.unit + marginBottom;
+      const maxScroll = largeContainerHeight - main.offsetHeight;
+
+      const dx = main.scrollLeft;
+      const dy = Math.min((focusNode.point.y + ks.rect.h * 2 + ks.margin.h) * ks.unit - main.offsetHeight, maxScroll);
+
+      const onFinish = () => {
+        main.scrollTop = dy;
+        stage.container().style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+        edit(TreeNodeUtil._focus(kTree, result.newNode.id));
+      };
+      const convergent = this.convergentRef.current;
+      const convergentShadow = this.convergentShadowRef.current;
+      if (convergent === null || convergentShadow === null) { return; }
+      convergent.to({x: -dx + (mode === 'dc' ? stage.width() / 2 : 0), y: -dy, duration: 0.5, onFinish});
+      convergentShadow.to({x: -dx + (mode === 'dc' ? stage.width() / 2 : 0), y: -dy, duration: 0.5});
     }
-    const largeContainerHeight = (kTree.self.h + ks.spr.h * 2) * ks.unit + marginBottom;
-    const maxScroll = largeContainerHeight - main.offsetHeight;
-
-    const dx = main.scrollLeft;
-    const dy = Math.min((focusNode.point.y + ks.rect.h * 2 + ks.margin.h) * ks.unit - main.offsetHeight, maxScroll);
-
-    const onFinish = () => {
-      main.scrollTop = dy;
-      stage.container().style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
-      edit(TreeNodeUtil._focus(kTree, result.newNode.id));
-    };
-    
-    stage.to({x: -dx, y: -dy, duration: 1, onFinish});
   }
 
   expand = (target: KWithArrow, open: boolean) => {

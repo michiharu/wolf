@@ -7,7 +7,7 @@ import { TreeNode } from '../../../../data-types/tree';
 import NodeViewerComponent from './node-viewer-component';
 
 export interface NodeViewerActions {
-  setNode:   (node: TreeNode) => Action<TreeNode>;
+  changeNode:   (node: TreeNode) => Action<TreeNode>;
 }
 
 function mapStateToProps(appState: AppState) {
@@ -16,7 +16,7 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    setNode: (node: TreeNode) => dispatch<Action>(selectActions.setNode(node)),
+    changeNode: (node: TreeNode) => dispatch<Action>(selectActions.changeNode(node)),
   };
 }
 

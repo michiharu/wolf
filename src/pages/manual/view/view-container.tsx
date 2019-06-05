@@ -8,9 +8,7 @@ import { SelectState } from '../../../redux/states/selectState';
 import { selectActions } from '../../../redux/actions/selectAction';
 
 import { RouteComponentProps } from 'react-router-dom';
-import { baseTreeNode, TreeNode, Tree, Manual } from '../../../data-types/tree';
-import TreeUtil from '../../../func/tree';
-import TreeNodeUtil from '../../../func/tree-node';
+import {  Manual } from '../../../data-types/tree';
 
 import ViewComponent from './view-component';
 import KSize from '../../../data-types/k-size';
@@ -21,9 +19,7 @@ import { CategoriesState } from '../../../redux/states/categoriesState';
 import User from '../../../data-types/user';
 
 export interface ViewActions {
-  setManual: (manual: Manual) => Action<Manual>;
-  setNode:   (node: TreeNode) => Action<TreeNode>;
-  clearRequest: () => Action<void>;
+  setSelect: (manual: Manual) => Action<Manual>;
 }
 
 interface Props extends
@@ -35,18 +31,14 @@ interface Props extends
   }
 
 const ViewContainer: React.FC<Props> = props => {
-  const { user, manuals, manual, request, setManual, setNode, clearRequest, match } =  props;
+  const { user, manuals, manual, setSelect, match } =  props;
 
   if (manual === null || manual.id !== match.params.id) {
-    var selected;
-    selected = TreeUtil._findArray(manuals, match.params.id)
-    if (selected === undefined) { throw new Error('Not found the manual.'); }
-    setManual(selected);
-    const tree = TreeUtil._get<Tree, TreeNode>(selected, baseTreeNode);
-    setNode(TreeNodeUtil._init(tree));
+    const selected = manuals.find(m => m.id === match.params.id)!;
+    setSelect(selected);
     return <p>loading...</p>
   }
-  const componentProps = {user, manual, request, clearRequest};
+  const componentProps = {user, manual };
   return <ViewComponent {...componentProps}/>;
 }
 
@@ -56,9 +48,7 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    setManual: (manual: Manual) => dispatch(selectActions.setManual(manual)),
-    setNode:   (node: TreeNode) => dispatch(selectActions.setNode(node)),
-    clearRequest: () => dispatch(selectActions.clearRequest()),
+    setSelect: (manual: Manual) => dispatch(selectActions.set(manual)),
     changeKS:  (ks: KSize) => dispatch(ksActions.change(ks)),
     resetKS:   () => dispatch(ksActions.reset()),
     changeRS:  (rs: ReadingSetting) => dispatch(rsActions.change(rs)),

@@ -1,17 +1,16 @@
 import * as React from 'react';
 import { createBrowserHistory } from 'history';
-import { ManualsState } from '../../../redux/states/manualsState';
 import {
   Theme, createStyles, WithStyles, Snackbar, IconButton,
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Tab, Tabs, Modal, withStyles,
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Tab, Tabs, Modal, withStyles, Divider,
 } from '@material-ui/core';
 
 import CloseIcon from '@material-ui/icons/Close';
 import ViewSettingsIcon from '@material-ui/icons/Settings';
 import { Divergent, Convergent } from '../../../settings/layout' 
 
-import { Tree, TreeNode, baseTreeNode, KTreeNode, Manual } from '../../../data-types/tree';
-import { RouteComponentProps } from 'react-router';
+import { Tree, TreeNode, baseTreeNode, KTreeNode } from '../../../data-types/tree';
+import { RouteComponentProps, withRouter } from 'react-router';
 import links from '../../../settings/links';
 import TreeUtil from '../../../func/tree';
 import NodeEditorContainer from './node-editor/node-editor-container';
@@ -23,6 +22,7 @@ import { MemoState } from '../../../redux/states/memoState';
 import { EditorFrameActions } from './editor-frame-container';
 import ViewSettingsContainer from '../../../components/view-settings/view-settings-container';
 import { NodeEditorProps } from './node-editor/node-editor-component';
+import { SelectState } from '../../../redux/states/selectState';
 
 export const styles = (theme: Theme) => createStyles({
   root: {
@@ -35,7 +35,6 @@ export const styles = (theme: Theme) => createStyles({
     width: theme.breakpoints.width('md'),
     margin: 'auto',
     paddingTop: theme.spacing(2),
-    marginBottom: theme.spacing(1),
   },
   convergent: {
     transform: 'scale(1, -1)',
@@ -62,7 +61,7 @@ export const styles = (theme: Theme) => createStyles({
 });
 
 interface Props extends
-  ManualsState,
+  SelectState,
   MemoState,
   EditorFrameActions,
   WithStyles<typeof styles>,
@@ -73,7 +72,7 @@ interface State {
   // divergent thinking（発散思考）、 convergent thinking（収束思考）
   mode: NodeEditMode;
   node: TreeNode;
-  memoList: KTreeNode[];
+  memos: KTreeNode[];
   hasDifference: boolean;
   cannotSaveReason: CannotSaveReason;
   saved: boolean;
@@ -86,9 +85,18 @@ class EditorFrameComponent extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    const { manuals, memos, match } = props;
-    const nodeId = match.params.id;
-    this.state = EditorFrameComponent.getInitialState(manuals, nodeId, memos);
+    const { node, memos } = props;
+    if (node === null) { throw new Error('Node cannot be null.'); }
+    this.state = {
+      tabIndex: 0,
+      mode: 'dc',
+      node,
+      memos,
+      hasDifference: false,
+      cannotSaveReason: null,
+      saved: false,
+      showVS: false,
+    };
   }
 
   componentDidMount() {
@@ -120,7 +128,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
       tabIndex: 0,
       mode: 'dc',
       node,
-      memoList,
+      memos: memoList,
       hasDifference: false,
       cannotSaveReason: null,
       saved: false,
@@ -129,10 +137,9 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 
   differenceCheck = () => {
-    const { manuals, match, history } = this.props;
-    const node = TreeUtil._findArray(manuals, match.params.id)!;
+    const { node, history } = this.props;
 
-    if (TreeUtil._hasDifference<Tree>(node, this.state.node)) {
+    if (TreeUtil._hasDifference<Tree>(node!, this.state.node)) {
       this.setState({hasDifference: true});
     } else {
       history.goBack();
@@ -144,26 +151,27 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 
   addMemo = (memo: KTreeNode) => {
-    const { memoList } = this.state;
+    const { memos: memoList } = this.state;
     memoList.push(memo);
-    this.setState({memoList});
+    this.setState({memos: memoList});
   }
 
   editMemo = (memo: KTreeNode) => {
-    const { memoList } = this.state;
+    const { memos: memoList } = this.state;
     this.setState({
-      memoList: memoList.map(m => m.id === memo.id ? memo : m)
+      memos: memoList.map(m => m.id === memo.id ? memo : m)
     });
   }
 
   deleteMemo = (memo: KTreeNode) => {
-    const { memoList } = this.state;
-    this.setState({memoList: memoList.filter(m => m.id !== memo.id)});
+    const { memos: memoList } = this.state;
+    this.setState({memos: memoList.filter(m => m.id !== memo.id)});
   }
 
   save = () => {
-    const { manuals, changeManuals, changeMemos, clearManual, history } = this.props;
-    const {node, memoList} = this.state;
+    const { manual, replaceManual, changeMemos, setSelect, history } = this.props;
+    if (manual === null) { throw new Error('Manual cannot be null.'); }
+    const {node, memos} = this.state;
     const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
     const isAllCaseHasItem = TreeUtil._isAllCaseHasItem(node);
     const cannotSaveReason: CannotSaveReason = !isAllSwitchHasCase ? 'switch' :
@@ -171,21 +179,22 @@ class EditorFrameComponent extends React.Component<Props, State> {
     this.setState({cannotSaveReason});
     if (cannotSaveReason === null) {
       this.setState({saved: true});
-      const newManuals = TreeUtil._replaceArray<Tree>(manuals, node) as Manual[];
-      changeManuals(newManuals);
-      changeMemos(memoList);
-      clearManual();
+      manual.rootTree = node;
+      replaceManual(manual);
+      changeMemos(memos);
+      setSelect(manual);
       history.goBack();
     }
   }
 
   saveAndGo = () => {
-    const { manuals, changeManuals, changeMemos, clearManual, history } = this.props;
-    const { node, memoList } = this.state;
-    const newManuals = TreeUtil._replaceArray<Tree>(manuals, node) as Manual[];
-    changeManuals(newManuals);
-    changeMemos(memoList);
-    clearManual();
+    const { manual, replaceManual, changeMemos, setSelect, history } = this.props;
+    if (manual === null) { throw new Error('Manual cannot be null.'); }
+    const { node, memos } = this.state;
+    manual.rootTree = node;
+    replaceManual(manual);
+    changeMemos(memos);
+    setSelect(manual);
     history.goBack();
   }
 
@@ -193,7 +202,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
 
   render() {
     const { classes } = this.props;
-    const { tabIndex, mode, node, memoList, hasDifference, cannotSaveReason, saved, showVS } = this.state;
+    const { tabIndex, mode, node, memos: memoList, hasDifference, cannotSaveReason, saved, showVS } = this.state;
   
     const nodeProps: NodeEditorProps = {
       mode,
@@ -236,7 +245,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
 
           <Button variant="contained" color="primary" size="small" onClick={this.save} className={classes.editFinishButton}>編集完了</Button>
         </div>
-
+        <Divider/>
         {tabIndex === 0 && <NodeEditorContainer {...nodeProps}/>}
         {tabIndex === 1 && <TextEditor {...textProps}/>}
 
@@ -301,4 +310,4 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 }
 
-export default withStyles(styles)(EditorFrameComponent);
+export default withRouter(withStyles(styles)(EditorFrameComponent));

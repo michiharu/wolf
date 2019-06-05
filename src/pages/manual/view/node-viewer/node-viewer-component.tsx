@@ -129,7 +129,7 @@ class NodeViewerComponent extends React.Component<Props, State> {
   }
 
   scroll = () => {
-    const { node, ks, setNode } = this.props;
+    const { node, ks, changeNode } = this.props;
     const scrollContainer = this.mainRef.current;
     const stage = this.stageRef.current;
     if (scrollContainer === null || stage === null) { throw  new Error('Cannot find elements.'); }
@@ -149,15 +149,14 @@ class NodeViewerComponent extends React.Component<Props, State> {
     const f = TreeNodeUtil._getFocusNode(this.kTree)!;
     if (f !== undefined) {
       if (f.point.x * ks.unit < dx || stage.width() / 2 + dx < (f.point.x + f.rect.w) * ks.unit) {
-        setNode(TreeNodeUtil._deleteFocus(node));
+        changeNode(TreeNodeUtil._deleteFocus(node));
       }
     }
   }
 
   expand = (target: KWithArrow, open: boolean) => {
-    const { node, setNode } = this.props;
-    var newNode = TreeNodeUtil._open(node, target.id, open);
-    setNode(newNode);
+    const { node, changeNode } = this.props;
+    changeNode(TreeNodeUtil._open(node, target.id, open));
     process.nextTick(() => this.resize());
   }
 

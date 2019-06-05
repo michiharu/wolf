@@ -1,4 +1,5 @@
 import User from "./user";
+import Category from "./category";
 
 export interface Tree {
   id: string;
@@ -34,45 +35,41 @@ export const baseTree: Tree = {
   children: [],
 };
 
-export interface Manual extends Tree {
+export interface Manual {
+  id: string;
+  title: string;
   ownerId: string;
   collaboratorIds: string[];
+  categoryId: string;
   isPublic: boolean;
-  inOperation: boolean;
-  reviewerId: string | null;
-  pullRequests: PullRequest[];
-  assignIds: string[];
-  followIds: string[];
+  viewerIds: string[];
+  visible: boolean;
+  favoriteIds: string[];
+  likeIds: string[];
+  rootTree: Tree | null;
 }
 
 export const baseManual: Manual = {
-  ...baseTree,
+  id: '',
+  title: '',
   ownerId: '',
   collaboratorIds: [],
+  categoryId: '',
   isPublic: true,
-  inOperation: false,
-  reviewerId: null,
-  pullRequests: [],
-  assignIds: [],
-  followIds: [],
+  viewerIds: [],
+  visible: true,
+  favoriteIds: [],
+  likeIds: [],
+  rootTree: null
 };
 
-export interface ManualWithUser extends Manual {
+export interface ManualWithObject extends Manual {
   owner: User;
   collaborators: User[];
-  reviewer: User | null;
-  assignUsers: User[];
-}
-
-export interface PullRequest extends PullRequestTree {
-  writerId: string;
-  requestMessage: string;
-  responseMessage: string | null;
-}
-
-export interface PullRequestTree extends Tree {
-  originalId: string | null;
-  children: PullRequestTree[];
+  category: Category;
+  viewers: User[];
+  favorites: User[];
+  likes: User[];
 }
 
 export interface TreeNode extends Tree {

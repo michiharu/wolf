@@ -29,19 +29,19 @@ interface Props extends ManualsState, CreateManualActions, WithStyles<typeof sty
 const CreateManualComponent: React.FC<Props> = props => {
 
   const { willCreate, handleWillCreate, classes } = props;
-  const [label, setLabel] = useState('');
-  const handleLabel = (e: any) => setLabel(e.target.value);
+  const [title, setTitle] = useState('');
+  const handleLabel = (e: any) => setTitle(e.target.value);
   const [isPublic, setIsPublic] = useState(true);
   const handleOpen = (e: any) => setIsPublic(e.target.checked);
   const close = () => {
-    setLabel('');
+    setTitle('');
     setIsPublic(true);
     handleWillCreate();
   }
 
   const create = () => {
     const {user, manuals, changeManuals} = props;
-    const newManual: Manual = {...baseManual, id: Util.getID(), label, ownerId: user.id, isPublic};
+    const newManual: Manual = {...baseManual, id: Util.getID(), title, ownerId: user.id, isPublic};
     manuals.unshift(newManual);
     changeManuals(manuals);
     close();
@@ -53,7 +53,7 @@ const CreateManualComponent: React.FC<Props> = props => {
       <DialogContent>
         <TextField
           placeholder="マニュアルの名称"
-          value={label}
+          value={title}
           onChange={handleLabel}
           fullWidth
         />

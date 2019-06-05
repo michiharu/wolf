@@ -7,22 +7,30 @@ import { manualsAction } from '../../../redux/actions/manualsAction';
 import { memoActions } from '../../../redux/actions/memoAction';
 import EditorFrameComponent from './editor-frame-component';
 import { selectActions } from '../../../redux/actions/selectAction';
+import { SelectState } from '../../../redux/states/selectState';
+import User from '../../../data-types/user';
 
 export interface EditorFrameActions {
-  changeManuals: (manuals: Manual[]) => Action<Manual[]>;
+  replaceManual: (manual: Manual) => Action<Manual>;
+  setSelect: (manual: Manual) => Action<Manual>;
   changeMemos: (memoList: KTreeNode[]) => Action<KTreeNode[]>;
-  clearManual: () => Action<void>;
+}
+
+interface Props extends
+  SelectState,
+  EditorFrameActions {
+    user: User;
 }
 
 function mapStateToProps(appState: AppState) {
-  return {...appState.manuals, ...appState.memos};
+  return {...appState.select, ...appState.memos};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    changeManuals: (manuals: Manual[]) => dispatch(manualsAction.change(manuals)),
+    replaceManual: (manual: Manual) => dispatch(manualsAction.replace(manual)),
+    setSelect: (manual: Manual) => dispatch(selectActions.set(manual)),
     changeMemos:   (memos: KTreeNode[]) => dispatch(memoActions.change(memos)),
-    clearManual: () => dispatch(selectActions.clearManual()),
   };
 }
 

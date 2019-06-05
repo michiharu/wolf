@@ -12,12 +12,12 @@ export interface NodeViewerActions {
 }
 
 function mapStateToProps(appState: AppState) {
-  return {node: appState.select.node!};
+  return {node: appState.select.node!, ...appState.ks, ...appState.rs};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    setNode: (node: TreeNode) => dispatch<Action>(selectActions.setNode(node)),
+    changeNode: (node: TreeNode) => dispatch<Action>(selectActions.changeNode(node)),
   };
 }
 

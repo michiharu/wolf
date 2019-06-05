@@ -5,9 +5,7 @@ export const user1: User = {
   lastName: '山田',
   firstName: '太郎',
   userManagement: {canCreate: true, canEdit: true, canDelete: true},
-  groupManagement: {canCreate: true, canEdit: true, canDelete: true},
-  isOperationManager: true,
-  canPullRequest: true,
+  groupManagement: {canCreate: true, canEdit: true, canDelete: true}
 };
 
 export const user2: User = {
@@ -15,9 +13,7 @@ export const user2: User = {
   lastName: '佐藤',
   firstName: '花子',
   userManagement: {canCreate: true, canEdit: true, canDelete: false},
-  groupManagement: {canCreate: true, canEdit: true, canDelete: true},
-  isOperationManager: true,
-  canPullRequest: true,
+  groupManagement: {canCreate: true, canEdit: true, canDelete: true}
 };
 
 export const user3: User = {
@@ -25,9 +21,7 @@ export const user3: User = {
   lastName: '江戸川',
   firstName: 'コナン',
   userManagement: {canCreate: false, canEdit: false, canDelete: false},
-  groupManagement: {canCreate: false, canEdit: false, canDelete: false},
-  isOperationManager: false,
-  canPullRequest: false,
+  groupManagement: {canCreate: false, canEdit: false, canDelete: false}
 };
 
 export const user4: User = {
@@ -35,7 +29,5 @@ export const user4: User = {
   lastName: '毛利',
   firstName: '小五郎',
   userManagement: {canCreate: false, canEdit: false, canDelete: false},
-  groupManagement: {canCreate: false, canEdit: false, canDelete: false},
-  isOperationManager: false,
-  canPullRequest: true,
+  groupManagement: {canCreate: false, canEdit: false, canDelete: false}
 };
