@@ -16,7 +16,7 @@ function* handleRequestLogin() {
       yield put(loginUserAction.set(user));
       yield put(usersAction.change(users));
       yield put(manualsAction.change(manuals));
-      yield put(categoriesAction.change(categories));
+      yield put(categoriesAction.set(categories));
     }
   }
 }

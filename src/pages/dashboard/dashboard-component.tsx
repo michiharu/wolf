@@ -9,8 +9,20 @@ import { TableCell, TableSortLabel, createMuiTheme, Badge } from '@material-ui/c
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import { theme } from '../..';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { categoriesAction } from '../../redux/actions/categoriesAction';
+import { Dispatch } from 'redux';
+import { Action } from 'typescript-fsa';
+import { CategoriesState } from '../../redux/states/categoriesState';
+import { UsersState } from '../../redux/states/usersState';
 
-interface Props extends ManualsState, LoginUserState, RouteComponentProps { }
+interface Props extends
+  LoginUserState,
+  UsersState,
+  ManualsState,
+  CategoriesState,
+  RouteComponentProps {
+  filterReset: () => Action<void>;
+}
 
 const getMuiTheme = () => createMuiTheme({
   ...theme,
@@ -30,7 +42,6 @@ const getMuiTheme = () => createMuiTheme({
 });
 
 const Dashboard: React.FC<Props> = (props: Props) => {
-  const { manuals, history } = props;
   const columns: MUIDataTableColumn[] = [
     {
       name: "id",
@@ -118,7 +129,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
       }
     },
     {
-      name: "ower",
+      name: "owner",
       label: "オーナー",
       options: {
         filter: true,
@@ -141,21 +152,31 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     like: string;
     title: string;
     description: string;
-    ower: string;
+    owner: string;
     updateAt: string;
-}
+  }
 
-  const data: CellData[] = manuals.map((m, i) => ({
-    id: m.id,
-    favoriteForColumn: {checked: i % 2 === 0, sum: i * 13},
-    favorite: i % 2 === 0 ? 'true' : 'false',
-    likeForColumn: {checked: i % 2 === 0, sum: i * 9},
-    like: i % 2 === 1 ? 'true' : 'false',
-    title: m.title,
-    description: 'ここにはマニュアルの説明。ここにはマニュアルの説明。ここにはマニュアルの説明。',
-    ower: m.ownerId,
-    updateAt: `2019/6/${i + 1}`
-  }));
+  const { user, users, manuals, history, filter, filterReset } = props;
+  if (user === null) { throw new Error('LoginUser cannot be null.') }
+
+  const data: CellData[] = manuals
+  .filter(m => filter === null || filter.id === m.categoryId)
+  .map((m, i) => {
+    const owner = users.find(u => u.id === m.ownerId)!;
+    const isFavorite = m.favoriteIds.find(f => f === user.id) !== undefined;
+    const isLike = m.likeIds.find(l => l === user.id) !== undefined;
+    return {
+      id: m.id,
+      favoriteForColumn: {checked: isFavorite, sum: m.favoriteIds.length},
+      favorite: isFavorite ? 'true' : 'false',
+      likeForColumn: {checked: isLike, sum: m.likeIds.length},
+      like: isLike ? 'true' : 'false',
+      title: m.title,
+      description: m.description,
+      owner: `${owner.lastName} ${owner.firstName}`,
+      updateAt: `2019/6/${i + 1}`
+    };
+  });
 
   const options: MUIDataTableOptions = {
     print: false,
@@ -163,8 +184,9 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     sortFilterList: false,
     selectableRows: false,
     elevation: 0,
+    responsive: 'scroll',
     rowsPerPageOptions: [10,20,50],
-    customSort: (d: {index: number; data: any[]}[], colIndex: number, order: string): {index: number; data: any[]}[] => {
+    customSort: (d: {index: number; data: any[]}[], colIndex: number, order: string) => {
       console.log(order)
       return d.sort(
         (colIndex === 1 || colIndex === 3)
@@ -173,6 +195,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     },
     onRowClick: (rowData: string[], rowMeta: { dataIndex: number, rowIndex: number }) => {
       history.push(`/manual/${rowData[0]}`);
+      filterReset();
     }
   };
   return (
@@ -188,7 +211,18 @@ const Dashboard: React.FC<Props> = (props: Props) => {
 };
 
 function mapStateToProps(appState: AppState) {
-  return {user: appState.loginUser.user!, ...appState.manuals};
+  return {
+    user: appState.loginUser.user!,
+    ...appState.users,
+    ...appState.manuals,
+    ...appState.categories
+  };
 }
 
-export default withRouter(connect(mapStateToProps)(Dashboard));
+function mapDispatchToProps(dispatch: Dispatch) {
+  return {
+    filterReset: () => dispatch(categoriesAction.filterReset()),
+  };
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Dashboard));

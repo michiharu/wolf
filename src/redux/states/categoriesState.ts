@@ -4,11 +4,15 @@ import Category from '../../data-types/category';
 
 export interface CategoriesState {
   categories: Category[];
+  filter: Category | null;
 }
 
 const initialState: CategoriesState = {
-  categories: []
+  categories: [],
+  filter: null
 };
 
 export const categoriesReducer = reducerWithInitialState(initialState)
-.case(categoriesAction.change, (state, categories) => ({...state, categories}))
+.case(categoriesAction.set, (state, categories) => ({...state, categories}))
+.case(categoriesAction.filterSet, (state, filter) => ({...state, filter}))
+.case(categoriesAction.filterReset, (state) => ({...state, filter: null}))

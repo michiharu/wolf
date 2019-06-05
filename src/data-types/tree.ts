@@ -38,6 +38,7 @@ export const baseTree: Tree = {
 export interface Manual {
   id: string;
   title: string;
+  description: string;
   ownerId: string;
   collaboratorIds: string[];
   categoryId: string;
@@ -52,6 +53,7 @@ export interface Manual {
 export const baseManual: Manual = {
   id: '',
   title: '',
+  description: '',
   ownerId: '',
   collaboratorIds: [],
   categoryId: '',

@@ -20,8 +20,6 @@ export interface LoginPostResponse {
   users: User[];
   categories: Category[];
   manuals: Manual[];
-  favorites: string[];
-  likes: string[];
   memos: KTreeNode[];
 }
 // DELETE -> ステータスコード200でログアウト

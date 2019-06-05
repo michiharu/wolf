@@ -1,12 +1,8 @@
 import React from 'react';
 import AppBar from '@material-ui/core/AppBar';
-import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -18,6 +14,7 @@ import { InputBase, Button } from '@material-ui/core';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import links from '../../settings/links';
 import AdapterLink from '../../components/custom-mui/adapter-link';
+import DrawerContentContainer from './drawer-content/drawer-content-container';
 
 const drawerWidth = 300;
 
@@ -109,28 +106,6 @@ function AppFrameComponent({user, location}: Props) {
     setSearchText(e.target.value);
   }
 
-  const drawer = (
-    <div>
-      <div className={classes.toolbar}/>
-      <Divider />
-      <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
-      </List>
-    </div>
-  );
-
   return (
     <div className={classes.root}>
       <AppBar position="fixed" color="inherit" elevation={0} className={classes.appBar}>
@@ -172,12 +147,12 @@ function AppFrameComponent({user, location}: Props) {
             classes={{ paper: classes.drawerPaper }}
             ModalProps={{ keepMounted: true }}
           >
-            {drawer}
+            <DrawerContentContainer/>
           </Drawer>
         </Hidden>
         <Hidden smDown implementation="css">
           <Drawer classes={{ paper: classes.drawerPaper }} variant="permanent" open>
-            {drawer}
+            <DrawerContentContainer/>
           </Drawer>
         </Hidden>
       </nav>
