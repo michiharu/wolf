@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles, Grid, Paper, Typography, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Button, FormGroup, Switch,
+  makeStyles, Theme, Grid, Paper, Typography, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Button, FormGroup, Switch,
 } from '@material-ui/core';
 import Slider from '@material-ui/lab/Slider';
 import KSize from '../../data-types/k-size';
@@ -8,8 +8,7 @@ import { KSState } from '../../redux/states/ksState';
 import { RSState } from '../../redux/states/rsState';
 import { ViewSettingsActions } from './view-settings-container';
 
-
-const styles = (theme: Theme) => createStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     position: 'absolute',
     top: '75vh',
@@ -39,18 +38,17 @@ const styles = (theme: Theme) => createStyles({
     paddingTop: theme.spacing(3),
     paddingBottom: theme.spacing(3),
   },
-});
+}));
 
-interface Props extends KSState, RSState, ViewSettingsActions, WithStyles<typeof styles> {}
-
+interface Props extends KSState, RSState, ViewSettingsActions {}
 
 const ViewSettingsComponent: React.FC<Props> = (props: Props) => {
-  const { ks, rs, changeKS, changeRS, resetKS, resetRS, classes } = props;
+  const { ks, rs, changeKS, changeRS, resetKS, resetRS } = props;
   const reset = () => {
     resetKS();
     resetRS();
-  }
-
+  };
+  const classes = useStyles();
   return (
     <Paper className={classes.root}>
       <Grid container spacing={4}>
@@ -207,4 +205,4 @@ const ViewSettingsComponent: React.FC<Props> = (props: Props) => {
   );
 }
 
-export default withStyles(styles)(ViewSettingsComponent);
+export default ViewSettingsComponent;

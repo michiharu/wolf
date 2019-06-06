@@ -5,7 +5,7 @@ import KSize from '../../data-types/k-size';
 import { ksActions } from '../../redux/actions/ksAction';
 import ReadingSetting from '../../data-types/reading-settings';
 import { rsActions } from '../../redux/actions/rsAction';
-import viewSettingsComponent from './view-settings-component';
+import ViewSettingsComponent from './view-settings-component';
 
 
 export interface ViewSettingsActions {
@@ -28,4 +28,4 @@ function mapDispatchToProps(dispatch: Dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(viewSettingsComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(ViewSettingsComponent);

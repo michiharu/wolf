@@ -1,8 +1,7 @@
 import * as React from 'react';
 import {useState} from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles,
-  Tabs, Tab, Typography, Divider, Button, IconButton, Modal,
+  makeStyles, Theme, Tabs, Tab, Typography, Divider, Button, IconButton, Modal,
 } from '@material-ui/core';
 import ViewSettingsIcon from '@material-ui/icons/Settings';
 
@@ -14,7 +13,7 @@ import ViewSettingsContainer from '../../../components/view-settings/view-settin
 import AdapterLink from '../../../components/custom-mui/adapter-link';
 import User from '../../../data-types/user';
 
-const styles = (theme: Theme) => createStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     paddingTop: theme.spacing(1),
   },
@@ -29,38 +28,18 @@ const styles = (theme: Theme) => createStyles({
     margin: 'auto',
     textAlign: 'right',
   },
-  toolbar: theme.mixins.toolbar,
-  convergent: {
-    transform: 'scale(1, -1)',
-  },
-  close: {
-    padding: theme.spacing(0.5),
-  },
-  viewSettingModal: {
-    backgroundColor: '#0002',
-  },
-  viewSettingPaper: {
-    position: 'absolute',
-    top: '75vh',
-    left: '50vw',
-    width: '90vw',
-    maxHeight: '45vh',
-    transform: 'translate(-50%, -50%)',
-    padding: theme.spacing(2),
-    outline: 'none',
-  },
   viewSettingButton: {
     marginLeft: theme.spacing(1)
   }
-});
+}));
 
-interface Props extends WithStyles<typeof styles> {
+interface Props {
   user: User;
   manual: Manual;
 }
 
 const ViewComponent: React.FC<Props> = props => {
-  const { user, manual, classes } =  props;
+  const { user, manual } =  props;
 
   const [tabIndex, setTabIndex] = useState(0);
   const [showVS, setShowVS] = useState(false);
@@ -73,6 +52,8 @@ const ViewComponent: React.FC<Props> = props => {
   const handleCloseVS = () => setShowVS(false);
 
   const isCommiter = manual.ownerId === user.id || manual.collaboratorIds.find(cid => cid === user.id) !== undefined;
+
+  const classes = useStyles();
   return (
     <div className={classes.root}>
       <div className={classes.header}>
@@ -101,13 +82,14 @@ const ViewComponent: React.FC<Props> = props => {
       <Modal
         open={showVS}
         onClose={handleCloseVS}
-        BackdropProps={{className: classes.viewSettingModal}}
-        disableAutoFocus
+        keepMounted
       >
-        <ViewSettingsContainer/>
+        <div>
+          <ViewSettingsContainer/>
+        </div>
       </Modal>
     </div>
   );
 }
 
-export default withStyles(styles)(ViewComponent);
+export default ViewComponent;
