@@ -29,12 +29,13 @@ const Collaborators: React.FC<Props> = props => {
     props.replace(newManual);
     props.set(newManual);
   };
-  const deleteCollaborator = (id: string) => () => {
-    changeCollaborators(collaboratorIds.filter(cid => cid !== id));
+  const deleteCollaborator = (id: string) => () => changeCollaborators(collaboratorIds.filter(cid => cid !== id));
+
+  const handleSelect = (e: any) => setCollaboratorId(e.target.value);
+  const addCollaborator = () => {
+    changeCollaborators(collaboratorIds.concat([collaboratorId]));
     setCollaboratorId('');
   }
-  const handleSelect = (e: any) => setCollaboratorId(e.target.value);
-  const addCollaborator = () => changeCollaborators(collaboratorIds.concat([collaboratorId]));
 
   const owner = users.find(u => u.id === manual.ownerId)!;
   const collaborators = collaboratorIds.map(cid => users.find(u => u.id === cid)!);
@@ -67,7 +68,7 @@ const Collaborators: React.FC<Props> = props => {
             </FormControl>
           </Grid>
           <Grid item>
-            <Button variant="contained" color="primary" onClick={addCollaborator}>追加</Button>
+            <Button variant="contained" color="primary" onClick={addCollaborator} disabled={collaboratorId === ''}>追加</Button>
           </Grid>
         </Grid>
       </div>
