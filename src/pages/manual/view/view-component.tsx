@@ -16,11 +16,13 @@ import User from '../../../data-types/user';
 
 const styles = (theme: Theme) => createStyles({
   root: {
-    paddingTop: theme.spacing(2),
+    paddingTop: theme.spacing(1),
   },
   header: {
-    maxWidth: theme.breakpoints.width('md'),
-    margin: 'auto',
+    display: 'flex',
+    paddingTop: theme.spacing(1),
+    marginLeft: theme.spacing(2),
+    marginRight: theme.spacing(2),
   },
   body: {
     maxWidth: theme.breakpoints.width('md'),
@@ -74,23 +76,21 @@ const ViewComponent: React.FC<Props> = props => {
   return (
     <div className={classes.root}>
       <div className={classes.header}>
-        <div style={{display: 'flex', height: 48}}>
-          <Typography variant="h4">{manual.title}</Typography>
-        </div>
-        <div style={{display: 'flex', height: 48}}>
-          <Tabs value={tabIndex} onChange={handleChangeTab}>
-            <Tab label="ツリー表示"/>
-            <Tab label="テキスト表示"/>
-            <Tab label="設定"/>
-          </Tabs>
-          <div style={{flexGrow: 1}} />
-          {(tabIndex === 0 || tabIndex === 1) && (isCommiter ?
-          <Button to={`/manual/${manual.id}/edit`} component={AdapterLink} color="primary">編集する</Button> :
-          <Button to={`/manual/${manual.id}/create-request`} component={AdapterLink} color="primary">リクエストの作成</Button>)}
+        <Typography variant="h4">{manual.title}</Typography>
+      </div>
+      <div className={classes.header}>
+        <Tabs value={tabIndex} onChange={handleChangeTab}>
+          <Tab label="ツリー表示"/>
+          <Tab label="テキスト表示"/>
+          <Tab label="設定"/>
+        </Tabs>
+        <div style={{flexGrow: 1}} />
+        {(tabIndex === 0 || tabIndex === 1) && (isCommiter ?
+        <Button to={`/manual/${manual.id}/edit`} component={AdapterLink} color="primary">編集する</Button> :
+        <Button to={`/manual/${manual.id}/create-request`} component={AdapterLink} color="primary">リクエストの作成</Button>)}
 
-          {tabIndex === 0 &&
-          <IconButton className={classes.viewSettingButton} onClick={handleShowVS}><ViewSettingsIcon/></IconButton>}
-        </div>
+        {tabIndex === 0 &&
+        <IconButton className={classes.viewSettingButton} onClick={handleShowVS}><ViewSettingsIcon/></IconButton>}
       </div>
       <Divider/>
       <div>

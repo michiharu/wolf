@@ -174,12 +174,12 @@ class NodeViewerComponent extends React.Component<Props, State> {
       expand: (target: KWithArrow) => this.expand(target, !target.open)
     };
 
-    const main = this.mainRef.current;
-    const largeContainerStyle: React.CSSProperties | undefined = main !== null ? {
+    const stage = this.stageRef.current;
+    const largeContainerStyle: React.CSSProperties | undefined = stage !== null ? {
       position: 'relative',
       overflow: 'hidden',
-      width: Math.max((node.self.w + ks.spr.w * 2) * ks.unit, main.offsetWidth),
-      height: Math.max((node.self.h + ks.spr.h * 2) * ks.unit + marginBottom, main.offsetHeight),
+      width: Math.max((node.self.w + ks.spr.w * 2) * ks.unit, stage.x()),
+      height: Math.max((node.self.h + ks.spr.h * 2) * ks.unit + marginBottom, stage.y()),
     } : undefined;
 
     return (
