@@ -121,7 +121,6 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
                     "visible": true,
                     "favoriteIds": [],
                     "likeIds": [],
-                    "rootTree": null,
                 },
                 {
                     "id": "2",
@@ -134,7 +133,6 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
                     "visible": true,
                     "favoriteIds": [],
                     "likeIds": [],
-                    "rootTree": null,
                 }
             ],
             "memos": [
@@ -165,14 +163,10 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
 
 # Group Manual
 ## マニュアル [/api/v1/manual/{id}]
-DB未保存のデータはidを"tmp:~"で始めるルールとする。
-おそらく親となるレコードのIDを子が持つDB設計になると思うが、
-レコードの削除はrootとなるマニュアルデータ以外は明示的なAPIを持たないため、
-編集時に削除されたデータがあるかどうかをチェックし、
-あれば該当レコードを削除するロジックをサーバーサイドで組む必要がある。
+マニュアルAPIにおけるtreeデータはPUTでは編集しない、代わりにTreeAPIを通じてtreeデータを編集する。
 
 ### マニュアル取得API [GET]
-リクエストパラメーターでmanualIdを渡し、rootTree以下のNodeを返す。
+リクエストパラメーターでmanualIdを渡し、rootTreeにNodeデータを持たせて返す。
 
 + Parameters
     + id: 123 (string, required) - manualId
@@ -189,40 +183,7 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
             "viewerIds": [],
             "visible": true,
             "favoriteIds": [],
-            "likeIds": [],
-            "rootTree": {
-                "id": "1231",
-                "label": "マニュアル１",
-                "type": "task",
-                "input": "",
-                "output": "",
-                "preConditions": "",
-                "postConditions": "",
-                "workerInCharge": "",
-                "remarks": "",
-                "necessaryTools": "",
-                "exceptions": "",
-                "imageName": "",
-                "imageBlob": "",
-                "children": [
-                    {
-                        "id": "1232",
-                        "label": "マニュアル１−１",
-                        "type": "task",
-                        "input": "",
-                        "output": "",
-                        "preConditions": "",
-                        "postConditions": "",
-                        "workerInCharge": "",
-                        "remarks": "",
-                        "necessaryTools": "",
-                        "exceptions": "",
-                        "imageName": "",
-                        "imageBlob": "",
-                        "children": []
-                    }
-                ]
-            }
+            "likeIds": []
         }
 
 
@@ -240,23 +201,7 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
             "viewerIds": [],
             "visible": true,
             "favorites": [],
-            "likes": [],
-            "rootTree": {
-                "id": "tmp:12",
-                "label": "",
-                "type": "task",
-                "input": "",
-                "output": "",
-                "preConditions": "",
-                "postConditions": "",
-                "workerInCharge": "",
-                "remarks": "",
-                "necessaryTools": "",
-                "exceptions": "",
-                "imageName": "",
-                "imageBlob": "",
-                "children": []
-            }
+            "likes": []
         }
 
 + Response 200 (application/json)
@@ -271,26 +216,12 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
             "visible": true,
             "viewerIds": [],
             "favorites": [],
-            "likes": [],
-            "rootTree": {
-                "id": "12",
-                "label": "",
-                "type": "task",
-                "input": "",
-                "output": "",
-                "preConditions": "",
-                "postConditions": "",
-                "workerInCharge": "",
-                "remarks": "",
-                "necessaryTools": "",
-                "exceptions": "",
-                "imageName": "",
-                "imageBlob": "",
-                "children": []
-            }
+            "likes": []
         }
 
 ### マニュアル編集API [PUT]
+マニュアル編集APIで、実際に編集される可能性のあるプロパティーは "ownerId", "categoryId", "isPublic", "visible"の4つだけです。
+配列データを持つプロパティーは別途APIを用意しているのでそこから編集されます。
 
 + Parameters
     + id: 123 (string, required) - manualId
@@ -308,37 +239,6 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
             "visible": true,
             "favorites": [],
             "likes": [],
-            "rootTree": {
-                "id": "12",
-                "label": "マニュアル１−１",
-                "type": "task",
-                "input": "",
-                "output": "",
-                "preConditions": "",
-                "postConditions": "",
-                "workerInCharge": "",
-                "remarks": "",
-                "necessaryTools": "",
-                "exceptions": "",
-                "imageName": "",
-                "imageBlob": "",
-                "children": [
-                    "id": "tmp:12",
-                    "label": "マニュアル１−１",
-                    "type": "task",
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": []
-                ]
-            }
         }
 
 + Response 200 (application/json)
@@ -350,25 +250,52 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
             "collaboratorIds": [],
             "category": "3",
             "isPublic": true,
+            "viewerIds": [],
             "visible": true,
             "favoriteIds": [],
-            "likeIds": [],
-            "rootTree": {
-                "id": "12",
-                "label": "マニュアル１−１",
-                "type": "task",
-                "input": "",
-                "output": "",
-                "preConditions": "",
-                "postConditions": "",
-                "workerInCharge": "",
-                "remarks": "",
-                "necessaryTools": "",
-                "exceptions": "",
-                "imageName": "",
-                "imageBlob": "",
-                "children": [
-                    "id": "123",
+            "likeIds": []
+        }
+
+### マニュアル削除API [DELETE]
++ Parameters
+    + id: 123 (string, required) - manualId
+
++ Response 200 (application/json)
+
+# Group Tree
+## マニュアルツリー [/api/v1/tree/{manualId}]
+DB未保存のデータはidを"tmp:~"で始めるルールとする。
+おそらく親となるレコードのIDを子が持つDB設計になると思うが、
+レコードの削除はrootとなるマニュアルデータ以外は明示的なAPIを持たないため、
+編集時に削除されたデータがあるかどうかをチェックし、
+あれば該当レコードを削除するロジックをサーバーサイドで組む必要がある。
+
+### ツリー取得API [GET]
+リクエストパラメーターでmanualIdを渡し、
+どのマニュアルのNodeについて操作（GET, POST, PUT, DELETE）するのかをサーバーに伝える。
+
++ Parameters
+    + manualId: 123 (string, required) - manualId
+
++ Response 200 (application/json)
+
+        {
+            "id": "1231",
+            "label": "マニュアル１",
+            "type": "task",
+            "input": "",
+            "output": "",
+            "preConditions": "",
+            "postConditions": "",
+            "workerInCharge": "",
+            "remarks": "",
+            "necessaryTools": "",
+            "exceptions": "",
+            "imageName": "",
+            "imageBlob": "",
+            "children": [
+                {
+                    "id": "1232",
                     "label": "マニュアル１−１",
                     "type": "task",
                     "input": "",
@@ -382,13 +309,130 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
                     "imageName": "",
                     "imageBlob": "",
                     "children": []
-                ]
-            }
+                }
+            ]
         }
 
-### マニュアル削除API [DELETE]
+
+### ツリー作成API [POST]
+
 + Parameters
-    + id: 123 (string, required) - manualId
+    + manualId: 123 (string, required) - manualId
+
++ Request  (application/json)
+
+        {
+            "id": "tmp:12",
+            "label": "",
+            "type": "task",
+            "input": "",
+            "output": "",
+            "preConditions": "",
+            "postConditions": "",
+            "workerInCharge": "",
+            "remarks": "",
+            "necessaryTools": "",
+            "exceptions": "",
+            "imageName": "",
+            "imageBlob": "",
+            "children": []
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "1g2u3i4d",
+            "label": "",
+            "type": "task",
+            "input": "",
+            "output": "",
+            "preConditions": "",
+            "postConditions": "",
+            "workerInCharge": "",
+            "remarks": "",
+            "necessaryTools": "",
+            "exceptions": "",
+            "imageName": "",
+            "imageBlob": "",
+            "children": []
+        }
+
+### ツリー編集API [PUT]
+
++ Parameters
+    + manualId: 123 (string, required) - manualId
+
++ Request  (application/json)
+
+        {
+            "id": "12",
+            "label": "マニュアル１−１",
+            "type": "task",
+            "input": "",
+            "output": "",
+            "preConditions": "",
+            "postConditions": "",
+            "workerInCharge": "",
+            "remarks": "",
+            "necessaryTools": "",
+            "exceptions": "",
+            "imageName": "",
+            "imageBlob": "",
+            "children": [
+                "id": "tmp:12",
+                "label": "マニュアル１−１",
+                "type": "task",
+                "input": "",
+                "output": "",
+                "preConditions": "",
+                "postConditions": "",
+                "workerInCharge": "",
+                "remarks": "",
+                "necessaryTools": "",
+                "exceptions": "",
+                "imageName": "",
+                "imageBlob": "",
+                "children": []
+            ]
+        }
+
++ Response 200 (application/json)
+
+        {
+            "id": "12",
+            "label": "マニュアル１−１",
+            "type": "task",
+            "input": "",
+            "output": "",
+            "preConditions": "",
+            "postConditions": "",
+            "workerInCharge": "",
+            "remarks": "",
+            "necessaryTools": "",
+            "exceptions": "",
+            "imageName": "",
+            "imageBlob": "",
+            "children": [
+                "id": "5g6u7i8d",
+                "label": "マニュアル１−１",
+                "type": "task",
+                "input": "",
+                "output": "",
+                "preConditions": "",
+                "postConditions": "",
+                "workerInCharge": "",
+                "remarks": "",
+                "necessaryTools": "",
+                "exceptions": "",
+                "imageName": "",
+                "imageBlob": "",
+                "children": []
+            ]
+        }
+
+### ツリー削除API [DELETE]
++ Parameters
+    + manualId: 123 (string, required) - manualId
 
 + Response 200 (application/json)
 
@@ -437,5 +481,23 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
 
 + Parameters
     + id: 123 (string, required) - manualId
+
++ Response 200 (application/json)
+
+# Group Collaborator
+## 共同編集者 [/api/v1/collaborators/{manualId}/{userId}]
+### 共同編集者登録 [POST]
+
++ Parameters
+    + manualId: 123 (string, required) - manualId
+    + userId: 123 (string, required) - userId
+
++ Response 200 (application/json)
+
+### 共同編集者解除 [DELETE]
+
++ Parameters
+    + manualId: 123 (string, required) - manualId
+    + userId: 123 (string, required) - userId
 
 + Response 200 (application/json)
