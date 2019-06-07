@@ -9,6 +9,7 @@ export const manual1: Manual = {
   collaboratorIds:['2'],
   categoryId: '1',
   favoriteIds: ['1'],
+  likeIds: ['1', '3', '4'],
   rootTree: {
     ...baseTree,
     id: '1',
@@ -30,6 +31,7 @@ export const manual11: Manual = {
   collaboratorIds:['2'],
   categoryId: '1',
   favoriteIds: ['1', '3', '4'],
+  likeIds: ['1', '4'],
   rootTree: {
     ...baseTree,
     id: '1',
@@ -51,6 +53,7 @@ export const manual2: Manual = {
   collaboratorIds:['2'],
   categoryId: '2',
   favoriteIds: ['2', '4'],
+  likeIds: ['1'],
   rootTree: {
     ...baseTree,
     id: '2',
@@ -71,6 +74,7 @@ export const manual3: Manual = {
   ownerId: '1',
   collaboratorIds:['2'],
   categoryId: '3',
+  favoriteIds: [],
   rootTree: {
     ...baseTree,
     id: '3',

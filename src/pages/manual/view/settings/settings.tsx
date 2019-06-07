@@ -1,23 +1,18 @@
 import * as React from 'react';
 import {useState} from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles, Grid, Paper, List, ListItem, ListItemText, Box
+  Grid, Paper, List, ListItem, ListItemText, Box
 } from '@material-ui/core';
-import { Manual } from '../../../../data-types/tree';
+import BaseSettings from './base-settings/base-settings-container';
 import Collaborators from './collaborators/collaborators-container';
-import Copy from './copy';
-import DeleteForm from './delete';
+import Copy from './copy/copy-container';
+import Delete from './delete/delete-container';
 
-const styles = (theme: Theme) => createStyles({
+export const maxWidth = 600;
 
-});
-
-interface Props extends WithStyles<typeof styles> {
-  manual: Manual;
-}
+interface Props {}
 
 const ManualSettings: React.FC<Props> = props => {
-  const { manual } =  props;
   const [selected, setSelected] = useState(0)
   const handleSelect = (i: number) => () => setSelected(i);
   return (
@@ -27,24 +22,28 @@ const ManualSettings: React.FC<Props> = props => {
           <Paper >
             <List>
               <ListItem button selected={selected === 0} onClick={handleSelect(0)}>
-                <ListItemText>コラボレーター</ListItemText>
+                <ListItemText>基本設定</ListItemText>
               </ListItem>
               <ListItem button selected={selected === 1} onClick={handleSelect(1)}>
-                <ListItemText>マニュアルの複製</ListItemText>
+                <ListItemText>コラボレーター</ListItemText>
               </ListItem>
               <ListItem button selected={selected === 2} onClick={handleSelect(2)}>
-                <ListItemText>マニュアルの非公開・削除</ListItemText>
+                <ListItemText>マニュアルの複製</ListItemText>
+              </ListItem>
+              <ListItem button selected={selected === 3} onClick={handleSelect(3)}>
+                <ListItemText>マニュアルの削除</ListItemText>
               </ListItem>
             </List>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={7}>
-          {selected === 0 && <Collaborators/>}
-          {selected === 1 && <Copy manual={manual}/>}
-          {selected === 2 && <DeleteForm manual={manual}/>}
+          {selected === 0 && <BaseSettings/>}
+          {selected === 1 && <Collaborators/>}
+          {selected === 2 && <Copy/>}
+          {selected === 3 && <Delete/>}
         </Grid>
       </Grid>
     </Box>
   );
 }
-export default withStyles(styles)(ManualSettings);
+export default ManualSettings;

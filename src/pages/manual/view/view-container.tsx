@@ -11,15 +11,13 @@ import { RouteComponentProps } from 'react-router-dom';
 import {  Manual } from '../../../data-types/tree';
 
 import ViewComponent from './view-component';
-import KSize from '../../../data-types/k-size';
-import { ksActions } from '../../../redux/actions/ksAction';
-import ReadingSetting from '../../../data-types/reading-settings';
-import { rsActions } from '../../../redux/actions/rsAction';
 import { CategoriesState } from '../../../redux/states/categoriesState';
 import User from '../../../data-types/user';
+import { manualsAction } from '../../../redux/actions/manualsAction';
 
 export interface ViewActions {
-  setSelect: (manual: Manual) => Action<Manual>;
+  replace: (manual: Manual) => Action<Manual>;
+  set: (manual: Manual) => Action<Manual>;
 }
 
 interface Props extends
@@ -31,14 +29,14 @@ interface Props extends
   }
 
 const ViewContainer: React.FC<Props> = props => {
-  const { user, manuals, manual, setSelect, match } =  props;
+  const { user, manuals, manual, set, replace, match } =  props;
 
   if (manual === null || manual.id !== match.params.id) {
     const selected = manuals.find(m => m.id === match.params.id)!;
-    setSelect(selected);
+    set(selected);
     return <p>loading...</p>
   }
-  const componentProps = {user, manual };
+  const componentProps = {user, manual, replace, set};
   return <ViewComponent {...componentProps}/>;
 }
 
@@ -48,11 +46,8 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    setSelect: (manual: Manual) => dispatch(selectActions.set(manual)),
-    changeKS:  (ks: KSize) => dispatch(ksActions.change(ks)),
-    resetKS:   () => dispatch(ksActions.reset()),
-    changeRS:  (rs: ReadingSetting) => dispatch(rsActions.change(rs)),
-    resetRS:   () => dispatch(rsActions.reset()),
+    replace: (manual: Manual) => dispatch(manualsAction.replace(manual)),
+    set: (manual: Manual) => dispatch(selectActions.set(manual)),
   };
 }
 

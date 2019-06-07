@@ -1,7 +1,7 @@
 import {TreeNode, Type, CheckNode, Point } from "../data-types/tree";
 import { defaultKS as ks } from "../settings/layout";
 import Util from "./util";
-import { CheckListState } from "../pages/check-list/check-list";
+import { CheckListState } from "../../archive/check-list/check-list";
 
 export default class CheckNodeUtil {
 

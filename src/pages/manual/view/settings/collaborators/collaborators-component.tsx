@@ -1,12 +1,13 @@
 import * as React from 'react';
 import {useState} from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles, Typography, Chip, Button, FormControl, InputLabel, Select, MenuItem, Grid
+  Theme, createStyles, WithStyles, withStyles, Typography, Chip, Button, FormControl, InputLabel, Select, MenuItem, Grid, Box
 
 } from '@material-ui/core';
 import { Manual } from '../../../../../data-types/tree';
 import { CollaboratorsActions } from './collaborators-container';
 import { UsersState } from '../../../../../redux/states/usersState';
+import { maxWidth } from '../settings';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -42,11 +43,14 @@ const Collaborators: React.FC<Props> = props => {
   const others = users.filter(u => collaboratorIds.find(cid => cid === u.id) === undefined);
   return (
     <div className={classes.root}>
-      <div className={classes.container}>
+      <Box p={2} maxWidth={maxWidth}>
+        <Typography variant="h5">コラボレーター</Typography>
+      </Box>
+      <Box p={2} maxWidth={maxWidth}>
         <Typography variant="caption">オーナー</Typography>
         <Chip className={classes.chip} label={`${owner.lastName} ${owner.firstName}`}/>
-      </div>
-      <div className={classes.container}>
+      </Box>
+      <Box p={2} maxWidth={maxWidth}>
         <Typography variant="caption">コラボレーター</Typography>
         {collaborators.map((c, i) => 
         <Chip
@@ -55,8 +59,8 @@ const Collaborators: React.FC<Props> = props => {
           label={`${c.lastName} ${c.firstName}`}
           onDelete={deleteCollaborator(c.id)}
         />)}
-      </div>
-      <div className={classes.container}>
+      </Box>
+      <Box p={2} maxWidth={maxWidth}>
         <Grid container alignItems="flex-end" spacing={3}>
           <Grid item xs={6}>
             <FormControl fullWidth>
@@ -71,7 +75,7 @@ const Collaborators: React.FC<Props> = props => {
             <Button variant="contained" color="primary" onClick={addCollaborator} disabled={collaboratorId === ''}>追加</Button>
           </Grid>
         </Grid>
-      </div>
+      </Box>
     </div>
   );
 }
