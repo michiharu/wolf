@@ -1,21 +1,31 @@
-# Create React App example with TypeScript
+# Flow Like 開発環境の立ち上げ方
 
 ## How to use
 
-Download the example [or clone the repo](https://github.com/mui-org/material-ui):
+SFSのgitサーバーからプロジェクトをクローンします。
 
 ```sh
-curl https://codeload.github.com/mui-org/material-ui/tar.gz/next | tar -xz --strip=2 material-ui-next/examples/create-react-app-with-typescript
-cd create-react-app-with-typescript
+git clone https://trac.sfsolutions.jp:55443/git/FlowLike/
 ```
 
 Install it and run:
 
 ```sh
 npm install
+```
+
+muidatatableというライブラリーの型定義ファイルを修正する必要があるので修正を行います。
+
+```ts:node_modules/@types/mui-datatables/index.d.ts
+// 43行目にMUIDataTableColumnOptionsを追加
+interface MUIDataTableCustomHeadRenderer extends MUIDataTableColumn, MUIDataTableColumnOptions {
+    index: number;
+}
+```
+
+実行します。
+
+```sh
 npm run start
 ```
 
-## The idea behind the example
-
-This example demonstrate how you can use [Create React App](https://github.com/facebookincubator/create-react-app) with [TypeScript](https://github.com/Microsoft/TypeScript).
