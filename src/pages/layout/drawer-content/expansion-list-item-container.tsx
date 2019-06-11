@@ -2,7 +2,7 @@ import { connect } from 'react-redux';
 import { AppState } from '../../../redux/store';
 import ExpansionListItemComponent from './expansion-list-item-component';
 import { Dispatch } from 'redux';
-import { categoriesAction } from '../../../redux/actions/categoriesAction';
+import { categoriesAction } from '../../../redux/actions/login-data/categoriesAction';
 import Category from '../../../data-types/category';
 import { Action } from 'typescript-fsa';
 

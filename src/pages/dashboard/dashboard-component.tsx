@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { LoginUserState } from '../../redux/states/loginUserState';
-import { ManualsState } from '../../redux/states/manualsState';
+import { LoginUserState } from '../../redux/states/login-data/loginUserState';
+import { ManualsState } from '../../redux/states/login-data/manualsState';
 import { AppState } from '../../redux/store';
 import MUIDataTable, { MUIDataTableOptions, MUIDataTableColumn } from 'mui-datatables';
 import { Star, StarBorder, ThumbUpAlt, ThumbUpAltOutlined } from '@material-ui/icons';
@@ -9,11 +9,11 @@ import { TableCell, TableSortLabel, createMuiTheme, Badge } from '@material-ui/c
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import { theme } from '../..';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import { categoriesAction } from '../../redux/actions/categoriesAction';
+import { categoriesAction } from '../../redux/actions/login-data/categoriesAction';
 import { Dispatch } from 'redux';
 import { Action } from 'typescript-fsa';
-import { CategoriesState } from '../../redux/states/categoriesState';
-import { UsersState } from '../../redux/states/usersState';
+import { CategoriesState } from '../../redux/states/login-data/categoriesState';
+import { UsersState } from '../../redux/states/login-data/usersState';
 
 interface Props extends
   LoginUserState,

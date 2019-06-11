@@ -1,6 +1,6 @@
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { loginActions, LoginInfo } from '../../redux/actions/loginAction';
+import { loginActions, LoginInfo } from '../../redux/actions/login-data/loginAction';
 import LoginComponent from './login-component';
 import { AppState } from '../../redux/store';
 

@@ -1,24 +1,26 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
-import { LoginUserState,  loginUserReducer }    from './states/loginUserState';
-import { ManualsState, manualsReducer }   from './states/manualsState';
-import { MemoState, memoReducer } from './states/memoState';
-import { SelectState, selectReducer } from './states/selectState';
+import { LoginUserState,  loginUserReducer }    from './states/login-data/loginUserState';
+import { ManualsState, manualsReducer }   from './states/login-data/manualsState';
+import { MemoState, memoReducer } from './states/login-data/memoState';
+import { SelectState, selectReducer } from './states/select/selectState';
 import { KSState, ksReducer } from './states/ksState';
 import { RSState, rsReducer } from './states/rsState';
 import createSagaMiddleware from '@redux-saga/core';
 import { rootSaga } from './saga';
-import { CategoriesState, categoriesReducer } from './states/categoriesState';
-import { UsersState, usersReducer } from './states/usersState';
+import { CategoriesState, categoriesReducer } from './states/login-data/categoriesState';
+import { UsersState, usersReducer } from './states/login-data/usersState';
+import { ViewState, viewReducer } from './states/viewState';
 
 export type AppState = {
-  loginUser: LoginUserState,
-  users: UsersState,
-  manuals: ManualsState,
-  categories: CategoriesState,
-  select: SelectState,
-  memos: MemoState,
-  ks: KSState,
-  rs: RSState,
+  loginUser: LoginUserState;
+  users: UsersState;
+  manuals: ManualsState;
+  categories: CategoriesState;
+  select: SelectState;
+  memos: MemoState;
+  view: ViewState;
+  ks: KSState;
+  rs: RSState;
 };
 
 const sagaMiddleware = createSagaMiddleware();
@@ -32,6 +34,7 @@ const store = createStore(
     categories: categoriesReducer,
     select: selectReducer,
     memos: memoReducer,
+    view: viewReducer,
     ks: ksReducer,
     rs: rsReducer,
   }),

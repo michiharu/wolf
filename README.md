@@ -28,4 +28,3 @@ interface MUIDataTableCustomHeadRenderer extends MUIDataTableColumn, MUIDataTabl
 ```sh
 npm run start
 ```
-

@@ -1,11 +1,11 @@
 import { put, call, fork, take } from 'redux-saga/effects';
 import * as API from '../api/axios-func/login';
-import { ACTIONS_LOGIN } from './actions/loginAction';
-import { loginUserAction } from './actions/loginUserAction';
+import { ACTIONS_LOGIN } from './actions/login-data/loginAction';
+import { loginUserAction } from './actions/login-data/loginUserAction';
 import { LoginPostResponse } from '../api/definitions';
-import { manualsAction } from './actions/manualsAction';
-import { usersAction } from './actions/usersAction';
-import { categoriesAction } from './actions/categoriesAction';
+import { manualsAction } from './actions/login-data/manualsAction';
+import { usersAction } from './actions/login-data/usersAction';
+import { categoriesAction } from './actions/login-data/categoriesAction';
 
 function* handleRequestLogin() {
   while (true) {
