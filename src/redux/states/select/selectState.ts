@@ -19,6 +19,7 @@ export const selectReducer = reducerWithInitialState(initialState)
 .case(selectActions.set, (state, manual) => {
   const cloneManual = clone(manual);
   const node = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneManual.rootTree!, baseTreeNode));
+
   node.label = cloneManual.title;
   return ({...state, manual: cloneManual, node});
 })

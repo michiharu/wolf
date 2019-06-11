@@ -5,7 +5,7 @@ export default class TreeNodeUtil {
 
   static _init = <T extends TreeNode>(node: T): T => {
     const children = node.children.map(c => TreeNodeUtil._init(c));
-    return {...node, open: children.length !== 0, children};
+    return {...node, open: children.length !== 0, focus: false, children};
   }
 
   static toArrayWithoutClose = <T extends TreeNode>(node: T): T[] => {
