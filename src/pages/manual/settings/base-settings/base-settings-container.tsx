@@ -18,7 +18,7 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    replace: (manual: Manual) => dispatch(manualsAction.replace(manual)),
+    replace: (manual: Manual) => dispatch(manualsAction.put(manual)),
     set: (manual: Manual) => dispatch(selectActions.set(manual)),
   };
 }

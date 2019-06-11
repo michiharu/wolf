@@ -31,7 +31,7 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    replaceManual: (manual: Manual) => dispatch(manualsAction.replace(manual)),
+    replaceManual: (manual: Manual) => dispatch(manualsAction.put(manual)),
     setSelect: (manual: Manual) => dispatch(selectActions.set(manual)),
     changeMemos:   (memos: KTreeNode[]) => dispatch(memoActions.change(memos)),
     editEnd: () => dispatch(viewAction.editEnd()),

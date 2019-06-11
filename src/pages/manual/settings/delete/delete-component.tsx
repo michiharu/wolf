@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import { Typography, Button, Grid, TextField, Box, Snackbar, IconButton } from '@material-ui/core';
 import { Manual } from '../../../../data-types/tree';
-import { ManualsState } from '../../../../redux/states/login-data/manualsState';
 import { DeleteActions } from './delete-container';
 import { Close } from '@material-ui/icons';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import links from '../../../../settings/links';
 
 
-interface Props extends ManualsState, DeleteActions, RouteComponentProps {
+interface Props extends DeleteActions, RouteComponentProps {
   select: Manual;
 }
 
 const DeleteComponent: React.FC<Props> = props => {
-  const { select, manuals, change, history } = props;
+  const { select, manualDelete, history } = props;
   const [title, setTitle] = useState('');
   function handleChangeTitle(e: React.ChangeEvent<HTMLInputElement>) {
     setTitle(e.target.value);
@@ -22,7 +21,7 @@ const DeleteComponent: React.FC<Props> = props => {
   const [miss, setMiss] = useState(false);
   function handleClick() {
     if (select.title === title) {
-      change(manuals.filter(m => m.id !== select.id));
+      manualDelete(select);
       history.push(links.dashboard);
     } else {
       setMiss(true);

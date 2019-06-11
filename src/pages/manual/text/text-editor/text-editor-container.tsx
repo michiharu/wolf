@@ -22,7 +22,7 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    replaceManual: (manual: Manual) => dispatch(manualsAction.replace(manual)),
+    replaceManual: (manual: Manual) => dispatch(manualsAction.put(manual)),
     setSelect: (manual: Manual) => dispatch(selectActions.set(manual)),
     editEnd: () => dispatch(viewAction.editEnd()),
   };

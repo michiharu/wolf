@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { Typography, Button, Grid, TextField, Box, Snackbar, IconButton } from '@material-ui/core';
 import { Manual } from '../../../../data-types/tree';
-import { ManualsState } from '../../../../redux/states/login-data/manualsState';
 import { CopyActions } from './copy-container';
 import Util from '../../../../func/util';
 import { Close } from '@material-ui/icons';
 
-interface Props extends ManualsState, CopyActions {
+interface Props extends CopyActions {
   select: Manual;
 }
 
@@ -17,9 +16,8 @@ const Copy: React.FC<Props> = props => {
   }
   const [copied, setCopied] = useState(false);
   function handleClick() {
-    const { select, manuals, change } = props;
-    const newManual: Manual = {...select, id: Util.getID(), title: newTitle};
-    change(manuals.concat([newManual]));
+    const { select, manualUpdate } = props;
+    manualUpdate({...select, id: Util.getID(), title: newTitle});
     setNewTitle('');
     setCopied(true);
   }

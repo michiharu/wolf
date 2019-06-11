@@ -7,16 +7,16 @@ import { Manual } from '../../../data-types/tree';
 import CreateManualComponent from './create-manual-component';
 
 export interface CreateManualActions {
-  changeManuals: (manuals: Manual[]) => Action<Manual[]>;
+  add: (manuals: Manual) => Action<Manual>;
 }
 
 function mapStateToProps(appState: AppState) {
-  return {user: appState.loginUser.user!, ...appState.manuals, ...appState.categories};
+  return {user: appState.loginUser.user!, ...appState.categories};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    changeManuals: (manuals: Manual[]) => dispatch(manualsAction.change(manuals)),
+    add: (manual: Manual) => dispatch(manualsAction.post(manual)),
   };
 }
 

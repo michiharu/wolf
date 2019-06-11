@@ -7,10 +7,9 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import { Divergent, Convergent } from '../../../../settings/layout' 
 
-import { Tree, TreeNode, baseTreeNode, KTreeNode } from '../../../../data-types/tree';
+import { TreeNode, KTreeNode, Manual } from '../../../../data-types/tree';
 import TreeUtil from '../../../../func/tree';
 import NodeEditorContainer from '../../node/node-editor/node-editor-container';
-import TreeNodeUtil from '../../../../func/tree-node';
 import { theme } from '../../../..';
 import { NodeEditMode } from '../../../../data-types/node-edit-mode';
 import { MemoState } from '../../../../redux/states/login-data/memoState';
@@ -83,21 +82,6 @@ class EditorFrameComponent extends React.Component<Props, State> {
     };
   }
 
-  static getInitialState = (manuals: Tree[], id: string, memoList: KTreeNode[]): State => {
-    const foundNode = TreeUtil._findArray(manuals, id)!;
-    var node = TreeUtil._get(foundNode, baseTreeNode);
-    node = TreeNodeUtil._init(node);
-    return {
-      mode: 'dc',
-      node,
-      memos: memoList,
-      hasDifference: false,
-      cannotSaveReason: null,
-      saved: false,
-      showVS: false,
-    };
-  }
-
   edit = (editNode: TreeNode) => {
     this.setState({node: editNode});
   }
@@ -123,7 +107,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
   save = () => {
     const { manual, replaceManual, changeMemos, setSelect, editEnd } = this.props;
     if (manual === null) { throw new Error('Manual cannot be null.'); }
-    const {node, memos} = this.state;
+    const {node, memos } = this.state;
     const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
     const isAllCaseHasItem = TreeUtil._isAllCaseHasItem(node);
     const cannotSaveReason: CannotSaveReason = !isAllSwitchHasCase ? 'switch' :
@@ -131,10 +115,10 @@ class EditorFrameComponent extends React.Component<Props, State> {
     this.setState({cannotSaveReason});
     if (cannotSaveReason === null) {
       this.setState({saved: true});
-      manual.rootTree = node;
-      replaceManual(manual);
+      const newManual: Manual = {...manual, rootTree: node, title: node.label };
+      replaceManual(newManual);
       changeMemos(memos);
-      setSelect(manual);
+      setSelect(newManual);
       editEnd();
     }
   }

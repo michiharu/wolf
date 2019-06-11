@@ -7,7 +7,7 @@ import CopyComponent from './copy-component';
 import { Action } from 'typescript-fsa';
 
 export interface CopyActions {
-  change: (manuals: Manual[]) => Action<Manual[]>;
+  manualUpdate: (manual: Manual) => Action<Manual>;
 }
 
 function mapStateToProps(appState: AppState) {
@@ -16,7 +16,7 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    change: (manuals: Manual[]) => dispatch(manualsAction.change(manuals)),
+    manualUpdate: (manual: Manual) => dispatch(manualsAction.put(manual)),
   };
 }
 

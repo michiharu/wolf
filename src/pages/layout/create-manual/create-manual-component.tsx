@@ -6,9 +6,8 @@ import {
   Button, DialogTitle, DialogContent, DialogActions, makeStyles, Box, Typography, FormControl, Select, MenuItem,
 } from '@material-ui/core';
 
-import { ManualsState } from '../../../redux/states/login-data/manualsState';
 import { CreateManualActions } from './create-manual-container';
-import { baseManual, Manual } from '../../../data-types/tree';
+import { baseManual, Manual, baseTree } from '../../../data-types/tree';
 import User from '../../../data-types/user';
 import Util from '../../../func/util';
 import { CategoriesState } from '../../../redux/states/login-data/categoriesState';
@@ -21,7 +20,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-interface Props extends ManualsState, CategoriesState, CreateManualActions {
+interface Props extends CategoriesState, CreateManualActions {
   user: User;
   onClose: () => void;
 }
@@ -32,6 +31,9 @@ const CreateManualComponent: React.FC<Props> = props => {
   const [title, setTitle] = useState('');
   const handleLabel = (e: any) => setTitle(e.target.value);
   const [categoryId, setCategoryId] = useState(categories[0].id);
+  const handleCategorySelect = (e: React.ChangeEvent<{ value: unknown; name?: string; }>) => {
+    setCategoryId(e.target.value as string);
+  }
 
   const [isPublic, setIsPublic] = useState(true);
   const handleIsPublic = (e: any) => setIsPublic(e.target.checked);
@@ -42,10 +44,11 @@ const CreateManualComponent: React.FC<Props> = props => {
   }
 
   const create = () => {
-    const {user, manuals, changeManuals} = props;
-    const newManual: Manual = {...baseManual, id: Util.getID(), title, ownerId: user.id, isPublic};
-    manuals.unshift(newManual);
-    changeManuals(manuals);
+    const {user, add} = props;
+    const newManual: Manual = {
+      ...baseManual, id: Util.getID(), title, categoryId, isPublic, ownerId: user.id, rootTree: baseTree
+    };
+    add(newManual);
     close();
   };
   const classes = useStyles();

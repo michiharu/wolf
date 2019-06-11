@@ -7,7 +7,7 @@ import DeleteComponent from './delete-component';
 import { Action } from 'typescript-fsa';
 
 export interface DeleteActions {
-  change: (manuals: Manual[]) => Action<Manual[]>;
+  manualDelete: (manual: Manual) => Action<Manual>;
 }
 
 function mapStateToProps(appState: AppState) {
@@ -16,7 +16,7 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    change: (manuals: Manual[]) => dispatch(manualsAction.change(manuals)),
+    manualDelete: (manual: Manual) => dispatch(manualsAction.delete(manual)),
   };
 }
 
