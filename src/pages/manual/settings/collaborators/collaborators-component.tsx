@@ -6,7 +6,7 @@ import {
 } from '@material-ui/core';
 import { Manual } from '../../../../data-types/tree';
 import { CollaboratorsActions } from './collaborators-container';
-import { UsersState } from '../../../../redux/states/login-data/usersState';
+import { UsersState } from '../../../../redux/states/main/usersState';
 import { maxWidth } from '../settings';
 
 const styles = (theme: Theme) => createStyles({
@@ -28,7 +28,6 @@ const Collaborators: React.FC<Props> = props => {
   const changeCollaborators = (collaboratorIds: string[]) => {
     const newManual: Manual = {...manual, collaboratorIds};
     props.replace(newManual);
-    props.set(newManual);
   };
   const deleteCollaborator = (id: string) => () => changeCollaborators(collaboratorIds.filter(cid => cid !== id));
 

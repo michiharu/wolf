@@ -1,16 +1,25 @@
 import axiosbase from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import * as env from '../settings/env.json';
-import {loginURL, usersURL} from './definitions';
+import {loginURL, usersURL, manualsURL} from './definitions';
 import postLogin from './mock-data/login/post';
 import { postUser , putUser, deleteUser } from './mock-data/users';
-
+import postManual from './mock-data/manual/post';
+import putManual from './mock-data/manual/put';
 
 export const baseURL = 'http://localhost:51391';
 
 const mockAdapter = (() => {
-  const mock = new MockAdapter(axiosbase, { delayResponse: 500 });
+  const mock = new MockAdapter(axiosbase, { delayResponse: 2000 });
+  // login
   mock.onPost(loginURL).reply(postLogin);
+
+  // manual
+  mock.onPost(manualsURL).reply(postManual);
+  const regexManualsURL = new RegExp(`${manualsURL}/*`);
+  mock.onPut(regexManualsURL).reply(putManual);
+
+  // Tree
 
   mock.onPost(usersURL).reply(postUser);
   const regexUsersURL = new RegExp(`${usersURL}/*`);

@@ -48,7 +48,7 @@ interface Props {
   manual: Manual;
   isEditing: boolean;
   replace: (manual: Manual) => Action<Manual>;
-  set: (manual: Manual) => Action<Manual>;
+  postFavorite: (userId: string) => Action<string>,
   editStart: () => Action<void>;
 }
 
@@ -70,7 +70,6 @@ const LayoutComponent: React.FC<Props> = props => {
   const isLike = manual.likeIds.find(lid => lid === user.id) !== undefined;
   const updateManual = (manual: Manual) => {
     props.replace(manual);
-    props.set(manual);
   }
   function uncheckFavorite() {
     const newManual: Manual = {...manual, favoriteIds: manual.favoriteIds.filter(fid => fid !== user.id)};
@@ -81,8 +80,7 @@ const LayoutComponent: React.FC<Props> = props => {
     updateManual(newManual);
   }
   function checkFavorite() {
-    const newManual: Manual = {...manual, favoriteIds: manual.favoriteIds.concat([user.id])};
-    updateManual(newManual);
+    props.postFavorite(user.id);
   }
   function checkLike() {
     const newManual: Manual = {...manual, likeIds: manual.likeIds.concat([user.id])};

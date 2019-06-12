@@ -1,11 +1,13 @@
 import { put, call, fork, take } from 'redux-saga/effects';
+import { Notification } from './states/notificationsState';
 import * as API from '../api/axios-func';
-import { ACTIONS_LOGIN } from './actions/login-data/loginAction';
-import { loginUserAction } from './actions/login-data/loginUserAction';
+import { ACTIONS_LOGIN } from './actions/main/loginAction';
+import { loginUserAction } from './actions/main/loginUserAction';
 import { LoginPostResponse } from '../api/definitions';
-import { manualsAction, ACTIONS_MANUAL_POST, ACTIONS_MANUAL_PUT, ACTIONS_MANUAL_DELETE, } from './actions/login-data/manualsAction';
-import { usersAction } from './actions/login-data/usersAction';
-import { categoriesAction } from './actions/login-data/categoriesAction';
+import { manualsAction, ACTIONS_MANUAL_POST, ACTIONS_MANUAL_PUT, ACTIONS_MANUAL_DELETE, ACTIONS_FAVORITE_POST, favoriteActions, } from './actions/main/manualsAction';
+import { usersAction } from './actions/main/usersAction';
+import { categoriesAction } from './actions/main/categoriesAction';
+import { notificationsAction } from './actions/notificationsAction';
 
 function* handleRequestLogin() {
   while (true) {
@@ -21,6 +23,8 @@ function* handleRequestLogin() {
   }
 }
 
+const getKey = () => new Date().getTime() + Math.random();
+
 function* handleRequestPostManual() {
   while (true) {
     const action = yield take(ACTIONS_MANUAL_POST);
@@ -28,8 +32,15 @@ function* handleRequestPostManual() {
     const data = yield call(API.manualPost, action.payload);
     if (data.error === undefined) {
       yield put(manualsAction.postSuccess({beforeId, manual: data}));
+      const notification: Notification =
+      {key: getKey(), variant: 'success', message: 'マニュアルを新規作成しました'};
+      yield put(notificationsAction.enqueue(notification));
+
     } else {
       yield put(manualsAction.postError(beforeId));
+      const notification: Notification =
+      {key: getKey(), variant: 'warning', message: 'マニュアルの作成に失敗しました'};
+      yield put(notificationsAction.enqueue(notification));
     }
   }
 }
@@ -41,8 +52,15 @@ function* handleRequestPutManual() {
     const data = yield call(API.manualPut, action.payload);
     if (data.error === undefined) {
       yield put(manualsAction.putSuccess({beforeId, manual: data}));
+      const notification: Notification =
+      {key: getKey(), variant: 'success', message: 'マニュアルを保存しました'};
+      yield put(notificationsAction.enqueue(notification));
     } else {
       yield put(manualsAction.putError(beforeId));
+      const notification: Notification =
+      {key: getKey(), variant: 'warning', message: 'マニュアルの保存に失敗しました'};
+      yield put(notificationsAction.enqueue(notification));
+
     }
   }
 }
@@ -60,9 +78,25 @@ function* handleRequestDeleteManual() {
   }
 }
 
+function* handleRequestPostFavorite() {
+  while (true) {
+    const action = yield take(ACTIONS_FAVORITE_POST);
+    const data = yield call(API.favoritePost, action.payload);
+    if (data.error === undefined) {
+      yield put(favoriteActions.postSuccess());
+    } else {
+      yield put(favoriteActions.postError());
+      const notification: Notification =
+      {key: getKey(), variant: 'warning', message: 'お気に入り登録に失敗しました'};
+      yield put(notificationsAction.enqueue(notification));
+    }
+  }
+}
+
 export function* rootSaga() {
   yield fork(handleRequestLogin);
   yield fork(handleRequestPostManual);
   yield fork(handleRequestPutManual);
   yield fork(handleRequestDeleteManual);
+  yield fork(handleRequestPostFavorite);
 }

@@ -1,10 +1,10 @@
 import {
   loginURL, LoginPostResponse,
-  manualsURL, ManualPostRequest
+  manualsURL, ManualPostRequest, FavoritePostRequestParams, favoriteURL
 } from "./definitions";
 
 import axios from "./axios";
-import { LoginInfo } from "../redux/actions/login-data/loginAction";
+import { LoginInfo } from "../redux/actions/main/loginAction";
 
 export const login = (loginInfo: LoginInfo) => axios
 .post<LoginPostResponse>(loginURL, loginInfo)
@@ -23,5 +23,10 @@ export const manualPut = (manual: ManualPostRequest) => axios
 
 export const manualDelete = (manual: ManualPostRequest) => axios
 .delete(`${manualsURL}/${manual.id}`)
+.then(res => res.data)
+.catch(error => ({ error }));
+
+export const favoritePost = (params: FavoritePostRequestParams) => axios
+.post<void>(`${favoriteURL}/${params.manualId}/${params.userId}`)
 .then(res => res.data)
 .catch(error => ({ error }));

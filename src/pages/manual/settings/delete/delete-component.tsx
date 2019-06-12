@@ -8,11 +8,11 @@ import links from '../../../../settings/links';
 
 
 interface Props extends DeleteActions, RouteComponentProps {
-  select: Manual;
+  manual: Manual;
 }
 
 const DeleteComponent: React.FC<Props> = props => {
-  const { select, manualDelete, history } = props;
+  const { manual, manualDelete, history } = props;
   const [title, setTitle] = useState('');
   function handleChangeTitle(e: React.ChangeEvent<HTMLInputElement>) {
     setTitle(e.target.value);
@@ -20,8 +20,8 @@ const DeleteComponent: React.FC<Props> = props => {
 
   const [miss, setMiss] = useState(false);
   function handleClick() {
-    if (select.title === title) {
-      manualDelete(select);
+    if (manual.title === title) {
+      manualDelete(manual);
       history.push(links.dashboard);
     } else {
       setMiss(true);
@@ -43,7 +43,7 @@ const DeleteComponent: React.FC<Props> = props => {
               placeholder="確認のためタイトルを入力"
               value={title}
               onChange={handleChangeTitle}
-              error={select.title !== title}
+              error={manual.title !== title}
               fullWidth
             />
           </Grid>

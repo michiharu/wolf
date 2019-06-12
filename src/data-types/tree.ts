@@ -37,6 +37,7 @@ export const baseTree: Tree = {
 
 export interface Manual {
   id: string;
+  beforeSaving: boolean;
   title: string;
   description: string;
   ownerId: string;
@@ -52,6 +53,7 @@ export interface Manual {
 
 export const baseManual: Manual = {
   id: '',
+  beforeSaving: false,
   title: '',
   description: '',
   ownerId: '',

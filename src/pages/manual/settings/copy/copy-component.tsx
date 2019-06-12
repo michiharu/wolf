@@ -6,7 +6,7 @@ import Util from '../../../../func/util';
 import { Close } from '@material-ui/icons';
 
 interface Props extends CopyActions {
-  select: Manual;
+  manual: Manual;
 }
 
 const Copy: React.FC<Props> = props => {
@@ -16,8 +16,8 @@ const Copy: React.FC<Props> = props => {
   }
   const [copied, setCopied] = useState(false);
   function handleClick() {
-    const { select, manualUpdate } = props;
-    manualUpdate({...select, id: Util.getID(), title: newTitle});
+    const { manual, add } = props;
+    add({...manual, id: Util.getID(), title: newTitle});
     setNewTitle('');
     setCopied(true);
   }

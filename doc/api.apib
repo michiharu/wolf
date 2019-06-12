@@ -313,50 +313,6 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
             ]
         }
 
-
-### ツリー作成API [POST]
-
-+ Parameters
-    + manualId: 123 (string, required) - manualId
-
-+ Request  (application/json)
-
-        {
-            "id": "tmp:12",
-            "label": "",
-            "type": "task",
-            "input": "",
-            "output": "",
-            "preConditions": "",
-            "postConditions": "",
-            "workerInCharge": "",
-            "remarks": "",
-            "necessaryTools": "",
-            "exceptions": "",
-            "imageName": "",
-            "imageBlob": "",
-            "children": []
-        }
-
-+ Response 200 (application/json)
-
-        {
-            "id": "1g2u3i4d",
-            "label": "",
-            "type": "task",
-            "input": "",
-            "output": "",
-            "preConditions": "",
-            "postConditions": "",
-            "workerInCharge": "",
-            "remarks": "",
-            "necessaryTools": "",
-            "exceptions": "",
-            "imageName": "",
-            "imageBlob": "",
-            "children": []
-        }
-
 ### ツリー編集API [PUT]
 
 + Parameters
@@ -443,20 +399,6 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
 + Parameters
     + manualId: 123 (string, required) - manualId
     + userId: user1234 (string, required) - userId
-
-+ Response 200 (application/json)
-
-### お気に入り編集 [PUT]
-
-+ Parameters
-    + manualId: 123 (string, required) - manualId
-    + userId: user1234 (string, required) - userId
-
-+ Request  (application/json)
-
-        {
-            "follow": true
-        }
 
 + Response 200 (application/json)
 

@@ -56,10 +56,6 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
-export interface NodeEditorProps {
-  node: TreeNode;
-}
-
 interface Props extends KSState, RSState, NodeViewerActions, WithStyles<typeof styles> {
   node: TreeNode;
 }
@@ -129,7 +125,7 @@ class NodeViewerComponent extends React.Component<Props, State> {
   }
 
   scroll = () => {
-    const { node, ks, changeNode } = this.props;
+    const { node, ks, update } = this.props;
     const scrollContainer = this.mainRef.current;
     const stage = this.stageRef.current;
     if (scrollContainer === null || stage === null) { throw  new Error('Cannot find elements.'); }
@@ -149,14 +145,14 @@ class NodeViewerComponent extends React.Component<Props, State> {
     const f = TreeNodeUtil._getFocusNode(this.kTree)!;
     if (f !== undefined) {
       if (f.point.x * ks.unit < dx || stage.width() / 2 + dx < (f.point.x + f.rect.w) * ks.unit) {
-        changeNode(TreeNodeUtil._deleteFocus(node));
+        update(TreeNodeUtil._deleteFocus(node));
       }
     }
   }
 
   expand = (target: KWithArrow, open: boolean) => {
-    const { node, changeNode } = this.props;
-    changeNode(TreeNodeUtil._open(node, target.id, open));
+    const { node, update } = this.props;
+    update(TreeNodeUtil._open(node, target.id, open));
     process.nextTick(() => this.resize());
   }
 

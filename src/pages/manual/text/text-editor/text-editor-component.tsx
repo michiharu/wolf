@@ -41,7 +41,6 @@ export interface TextEditorProps {
   manual: Manual;
   node: TreeNode;
   replaceManual: (manual: Manual) => Action<Manual>;
-  setSelect: (manual: Manual) => Action<Manual>;
   editEnd: () => Action<void>;
   buttonRef: React.RefObject<HTMLDivElement>;
 }
@@ -61,10 +60,9 @@ class TextEditor extends React.Component<Props, State> {
   }
 
   save = () => {
-    const { manual, replaceManual, setSelect, editEnd } = this.props;
+    const { manual, replaceManual, editEnd } = this.props;
     const newManual: Manual = {...manual, rootTree: this.state.node};
     replaceManual(newManual);
-    setSelect(newManual);
     editEnd();
   }
 

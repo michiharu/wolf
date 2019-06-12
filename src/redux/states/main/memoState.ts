@@ -1,5 +1,5 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
-import { memoActions } from '../../actions/login-data/memoAction';
+import { memoActions } from '../../actions/main/memoAction';
 import { KTreeNode } from '../../../data-types/tree';
 
 export interface MemoState {

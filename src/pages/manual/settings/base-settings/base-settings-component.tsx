@@ -24,16 +24,14 @@ interface Props extends BaseSettingsActions {
 }
 
 const Collaborators: React.FC<Props> = props => {
-  const { manual, categories, replace, set } =  props;
+  const { manual, categories, replace } =  props;
   const handleCategorySelect = (e: React.ChangeEvent<{ value: unknown; name?: string; }>) => {
     const newManual: Manual = {...manual, categoryId: e.target.value as string};
     replace(newManual);
-    set(newManual);
   }
   const handleSwitch = (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
     const newManual: Manual = {...manual, isPublic: checked};
     replace(newManual);
-    set(newManual);
   }
 
   const classes = useStyles();

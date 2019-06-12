@@ -62,8 +62,8 @@ export type ManualPutResponse = Manual;
 /* Favorite */
 export const favoriteURL = '/api/v1/favorites/';
 // POST(/api/v1/favorites/:manualId)
-export type FollowPostRequest = { follow: boolean };
-export type FollowPostResponse = void;
+export type FavoritePostRequestParams = { manualId: string; userId: string; };
+export type FavoritePostResponse = void;
 // DELETE(/api/v1/favorites/:manualId)
 
 /* Like */

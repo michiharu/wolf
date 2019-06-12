@@ -1,5 +1,5 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
-import { categoriesAction } from '../../actions/login-data/categoriesAction';
+import { categoriesAction } from '../../actions/main/categoriesAction';
 import Category from '../../../data-types/category';
 
 export interface CategoriesState {

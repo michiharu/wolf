@@ -4,7 +4,7 @@ import { AppState } from '../redux/store';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 import links from '../settings/links';
 import LoginContainer from './login/login-container';
-import { LoginUserState } from '../redux/states/login-data/loginUserState';
+import { LoginUserState } from '../redux/states/main/loginUserState';
 import LayoutContainer from './layout/layout-container';
 
 

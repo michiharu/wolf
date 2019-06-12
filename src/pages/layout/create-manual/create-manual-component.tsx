@@ -10,7 +10,7 @@ import { CreateManualActions } from './create-manual-container';
 import { baseManual, Manual, baseTree } from '../../../data-types/tree';
 import User from '../../../data-types/user';
 import Util from '../../../func/util';
-import { CategoriesState } from '../../../redux/states/login-data/categoriesState';
+import { CategoriesState } from '../../../redux/states/main/categoriesState';
 
 const useStyles = makeStyles((theme: Theme) => ({
   switch: {
@@ -46,7 +46,7 @@ const CreateManualComponent: React.FC<Props> = props => {
   const create = () => {
     const {user, add} = props;
     const newManual: Manual = {
-      ...baseManual, id: Util.getID(), title, categoryId, isPublic, ownerId: user.id, rootTree: baseTree
+      ...baseManual, id: Util.getID(), beforeSaving: true, title, categoryId, isPublic, ownerId: user.id, rootTree: baseTree
     };
     add(newManual);
     close();

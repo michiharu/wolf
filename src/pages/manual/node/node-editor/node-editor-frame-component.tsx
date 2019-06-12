@@ -12,11 +12,10 @@ import TreeUtil from '../../../../func/tree';
 import NodeEditorContainer from '../../node/node-editor/node-editor-container';
 import { theme } from '../../../..';
 import { NodeEditMode } from '../../../../data-types/node-edit-mode';
-import { MemoState } from '../../../../redux/states/login-data/memoState';
+import { MemoState } from '../../../../redux/states/main/memoState';
 import { EditorFrameActions } from './node-editor-frame-container';
 import ViewSettingsContainer from '../../../../components/view-settings/view-settings-container';
 import { NodeEditorProps } from './node-editor-component';
-import { SelectState } from '../../../../redux/states/select/selectState';
 
 export const styles = (theme: Theme) => createStyles({
   convergent: {
@@ -44,10 +43,11 @@ export const styles = (theme: Theme) => createStyles({
 });
 
 interface Props extends
-  SelectState,
   MemoState,
   EditorFrameActions,
   WithStyles<typeof styles> {
+    manual: Manual;
+    node: TreeNode;
     modeRef: React.RefObject<HTMLDivElement>;
     buttonRef: React.RefObject<HTMLDivElement>;
   }
@@ -105,7 +105,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 
   save = () => {
-    const { manual, replaceManual, changeMemos, setSelect, editEnd } = this.props;
+    const { manual, replaceManual, changeMemos, editEnd } = this.props;
     if (manual === null) { throw new Error('Manual cannot be null.'); }
     const {node, memos } = this.state;
     const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
@@ -118,19 +118,17 @@ class EditorFrameComponent extends React.Component<Props, State> {
       const newManual: Manual = {...manual, rootTree: node, title: node.label };
       replaceManual(newManual);
       changeMemos(memos);
-      setSelect(newManual);
       editEnd();
     }
   }
 
   saveAndGo = () => {
-    const { manual, replaceManual, changeMemos, setSelect, editEnd } = this.props;
+    const { manual, replaceManual, changeMemos, editEnd } = this.props;
     if (manual === null) { throw new Error('Manual cannot be null.'); }
     const { node, memos } = this.state;
     manual.rootTree = node;
     replaceManual(manual);
     changeMemos(memos);
-    setSelect(manual);
     editEnd();
   }
 

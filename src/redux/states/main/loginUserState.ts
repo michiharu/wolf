@@ -1,6 +1,6 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
 import User from '../../../data-types/user';
-import { loginUserAction } from '../../actions/login-data/loginUserAction';
+import { loginUserAction } from '../../actions/main/loginUserAction';
 
 export interface LoginUserState {
   user: User | null;

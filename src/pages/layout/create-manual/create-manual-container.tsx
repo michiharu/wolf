@@ -2,7 +2,7 @@ import { Action } from 'typescript-fsa';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { AppState } from '../../../redux/store';
-import { manualsAction } from '../../../redux/actions/login-data/manualsAction';
+import { manualsAction } from '../../../redux/actions/main/manualsAction';
 import { Manual } from '../../../data-types/tree';
 import CreateManualComponent from './create-manual-component';
 

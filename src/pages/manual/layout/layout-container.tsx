@@ -3,22 +3,21 @@ import { Action } from 'typescript-fsa';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { AppState } from '../../../redux/store';
-import { ManualsState } from       '../../../redux/states/login-data/manualsState';
-import { SelectState } from '../../../redux/states/select/selectState';
-import { selectActions } from '../../../redux/actions/select/selectAction';
+import { ManualsState } from       '../../../redux/states/main/manualsState';
 
 import { RouteComponentProps } from 'react-router-dom';
 import {  Manual } from '../../../data-types/tree';
 
 import LayoutComponent from './layout-component';
-import { CategoriesState } from '../../../redux/states/login-data/categoriesState';
+import { CategoriesState } from '../../../redux/states/main/categoriesState';
 import User from '../../../data-types/user';
-import { manualsAction } from '../../../redux/actions/login-data/manualsAction';
+import { manualsAction, selectActions, favoriteActions } from '../../../redux/actions/main/manualsAction';
 import { viewAction } from '../../../redux/actions/viewAction';
 import { ViewState } from '../../../redux/states/viewState';
 
 export interface ViewActions {
   replace: (manual: Manual) => Action<Manual>;
+  postFavorite: (userId: string) => Action<string>,
   set: (manual: Manual) => Action<Manual>;
   editStart: () => Action<void>;
 }
@@ -26,7 +25,6 @@ export interface ViewActions {
 interface Props extends
   ManualsState,
   CategoriesState,
-  SelectState,
   ViewState,
   ViewActions,
   RouteComponentProps<{id: string}> {
@@ -34,14 +32,15 @@ interface Props extends
   }
 
 const ViewContainer: React.FC<Props> = props => {
-  const { user, manuals, manual, isEditing, match, set, replace, editStart } =  props;
+  const { user, manuals, selectId, isEditing, match, set, replace, postFavorite, editStart } =  props;
 
-  if (manual === null || manual.id !== match.params.id) {
+  if (selectId !== match.params.id) {
     const selected = manuals.find(m => m.id === match.params.id)!;
     set(selected);
-    return <p>loading...</p>
   }
-  const componentProps = {user, manual, isEditing, replace, set, editStart};
+  const id = selectId || match.params.id;
+  const manual = manuals.find(m => m.id === id)!;
+  const componentProps = {user, manual, isEditing, replace, postFavorite, set, editStart};
   return <LayoutComponent {...componentProps}/>;
 }
 
@@ -50,15 +49,16 @@ function mapStateToProps(appState: AppState) {
     user: appState.loginUser.user!,
     ...appState.manuals,
     ...appState.categories,
-    ...appState.select,
     ...appState.view,
-    ...appState.ks};
+    ...appState.ks
+  };
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
     replace: (manual: Manual) => dispatch(manualsAction.put(manual)),
-    set: (manual: Manual) => dispatch(selectActions.set(manual)),
+    postFavorite: (userId: string) => dispatch(favoriteActions.post(userId)),
+    set: (manual: Manual) => dispatch(selectActions.select(manual)),
     editStart: () => dispatch(viewAction.editStart()),
   };
 }

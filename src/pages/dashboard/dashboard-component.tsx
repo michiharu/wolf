@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { LoginUserState } from '../../redux/states/login-data/loginUserState';
-import { ManualsState } from '../../redux/states/login-data/manualsState';
+import { LoginUserState } from '../../redux/states/main/loginUserState';
+import { ManualsState } from '../../redux/states/main/manualsState';
 import { AppState } from '../../redux/store';
 import MUIDataTable, { MUIDataTableOptions, MUIDataTableColumn } from 'mui-datatables';
 import { Star, StarBorder, ThumbUpAlt, ThumbUpAltOutlined } from '@material-ui/icons';
@@ -9,11 +9,11 @@ import { TableCell, TableSortLabel, createMuiTheme, Badge } from '@material-ui/c
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import { theme } from '../..';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import { categoriesAction } from '../../redux/actions/login-data/categoriesAction';
+import { categoriesAction } from '../../redux/actions/main/categoriesAction';
 import { Dispatch } from 'redux';
 import { Action } from 'typescript-fsa';
-import { CategoriesState } from '../../redux/states/login-data/categoriesState';
-import { UsersState } from '../../redux/states/login-data/usersState';
+import { CategoriesState } from '../../redux/states/main/categoriesState';
+import { UsersState } from '../../redux/states/main/usersState';
 
 interface Props extends
   LoginUserState,
@@ -27,12 +27,12 @@ interface Props extends
 const getMuiTheme = () => createMuiTheme({
   ...theme,
   overrides: {
-    MuiTableCell: {
-      root: {
-        padding: 8,
-        paddingTop: 10
-      }
-    },
+    // MuiTableCell: {
+    //   root: {
+    //     padding: 8,
+    //     paddingTop: 10
+    //   }
+    // },
     MuiTableSortLabel: {
       root: {
         marginRight: -10
@@ -45,6 +45,13 @@ const Dashboard: React.FC<Props> = (props: Props) => {
   const columns: MUIDataTableColumn[] = [
     {
       name: "id",
+      options: {
+        display: "false",
+        filter: false,
+      }
+    },
+    {
+      name: "beforeSaving",
       options: {
         display: "false",
         filter: false,
@@ -167,6 +174,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     const isLike = m.likeIds.find(l => l === user.id) !== undefined;
     return {
       id: m.id,
+      beforeSaving: m.beforeSaving ? 'true' : 'false',
       favoriteForColumn: {checked: isFavorite, sum: m.favoriteIds.length},
       favorite: isFavorite ? 'true' : 'false',
       likeForColumn: {checked: isLike, sum: m.likeIds.length},
@@ -187,15 +195,16 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     responsive: 'scroll',
     rowsPerPageOptions: [10,20,50],
     customSort: (d: {index: number; data: any[]}[], colIndex: number, order: string) => {
-      console.log(order)
       return d.sort(
-        (colIndex === 1 || colIndex === 3)
+        (colIndex === 2 || colIndex === 4)
           ? (a, b) => (a.data[colIndex].sum < b.data[colIndex].sum ? -1 : 1) * (order === 'asc' ? 1 : -1)
           : (a, b) => (a.data[colIndex].localeCompare(b.data[colIndex]) ? -1 : 1) * (order === 'asc' ? 1 : -1))
     },
     onRowClick: (rowData: string[], rowMeta: { dataIndex: number, rowIndex: number }) => {
-      history.push(`/manual/${rowData[0]}`);
-      filterReset();
+      if (rowData[1] === 'false') {
+        history.push(`/manual/${rowData[0]}`);
+        filterReset();
+      }
     }
   };
   return (
