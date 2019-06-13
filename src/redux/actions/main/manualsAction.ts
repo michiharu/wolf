@@ -1,5 +1,6 @@
 import actionCreatorFactory from 'typescript-fsa';
 import { Manual, TreeNode } from '../../../data-types/tree';
+import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequestParams, LikeDeleteRequestParams, TreePutRequest } from '../../../api/definitions';
 
 const actionCreator = actionCreatorFactory();
 export const ACTIONS_MANUAL_SET    = 'ACTIONS_MANUAL_SET'; // ログイン後のマニュアルセット
@@ -51,11 +52,39 @@ export const ACTIONS_FAVORITE_DELETE_SUCCESS = 'ACTIONS_FAVORITE_DELETE_SUCCESS'
 export const ACTIONS_FAVORITE_DELETE_ERROR   = 'ACTIONS_FAVORITE_DELETE_ERROR';
 
 export const favoriteActions = {
-  post: actionCreator<string>(ACTIONS_FAVORITE_POST),
-  postSuccess: actionCreator<void>(ACTIONS_FAVORITE_POST_SUCCESS),
-  postError: actionCreator<void>(ACTIONS_FAVORITE_POST_ERROR),
+  post: actionCreator<FavoritePostRequestParams>(ACTIONS_FAVORITE_POST),
+  postSuccess: actionCreator<string>(ACTIONS_FAVORITE_POST_SUCCESS),
+  postError: actionCreator<string>(ACTIONS_FAVORITE_POST_ERROR),
 
-  delete: actionCreator<string>(ACTIONS_FAVORITE_DELETE),
-  deleteSuccess: actionCreator<void>(ACTIONS_FAVORITE_DELETE_SUCCESS),
-  deleteError: actionCreator<void>(ACTIONS_FAVORITE_DELETE_ERROR),
+  delete: actionCreator<FavoriteDeleteRequestParams>(ACTIONS_FAVORITE_DELETE),
+  deleteSuccess: actionCreator<string>(ACTIONS_FAVORITE_DELETE_SUCCESS),
+  deleteError: actionCreator<string>(ACTIONS_FAVORITE_DELETE_ERROR),
+}
+
+export const ACTIONS_LIKE_POST         = 'ACTIONS_LIKE_POST';
+export const ACTIONS_LIKE_POST_SUCCESS = 'ACTIONS_LIKE_POST_SUCCESS';
+export const ACTIONS_LIKE_POST_ERROR   = 'ACTIONS_LIKE_POST_ERROR';
+
+export const ACTIONS_LIKE_DELETE         = 'ACTIONS_LIKE_DELETE';
+export const ACTIONS_LIKE_DELETE_SUCCESS = 'ACTIONS_LIKE_DELETE_SUCCESS';
+export const ACTIONS_LIKE_DELETE_ERROR   = 'ACTIONS_LIKE_DELETE_ERROR';
+
+export const likeActions = {
+  post: actionCreator<LikePostRequestParams>(ACTIONS_LIKE_POST),
+  postSuccess: actionCreator<string>(ACTIONS_LIKE_POST_SUCCESS),
+  postError: actionCreator<string>(ACTIONS_LIKE_POST_ERROR),
+
+  delete: actionCreator<LikeDeleteRequestParams>(ACTIONS_LIKE_DELETE),
+  deleteSuccess: actionCreator<string>(ACTIONS_LIKE_DELETE_SUCCESS),
+  deleteError: actionCreator<string>(ACTIONS_LIKE_DELETE_ERROR),
+}
+
+export const ACTIONS_TREE_PUT         = 'ACTIONS_TREE_PUT';
+export const ACTIONS_TREE_PUT_SUCCESS = 'ACTIONS_TREE_PUT_SUCCESS';
+export const ACTIONS_TREE_PUT_ERROR   = 'ACTIONS_TREE_PUT_ERROR';
+
+export const treeActions = {
+  put: actionCreator<TreePutRequest>(ACTIONS_TREE_PUT),
+  putSuccess: actionCreator<string>(ACTIONS_TREE_PUT_SUCCESS),
+  putError: actionCreator<string>(ACTIONS_TREE_PUT_ERROR),
 }

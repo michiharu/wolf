@@ -112,7 +112,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
             "manuals": [
                 {
                     "id": "1",
-                    "label": "営業マニュアル",
+                    "title": "営業マニュアル",
                     "ownerId": "user1234",
                     "collaboratorIds": ["user2222"],
                     "categoryId": "2",
@@ -124,7 +124,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
                 },
                 {
                     "id": "2",
-                    "label": "ソフトウェアマニュアル",
+                    "title": "ソフトウェアマニュアル",
                     "ownerId": "user1234",
                     "collaboratorIds": ["user2222"],
                     "categoryId": "3",
@@ -175,7 +175,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
 
         {
             "id": "1",
-            "label": "営業マニュアル",
+            "title": "営業マニュアル",
             "ownerId": "user1234",
             "collaboratorIds": ["user2222"],
             "categoryId": "2",
@@ -183,7 +183,40 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
             "viewerIds": [],
             "visible": true,
             "favoriteIds": [],
-            "likeIds": []
+            "likeIds": [],
+            "rootTree": {
+                "id": "1231",
+                "label": "マニュアル１",
+                "type": "task",
+                "input": "",
+                "output": "",
+                "preConditions": "",
+                "postConditions": "",
+                "workerInCharge": "",
+                "remarks": "",
+                "necessaryTools": "",
+                "exceptions": "",
+                "imageName": "",
+                "imageBlob": "",
+                "children": [
+                    {
+                        "id": "1232",
+                        "label": "マニュアル１−１",
+                        "type": "task",
+                        "input": "",
+                        "output": "",
+                        "preConditions": "",
+                        "postConditions": "",
+                        "workerInCharge": "",
+                        "remarks": "",
+                        "necessaryTools": "",
+                        "exceptions": "",
+                        "imageName": "",
+                        "imageBlob": "",
+                        "children": []
+                    }
+                ]
+            }
         }
 
 
@@ -193,7 +226,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
 
         {
             "id": "tmp:1",
-            "label": "マニュアル1",
+            "title": "マニュアル1",
             "ownerId": "user1234",
             "collaboratorIds": [],
             "category": "3",
@@ -208,7 +241,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
 
         {
             "id": "1",
-            "label": "マニュアル1",
+            "title": "マニュアル1",
             "ownerId": "user1234",
             "collaboratorIds": [],
             "categoryId": "3",
@@ -220,7 +253,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
         }
 
 ### マニュアル編集API [PUT]
-マニュアル編集APIで、実際に編集される可能性のあるプロパティーは "ownerId", "categoryId", "isPublic", "visible"の4つだけです。
+マニュアル編集APIで、実際に編集される可能性のあるプロパティーは "title", "ownerId", "categoryId", "isPublic", "visible"の4つだけです。
 配列データを持つプロパティーは別途APIを用意しているのでそこから編集されます。
 
 + Parameters
@@ -230,7 +263,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
 
         {
             "id": "1",
-            "label": "マニュアル1",
+            "title": "マニュアル1",
             "ownerId": "user1234",
             "collaboratorIds": [],
             "categoryId": "3",
@@ -245,7 +278,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
 
         {
             "id": "1",
-            "label": "マニュアル1",
+            "title": "マニュアル1",
             "ownerId": "user1234",
             "collaboratorIds": [],
             "category": "3",
@@ -269,49 +302,6 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
 レコードの削除はrootとなるマニュアルデータ以外は明示的なAPIを持たないため、
 編集時に削除されたデータがあるかどうかをチェックし、
 あれば該当レコードを削除するロジックをサーバーサイドで組む必要がある。
-
-### ツリー取得API [GET]
-リクエストパラメーターでmanualIdを渡し、
-どのマニュアルのNodeについて操作（GET, POST, PUT, DELETE）するのかをサーバーに伝える。
-
-+ Parameters
-    + manualId: 123 (string, required) - manualId
-
-+ Response 200 (application/json)
-
-        {
-            "id": "1231",
-            "label": "マニュアル１",
-            "type": "task",
-            "input": "",
-            "output": "",
-            "preConditions": "",
-            "postConditions": "",
-            "workerInCharge": "",
-            "remarks": "",
-            "necessaryTools": "",
-            "exceptions": "",
-            "imageName": "",
-            "imageBlob": "",
-            "children": [
-                {
-                    "id": "1232",
-                    "label": "マニュアル１−１",
-                    "type": "task",
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "children": []
-                }
-            ]
-        }
 
 ### ツリー編集API [PUT]
 
@@ -386,27 +376,19 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
             ]
         }
 
-### ツリー削除API [DELETE]
-+ Parameters
-    + manualId: 123 (string, required) - manualId
-
-+ Response 200 (application/json)
-
 # Group Favorite
-## お気に入り [/api/v1/favorites/{manualId}/{userId}]
+## お気に入り [/api/v1/favorites/{id}]
 ### お気に入り登録 [POST]
 
 + Parameters
-    + manualId: 123 (string, required) - manualId
-    + userId: user1234 (string, required) - userId
+    + id: 123 (string, required) - manualId
 
 + Response 200 (application/json)
 
 ### お気に入り解除 [DELETE]
 
 + Parameters
-    + manualId: 123 (string, required) - manualId
-    + userId: user1234 (string, required) - userId
+    + id: 123 (string, required) - manualId
 
 + Response 200 (application/json)
 

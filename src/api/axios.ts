@@ -1,16 +1,16 @@
 import axiosbase from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import * as env from '../settings/env.json';
-import {loginURL, usersURL, manualsURL} from './definitions';
-import postLogin from './mock-data/login/post';
-import { postUser , putUser, deleteUser } from './mock-data/users';
-import postManual from './mock-data/manual/post';
-import putManual from './mock-data/manual/put';
+import { loginURL, manualsURL, favoriteURL, likeURL } from './definitions';
+import { postLogin } from './mock-data/login';
+import { postManual, putManual, deleteManual } from './mock-data/manual';
+import { postFavorite, deleteFavorite } from './mock-data/favorite';
+import { postLike, deleteLike } from './mock-data/like';
 
 export const baseURL = 'http://localhost:51391';
 
 const mockAdapter = (() => {
-  const mock = new MockAdapter(axiosbase, { delayResponse: 2000 });
+  const mock = new MockAdapter(axiosbase, { delayResponse: 1000 });
   // login
   mock.onPost(loginURL).reply(postLogin);
 
@@ -18,18 +18,20 @@ const mockAdapter = (() => {
   mock.onPost(manualsURL).reply(postManual);
   const regexManualsURL = new RegExp(`${manualsURL}/*`);
   mock.onPut(regexManualsURL).reply(putManual);
+  mock.onDelete(regexManualsURL).reply(deleteManual);
 
-  // Tree
+  // favorite
+  const regexFavoriteURL= new RegExp(`${favoriteURL}/*`);
+  mock.onPost(regexFavoriteURL).reply(postFavorite);
+  mock.onDelete(regexFavoriteURL).reply(deleteFavorite);
 
-  mock.onPost(usersURL).reply(postUser);
-  const regexUsersURL = new RegExp(`${usersURL}/*`);
-  mock.onPut(regexUsersURL).reply(putUser);
-  mock.onDelete(regexUsersURL).reply(deleteUser);
+  // like
+  const regexLikeURL= new RegExp(`${likeURL}/*`);
+  mock.onPost(regexLikeURL).reply(postLike);
+  mock.onDelete(regexLikeURL).reply(deleteLike);
 
-  // URLに正規表現も使える↓↓
-  // const regexOrg = new RegExp(`${url.organizations}/*`);
-  // mock.onPut   (regexOrg).reply(putOrganization);
-  // mock.onDelete(regexOrg).reply(deleteOrganization);
+  // tree
+  
 
   return axiosbase;
 })();

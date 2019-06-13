@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   wrapper: {
     marginTop: theme.spacing(3),
     position: 'relative',
+    width: '100%'
   },
   buttonProgress: {
     color: green[500],

@@ -1,8 +1,8 @@
-import * as React from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {
   makeStyles, Theme, Typography,
-  Box, FormControlLabel, Switch, FormControl, Select, MenuItem,
+  Box, FormControlLabel, Switch, FormControl, Select, MenuItem, TextField, Button,
 } from '@material-ui/core';
 import { Manual } from '../../../../data-types/tree';
 import { BaseSettingsActions } from './base-settings-container';
@@ -13,7 +13,8 @@ const useStyles = makeStyles((theme: Theme) => ({
   root: {
 
   },
-  container: { padding: theme.spacing(2) },
+  title: { width: 'calc(100% - 64px)' },
+
   chip: { margin: theme.spacing(1) },
   switch: { width: 200 },
 }));
@@ -25,6 +26,19 @@ interface Props extends BaseSettingsActions {
 
 const Collaborators: React.FC<Props> = props => {
   const { manual, categories, replace } =  props;
+  const [isEditing, setIsEditing] = useState(false);
+  function handleClickEdit() {
+    if (isEditing) {
+      const newManual: Manual = {...manual, title};
+      replace(newManual);
+    }
+    setIsEditing(!isEditing);
+  }
+  const [title, setTitle] = useState(manual.title);
+  const handleChangeTitle: React.ChangeEventHandler<HTMLInputElement> = e => {
+    setTitle(e.target.value);
+  }
+
   const handleCategorySelect = (e: React.ChangeEvent<{ value: unknown; name?: string; }>) => {
     const newManual: Manual = {...manual, categoryId: e.target.value as string};
     replace(newManual);
@@ -34,6 +48,10 @@ const Collaborators: React.FC<Props> = props => {
     replace(newManual);
   }
 
+  useEffect(() => {
+    setTitle(manual.title);
+  }, [manual.title]);
+
   const classes = useStyles();
   return (
     <div className={classes.root}>
@@ -41,9 +59,21 @@ const Collaborators: React.FC<Props> = props => {
         <Typography variant="h5">マニュアルの基本設定</Typography>
       </Box>
       <Box p={2} maxWidth={maxWidth}>
+        <Typography variant="caption">マニュアル名称</Typography>
+        <Box>
+          <TextField
+            className={classes.title}
+            value={title}
+            onChange={handleChangeTitle}
+            disabled={!isEditing}
+          />
+          <Button onClick={handleClickEdit}>変更</Button>
+        </Box>
+      </Box>
+      <Box p={2} maxWidth={maxWidth}>
         <Typography variant="caption">カテゴリー</Typography>
         <FormControl fullWidth>
-          <Select value={manual.id} onChange={handleCategorySelect}>
+          <Select value={manual.categoryId} onChange={handleCategorySelect}>
             {categories.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
           </Select>
         </FormControl>

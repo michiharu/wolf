@@ -16,6 +16,7 @@ import { MemoState } from '../../../../redux/states/main/memoState';
 import { EditorFrameActions } from './node-editor-frame-container';
 import ViewSettingsContainer from '../../../../components/view-settings/view-settings-container';
 import { NodeEditorProps } from './node-editor-component';
+import { TreePutRequest } from '../../../../api/definitions';
 
 export const styles = (theme: Theme) => createStyles({
   convergent: {
@@ -72,7 +73,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
     const { node, memos } = props;
     if (node === null) { throw new Error('Node cannot be null.'); }
     this.state = {
-      mode: 'dc',
+      mode: 'c',
       node,
       memos,
       hasDifference: false,
@@ -105,7 +106,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 
   save = () => {
-    const { manual, replaceManual, changeMemos, editEnd } = this.props;
+    const { manual, putTree, changeMemos, editEnd } = this.props;
     if (manual === null) { throw new Error('Manual cannot be null.'); }
     const {node, memos } = this.state;
     const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
@@ -115,19 +116,19 @@ class EditorFrameComponent extends React.Component<Props, State> {
     this.setState({cannotSaveReason});
     if (cannotSaveReason === null) {
       this.setState({saved: true});
-      const newManual: Manual = {...manual, rootTree: node, title: node.label };
-      replaceManual(newManual);
+      const params: TreePutRequest = {manualId: manual.id, rootTree: node };
+      putTree(params);
       changeMemos(memos);
       editEnd();
     }
   }
 
   saveAndGo = () => {
-    const { manual, replaceManual, changeMemos, editEnd } = this.props;
+    const { manual, putTree, changeMemos, editEnd } = this.props;
     if (manual === null) { throw new Error('Manual cannot be null.'); }
     const { node, memos } = this.state;
-    manual.rootTree = node;
-    replaceManual(manual);
+    const params: TreePutRequest = {manualId: manual.id, rootTree: node };
+    putTree(params);
     changeMemos(memos);
     editEnd();
   }

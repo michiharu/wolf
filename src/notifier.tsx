@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { connect } from 'react-redux';
 import { useSnackbar } from 'notistack';
 import { NotificationsState } from './redux/states/notificationsState';
@@ -15,14 +15,19 @@ interface Props extends NotificationsState {
 
 const Notifier: React.FC<Props> = ({queue, display, remove}) => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-  if (queue) {
-    enqueueSnackbar(queue.message, {
-      variant: queue.variant,
-      action: closeSnackbarButton(closeSnackbar),
-      onExited: () => remove(queue.key)
-    });
-    display()
-  }
+
+  useEffect(() => {
+    if (queue) {
+      enqueueSnackbar(queue.message, {
+        variant: queue.variant,
+        action: closeSnackbarButton(closeSnackbar),
+        onExited: () => remove(queue.key)
+      });
+      display()
+    }
+    return;
+  });
+  
   return <></>;
 }
 

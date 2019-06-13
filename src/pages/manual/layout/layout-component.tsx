@@ -16,6 +16,7 @@ import { Action } from 'typescript-fsa';
 import NodeEditorContainer from '../node/node-editor/node-editor-frame-container';
 import { drawerWidth } from '../../layout/layout-component';
 import TextEditorContainer from '../text/text-editor/text-editor-container';
+import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequestParams, LikeDeleteRequestParams } from '../../../api/definitions';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -48,7 +49,10 @@ interface Props {
   manual: Manual;
   isEditing: boolean;
   replace: (manual: Manual) => Action<Manual>;
-  postFavorite: (userId: string) => Action<string>,
+  postFavorite: (params: FavoritePostRequestParams) => Action<FavoritePostRequestParams>,
+  deleteFavorite: (params: FavoriteDeleteRequestParams) => Action<FavoriteDeleteRequestParams>,
+  postLike: (params: LikePostRequestParams) => Action<LikePostRequestParams>,
+  deleteLike: (params: LikeDeleteRequestParams) => Action<LikeDeleteRequestParams>,
   editStart: () => Action<void>;
 }
 
@@ -68,23 +72,18 @@ const LayoutComponent: React.FC<Props> = props => {
   const isCommiter = manual.ownerId === user.id || manual.collaboratorIds.find(cid => cid === user.id) !== undefined;
   const isFavorite = manual.favoriteIds.find(fid => fid === user.id) !== undefined;
   const isLike = manual.likeIds.find(lid => lid === user.id) !== undefined;
-  const updateManual = (manual: Manual) => {
-    props.replace(manual);
-  }
+
   function uncheckFavorite() {
-    const newManual: Manual = {...manual, favoriteIds: manual.favoriteIds.filter(fid => fid !== user.id)};
-    updateManual(newManual);
+    props.deleteFavorite({manualId: manual.id, userId: user.id});    
   }
   function uncheckLike() {
-    const newManual: Manual = {...manual, likeIds: manual.likeIds.filter(lid => lid !== user.id)};
-    updateManual(newManual);
+    props.deleteLike({manualId: manual.id, userId: user.id});
   }
   function checkFavorite() {
-    props.postFavorite(user.id);
+    props.postFavorite({manualId: manual.id, userId: user.id});
   }
   function checkLike() {
-    const newManual: Manual = {...manual, likeIds: manual.likeIds.concat([user.id])};
-    updateManual(newManual);
+    props.postLike({manualId: manual.id, userId: user.id});
   }
 
   function onClickEditStart() { props.editStart(); }

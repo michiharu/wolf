@@ -1,6 +1,6 @@
 import {
   loginURL, LoginPostResponse,
-  manualsURL, ManualPostRequest, FavoritePostRequestParams, favoriteURL
+  manualsURL, ManualPostRequest, FavoritePostRequestParams, favoriteURL, FavoriteDeleteRequestParams, likeURL, LikePostRequestParams, LikeDeleteRequestParams, TreePutRequest
 } from "./definitions";
 
 import axios from "./axios";
@@ -27,6 +27,26 @@ export const manualDelete = (manual: ManualPostRequest) => axios
 .catch(error => ({ error }));
 
 export const favoritePost = (params: FavoritePostRequestParams) => axios
-.post<void>(`${favoriteURL}/${params.manualId}/${params.userId}`)
+.post<void>(`${favoriteURL}/${params.manualId}`)
+.then(res => res.data)
+.catch(error => ({ error }));
+
+export const favoriteDelete = (params: FavoriteDeleteRequestParams) => axios
+.delete(`${favoriteURL}/${params.manualId}`)
+.then(res => res.data)
+.catch(error => ({ error }));
+
+export const likePost = (params: LikePostRequestParams) => axios
+.post<void>(`${likeURL}/${params.manualId}`)
+.then(res => res.data)
+.catch(error => ({ error }));
+
+export const likeDelete = (params: LikeDeleteRequestParams) => axios
+.delete(`${likeURL}/${params.manualId}`)
+.then(res => res.data)
+.catch(error => ({ error }));
+
+export const treePut = ({manualId, rootTree}: TreePutRequest) => axios
+.put<ManualPostRequest>(`${manualsURL}/${manualId}`, rootTree)
 .then(res => res.data)
 .catch(error => ({ error }));

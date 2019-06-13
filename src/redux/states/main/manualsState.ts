@@ -1,6 +1,6 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
-import { manualsAction, selectActions, favoriteActions } from '../../actions/main/manualsAction';
-import { Manual, TreeNode, Tree, baseTreeNode } from '../../../data-types/tree';
+import { manualsAction, selectActions, favoriteActions, likeActions, treeActions } from '../../actions/main/manualsAction';
+import { Manual, TreeNode, Tree, baseTreeNode, baseTree } from '../../../data-types/tree';
 import cloneDeep from 'lodash/cloneDeep';
 import TreeNodeUtil from '../../../func/tree-node';
 import TreeUtil from '../../../func/tree';
@@ -10,7 +10,9 @@ export interface ManualsState {
   selectId: string | null;
   selectNode: TreeNode | null;
   manualBeforeSaving: Manual[];
-  favoriteBeforeSaving: string | null;
+  favoriteBeforeSaving: { manualId: string; userId: string; }[];
+  likeBeforeSaving: { manualId: string; userId: string; }[];
+  treeBeforeSaving: { manualId: string; tree: TreeNode | null; }[];
 }
 
 const initialState: ManualsState = {
@@ -18,7 +20,9 @@ const initialState: ManualsState = {
   selectId: null,
   selectNode: null,
   manualBeforeSaving: [],
-  favoriteBeforeSaving: null,
+  favoriteBeforeSaving: [],
+  likeBeforeSaving: [],
+  treeBeforeSaving: [],
 };
 
 export const manualsReducer = reducerWithInitialState(initialState)
@@ -132,7 +136,8 @@ export const manualsReducer = reducerWithInitialState(initialState)
 // SELECT
 .case(selectActions.select, (state, manual) => {
   const cloneManual = cloneDeep(manual);
-  const selectNode = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneManual.rootTree!, baseTreeNode));
+  const rootTree = cloneManual.rootTree ? cloneManual.rootTree : {...baseTree};
+  const selectNode = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(rootTree, baseTreeNode));
   selectNode.label = cloneManual.title;
   return ({...state, selectId: manual.id, selectNode});
 })
@@ -142,74 +147,190 @@ export const manualsReducer = reducerWithInitialState(initialState)
 // POST FAVORITE
 .case(
   favoriteActions.post,
-  (state, userId) => {
-    const { manuals, selectId } = state;
+  (state, {manualId, userId}) => {
+    const { manuals, favoriteBeforeSaving } = state;
     const newManuals = manuals.map(m => {
-      if (m.id === selectId) { m.favoriteIds.push(userId); }
+      if (m.id === manualId) { m.favoriteIds.push(userId); }
       return m;
     });
     return ({
       ...state,
       manuals: newManuals,
-      favoriteBeforeSaving: userId
+      favoriteBeforeSaving: favoriteBeforeSaving.concat([{manualId, userId}]),
     });
   }
 )
 .case(
   favoriteActions.postSuccess,
-  (state) => {
-    return ({...state, favoriteBeforeSaving: null});
+  (state, manualId) => {
+    const { favoriteBeforeSaving: before } = state;
+    const favoriteBeforeSaving = before.filter(b => b.manualId !== manualId);
+    return ({...state, favoriteBeforeSaving});
   }
 )
 .case(
   favoriteActions.postError,
-  (state) => {
-    const { manuals, selectId, favoriteBeforeSaving: userId } = state;
+  (state, manualId) => {
+    const { manuals, favoriteBeforeSaving: before } = state;
+    const {userId} = before.find(b => b.manualId === manualId)!;
     const newManuals = manuals.map(m => {
-      if (m.id === selectId) { m.favoriteIds = m.favoriteIds.filter(fid => fid !== userId); }
+      if (m.id === manualId) { m.favoriteIds = m.favoriteIds.filter(fid => fid !== userId); }
       return m;
     });
-    return ({
-      ...state,
-      manuals: newManuals,
-      favoriteBeforeSaving: null
-    });
+    const favoriteBeforeSaving = before.filter(b => b.manualId !== manualId);
+    return ({...state, manuals: newManuals, favoriteBeforeSaving});
   }
 )
 // DELETE FAVORITE
 .case(
   favoriteActions.delete,
-  (state, userId) => {
-    const { manuals, selectId } = state;
+  (state, {manualId, userId}) => {
+    const { manuals, favoriteBeforeSaving } = state;
     const newManuals = manuals.map(m => {
-      if (m.id === selectId) { m.favoriteIds = m.favoriteIds.filter(fid => fid !== userId); }
+      if (m.id === manualId) { m.favoriteIds = m.favoriteIds.filter(fid => fid !== userId); }
       return m;
     });
     return ({
       ...state,
       manuals: newManuals,
-      favoriteBeforeSaving: userId
+      favoriteBeforeSaving: favoriteBeforeSaving.concat([{manualId, userId}])
     });
   }
 )
 .case(
   favoriteActions.postSuccess,
-  (state) => {
-    return ({...state, favoriteBeforeSaving: null});
+  (state, manualId) => {
+    const { favoriteBeforeSaving: before } = state;
+    const favoriteBeforeSaving = before.filter(b => b.manualId !== manualId);
+    return ({...state, favoriteBeforeSaving});
   }
 )
 .case(
   favoriteActions.deleteError,
-  (state) => {
-    const { manuals, selectId, favoriteBeforeSaving: userId } = state;
+  (state, manualId) => {
+    const { manuals, favoriteBeforeSaving: before } = state;
+    const {userId} = before.find(b => b.manualId === manualId)!;
     const newManuals = manuals.map(m => {
-      if (m.id === selectId) { m.favoriteIds.push(userId!); }
+      if (m.id === manualId) { m.favoriteIds.push(userId!); }
+      return m;
+    });
+    const favoriteBeforeSaving = before.filter(b => b.manualId !== manualId);
+    return ({...state, manuals: newManuals, favoriteBeforeSaving});
+  }
+)
+// POST LIKE
+.case(
+  likeActions.post,
+  (state, {manualId, userId}) => {
+    const { manuals, likeBeforeSaving } = state;
+    const newManuals = manuals.map(m => {
+      if (m.id === manualId) { m.likeIds.push(userId); }
       return m;
     });
     return ({
       ...state,
       manuals: newManuals,
-      favoriteBeforeSaving: null
+      likeBeforeSaving: likeBeforeSaving.concat([{manualId, userId}]),
     });
+  }
+)
+.case(
+  likeActions.postSuccess,
+  (state, manualId) => {
+    const { likeBeforeSaving: before } = state;
+    const likeBeforeSaving = before.filter(b => b.manualId !== manualId);
+    return ({...state, likeBeforeSaving});
+  }
+)
+.case(
+  likeActions.postError,
+  (state, manualId) => {
+    const { manuals, likeBeforeSaving: before } = state;
+    const {userId} = before.find(b => b.manualId === manualId)!;
+    const newManuals = manuals.map(m => {
+      if (m.id === manualId) { m.likeIds = m.likeIds.filter(fid => fid !== userId); }
+      return m;
+    });
+    const likeBeforeSaving = before.filter(b => b.manualId !== manualId);
+    return ({...state, manuals: newManuals, likeBeforeSaving});
+  }
+)
+// DELETE LIKE
+.case(
+  likeActions.delete,
+  (state, {manualId, userId}) => {
+    const { manuals, likeBeforeSaving } = state;
+    const newManuals = manuals.map(m => {
+      if (m.id === manualId) { m.likeIds = m.likeIds.filter(fid => fid !== userId); }
+      return m;
+    });
+    return ({
+      ...state,
+      manuals: newManuals,
+      likeBeforeSaving: likeBeforeSaving.concat([{manualId, userId}])
+    });
+  }
+)
+.case(
+  likeActions.postSuccess,
+  (state, manualId) => {
+    const { likeBeforeSaving: before } = state;
+    const likeBeforeSaving = before.filter(b => b.manualId !== manualId);
+    return ({...state, likeBeforeSaving});
+  }
+)
+.case(
+  likeActions.deleteError,
+  (state, manualId) => {
+    const { manuals, likeBeforeSaving: before } = state;
+    const {userId} = before.find(b => b.manualId === manualId)!;
+    const newManuals = manuals.map(m => {
+      if (m.id === manualId) { m.likeIds.push(userId!); }
+      return m;
+    });
+    const likeBeforeSaving = before.filter(b => b.manualId !== manualId);
+    return ({...state, manuals: newManuals, likeBeforeSaving});
+  }
+)
+// PUT TREE
+.case(
+  treeActions.put,
+  (state, {manualId, rootTree}) => {
+    const cloneTree = cloneDeep(rootTree);
+    const { manuals, selectNode: before, treeBeforeSaving } = state;
+    const newManuals = manuals.map(m => {
+      if (m.id === manualId) {
+        m.rootTree = cloneTree
+      }
+      return m;
+    });
+    const selectNode = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneTree, baseTreeNode));
+    return ({
+      ...state,
+      manuals: newManuals,
+      selectNode,
+      treeBeforeSaving: treeBeforeSaving.concat([{manualId, tree: before}]),
+    });
+  }
+)
+.case(
+  treeActions.putSuccess,
+  (state, manualId) => {
+    const { treeBeforeSaving: before } = state;
+    const treeBeforeSaving = before.filter(b => b.manualId !== manualId);
+    return ({...state, treeBeforeSaving});
+  }
+)
+.case(
+  treeActions.putError,
+  (state, manualId) => {
+    const { manuals, treeBeforeSaving: before } = state;
+    const {tree} = before.find(b => b.manualId === manualId)!;
+    const newManuals = manuals.map(m => {
+      if (m.id === manualId) { m.rootTree = tree; }
+      return m;
+    });
+    const treeBeforeSaving = before.filter(b => b.manualId !== manualId);
+    return ({...state, manuals: newManuals, selectNode: tree, treeBeforeSaving});
   }
 )

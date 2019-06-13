@@ -245,8 +245,10 @@ class NodeEditorComponent extends React.Component<Props, State> {
       this.setState({labelFocus: false});
       process.nextTick(() => this.resize());
     } else {
-      this.setState({labelFocus: true});
-      process.nextTick(() => this.labelRef.current!.focus());
+      if (target.depth.top !== 0) {
+        this.setState({labelFocus: true});
+        process.nextTick(() => this.labelRef.current!.focus());
+      }
     }
   }
 
@@ -676,7 +678,12 @@ class NodeEditorComponent extends React.Component<Props, State> {
         };
         TypeButton = (
           <div>
-            <IconButton style={buttonStyle} onClick={e => this.setState({typeAnchorEl: e.currentTarget})} disableRipple>
+            <IconButton
+              style={buttonStyle}
+              onClick={e => this.setState({typeAnchorEl: e.currentTarget})}
+              disableRipple
+              disabled={focusNode.depth.top === 0}
+            >
               {focusNode.type === 'task' ? <Task/> : focusNode.type === 'switch' ? <Switch style={{transform: 'scale(1, -1)'}}/> : <Case/>}
             </IconButton>
             <Menu

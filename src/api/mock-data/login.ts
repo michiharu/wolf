@@ -1,10 +1,10 @@
 import { AxiosRequestConfig } from 'axios';
-import { LoginPostResponse } from '../../definitions';
-import { user1, user2, user3, user4 } from '../common-data/users';
-import { manual1, manual2, manual3, manual11 } from '../common-data/manuals';
-import { category1, category2, category3 } from '../common-data/categories';
+import { LoginPostResponse } from '../definitions';
+import { user1, user2, user3, user4 } from './common-data/users';
+import { manual1, manual2, manual3, manual11 } from './common-data/manuals';
+import { category1, category2, category3 } from './common-data/categories';
 
-const postLogin = (config: AxiosRequestConfig) => {
+export const postLogin = (config: AxiosRequestConfig) => {
   const { method, url, data: requestJson } = config;
   const req = JSON.parse(requestJson);
 
@@ -40,5 +40,3 @@ const postLogin = (config: AxiosRequestConfig) => {
   console.log(method, url, req, data);
   return [200, data]
 };
-
-export default postLogin;

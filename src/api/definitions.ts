@@ -4,7 +4,7 @@
  * そのためフロントからサーバーに送られるIDの値については無視すること。
  */
 import User from "../data-types/user";
-import { KTreeNode, Manual } from "../data-types/tree";
+import { Manual, Tree, KTreeNode } from "../data-types/tree";
 import Category from "../data-types/category";
 
 /* Login */
@@ -58,17 +58,32 @@ export type ManualPostResponse = Manual;
 export type ManualPutRequest = Manual;
 export type ManualPutResponse = Manual;
 // DELETE
+export type ManualDeleteResponse = {};
+
+/* Tree */
+export const treeURL = '/api/v1/tree';
+// PUT(/api/v1/tree/:manualId)
+export type TreePutRequest = { manualId: string; rootTree: Tree; };
+export type TreePutResponse = Tree;
 
 /* Favorite */
-export const favoriteURL = '/api/v1/favorites/';
+export const favoriteURL = '/api/v1/favorites';
 // POST(/api/v1/favorites/:manualId)
 export type FavoritePostRequestParams = { manualId: string; userId: string; };
-export type FavoritePostResponse = void;
+export type FavoritePostRequest = void;
+export type FavoritePostResponse = {};
 // DELETE(/api/v1/favorites/:manualId)
+export type FavoriteDeleteRequestParams = { manualId: string; userId: string; };
+export type FavoriteDeleteRequest = void;
+export type FavoriteDeleteResponse = {};
 
 /* Like */
-export const likeURL = '/api/v1/likes/';
+export const likeURL = '/api/v1/likes';
 // POST(/api/v1/likes/:manualId)
-export type StarPostRequest = void;
-export type StarPostResponse = void;
+export type LikePostRequestParams = { manualId: string; userId: string; };
+export type LikePostRequest = void;
+export type LikePostResponse = {};
 // DELETE(/api/v1/likes/:manualId)
+export type LikeDeleteRequestParams = { manualId: string; userId: string; };
+export type LikeDeleteRequest = void;
+export type LikeDeleteResponse = {};
