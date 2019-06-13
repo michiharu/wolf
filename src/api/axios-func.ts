@@ -4,7 +4,7 @@ import {
 } from "./definitions";
 
 import axios from "./axios";
-import { LoginInfo } from "../redux/actions/main/loginAction";
+import { LoginInfo } from "../redux/actions/loginAction";
 
 export const login = (loginInfo: LoginInfo) => axios
 .post<LoginPostResponse>(loginURL, loginInfo)

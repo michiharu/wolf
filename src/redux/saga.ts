@@ -1,18 +1,21 @@
 import { put, call, fork, take } from 'redux-saga/effects';
 import { Notification } from './states/notificationsState';
 import * as API from '../api/axios-func';
-import { ACTIONS_LOGIN } from './actions/main/loginAction';
+import { ACTIONS_LOGIN } from './actions/loginAction';
 import { loginUserAction } from './actions/main/loginUserAction';
 import { LoginPostResponse } from '../api/definitions';
 import { manualsAction, ACTIONS_MANUAL_POST, ACTIONS_MANUAL_PUT, ACTIONS_MANUAL_DELETE, ACTIONS_FAVORITE_POST, favoriteActions, } from './actions/main/manualsAction';
 import { usersAction } from './actions/main/usersAction';
 import { categoriesAction } from './actions/main/categoriesAction';
 import { notificationsAction } from './actions/notificationsAction';
+import { loadingActions } from './actions/loadingAction';
 
 function* handleRequestLogin() {
   while (true) {
     const action = yield take(ACTIONS_LOGIN);
+    yield put(loadingActions.beginLogin());
     const data = yield call(API.login, action.payload);
+    yield put(loadingActions.endLogin());
     if (data.error === undefined) {
       const { user, users, manuals, categories } = data as LoginPostResponse;
       yield put(loginUserAction.set(user));

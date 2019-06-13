@@ -10,8 +10,10 @@ import { CategoriesState, categoriesReducer } from './states/main/categoriesStat
 import { UsersState, usersReducer } from './states/main/usersState';
 import { ViewState, viewReducer } from './states/viewState';
 import { NotificationsState, notificationsReducer } from './states/notificationsState';
+import { LoadingState, loadingReducer } from './states/loadingState';
 
 export type AppState = {
+  loading: LoadingState;
   loginUser: LoginUserState;
   users: UsersState;
   manuals: ManualsState;
@@ -28,6 +30,7 @@ const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ||
 
 const store = createStore(
   combineReducers<AppState>({
+    loading: loadingReducer,
     loginUser: loginUserReducer,
     users: usersReducer,
     manuals: manualsReducer,
