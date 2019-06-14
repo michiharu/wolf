@@ -53,8 +53,8 @@ interface Props extends LoginActions {
 }
 
 const LoginComponent: React.FC<Props> = ({loading, login}) => {
-  const [id, setId] = useState('1');
-  const [password, setPassword] = useState('1');
+  const [id, setId] = useState('a');
+  const [password, setPassword] = useState('password');
   const [showPassword, setShowPassword] = useState(false);
   const handleChangeId = (e: any) => setId(e.target.value);
   const handleChangePassword = (e: any) => setPassword(e.target.value);
