@@ -8,7 +8,7 @@ import { postFavorite, deleteFavorite } from './mock-data/favorite';
 import { postLike, deleteLike } from './mock-data/like';
 import { putTree } from './mock-data/tree';
 
-export const baseURL = 'http://localhost:51391';
+export const baseURL = 'http://localhost:55616';
 
 const mockAdapter = () => {
   const mock = new MockAdapter(axiosbase, { delayResponse: 1000 });
