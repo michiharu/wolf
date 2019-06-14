@@ -10,20 +10,26 @@ import closeSnackbarButton from './components/notistack';
 
 interface Props extends NotificationsState {
   display: () => Action<void>;
+  dismiss: () => Action<void>;
   remove: (key: number) => Action<number>;
 }
 
-const Notifier: React.FC<Props> = ({queue, display, remove}) => {
+const Notifier: React.FC<Props> = ({enqueue, display, dequeue, dismiss, remove}) => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 
   useEffect(() => {
-    if (queue) {
-      enqueueSnackbar(queue.message, {
-        variant: queue.variant,
+    if (enqueue) {
+      enqueueSnackbar(enqueue.message, {
+        key: enqueue.key,
+        variant: enqueue.variant,
         action: closeSnackbarButton(closeSnackbar),
-        onExited: () => remove(queue.key)
+        onExited: () => remove(enqueue.key)
       });
       display()
+    }
+    if (dequeue) {
+      closeSnackbar(dequeue.key);
+      dismiss();
     }
     return;
   });
@@ -38,6 +44,7 @@ function mapStateToProps(appState: AppState) {
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
     display: () => dispatch(notificationsAction.display()),
+    dismiss: () => dispatch(notificationsAction.dismiss()),
     remove: (key: number) => dispatch(notificationsAction.remove(key)),
   };
 }

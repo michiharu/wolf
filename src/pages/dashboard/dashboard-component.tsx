@@ -5,7 +5,7 @@ import { ManualsState } from '../../redux/states/main/manualsState';
 import { AppState } from '../../redux/store';
 import MUIDataTable, { MUIDataTableOptions, MUIDataTableColumn } from 'mui-datatables';
 import { Star, StarBorder, ThumbUpAlt, ThumbUpAltOutlined } from '@material-ui/icons';
-import { TableCell, TableSortLabel, createMuiTheme, Badge } from '@material-ui/core';
+import { TableCell, TableSortLabel, createMuiTheme, Typography } from '@material-ui/core';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import { theme } from '../..';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
@@ -27,12 +27,12 @@ interface Props extends
 const getMuiTheme = () => createMuiTheme({
   ...theme,
   overrides: {
-    // MuiTableCell: {
-    //   root: {
-    //     padding: 8,
-    //     paddingTop: 10
-    //   }
-    // },
+    MuiTableCell: {
+      root: {
+        paddingLeft: 8,
+        paddingRight: 8
+      }
+    },
     MuiTableSortLabel: {
       root: {
         marginRight: -10
@@ -58,65 +58,57 @@ const Dashboard: React.FC<Props> = (props: Props) => {
       }
     },
     {
-      name: "favoriteForColumn",
-      options: {
-        filter: false,
-        sort: true,
-        customHeadRender: (o, updateDirection) =>
-        <TableCell
-          align="left"
-          sortDirection={o.sortDirection}
-          onClick={() =>  updateDirection(o.index)}
-        >
-          <TableSortLabel
-            active={o.sortDirection !== null}
-            direction={o.sortDirection || "asc"}
-          >
-            {o.sortDirection !== null ? <Star/> : <StarBorder/>}
-          </TableSortLabel>
-        </TableCell>,
-        customBodyRender: (value, tableMeta, updateValue) => 
-        <Badge color="primary" badgeContent={value.sum}>
-          {value.checked ? <Star/> : <StarBorder/>}
-        </Badge>
-      }
-    },
-    {
       name: "favorite",
+      label: " ",
       options: {
-        display: "false",
         filter: true,
+        sort: false,
+        customBodyRender: value => value === 'true' ? <Star/> : <StarBorder/>
       }
     },
     {
-      name: "likeForColumn",
+      name: "favoriteSum",
+      
       options: {
         filter: false,
         sort: true,
-        customHeadRender: (o, updateDirection) =>
-        <TableCell
-          align="left"
-          sortDirection={o.sortDirection}
-          onClick={() =>  updateDirection(o.index)}
-        >
+        customHeadRender: (o, update) =>
+        <TableCell sortDirection={o.sortDirection} onClick={() => update(o.index)}>
           <TableSortLabel
+            style={{transform: 'translateX(-34px)', zIndex: 2000}}
             active={o.sortDirection !== null}
             direction={o.sortDirection || "asc"}
           >
-            {o.sortDirection !== null ? <ThumbUpAlt/> : <ThumbUpAltOutlined/>}
+            <StarBorder/>
           </TableSortLabel>
         </TableCell>,
-        customBodyRender: (value, tableMeta, updateValue) =>
-        <Badge color="primary" badgeContent={value.sum}>
-          {value.checked ? <ThumbUpAlt/> : <ThumbUpAltOutlined/>}
-        </Badge>
       }
     },
     {
       name: "like",
+      label: " ",
       options: {
-        display: "false",
         filter: true,
+        sort: false,
+        customBodyRender: value => value === 'true' ? <ThumbUpAlt/> : <ThumbUpAltOutlined/>
+      }
+    },
+    {
+      name: "likeSum",
+      label: "-",
+      options: {
+        filter: false,
+        sort: true,
+        customHeadRender: (o, update) =>
+        <TableCell sortDirection={o.sortDirection} onClick={() => update(o.index)}>
+          <TableSortLabel
+            style={{transform: 'translateX(-34px)', zIndex: 2000}}
+            active={o.sortDirection !== null}
+            direction={o.sortDirection || "asc"}
+          >
+            <ThumbUpAltOutlined/>
+          </TableSortLabel>
+        </TableCell>,
       }
     },
     {
@@ -133,6 +125,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
       options: {
         filter: false,
         sort: false,
+        customBodyRender: value => <Typography style={{width: 'calc(40vw - 100px)'}} noWrap>{value}</Typography>
       }
     },
     {
@@ -147,16 +140,11 @@ const Dashboard: React.FC<Props> = (props: Props) => {
 
   interface CellData {
     id: string;
-    favoriteForColumn: {
-        checked: boolean;
-        sum: number;
-    };
+    beforeSaving: string;
     favorite: string;
-    likeForColumn: {
-      checked: boolean;
-      sum: number;
-    };
+    favoriteSum: string;
     like: string;
+    likeSum: string;
     title: string;
     description: string;
     owner: string;
@@ -175,10 +163,10 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     return {
       id: m.id,
       beforeSaving: m.beforeSaving ? 'true' : 'false',
-      favoriteForColumn: {checked: isFavorite, sum: m.favoriteIds.length},
       favorite: isFavorite ? 'true' : 'false',
-      likeForColumn: {checked: isLike, sum: m.likeIds.length},
+      favoriteSum: String(m.favoriteIds.length),
       like: isLike ? 'true' : 'false',
+      likeSum: String(m.likeIds.length),
       title: m.title,
       description: m.description,
       owner: `${owner.lastName} ${owner.firstName}`,
@@ -191,15 +179,10 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     download: false,
     sortFilterList: false,
     selectableRows: false,
+    viewColumns: false,
     elevation: 0,
     responsive: 'scroll',
     rowsPerPageOptions: [10,20,50],
-    customSort: (d: {index: number; data: any[]}[], colIndex: number, order: string) => {
-      return d.sort(
-        (colIndex === 2 || colIndex === 4)
-          ? (a, b) => (a.data[colIndex].sum < b.data[colIndex].sum ? -1 : 1) * (order === 'asc' ? 1 : -1)
-          : (a, b) => (a.data[colIndex].localeCompare(b.data[colIndex]) ? -1 : 1) * (order === 'asc' ? 1 : -1))
-    },
     onRowClick: (rowData: string[], rowMeta: { dataIndex: number, rowIndex: number }) => {
       if (rowData[1] === 'false') {
         history.push(`/manual/${rowData[0]}`);

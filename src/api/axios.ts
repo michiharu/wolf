@@ -2,7 +2,7 @@ import axiosbase from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import * as env from '../settings/env.json';
 import { loginURL, manualURL, favoriteURL, likeURL, treeURL } from './definitions';
-import { postLogin } from './mock-data/login';
+import { postLogin, deleteLogin } from './mock-data/login';
 import * as Manual from './mock-data/manual';
 import * as Favorite from './mock-data/favorite';
 import * as Like from './mock-data/like';
@@ -14,6 +14,7 @@ const mockAdapter = () => {
   const mock = new MockAdapter(axiosbase, { delayResponse: 1000 });
   // login
   mock.onPost(loginURL).reply(postLogin);
+  mock.onDelete(loginURL).reply(deleteLogin);
 
   // manual
   const regexManualsURL = new RegExp(`${manualURL}/*`);

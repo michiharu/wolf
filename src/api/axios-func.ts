@@ -11,6 +11,11 @@ export const login = (loginInfo: LoginInfo) => axios
 .then(res => res.data)
 .catch(error => ({ error }));
 
+export const logout = () => axios
+.delete(loginURL)
+.then(res => res.data)
+.catch(error => ({ error }));
+
 export const manualGet = (manual: ManualGetRequestParams) => axios
 .get(`${manualURL}/${manual.id}`)
 .then(res => res.data)

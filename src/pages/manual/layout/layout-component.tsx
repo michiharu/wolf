@@ -11,7 +11,7 @@ import ManualSettings from '../settings/settings';
 import ViewSettingsContainer from '../../../components/view-settings/view-settings-container';
 import User from '../../../data-types/user';
 import { Star, StarBorder, ThumbUp, ThumbUpAltOutlined } from '@material-ui/icons';
-import { yellow, blue, green } from '@material-ui/core/colors';
+import { yellow, blue } from '@material-ui/core/colors';
 import { Action } from 'typescript-fsa';
 import NodeEditorContainer from '../node/node-editor/node-editor-frame-container';
 import { drawerWidth } from '../../layout/layout-component';
@@ -45,7 +45,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     position: 'relative',
   },
   progress: {
-    color: green[500],
     position: 'absolute',
     top: '50%',
     left: '50%',

@@ -9,12 +9,13 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { LoginUserState } from '../../redux/states/main/loginUserState';
 import PageRouter from '../page-router';
-import { Search } from '@material-ui/icons';
-import { InputBase, Button } from '@material-ui/core';
+import { Search, AccountCircle } from '@material-ui/icons';
+import { InputBase, Button, Menu, MenuItem } from '@material-ui/core';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import links from '../../settings/links';
 import AdapterLink from '../../components/custom-mui/adapter-link';
 import DrawerContentContainer from './drawer-content/drawer-content-container';
+import { LayoutActions } from './layout-container';
 
 export const drawerWidth = 300;
 
@@ -80,6 +81,9 @@ const useStyles = makeStyles((theme: Theme) => ({
       width: 240,
     },
   },
+  grow: {
+    flexGrow: 1,
+  },
   toolbar: theme.mixins.toolbar,
   drawerPaper: {
     width: drawerWidth,
@@ -90,9 +94,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface Props extends LoginUserState, RouteComponentProps<{}> {}
+interface Props extends LoginUserState, LayoutActions, RouteComponentProps {}
 
-function AppFrameComponent({user, location}: Props) {
+function AppFrameComponent({user, logout, location}: Props) {
 
   const classes = useStyles();
 
@@ -105,6 +109,36 @@ function AppFrameComponent({user, location}: Props) {
   function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
     setSearchText(e.target.value);
   }
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const isMenuOpen = Boolean(anchorEl);
+
+  function handleProfileMenuOpen(event: React.MouseEvent<HTMLElement>) {
+    setAnchorEl(event.currentTarget);
+  }
+
+  function handleMenuClose() {
+    setAnchorEl(null);
+  }
+  function handleLogout() {
+    setAnchorEl(null);
+    logout();
+  }
+
+  const menuId = 'account-menu';
+  const renderMenu = (
+    <Menu
+      anchorEl={anchorEl}
+      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
+    >
+      <MenuItem onClick={handleLogout}>ログアウト</MenuItem>
+    </Menu>
+  );
 
   return (
     <div className={classes.root}>
@@ -136,6 +170,19 @@ function AppFrameComponent({user, location}: Props) {
               onChange={handleSearch}
             />
           </div>}
+          <div className={classes.grow} />
+          <IconButton
+            edge="end"
+            aria-label="Account of current user"
+            aria-controls={menuId}
+            aria-haspopup="true"
+            onClick={handleProfileMenuOpen}
+            color="inherit"
+          >
+            <AccountCircle />
+          </IconButton>
+          {renderMenu}
+
         </Toolbar>
       </AppBar>
       <nav className={classes.drawer}>

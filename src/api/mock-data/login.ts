@@ -40,3 +40,10 @@ export const postLogin = (config: AxiosRequestConfig) => {
   console.log(method, url, req, data);
   return [200, data]
 };
+
+export const deleteLogin = (config: AxiosRequestConfig) => {
+  const { method, url } = config;
+  const data = {}
+  console.log(method, url, data);
+  return [200, data]
+};

@@ -1,7 +1,7 @@
 import { put, call, fork, take } from 'redux-saga/effects';
 import { Notification } from './states/notificationsState';
 import * as API from '../api/axios-func';
-import { ACTIONS_LOGIN } from './actions/loginAction';
+import { ACTIONS_LOGIN, ACTIONS_LOGOUT } from './actions/loginAction';
 import { loginUserAction } from './actions/main/loginUserAction';
 import { LoginPostResponse } from '../api/definitions';
 import * as ManualAction from './actions/main/manualsAction';
@@ -22,6 +22,30 @@ function* handleRequestLogin() {
       yield put(usersAction.change(users));
       yield put(ManualAction.manualsAction.set(manuals));
       yield put(categoriesAction.set(categories));
+    }
+  }
+}
+
+function* handleRequestLogout() {
+  while (true) {
+    yield take(ACTIONS_LOGOUT);
+
+    const key = getKey();
+    const notification: Notification = { key, variant: 'info', message: 'ログアウトしています..' };
+    yield put(notificationsAction.enqueue(notification));
+
+    const data = yield call(API.logout);
+    yield put(notificationsAction.dequeue(key));
+    
+    if (data.error === undefined) {
+      yield put(loginUserAction.reset());
+      const notification: Notification =
+        { key: getKey(), variant: 'success', message: 'ログアウトしました' };
+      yield put(notificationsAction.enqueue(notification));
+    } else {
+      const notification: Notification =
+      { key: getKey(), variant: 'warning', message: 'ログアウトに失敗しました' };
+      yield put(notificationsAction.enqueue(notification));
     }
   }
 }
@@ -188,6 +212,7 @@ function* handleRequestPutTree() {
 
 export function* rootSaga() {
   yield fork(handleRequestLogin);
+  yield fork(handleRequestLogout);
 
   yield fork(handleRequestGetManual);
   yield fork(handleRequestPostManual);

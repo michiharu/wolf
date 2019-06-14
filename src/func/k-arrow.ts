@@ -119,7 +119,7 @@ export default class KArrowUtil {
     const dv: Point = {x: exit.point.x - node.point.x, y: exit.point.y - node.point.y};
     if (before.type === 'task' && !KArrowUtil._hasUnderNode(before, node)) {
       const exitCenter = ks.rect.w / 2  - ks.spr.w * 4 - (node.point.x - before.point.x);
-      if (exitCenter < 0) {
+      if (exitCenter < ks.spr.w) {
         return [[
           {x: ks.rect.w / 2 - ks.spr.w * 4, y: ks.rect.h},
           {x: ks.rect.w / 2 - ks.spr.w * 4, y: ks.rect.h + ks.spr.h},

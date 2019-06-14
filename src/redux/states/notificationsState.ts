@@ -10,23 +10,36 @@ export interface Notification {
 }
 
 export interface NotificationsState {
-  queue: Notification | null;
+  enqueue: Notification | null;
+  dequeue: Notification | null;
   displayed: Notification[];
 }
 
 const initialState: NotificationsState = {
-  queue: null,
+  enqueue: null,
+  dequeue: null,
   displayed: [],
 };
 
 export const notificationsReducer = reducerWithInitialState(initialState)
 .case(
   notificationsAction.enqueue,
-  (state, notification) => ({...state, queue: notification})
+  (state, notification) => ({...state, enqueue: notification})
 )
 .case(
   notificationsAction.display,
-  (state) => ({...state, queue: null, displayed: state.displayed.concat([state.queue!])})
+  (state) => ({...state, enqueue: null, displayed: state.displayed.concat([state.enqueue!])})
+)
+.case(
+  notificationsAction.dequeue,
+  (state, key) => {
+    const dequeue = state.displayed.find(d => d.key === key)!
+    return {...state, dequeue};
+  }
+)
+.case(
+  notificationsAction.dismiss,
+  (state) => ({...state, dequeue: null})
 )
 .case(
   notificationsAction.remove,
