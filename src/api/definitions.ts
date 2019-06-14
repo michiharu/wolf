@@ -49,7 +49,7 @@ export type UserPutResponse = User;
  * なので最初の一文字がtで始まるかどうかや、
  * GUIDとして適当な文字列かどうかをチェックするC#のメソッド（TryParse）で判定可能です。
  */
-export const manualsURL = '/api/v1/manuals';
+export const manualURL = '/api/v1/manual';
 // GET(/api/v1/manuals/:id)
 export type ManualGetRequestParams = Manual;
 export type ManualGetResponse = Manual;

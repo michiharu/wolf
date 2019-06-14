@@ -1,7 +1,7 @@
 import axiosbase from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import * as env from '../settings/env.json';
-import { loginURL, manualsURL, favoriteURL, likeURL, treeURL } from './definitions';
+import { loginURL, manualURL, favoriteURL, likeURL, treeURL } from './definitions';
 import { postLogin } from './mock-data/login';
 import { postManual, putManual, deleteManual, getManual } from './mock-data/manual';
 import { postFavorite, deleteFavorite } from './mock-data/favorite';
@@ -16,9 +16,9 @@ const mockAdapter = () => {
   mock.onPost(loginURL).reply(postLogin);
 
   // manual
-  const regexManualsURL = new RegExp(`${manualsURL}/*`);
+  const regexManualsURL = new RegExp(`${manualURL}/*`);
   mock.onGet(regexManualsURL).reply(getManual);
-  mock.onPost(manualsURL).reply(postManual);
+  mock.onPost(manualURL).reply(postManual);
   mock.onPut(regexManualsURL).reply(putManual);
   mock.onDelete(regexManualsURL).reply(deleteManual);
 
