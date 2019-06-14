@@ -1,16 +1,19 @@
 import { AxiosRequestConfig } from 'axios';
-import { ManualPostResponse, ManualPostRequest, ManualPutResponse, ManualDeleteResponse, ManualGetRequestParams, ManualGetResponse } from '../definitions';
+import { ManualPostResponse, ManualPostRequest, ManualPutResponse, ManualDeleteResponse, ManualGetResponse } from '../definitions';
 import Util from '../../func/util';
+import cloneDeep from 'lodash/cloneDeep';
+import { manual1, manual2, manual3, manual4, rootTree as tree } from './common-data/manuals';
 
 export const getManual = (config: AxiosRequestConfig) => {
-  const { method, url, data: requestJson } = config;
-  const req = JSON.parse(requestJson) as ManualGetRequestParams;
+  const { method, url } = config;
+  const reversedURL = [...url!].reduceRight((p, c) => p + c);
+  const rootTree = cloneDeep(tree);
+  const data: ManualGetResponse =
+    reversedURL[0] === '1' ? {...manual1, rootTree} :
+    reversedURL[0] === '2' ? {...manual2, rootTree} :
+    reversedURL[0] === '3' ? {...manual3, rootTree} : {...manual4, rootTree};
 
-  const data: ManualGetResponse = {
-    ...req,
-  };
-
-  console.log(method, url, req, data);
+  console.log(method, url, data);
   return [200, data]
 };
 

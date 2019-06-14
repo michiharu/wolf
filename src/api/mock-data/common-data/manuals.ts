@@ -10,38 +10,7 @@ export const manual1: Manual = {
   categoryId: '1',
   favoriteIds: ['1'],
   likeIds: ['1', '3', '4'],
-  rootTree: {
-    ...baseTree,
-    id: '1',
-    label: 'マニュアル１',
-    children:[
-      {...baseTree, id: '1-1', label: 'マニュアル１−１'},
-      {...baseTree, id: '1-2', label: 'マニュアル１−２'},
-      {...baseTree, id: '1-3', label: 'マニュアル１−３'},
-    ]
-  }
-};
-
-export const manual11: Manual = {
-  ...baseManual,
-  id: '11',
-  title: '企画マニュアル２',
-  description: 'ここには企画マニュアル２の説明。ここにはマニュアルの説明。ここにはマニュアルの説明。',
-  ownerId: '1',
-  collaboratorIds:['2'],
-  categoryId: '1',
-  favoriteIds: ['1', '3', '4'],
-  likeIds: ['1', '4'],
-  rootTree: {
-    ...baseTree,
-    id: '1',
-    label: 'マニュアル１',
-    children:[
-      {...baseTree, id: '1-1', label: 'マニュアル１−１'},
-      {...baseTree, id: '1-2', label: 'マニュアル１−２'},
-      {...baseTree, id: '1-3', label: 'マニュアル１−３'},
-    ]
-  }
+  rootTree: null,
 };
 
 export const manual2: Manual = {
@@ -54,16 +23,7 @@ export const manual2: Manual = {
   categoryId: '2',
   favoriteIds: ['2', '4'],
   likeIds: ['1'],
-  rootTree: {
-    ...baseTree,
-    id: '2',
-    label: 'マニュアル２',
-    children: [
-      {...baseTree, id: '2-1', label: 'マニュアル２−１'},
-      {...baseTree, id: '2-2', label: 'マニュアル２−２'},
-      {...baseTree, id: '2-3', label: 'マニュアル２−３'},
-    ]
-  }
+  rootTree: null,
 };
 
 export const manual3: Manual = {
@@ -75,14 +35,30 @@ export const manual3: Manual = {
   collaboratorIds:['2'],
   categoryId: '3',
   favoriteIds: [],
-  rootTree: {
-    ...baseTree,
-    id: '3',
-    label: 'マニュアル３',
-    children: [
-      {...baseTree, id: '3-1', label: 'マニュアル3−１'},
-      {...baseTree, id: '3-2', label: 'マニュアル3−２'},
-      {...baseTree, id: '3-3', label: 'マニュアル3−３'},
-    ]
-  }
+  rootTree: null,  
 };
+
+export const manual4: Manual = {
+  ...baseManual,
+  id: '4',
+  title: '企画マニュアル２',
+  description: 'ここには企画マニュアル２の説明。ここにはマニュアルの説明。ここにはマニュアルの説明。',
+  ownerId: '1',
+  collaboratorIds:['2'],
+  categoryId: '1',
+  favoriteIds: ['1', '3', '4'],
+  likeIds: ['1', '4'],
+  rootTree: null,
+};
+
+export const rootTree = {
+  ...baseTree,
+  id: '5',
+  label: '',
+  children:[
+    {...baseTree, id: '6', label: '手順１'},
+    {...baseTree, id: '7', label: '手順２'},
+    {...baseTree, id: '8', label: '手順３'},
+  ]
+}
+

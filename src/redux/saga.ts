@@ -33,6 +33,7 @@ function* handleRequestGetManual() {
     const action = yield take(ManualAction.ACTIONS_MANUAL_GET);
     const beforeId = action.payload.id;
     const data = yield call(API.manualGet, action.payload);
+    console.log(data);
     if (data.error === undefined) {
       yield put(ManualAction.manualsAction.getSuccess({ beforeId, manual: data }));
     } else {

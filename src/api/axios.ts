@@ -1,15 +1,16 @@
 import axiosbase from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import * as env from '../settings/env.json';
-import { loginURL, manualsURL, favoriteURL, likeURL } from './definitions';
+import { loginURL, manualsURL, favoriteURL, likeURL, treeURL } from './definitions';
 import { postLogin } from './mock-data/login';
 import { postManual, putManual, deleteManual, getManual } from './mock-data/manual';
 import { postFavorite, deleteFavorite } from './mock-data/favorite';
 import { postLike, deleteLike } from './mock-data/like';
+import { putTree } from './mock-data/tree';
 
 export const baseURL = 'http://localhost:51391';
 
-const mockAdapter = (() => {
+const mockAdapter = () => {
   const mock = new MockAdapter(axiosbase, { delayResponse: 1000 });
   // login
   mock.onPost(loginURL).reply(postLogin);
@@ -32,12 +33,13 @@ const mockAdapter = (() => {
   mock.onDelete(regexLikeURL).reply(deleteLike);
 
   // tree
-  
+  const regexTreeURL = new RegExp(`${treeURL}/*`);
+  mock.onPut(regexTreeURL).reply(putTree);
 
   return axiosbase;
-})();
+};
 
-const axios = env.useMock ? mockAdapter : axiosbase.create({
+const axios = env.useMock ? mockAdapter() : axiosbase.create({
     baseURL,
     headers: {
       'Content-Type': 'application/json',

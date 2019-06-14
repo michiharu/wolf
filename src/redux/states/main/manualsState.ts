@@ -35,7 +35,10 @@ export const manualsReducer = reducerWithInitialState(initialState)
   manualsAction.get,
   (state, manual) => {
     const cloneManual = cloneDeep({...manual, beforeSaving: true});
-    const selectNode = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneManual.rootTree!, baseTreeNode));
+    const selectNode = cloneManual.rootTree !== null
+      ? TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneManual.rootTree!, baseTreeNode))
+      : null;
+    if (selectNode !== null) { selectNode.label = cloneManual.title; }
     const beforeManual = state.manuals.find(m => m.id === manual.id)!
     return ({
       ...state,
@@ -49,7 +52,12 @@ export const manualsReducer = reducerWithInitialState(initialState)
   manualsAction.getSuccess,
   (state, {beforeId, manual}) => {
     const cloneManual = cloneDeep({...manual, beforeSaving: false});
-    const selectNode = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneManual.rootTree!, baseTreeNode));
+    const selectNode = cloneManual.rootTree !== null
+      ? TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneManual.rootTree!, baseTreeNode))
+      : {...baseTreeNode};
+
+    selectNode.label = cloneManual.title;
+
     return ({
       ...state,
       manuals: state.manuals.map(m => m.id === beforeId ? cloneManual : m),
@@ -63,7 +71,10 @@ export const manualsReducer = reducerWithInitialState(initialState)
   manualsAction.getError,
   (state, beforeId) => {
     const before = state.manualBeforeSaving.find(m => m.id === beforeId)!
-    const selectNode = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(before.rootTree!, baseTreeNode));
+    const selectNode = before.rootTree !== null
+      ? TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(before.rootTree!, baseTreeNode))
+      : null;
+    if (selectNode !== null) { selectNode.label = before.title; }
     return {
       ...state,
       manuals: state.manuals.map(m => m.id === beforeId ? before : m),
@@ -108,7 +119,9 @@ export const manualsReducer = reducerWithInitialState(initialState)
   manualsAction.put,
   (state, manual) => {
     const cloneManual = cloneDeep({...manual, beforeSaving: true});
-    const selectNode = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneManual.rootTree!, baseTreeNode));
+    const selectNode = cloneManual.rootTree !== null
+      ? TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneManual.rootTree!, baseTreeNode))
+      : null;
     const beforeManual = state.manuals.find(m => m.id === manual.id)!
     return ({
       ...state,
@@ -122,7 +135,9 @@ export const manualsReducer = reducerWithInitialState(initialState)
   manualsAction.putSuccess,
   (state, {beforeId, manual}) => {
     const cloneManual = cloneDeep({...manual, beforeSaving: false});
-    const selectNode = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneManual.rootTree!, baseTreeNode));
+    const selectNode = cloneManual.rootTree !== null
+    ? TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneManual.rootTree!, baseTreeNode))
+    : null;
     return ({
       ...state,
       manuals: state.manuals.map(m => m.id === beforeId ? cloneManual : m),
@@ -136,7 +151,9 @@ export const manualsReducer = reducerWithInitialState(initialState)
   manualsAction.putError,
   (state, beforeId) => {
     const before = state.manualBeforeSaving.find(m => m.id === beforeId)!
-    const selectNode = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(before.rootTree!, baseTreeNode));
+    const selectNode = before.rootTree !== null
+    ? TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(before.rootTree!, baseTreeNode))
+    : null;
     return {
       ...state,
       manuals: state.manuals.map(m => m.id === beforeId ? before : m),
@@ -178,7 +195,7 @@ export const manualsReducer = reducerWithInitialState(initialState)
 // SELECT
 .case(selectActions.select, (state, manual) => {
   const cloneManual = cloneDeep(manual);
-  const rootTree = cloneManual.rootTree ? cloneManual.rootTree : {...baseTree};
+  const rootTree = cloneManual.rootTree !== null ? cloneManual.rootTree : {...baseTree};
   const selectNode = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(rootTree, baseTreeNode));
   selectNode.label = cloneManual.title;
   return ({...state, selectId: manual.id, selectNode});

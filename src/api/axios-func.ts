@@ -52,6 +52,6 @@ export const likeDelete = (params: LikeDeleteRequestParams) => axios
 .catch(error => ({ error }));
 
 export const treePut = ({manualId, rootTree}: TreePutRequest) => axios
-.put<ManualPostRequest>(`${treeURL}/${manualId}`, rootTree)
+.put<TreePutRequest>(`${treeURL}/${manualId}`, rootTree)
 .then(res => res.data)
 .catch(error => ({ error }));

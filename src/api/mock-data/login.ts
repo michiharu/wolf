@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 import { LoginPostResponse } from '../definitions';
 import { user1, user2, user3, user4 } from './common-data/users';
-import { manual1, manual2, manual3, manual11 } from './common-data/manuals';
+import { manual1, manual2, manual3, manual4 } from './common-data/manuals';
 import { category1, category2, category3 } from './common-data/categories';
 
 export const postLogin = (config: AxiosRequestConfig) => {
@@ -9,7 +9,7 @@ export const postLogin = (config: AxiosRequestConfig) => {
   const req = JSON.parse(requestJson);
 
   const users = [user1, user2, user3, user4];
-  const manuals = [manual1, manual11, manual2, manual3];
+  const manuals = [manual1, manual2, manual3, manual4];
   const categories = [category1, category2, category3];
 
   const data1: LoginPostResponse = {

@@ -1,6 +1,6 @@
 import React, {useState, useRef} from 'react';
 import {
-  makeStyles, Theme, Tabs, Tab, Typography, Divider, Button, IconButton, Modal, Box, Grid,
+  makeStyles, Theme, Tabs, Tab, Typography, Divider, Button, IconButton, Modal, Box, Grid, CircularProgress,
 } from '@material-ui/core';
 import ViewSettingsIcon from '@material-ui/icons/Settings';
 
@@ -11,7 +11,7 @@ import ManualSettings from '../settings/settings';
 import ViewSettingsContainer from '../../../components/view-settings/view-settings-container';
 import User from '../../../data-types/user';
 import { Star, StarBorder, ThumbUp, ThumbUpAltOutlined } from '@material-ui/icons';
-import { yellow, blue } from '@material-ui/core/colors';
+import { yellow, blue, green } from '@material-ui/core/colors';
 import { Action } from 'typescript-fsa';
 import NodeEditorContainer from '../node/node-editor/node-editor-frame-container';
 import { drawerWidth } from '../../layout/layout-component';
@@ -38,6 +38,19 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   body: {
     width: `calc(100vw - ${drawerWidth}px)`,
+  },
+  progressContainer: {
+    width: ``,
+    height: `calc(100vh - ${drawerWidth}px)`,
+    position: 'relative',
+  },
+  progress: {
+    color: green[500],
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -30,
+    marginLeft: -30,
   },
   viewSettingButton: {
     marginLeft: theme.spacing(1)
@@ -92,6 +105,24 @@ const LayoutComponent: React.FC<Props> = props => {
   const buttonRef = useRef<HTMLDivElement>(null);
 
   const classes = useStyles();
+  const ShowTree = (
+    <div className={classes.body}>
+      {tabIndex === 0 && (!isEditing ? <NodeViewer/> : <NodeEditorContainer modeRef={modeRef} buttonRef={buttonRef}/>)}
+      {tabIndex === 1 &&
+      (!isEditing
+        ? <TextViewer itemNumber={manual.title} />
+        : <TextEditorContainer buttonRef={buttonRef}/>)}
+      {tabIndex === 2 && <ManualSettings/>}
+    </div>
+  );
+
+  const LoadingTree = (
+    <div className={classes.progressContainer}>
+      <CircularProgress className={classes.progress} size={60}/>
+    </div>
+  );
+
+  
   return (
     <div className={classes.root}>
       <Box mt={1} mx={2}>
@@ -129,14 +160,7 @@ const LayoutComponent: React.FC<Props> = props => {
         <IconButton className={classes.viewSettingButton} onClick={handleShowVS}><ViewSettingsIcon/></IconButton>}
       </div>
       <Divider/>
-      <div className={classes.body}>
-        {tabIndex === 0 && (!isEditing ? <NodeViewer/> : <NodeEditorContainer modeRef={modeRef} buttonRef={buttonRef}/>)}
-        {tabIndex === 1 &&
-        (!isEditing
-          ? <TextViewer itemNumber={manual.title} />
-          : <TextEditorContainer buttonRef={buttonRef}/>)}
-        {tabIndex === 2 && <ManualSettings/>}
-      </div>
+      {manual.rootTree !== null ? ShowTree : LoadingTree}
       <Modal
         open={showVS}
         onClose={handleCloseVS}
