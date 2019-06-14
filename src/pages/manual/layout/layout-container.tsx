@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { Action } from 'typescript-fsa';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
@@ -11,7 +11,7 @@ import {  Manual } from '../../../data-types/tree';
 import LayoutComponent from './layout-component';
 import { CategoriesState } from '../../../redux/states/main/categoriesState';
 import User from '../../../data-types/user';
-import { manualsAction, selectActions, favoriteActions, likeActions } from '../../../redux/actions/main/manualsAction';
+import { manualsAction, favoriteActions, likeActions } from '../../../redux/actions/main/manualsAction';
 import { viewAction } from '../../../redux/actions/viewAction';
 import { ViewState } from '../../../redux/states/viewState';
 import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequestParams, LikeDeleteRequestParams } from '../../../api/definitions';
@@ -23,7 +23,7 @@ export interface ViewActions {
   deleteFavorite: (params: FavoriteDeleteRequestParams) => Action<FavoriteDeleteRequestParams>,
   postLike: (params: LikePostRequestParams) => Action<LikePostRequestParams>,
   deleteLike: (params: LikeDeleteRequestParams) => Action<LikeDeleteRequestParams>,
-  set: (manual: Manual) => Action<Manual>;
+  clear: () => Action<void>;
   editStart: () => Action<void>;
 }
 
@@ -41,10 +41,10 @@ const ViewContainer: React.FC<Props> = props => {
     user,
     manuals,
     selectId,
+    selectNode,
     isEditing,
     match,
     get,
-    set,
     replace,
     postFavorite,
     deleteFavorite,
@@ -53,23 +53,22 @@ const ViewContainer: React.FC<Props> = props => {
     editStart,
   } =  props;
 
-  if (selectId !== match.params.id) {
+  if (selectId !== match.params.id || selectNode === null) {
     const selected = manuals.find(m => m.id === match.params.id)!;
     get(selected)
-    set(selected);
   }
   const id = selectId || match.params.id;
   const manual = manuals.find(m => m.id === id)!;
   const componentProps = {
     user,
     manual,
+    selectNode,
     isEditing,
     replace,
     postFavorite,
     deleteFavorite,
     postLike,
     deleteLike,
-    set,
     editStart
   };
   return <LayoutComponent {...componentProps}/>;
@@ -93,7 +92,6 @@ function mapDispatchToProps(dispatch: Dispatch) {
     deleteFavorite: (params: FavoriteDeleteRequestParams) => dispatch(favoriteActions.delete(params)),
     postLike: (params: LikePostRequestParams) => dispatch(likeActions.post(params)),
     deleteLike: (params: LikeDeleteRequestParams) => dispatch(likeActions.delete(params)),
-    set: (manual: Manual) => dispatch(selectActions.select(manual)),
     editStart: () => dispatch(viewAction.editStart()),
   };
 }

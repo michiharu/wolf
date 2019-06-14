@@ -5,7 +5,6 @@ import { InputAdornment, IconButton } from '@material-ui/core';
 import { VisibilityOff, Visibility } from '@material-ui/icons';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { LoginActions } from './login-container';
-import { green } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme: Theme) => ({
   main: {
@@ -39,7 +38,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '100%'
   },
   buttonProgress: {
-    color: green[500],
     position: 'absolute',
     top: '50%',
     left: '50%',

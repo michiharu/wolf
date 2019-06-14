@@ -24,9 +24,9 @@ export const ACTIONS_MANUAL_DELETE_ERROR   = 'ACTIONS_MANUAL_DELETE_ERROR';
 export const manualsAction = {
   set: actionCreator<Manual[]>(ACTIONS_MANUAL_SET),
 
-  get:        actionCreator<Manual>                            (ACTIONS_MANUAL_GET),
-  getSuccess: actionCreator<{beforeId: string, manual: Manual}>(ACTIONS_MANUAL_GET_SUCCESS),
-  getError:   actionCreator<string>                            (ACTIONS_MANUAL_GET_ERROR),
+  get:        actionCreator<Manual>(ACTIONS_MANUAL_GET),
+  getSuccess: actionCreator<Manual>  (ACTIONS_MANUAL_GET_SUCCESS),
+  getError:   actionCreator<void>  (ACTIONS_MANUAL_GET_ERROR),
 
   post: actionCreator<Manual>(ACTIONS_MANUAL_POST),
   postSuccess: actionCreator<{beforeId: string, manual: Manual}>(ACTIONS_MANUAL_POST_SUCCESS),
@@ -41,14 +41,10 @@ export const manualsAction = {
   deleteError: actionCreator<string>(ACTIONS_MANUAL_DELETE_ERROR),
 };
 
-export const ACTIONS_SELECT_SELECT = 'ACTIONS_SELECT_SELECT';
 export const ACTIONS_SELECT_UPDATE = 'ACTIONS_SELECT_UPDATE';
-export const ACTIONS_SELECT_CLEAR  = 'ACTIONS_SELECT_CLEAR';
 
 export const selectActions = {
-  select: actionCreator<Manual>(ACTIONS_SELECT_SELECT),
   update: actionCreator<TreeNode>(ACTIONS_SELECT_UPDATE),
-  clear:  actionCreator<void>(ACTIONS_SELECT_CLEAR),
 };
 
 export const ACTIONS_FAVORITE_POST         = 'ACTIONS_FAVORITE_POST';

@@ -4,7 +4,7 @@ import {
 } from '@material-ui/core';
 import ViewSettingsIcon from '@material-ui/icons/Settings';
 
-import { Manual } from '../../../data-types/tree';
+import { Manual, TreeNode } from '../../../data-types/tree';
 import NodeViewer from '../node/node-viewer/node-viewer-container';
 import TextViewer from '../text/text-viewer/text-viewer-container';
 import ManualSettings from '../settings/settings';
@@ -60,6 +60,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   user: User;
   manual: Manual;
+  selectNode: TreeNode | null;
   isEditing: boolean;
   replace: (manual: Manual) => Action<Manual>;
   postFavorite: (params: FavoritePostRequestParams) => Action<FavoritePostRequestParams>,
@@ -70,7 +71,7 @@ interface Props {
 }
 
 const LayoutComponent: React.FC<Props> = props => {
-  const { user, manual, isEditing } =  props;
+  const { user, manual, selectNode, isEditing } =  props;
 
   const [tabIndex, setTabIndex] = useState(0);
   const [showVS, setShowVS] = useState(false);
@@ -160,7 +161,7 @@ const LayoutComponent: React.FC<Props> = props => {
         <IconButton className={classes.viewSettingButton} onClick={handleShowVS}><ViewSettingsIcon/></IconButton>}
       </div>
       <Divider/>
-      {manual.rootTree !== null ? ShowTree : LoadingTree}
+      {selectNode !== null ? ShowTree : LoadingTree}
       <Modal
         open={showVS}
         onClose={handleCloseVS}

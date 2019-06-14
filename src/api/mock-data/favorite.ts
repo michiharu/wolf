@@ -4,7 +4,7 @@ import {
   FavoriteDeleteResponse
 } from '../definitions';
 
-export const postFavorite = (config: AxiosRequestConfig) => {
+export const post = (config: AxiosRequestConfig) => {
   const { method, url } = config;
   const data: FavoritePostResponse = {};
 
@@ -12,7 +12,7 @@ export const postFavorite = (config: AxiosRequestConfig) => {
   return [200, data]
 };
 
-export const deleteFavorite = (config: AxiosRequestConfig) => {
+export const _delete = (config: AxiosRequestConfig) => {
   const { method, url } = config;
   const data: FavoriteDeleteResponse = {};
 

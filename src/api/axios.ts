@@ -3,9 +3,9 @@ import MockAdapter from 'axios-mock-adapter';
 import * as env from '../settings/env.json';
 import { loginURL, manualURL, favoriteURL, likeURL, treeURL } from './definitions';
 import { postLogin } from './mock-data/login';
-import { postManual, putManual, deleteManual, getManual } from './mock-data/manual';
-import { postFavorite, deleteFavorite } from './mock-data/favorite';
-import { postLike, deleteLike } from './mock-data/like';
+import * as Manual from './mock-data/manual';
+import * as Favorite from './mock-data/favorite';
+import * as Like from './mock-data/like';
 import { putTree } from './mock-data/tree';
 
 export const baseURL = 'http://localhost:55616';
@@ -17,20 +17,20 @@ const mockAdapter = () => {
 
   // manual
   const regexManualsURL = new RegExp(`${manualURL}/*`);
-  mock.onGet(regexManualsURL).reply(getManual);
-  mock.onPost(manualURL).reply(postManual);
-  mock.onPut(regexManualsURL).reply(putManual);
-  mock.onDelete(regexManualsURL).reply(deleteManual);
+  mock.onGet(regexManualsURL).reply(Manual.get);
+  mock.onPost(manualURL).reply(Manual.post);
+  mock.onPut(regexManualsURL).reply(Manual.put);
+  mock.onDelete(regexManualsURL).reply(Manual._delete);
 
   // favorite
   const regexFavoriteURL= new RegExp(`${favoriteURL}/*`);
-  mock.onPost(regexFavoriteURL).reply(postFavorite);
-  mock.onDelete(regexFavoriteURL).reply(deleteFavorite);
+  mock.onPost(regexFavoriteURL).reply(Favorite.post);
+  mock.onDelete(regexFavoriteURL).reply(Favorite._delete);
 
   // like
   const regexLikeURL= new RegExp(`${likeURL}/*`);
-  mock.onPost(regexLikeURL).reply(postLike);
-  mock.onDelete(regexLikeURL).reply(deleteLike);
+  mock.onPost(regexLikeURL).reply(Like.post);
+  mock.onDelete(regexLikeURL).reply(Like._delete);
 
   // tree
   const regexTreeURL = new RegExp(`${treeURL}/*`);
@@ -41,9 +41,7 @@ const mockAdapter = () => {
 
 const axios = env.useMock ? mockAdapter() : axiosbase.create({
     baseURL,
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: {'Content-Type': 'application/json'},
   });
 
 export default axios;

@@ -31,17 +31,14 @@ const getKey = () => new Date().getTime() + Math.random();
 function* handleRequestGetManual() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_MANUAL_GET);
-    const beforeId = action.payload.id;
     const data = yield call(API.manualGet, action.payload);
-    console.log(data);
     if (data.error === undefined) {
-      yield put(ManualAction.manualsAction.getSuccess({ beforeId, manual: data }));
+      yield put(ManualAction.manualsAction.getSuccess(data));
     } else {
-      yield put(ManualAction.manualsAction.getError(beforeId));
+      yield put(ManualAction.manualsAction.getError());
       const notification: Notification =
         { key: getKey(), variant: 'warning', message: 'マニュアルの読み込みに失敗しました' };
       yield put(notificationsAction.enqueue(notification));
-
     }
   }
 }

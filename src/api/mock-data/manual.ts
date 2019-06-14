@@ -4,7 +4,7 @@ import Util from '../../func/util';
 import cloneDeep from 'lodash/cloneDeep';
 import { manual1, manual2, manual3, manual4, rootTree as tree } from './common-data/manuals';
 
-export const getManual = (config: AxiosRequestConfig) => {
+export const get = (config: AxiosRequestConfig) => {
   const { method, url } = config;
   const reversedURL = [...url!].reduceRight((p, c) => p + c);
   const rootTree = cloneDeep(tree);
@@ -17,7 +17,7 @@ export const getManual = (config: AxiosRequestConfig) => {
   return [200, data]
 };
 
-export const postManual = (config: AxiosRequestConfig) => {
+export const post = (config: AxiosRequestConfig) => {
   const { method, url, data: requestJson } = config;
   const req = JSON.parse(requestJson) as ManualPostRequest;
 
@@ -29,7 +29,7 @@ export const postManual = (config: AxiosRequestConfig) => {
   return [200, data]
 };
 
-export const putManual = (config: AxiosRequestConfig) => {
+export const put = (config: AxiosRequestConfig) => {
   const { method, url, data: requestJson } = config;
   const req = JSON.parse(requestJson) as ManualPostRequest;
 
@@ -39,7 +39,7 @@ export const putManual = (config: AxiosRequestConfig) => {
   return [200, data]
 };
 
-export const deleteManual = (config: AxiosRequestConfig) => {
+export const _delete = (config: AxiosRequestConfig) => {
   const { method, url } = config;
   const data: ManualDeleteResponse = {};
 

@@ -3,7 +3,7 @@ import {
   LikePostResponse
 } from '../definitions';
 
-export const postLike = (config: AxiosRequestConfig) => {
+export const post = (config: AxiosRequestConfig) => {
   const { method, url } = config;
   const data: LikePostResponse = {};
 
@@ -11,7 +11,7 @@ export const postLike = (config: AxiosRequestConfig) => {
   return [200, data]
 };
 
-export const deleteLike = (config: AxiosRequestConfig) => {
+export const _delete = (config: AxiosRequestConfig) => {
   const { method, url } = config;
   const data: LikePostResponse = {};
 
