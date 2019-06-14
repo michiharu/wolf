@@ -5,6 +5,10 @@ import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequest
 const actionCreator = actionCreatorFactory();
 export const ACTIONS_MANUAL_SET    = 'ACTIONS_MANUAL_SET'; // ログイン後のマニュアルセット
 
+export const ACTIONS_MANUAL_GET          = 'ACTIONS_MANUAL_GET';
+export const ACTIONS_MANUAL_GET_SUCCESS  = 'ACTIONS_MANUAL_GET_SUCCESS';
+export const ACTIONS_MANUAL_GET_ERROR    = 'ACTIONS_MANUAL_GET_ERROR';
+
 export const ACTIONS_MANUAL_POST         = 'ACTIONS_MANUAL_POST';
 export const ACTIONS_MANUAL_POST_SUCCESS = 'ACTIONS_MANUAL_POST_SUCCESS';
 export const ACTIONS_MANUAL_POST_ERROR   = 'ACTIONS_MANUAL_POST_ERROR';
@@ -19,6 +23,10 @@ export const ACTIONS_MANUAL_DELETE_ERROR   = 'ACTIONS_MANUAL_DELETE_ERROR';
 
 export const manualsAction = {
   set: actionCreator<Manual[]>(ACTIONS_MANUAL_SET),
+
+  get:        actionCreator<Manual>                            (ACTIONS_MANUAL_GET),
+  getSuccess: actionCreator<{beforeId: string, manual: Manual}>(ACTIONS_MANUAL_GET_SUCCESS),
+  getError:   actionCreator<string>                            (ACTIONS_MANUAL_GET_ERROR),
 
   post: actionCreator<Manual>(ACTIONS_MANUAL_POST),
   postSuccess: actionCreator<{beforeId: string, manual: Manual}>(ACTIONS_MANUAL_POST_SUCCESS),

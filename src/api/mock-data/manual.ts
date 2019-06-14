@@ -1,6 +1,18 @@
 import { AxiosRequestConfig } from 'axios';
-import { ManualPostResponse, ManualPostRequest, ManualPutResponse, ManualDeleteResponse } from '../definitions';
+import { ManualPostResponse, ManualPostRequest, ManualPutResponse, ManualDeleteResponse, ManualGetRequestParams, ManualGetResponse } from '../definitions';
 import Util from '../../func/util';
+
+export const getManual = (config: AxiosRequestConfig) => {
+  const { method, url, data: requestJson } = config;
+  const req = JSON.parse(requestJson) as ManualGetRequestParams;
+
+  const data: ManualGetResponse = {
+    ...req,
+  };
+
+  console.log(method, url, req, data);
+  return [200, data]
+};
 
 export const postManual = (config: AxiosRequestConfig) => {
   const { method, url, data: requestJson } = config;

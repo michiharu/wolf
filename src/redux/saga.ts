@@ -28,6 +28,23 @@ function* handleRequestLogin() {
 
 const getKey = () => new Date().getTime() + Math.random();
 
+function* handleRequestGetManual() {
+  while (true) {
+    const action = yield take(ManualAction.ACTIONS_MANUAL_GET);
+    const beforeId = action.payload.id;
+    const data = yield call(API.manualGet, action.payload);
+    if (data.error === undefined) {
+      yield put(ManualAction.manualsAction.getSuccess({ beforeId, manual: data }));
+    } else {
+      yield put(ManualAction.manualsAction.getError(beforeId));
+      const notification: Notification =
+        { key: getKey(), variant: 'warning', message: 'マニュアルの読み込みに失敗しました' };
+      yield put(notificationsAction.enqueue(notification));
+
+    }
+  }
+}
+
 function* handleRequestPostManual() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_MANUAL_POST);
@@ -174,6 +191,7 @@ function* handleRequestPutTree() {
 export function* rootSaga() {
   yield fork(handleRequestLogin);
 
+  yield fork(handleRequestGetManual);
   yield fork(handleRequestPostManual);
   yield fork(handleRequestPutManual);
   yield fork(handleRequestDeleteManual);

@@ -17,6 +17,7 @@ import { ViewState } from '../../../redux/states/viewState';
 import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequestParams, LikeDeleteRequestParams } from '../../../api/definitions';
 
 export interface ViewActions {
+  get: (manual: Manual) => Action<Manual>;
   replace: (manual: Manual) => Action<Manual>;
   postFavorite: (params: FavoritePostRequestParams) => Action<FavoritePostRequestParams>,
   deleteFavorite: (params: FavoriteDeleteRequestParams) => Action<FavoriteDeleteRequestParams>,
@@ -42,6 +43,7 @@ const ViewContainer: React.FC<Props> = props => {
     selectId,
     isEditing,
     match,
+    get,
     set,
     replace,
     postFavorite,
@@ -53,6 +55,7 @@ const ViewContainer: React.FC<Props> = props => {
 
   if (selectId !== match.params.id) {
     const selected = manuals.find(m => m.id === match.params.id)!;
+    get(selected)
     set(selected);
   }
   const id = selectId || match.params.id;
@@ -84,6 +87,7 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
+    get: (manual: Manual) => dispatch(manualsAction.get(manual)),
     replace: (manual: Manual) => dispatch(manualsAction.put(manual)),
     postFavorite: (params: FavoritePostRequestParams) => dispatch(favoriteActions.post(params)),
     deleteFavorite: (params: FavoriteDeleteRequestParams) => dispatch(favoriteActions.delete(params)),

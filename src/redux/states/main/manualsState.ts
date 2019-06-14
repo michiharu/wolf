@@ -30,6 +30,48 @@ export const manualsReducer = reducerWithInitialState(initialState)
   manualsAction.set,
   (state, manuals) => ({...state, manuals})
 )
+// GET
+.case(
+  manualsAction.get,
+  (state, manual) => {
+    const cloneManual = cloneDeep({...manual, beforeSaving: true});
+    const selectNode = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneManual.rootTree!, baseTreeNode));
+    const beforeManual = state.manuals.find(m => m.id === manual.id)!
+    return ({
+      ...state,
+      manuals: state.manuals.map(m => m.id === cloneManual.id ? cloneManual : m),
+      selectNode,
+      manualBeforeSaving: state.manualBeforeSaving.concat([beforeManual])
+    })
+  }
+)
+.case(
+  manualsAction.getSuccess,
+  (state, {beforeId, manual}) => {
+    const cloneManual = cloneDeep({...manual, beforeSaving: false});
+    const selectNode = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneManual.rootTree!, baseTreeNode));
+    return ({
+      ...state,
+      manuals: state.manuals.map(m => m.id === beforeId ? cloneManual : m),
+      selectId: cloneManual.id,
+      selectNode,
+      manualBeforeSaving: state.manualBeforeSaving.filter(m => m.id !== beforeId)
+    })
+  }
+)
+.case(
+  manualsAction.getError,
+  (state, beforeId) => {
+    const before = state.manualBeforeSaving.find(m => m.id === beforeId)!
+    const selectNode = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(before.rootTree!, baseTreeNode));
+    return {
+      ...state,
+      manuals: state.manuals.map(m => m.id === beforeId ? before : m),
+      selectNode,
+      manualBeforeSaving: state.manualBeforeSaving.filter(m => m.id !== beforeId)
+    };
+  }
+)
 // POST
 .case(
   manualsAction.post,

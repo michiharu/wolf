@@ -50,7 +50,9 @@ export type UserPutResponse = User;
  * GUIDとして適当な文字列かどうかをチェックするC#のメソッド（TryParse）で判定可能です。
  */
 export const manualsURL = '/api/v1/manuals';
-// GET
+// GET(/api/v1/manuals/:id)
+export type ManualGetRequestParams = Manual;
+export type ManualGetResponse = Manual;
 // POST(/api/v1/manuals)
 export type ManualPostRequest = Manual;
 export type ManualPostResponse = Manual;

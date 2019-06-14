@@ -1,6 +1,6 @@
 import {
   loginURL, LoginPostResponse,
-  manualsURL, ManualPostRequest, FavoritePostRequestParams, favoriteURL, FavoriteDeleteRequestParams, likeURL, LikePostRequestParams, LikeDeleteRequestParams, TreePutRequest
+  manualsURL, ManualPostRequest, FavoritePostRequestParams, favoriteURL, FavoriteDeleteRequestParams, likeURL, LikePostRequestParams, LikeDeleteRequestParams, TreePutRequest, ManualGetRequestParams, treeURL
 } from "./definitions";
 
 import axios from "./axios";
@@ -8,6 +8,11 @@ import { LoginInfo } from "../redux/actions/loginAction";
 
 export const login = (loginInfo: LoginInfo) => axios
 .post<LoginPostResponse>(loginURL, loginInfo)
+.then(res => res.data)
+.catch(error => ({ error }));
+
+export const manualGet = (manual: ManualGetRequestParams) => axios
+.get(`${manualsURL}/${manual.id}`)
 .then(res => res.data)
 .catch(error => ({ error }));
 
@@ -47,6 +52,6 @@ export const likeDelete = (params: LikeDeleteRequestParams) => axios
 .catch(error => ({ error }));
 
 export const treePut = ({manualId, rootTree}: TreePutRequest) => axios
-.put<ManualPostRequest>(`${manualsURL}/${manualId}`, rootTree)
+.put<ManualPostRequest>(`${treeURL}/${manualId}`, rootTree)
 .then(res => res.data)
 .catch(error => ({ error }));
