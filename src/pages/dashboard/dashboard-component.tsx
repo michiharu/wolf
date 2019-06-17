@@ -6,7 +6,7 @@ import { AppState } from '../../redux/store';
 import MUIDataTable, { MUIDataTableOptions, MUIDataTableColumn } from 'mui-datatables';
 import { Star, StarBorder, ThumbUpAlt, ThumbUpAltOutlined } from '@material-ui/icons';
 import { TableCell, TableSortLabel, createMuiTheme, Typography } from '@material-ui/core';
-import { MuiThemeProvider } from '@material-ui/core/styles';
+import { MuiThemeProvider, makeStyles, Theme } from '@material-ui/core/styles';
 import { theme } from '../..';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { categoriesAction } from '../../redux/actions/main/categoriesAction';
@@ -14,6 +14,15 @@ import { Dispatch } from 'redux';
 import { Action } from 'typescript-fsa';
 import { CategoriesState } from '../../redux/states/main/categoriesState';
 import { UsersState } from '../../redux/states/main/usersState';
+
+const useStyles = makeStyles((theme: Theme) => ({
+  descriptionColumn: {
+    width: 'calc(100vw - 750px)',
+    [theme.breakpoints.down('sm')]: {
+      width: 'calc(100vw - 450px)',
+    },
+  },
+}));
 
 interface Props extends
   LoginUserState,
@@ -42,6 +51,7 @@ const getMuiTheme = () => createMuiTheme({
 });
 
 const Dashboard: React.FC<Props> = (props: Props) => {
+  const classes = useStyles();
   const columns: MUIDataTableColumn[] = [
     {
       name: "id",
@@ -125,7 +135,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
       options: {
         filter: false,
         sort: false,
-        customBodyRender: value => <Typography style={{width: 'calc(80vw - 400px)'}} noWrap>{value}</Typography>
+        customBodyRender: value => <Typography className={classes.descriptionColumn} noWrap>{value}</Typography>
       }
     },
     {
