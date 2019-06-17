@@ -125,7 +125,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
       options: {
         filter: false,
         sort: false,
-        customBodyRender: value => <Typography style={{width: 'calc(40vw - 100px)'}} noWrap>{value}</Typography>
+        customBodyRender: value => <Typography style={{width: 'calc(80vw - 400px)'}} noWrap>{value}</Typography>
       }
     },
     {

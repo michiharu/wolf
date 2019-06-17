@@ -8,7 +8,7 @@ import { LoginInfo } from "../redux/actions/loginAction";
 
 export const login = (loginInfo: LoginInfo) => axios
 .post<LoginPostResponse>(loginURL, loginInfo)
-.then(res => res.data)
+.then(res => { console.log(res.headers); return res.data; } )
 .catch(error => ({ error }));
 
 export const logout = () => axios
