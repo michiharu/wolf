@@ -42,9 +42,11 @@ export const manualsAction = {
 };
 
 export const ACTIONS_SELECT_UPDATE = 'ACTIONS_SELECT_UPDATE';
+export const ACTIONS_SELECT_CLEAR = 'ACTIONS_SELECT_CLEAR';
 
 export const selectActions = {
   update: actionCreator<TreeNode>(ACTIONS_SELECT_UPDATE),
+  clear: actionCreator<void>(ACTIONS_SELECT_CLEAR),
 };
 
 export const ACTIONS_FAVORITE_POST         = 'ACTIONS_FAVORITE_POST';

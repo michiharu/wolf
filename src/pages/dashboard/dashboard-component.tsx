@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { LoginUserState } from '../../redux/states/main/loginUserState';
 import { ManualsState } from '../../redux/states/main/manualsState';
@@ -14,6 +14,7 @@ import { Dispatch } from 'redux';
 import { Action } from 'typescript-fsa';
 import { CategoriesState } from '../../redux/states/main/categoriesState';
 import { UsersState } from '../../redux/states/main/usersState';
+import { selectActions } from '../../redux/actions/main/manualsAction';
 
 const useStyles = makeStyles((theme: Theme) => ({
   descriptionColumn: {
@@ -31,6 +32,7 @@ interface Props extends
   CategoriesState,
   RouteComponentProps {
   filterReset: () => Action<void>;
+  clearSelect: () => Action<void>;
 }
 
 const getMuiTheme = () => createMuiTheme({
@@ -51,6 +53,10 @@ const getMuiTheme = () => createMuiTheme({
 });
 
 const Dashboard: React.FC<Props> = (props: Props) => {
+  useEffect(() => {
+    props.clearSelect()
+  }, [props]);
+
   const classes = useStyles();
   const columns: MUIDataTableColumn[] = [
     {
@@ -224,6 +230,7 @@ function mapStateToProps(appState: AppState) {
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
     filterReset: () => dispatch(categoriesAction.filterReset()),
+    clearSelect: () => dispatch(selectActions.clear()),
   };
 }
 

@@ -164,6 +164,7 @@ export const manualsReducer = reducerWithInitialState(initialState)
 )
 // SELECT
 .case(selectActions.update, (state, node) => ({...state, selectNode: cloneDeep(node)}))
+.case(selectActions.clear, (state) => ({...state, selectNode: null}))
 
 // POST FAVORITE
 .case(
