@@ -10,7 +10,7 @@ import AddNext from '@material-ui/icons/Forward';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
-import { TreeNode, Type, KTreeNode, DragRow, Point, baseKTreeNode, baseKWithArrow,  KWithArrow } from '../../../../data-types/tree';
+import { TreeNode, Type, KTreeNode, DragRow, Point, baseKTreeNode, baseKWithArrow,  KWithArrow, isSwitch, isTask, isCase } from '../../../../data-types/tree';
 import { toolbarHeight, toolbarMinHeight, Task, Switch, Case, Delete, More, Less } from '../../../../settings/layout';
 
 import TreeUtil from '../../../../func/tree';
@@ -230,8 +230,8 @@ class NodeEditorComponent extends React.Component<Props, State> {
     if (!target.focus && rs.playOnClick) {
       const ssu = new SpeechSynthesisUtterance();
       ssu.text = !Util.isEmpty(target.label) ? target.label :
-      target.type === 'task' ? phrase.empty.task :
-      target.type === 'switch' ? phrase.empty.switch : phrase.empty.case;
+      isTask(target.type) ? phrase.empty.task :
+      isSwitch(target.type) ? phrase.empty.switch : phrase.empty.case;
       ssu.lang = 'ja-JP';
       ssu.rate = rs.rate;
       ssu.pitch = rs.pitch;
@@ -258,8 +258,8 @@ class NodeEditorComponent extends React.Component<Props, State> {
     if (!target.focus && rs.playOnClick) {
       const ssu = new SpeechSynthesisUtterance();
       ssu.text = !Util.isEmpty(target.label) ? target.label :
-      target.type === 'task' ? phrase.empty.task :
-      target.type === 'switch' ? phrase.empty.switch : phrase.empty.case;
+      isTask(target.type) ? phrase.empty.task :
+      isSwitch(target.type) ? phrase.empty.switch : phrase.empty.case;
       ssu.lang = 'ja-JP';
       ssu.rate = rs.rate;
       ssu.pitch = rs.pitch;
@@ -301,7 +301,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
       const row = rows[pointY];
       if (row === undefined || row.node.id === target.id) { return; }
         
-        if (target.type === 'case') {
+        if (isCase(target.type)) {
           if (row.action === 'moveToBrother' && dragParent!.children.find(c => c.id === row.node.id) !== undefined) {
             edit(TreeUtil.moveBrother(node, target, row.node));
             process.nextTick(() => this.resize());
@@ -313,14 +313,14 @@ class NodeEditorComponent extends React.Component<Props, State> {
           return;
         }
 
-        if (row.action === 'moveToBrother' && row.node.type !== 'case') {
+        if (row.action === 'moveToBrother' && !isCase(row.node.type)) {
           edit(TreeUtil.moveBrother(node, target, row.node));
           process.nextTick(() => this.resize());
         }
 
         if (row.action === 'moveInOut') {
           const out = TreeUtil._find(row.node, target.id) === undefined;
-          if (row.node.type === 'task' || (out && row.node.type === 'case') || (!out && row.node.type === 'switch')) {
+          if (isTask(row.node.type) || (out && isCase(row.node.type)) || (!out && isSwitch(row.node.type))) {
             edit(TreeUtil.moveInOut(node, target, row.node));
           }
           process.nextTick(() => this.resize());
@@ -378,9 +378,9 @@ class NodeEditorComponent extends React.Component<Props, State> {
         const row = rows[this.dropRow];
 
         if (row === undefined) { return this.keepMemo(memo); }
-        if (row.action === 'insertBefore' && row.node.type === 'case')   { return this.keepMemo(memo); }
-        if (row.action === 'insertNext'   && row.node.type === 'case')   { return this.keepMemo(memo); }
-        if (row.action === 'insertLast'   && row.node.type === 'switch') { return this.keepMemo(memo); }
+        if (row.action === 'insertBefore' && isCase(row.node.type))   { return this.keepMemo(memo); }
+        if (row.action === 'insertNext'   && isCase(row.node.type))   { return this.keepMemo(memo); }
+        if (row.action === 'insertLast'   && isSwitch(row.node.type)) { return this.keepMemo(memo); }
       
         var newKTreeNode;
         if (row.action === 'insertBefore') {
@@ -459,12 +459,12 @@ class NodeEditorComponent extends React.Component<Props, State> {
       this.changeFocusNode(newNode);
     }
 
-    if (type === 'task') {
+    if (isTask(type)) {
       const children = node.children.map(c => c.children).reduce((a, b) => a.concat(b));
       const newNode = { ...node, type, children, open: true };
       this.changeFocusNode(newNode);
     } else {
-      const newCase = TreeUtil.getNewNode('switch', baseKWithArrow);
+      const newCase = TreeUtil.getNewNode(Type.switch, baseKWithArrow);
       const children = [{ ...newCase, children: node.children }];
       const newNode = { ...node, type, children, open: true };
       this.changeFocusNode(newNode);
@@ -515,7 +515,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
   createMemo = () => {
     const { ks, addMemo } = this.props;
     const { createBoxText } = this.state;
-    const newMemo = TreeUtil.getNewNode('task', baseKTreeNode);
+    const newMemo = TreeUtil.getNewNode(Type.task, baseKTreeNode);
     const stage = this.stageRef.current;
     if (stage === null) { throw new Error('Cannot find elements.'); }
     addMemo({
@@ -684,7 +684,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
               disableRipple
               disabled={focusNode.depth.top === 0}
             >
-              {focusNode.type === 'task' ? <Task/> : focusNode.type === 'switch' ? <Switch style={{transform: 'scale(1, -1)'}}/> : <Case/>}
+              {isTask(focusNode.type) ? <Task/> : isSwitch(focusNode.type) ? <Switch style={{transform: 'scale(1, -1)'}}/> : <Case/>}
             </IconButton>
             <Menu
               anchorEl={typeAnchorEl}
@@ -694,21 +694,21 @@ class NodeEditorComponent extends React.Component<Props, State> {
                 this.setState({typeAnchorEl: null});
               }}
             >
-              {focusNode.type !== 'case' &&
-              <MenuItem onClick={() => this.changeType('task')}>
-                <ListItemIcon><Task/></ListItemIcon>
-                <ListItemText inset primary="作業"/>
-              </MenuItem>}
-              {focusNode.type !== 'case' &&
-              <MenuItem onClick={() => this.changeType('switch')}>
-                <ListItemIcon><Switch style={{transform: 'scale(1, -1)'}}/></ListItemIcon>
-                <ListItemText inset primary="分岐"/>
-              </MenuItem>}
-              {focusNode.type === 'case' &&
-              <MenuItem onClick={() => this.changeType('case')}>
-                <ListItemIcon><Case/></ListItemIcon>
-                <ListItemText inset primary="条件"/>
-              </MenuItem>}
+              {!isCase(focusNode.type) &&
+              <>
+                <MenuItem onClick={() => this.changeType(Type.task)}>
+                  <ListItemIcon><Task/></ListItemIcon>
+                  <ListItemText inset primary="作業"/>
+                </MenuItem>
+                <MenuItem onClick={() => this.changeType(Type.switch)}>
+                  <ListItemIcon><Switch style={{transform: 'scale(1, -1)'}}/></ListItemIcon>
+                  <ListItemText inset primary="分岐"/>
+                </MenuItem>
+                <MenuItem onClick={() => this.changeType(Type.case)}>
+                  <ListItemIcon><Case/></ListItemIcon>
+                  <ListItemText inset primary="条件"/>
+                </MenuItem>
+              </>}
             </Menu>
           </div>
         );
@@ -747,8 +747,8 @@ class NodeEditorComponent extends React.Component<Props, State> {
             style={labelStyle}
             InputProps={{style: fontSize}}
             placeholder={
-              focusNode.type === 'task' ? phrase.placeholder.task :
-              focusNode.type === 'switch' ? phrase.placeholder.switch : phrase.placeholder.case
+              isTask(focusNode.type) ? phrase.placeholder.task :
+              isSwitch(focusNode.type) ? phrase.placeholder.switch : phrase.placeholder.case
             }
             InputLabelProps={{shrink: true}}
             value={focusNode.label}

@@ -9,7 +9,7 @@ import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
   WorkerInCharge, Remarks, NecessaryTools, Exceptions,
 } from '../../../../settings/layout';
-import { TreeNode, Type } from '../../../../data-types/tree';
+import { TreeNode, Type, isSwitch, isTask, isCase } from '../../../../data-types/tree';
 
 import { phrase } from '../../../../settings/phrase';
 
@@ -91,7 +91,7 @@ const TextViewer: React.FC<Props> = (props: Props) => {
 
   const ExceptionsIcon = <InputAdornment position="start"><Exceptions/></InputAdornment>;
 
-  const focusType: Type = node === null ? 'task' : node.type;
+  const focusType: Type = node === null ? Type.task : node.type;
 
   return (
     <div className={classes.root}>
@@ -102,21 +102,17 @@ const TextViewer: React.FC<Props> = (props: Props) => {
               <FormControl>
                 <Select
                   classes={{
-                    icon: focusType !== 'switch'
-                      ? classes.selectType
-                      : classnames(classes.selectType, classes.switchIcon),
+                    icon: !isSwitch(focusType) ? classes.selectType : classnames(classes.selectType, classes.switchIcon),
                     select: classes.select
                   }}
                   value={node.type}
                   IconComponent={
-                    p => focusType === 'task' ?   <Task {...p}/> :
-                        focusType === 'switch' ? <Switch {...p}/> :
-                                                  <Case {...p}/>}
+                    p => isTask(focusType) ? <Task {...p}/> : isSwitch(focusType) ? <Switch {...p}/> : <Case {...p}/>}
                   disabled
                 >
                   <MenuItem value="task">作業</MenuItem>
                   <MenuItem value="switch">分岐</MenuItem>
-                  {node.type === 'case' && <MenuItem value="case">条件</MenuItem>}
+                  {isCase(node.type) && <MenuItem value="case">条件</MenuItem>}
                 </Select>
               </FormControl>
             </Grid>
@@ -127,8 +123,8 @@ const TextViewer: React.FC<Props> = (props: Props) => {
           <TextField
             style={{paddingLeft: 80}}
             placeholder={
-              node.type === 'task' ? phrase.placeholder.task :
-              node.type === 'switch' ? phrase.placeholder.switch : phrase.placeholder.case
+              isTask(node.type) ? phrase.placeholder.task :
+              isSwitch(node.type) ? phrase.placeholder.switch : phrase.placeholder.case
             }
             value={node.label}
             InputProps={{classes: {input: classes.title}}}

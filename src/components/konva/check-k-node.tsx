@@ -3,7 +3,7 @@ import { lightBlue, amber, yellow, grey } from '@material-ui/core/colors';
 
 import { Rect, Group, Text } from 'react-konva';
 
-import { CheckNode } from '../../data-types/tree';
+import { CheckNode, isTask, isSwitch, isCase } from '../../data-types/tree';
 
 import Util from '../../func/util';
 import CheckBox, { CheckBoxProps } from './check-box';
@@ -22,8 +22,8 @@ const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
 
   const fill =
     node.id === '--' || node.skipped ? grey[400] :
-    node.type === 'task' ?   node.focus ? lightBlue[200] : lightBlue[300] :
-    node.type === 'switch' ? node.focus ? amber[400]     : amber[300] :
+    isTask(node.type) ?   node.focus ? lightBlue[200] : lightBlue[300] :
+    isSwitch(node.type) ? node.focus ? amber[400]     : amber[300] :
                              node.focus ? yellow[400]    : yellow[300];
   const baseRectProps = {
     x: 0, y: 0,
@@ -83,7 +83,7 @@ const CheckKNode: React.FC<CheckKNodeProps> = (props: CheckKNodeProps) => {
       {node.open && node.children.length !== 0 && <Rect {...containerRectProps}/>}
       <Group {...rectGroupProps}>
         <Rect {...baseRectProps}/>
-        {node.type !== 'case' ? <CheckBox {...checkProps}/> : <RadioButton {...checkProps}/>}
+        {!isCase(node.type) ? <CheckBox {...checkProps}/> : <RadioButton {...checkProps}/>}
         <Text {...labelProps}/>
       </Group>
     </Group>

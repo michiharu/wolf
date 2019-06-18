@@ -1,6 +1,13 @@
 import User from "./user";
 import Category from "./category";
 
+export enum Type { task, switch, case }
+
+export const isTask = (type: Type) => type === Type.task; 
+export const isSwitch = (type: Type) => type === Type.switch; 
+export const isCase = (type: Type) => type === Type.case; 
+
+
 export interface Tree {
   id: string;
   type: Type;
@@ -20,7 +27,7 @@ export interface Tree {
 
 export const baseTree: Tree = {
   id: '',
-  type: 'task',
+  type: Type.task,
   label: '',
   input: '',
   output: '',
@@ -166,7 +173,6 @@ export interface CheckRecord {
 }
 
 // export const dummyId = '--';
-export type Type = 'task' | 'switch' | 'case';
 export type Point = {x: number, y: number};
 export type Size = {w: number, h:number};
 export type DragAction = 'moveToBrother' | 'moveInOut';

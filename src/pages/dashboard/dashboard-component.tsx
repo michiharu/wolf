@@ -188,7 +188,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     print: false,
     download: false,
     sortFilterList: false,
-    selectableRows: false,
+    selectableRows: 'none',
     viewColumns: false,
     elevation: 0,
     responsive: 'scroll',

@@ -31,7 +31,7 @@ class SimilarityTable extends React.Component<Props, State> {
       elevation: 0,
       responsive: 'scroll',
       rowHover: false,
-      selectableRows: false,
+      selectableRows: 'none',
       pagination: false,
       filter: false,
       search: false,

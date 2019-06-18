@@ -18,7 +18,7 @@ const DragMap: React.SFC<Props> = ({node, rows, ks}: Props) => (
       const fill = row.action === 'moveInOut' ? ('#ccff' + _.padStart(String(row.node.depth.top * 16), 2, '0')) :
                   row.action === 'moveToBrother' ? 'blue' : 'grey';
       const labelProps = {
-        text: row.node.type,
+        text: row.node.type.toString(),
         fontSize: ks.fontSize * ks.unit,
       };
       return (

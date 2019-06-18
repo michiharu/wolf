@@ -12,7 +12,7 @@ import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
   WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Close,
 } from '../../../../settings/layout';
-import { TreeNode, Type, baseTreeNode } from '../../../../data-types/tree';
+import { TreeNode, Type, baseTreeNode, isTask, isSwitch, isCase } from '../../../../data-types/tree';
 
 import TreeUtil from '../../../../func/tree';
 import { phrase } from '../../../../settings/phrase';
@@ -86,7 +86,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
 
   const cahngeType = (e: any) => {
     if (node === null) { return; }
-    const newType = e.target.value === 'task' ? 'task' : 'switch';
+    const newType = isTask(e.target.value) ? Type.task : Type.switch;
     if (node.type === newType) { return; }
 
     if (node.children.length === 0) {
@@ -94,12 +94,12 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
       changeNode(newNode);
     }
 
-    if (newType === 'task') {
+    if (isTask(newType)) {
       const children: TreeNode[] = node.children.map(c => c.children).reduce((a, b) => a.concat(b));
       const newNode: TreeNode = {...node, type: newType, children};
       changeNode(newNode);
     } else {
-      const newCase = TreeUtil.getNewNode('switch', baseTreeNode);
+      const newCase = TreeUtil.getNewNode(Type.switch, baseTreeNode);
       const children: TreeNode[] = [{...newCase, children: node.children}];
       const newNode: TreeNode = {...node, type: newType, children};
       changeNode(newNode);
@@ -136,7 +136,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
 
   const ExceptionsIcon = <InputAdornment position="start"><Exceptions/></InputAdornment>;
 
-  const focusType: Type = node === null ? 'task' : node.type;
+  const focusType: Type = node === null ? Type.task : node.type;
 
   const [deleteFlag, setDeleteFlag] = useState(false);
   // const handleClickDelete = () => {
@@ -173,7 +173,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
               <FormControl>
                 <Select
                   classes={{
-                    icon: focusType !== 'switch'
+                    icon: !isSwitch(focusType)
                       ? classes.selectType
                       : classnames(classes.selectType, classes.switchIcon),
                     select: classes.select
@@ -182,14 +182,13 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
                   value={node.type}
                   onChange={cahngeType}
                   IconComponent={
-                    p => focusType === 'task' ?   <Task {...p}/> :
-                        focusType === 'switch' ? <Switch {...p}/> :
-                                                  <Case {...p}/>}
-                  disabled={node.type === 'case'}
+                    p => isTask(focusType) ? <Task {...p}/> : isSwitch(focusType) ? <Switch {...p}/> : <Case {...p}/>
+                  }
+                  disabled={isCase(node.type)}
                 >
                   <MenuItem value="task">作業</MenuItem>
                   <MenuItem value="switch">分岐</MenuItem>
-                  {node.type === 'case' && <MenuItem value="case">条件</MenuItem>}
+                  {isCase(node.type) && <MenuItem value="case">条件</MenuItem>}
                 </Select>
               </FormControl>
             </Grid>
@@ -200,8 +199,8 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
           <TextField
             style={{paddingLeft: 80}}
             placeholder={
-              node.type === 'task' ? phrase.placeholder.task :
-              node.type === 'switch' ? phrase.placeholder.switch : phrase.placeholder.case
+              isTask(node.type) ? phrase.placeholder.task :
+              isSwitch(node.type) ? phrase.placeholder.switch : phrase.placeholder.case
             }
             value={node.label}
             InputProps={{classes: {input: classes.title}}}

@@ -1,4 +1,4 @@
-import {Tree, Type } from "../data-types/tree";
+import {Tree, Type, isSwitch, isCase } from "../data-types/tree";
 
 export default class TreeUtil {
 
@@ -88,7 +88,7 @@ export default class TreeUtil {
   static getNewNode = <T extends Tree>(parentType: Type, base: T): T => ({
     ...base, 
     id: 'rand:' + String(Math.random()).slice(2),
-    type: parentType !== 'switch' ? 'task' : 'case',
+    type: !isSwitch(parentType) ? Type.task : Type.case,
   });
 
   static match = (node: Tree, words: string[]): boolean => {
@@ -136,12 +136,12 @@ export default class TreeUtil {
   }
 
   static _isAllSwitchHasCase = <T extends Tree>(node: T): boolean => {
-    if (node.children.length === 0) { return node.type !== 'switch'; }
+    if (node.children.length === 0) { return !isSwitch(node.type); }
     return node.children.map(c => TreeUtil._isAllSwitchHasCase(c)).reduce((a, b) => a && b);
   }
 
   static _isAllCaseHasItem = <T extends Tree>(node: T): boolean => {
-    if (node.children.length === 0) { return node.type !== 'case'; }
+    if (node.children.length === 0) { return !isCase(node.type); }
     return node.children.map(c => TreeUtil._isAllCaseHasItem(c)).reduce((a, b) => a && b);
   }
 

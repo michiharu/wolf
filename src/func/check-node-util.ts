@@ -1,4 +1,4 @@
-import {TreeNode, Type, CheckNode, Point } from "../data-types/tree";
+import {TreeNode, Type, CheckNode, Point, isSwitch, isTask, isCase } from "../data-types/tree";
 import { defaultKS as ks } from "../settings/layout";
 import Util from "./util";
 import { CheckListState } from "../../archive/check-list/check-list";
@@ -8,7 +8,7 @@ export default class CheckNodeUtil {
   static get = (parentType: Type, node: TreeNode): CheckNode => {
     const rect = {
       w: ks.rect.w,
-      h: ks.rect.h + (parentType === 'switch' ? ks.textline : 0),
+      h: ks.rect.h + (isSwitch(parentType) ? ks.textline : 0),
     };
 
     return {
@@ -27,7 +27,7 @@ export default class CheckNodeUtil {
   }
 
   static getInitialState = (point: Point, parent: TreeNode | null, node: TreeNode): CheckListState => {
-    const parentType: Type = parent !== null ? parent.type : 'task';
+    const parentType: Type = parent !== null ? parent.type : Type.task;
     const newNode = CheckNodeUtil.get(parentType, node);
     const initNode = CheckNodeUtil.setCalcProps(point, newNode);
 
@@ -47,7 +47,7 @@ export default class CheckNodeUtil {
 
   static _openFirst = (node: CheckNode): CheckNode => {
     if (node.children.length === 0) { return {...node, open: true, focus: true}; }
-    if (node.type === 'task') {
+    if (isTask(node.type)) {
       const children = node.children.map((c, i) => i === 0 ? CheckNodeUtil._openFirst(c) : c);
       return {...node, open: true, children};
     } else {
@@ -66,7 +66,7 @@ export default class CheckNodeUtil {
 
   static calcSelfLength = (node: CheckNode, open: boolean, which: which) => {
 
-    if (node.type !== 'switch') {
+    if (!isSwitch(node.type)) {
       if (open) {
         if (which === 'width') {
           // task, open, width
@@ -167,7 +167,7 @@ export default class CheckNodeUtil {
   }
 
   static _check = (node: CheckNode): CheckNode => {
-    if ((node.type !== 'case' && (node.checked || node.skipped)) || node.children.length === 0) {
+    if ((!isCase(node.type) && (node.checked || node.skipped)) || node.children.length === 0) {
       return node;
     }
 
@@ -175,7 +175,7 @@ export default class CheckNodeUtil {
       const children = node.children.map(c => CheckNodeUtil._check(c));
       const hasFocus = children.map(c => CheckNodeUtil._hasFocus(c)).reduce((a, b) => a || b);
       if (hasFocus) { return {...node, children}; }
-      if (node.type === 'switch') {
+      if (isSwitch(node.type)) {
         const hasCheck = children.map(c => c.checked).reduce((a, b) => a || b);
         if (hasCheck) { return {...node, children, checked: true, open: false}; }
       }
@@ -211,7 +211,7 @@ export default class CheckNodeUtil {
   }
 
   static _skip = (node: CheckNode): CheckNode => {
-    if ((node.type !== 'case' && (node.checked || node.skipped)) || node.children.length === 0) {
+    if ((!isCase(node.type) && (node.checked || node.skipped)) || node.children.length === 0) {
       return node;
     }
 
@@ -219,7 +219,7 @@ export default class CheckNodeUtil {
       const children = node.children.map(c => CheckNodeUtil._skip(c));
       const hasFocus = children.map(c => CheckNodeUtil._hasFocus(c)).reduce((a, b) => a || b);
       if (hasFocus) { return {...node, children}; }
-      if (node.type === 'switch') {
+      if (isSwitch(node.type)) {
         const hasCheck = children.map(c => c.checked).reduce((a, b) => a || b);
         if (hasCheck) {
           const caseChildren = children.find(c => c.checked)!.children;
@@ -242,7 +242,7 @@ export default class CheckNodeUtil {
       );
       return {...node, children: setFocusChildren};
     }
-    if (node.type === 'switch') {
+    if (isSwitch(node.type)) {
       const children = node.children.map(c => ({...c, focus: false, skipped: true}));
       return {...node, children, skipped: true, open: false};
     }
@@ -318,16 +318,16 @@ export default class CheckNodeUtil {
 
     var anchor = 0;
     const children = node.children.map(c => {
-      const p: Point = (node.type === 'switch' && c.checked)
+      const p: Point = (isSwitch(node.type) && c.checked)
       ? {
         x: point.x + ks.indent,
         y: point.y + node.rect.h + ks.spr.h
       } : {
-        x: point.x + ks.indent + (node.type !== 'switch' ? 0 : anchor),
-        y: point.y + node.rect.h + ks.spr.h + (node.type === 'switch' ? 0 : anchor)
+        x: point.x + ks.indent + (isSwitch(node.type) ? anchor : 0),
+        y: point.y + node.rect.h + ks.spr.h + (isSwitch(node.type) ? 0 : anchor)
       };
       const child = CheckNodeUtil._setPoint(p, c);
-      anchor += node.type !== 'switch' ? c.self.h + ks.spr.h : c.self.w + ks.spr.w;
+      anchor += !isSwitch(node.type) ? c.self.h + ks.spr.h : c.self.w + ks.spr.w;
       return child;
     });
 
@@ -357,7 +357,7 @@ export default class CheckNodeUtil {
 
   static toFlat = (node: CheckNode): CheckNode[] => {
     if (node.children.length === 0 || !node.open) {
-      if (node.type !== 'switch') {
+      if (!isSwitch(node.type)) {
         return [node];
       } else {
         const checkedCase = node.children.find(c => c.checked);

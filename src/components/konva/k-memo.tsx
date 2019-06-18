@@ -4,7 +4,7 @@ import { lightBlue, amber, yellow } from '@material-ui/core/colors';
 import Konva from 'konva';
 import { Rect, Group, Text } from 'react-konva';
 
-import { KTreeNode } from '../../data-types/tree';
+import { KTreeNode, isTask, isSwitch } from '../../data-types/tree';
 
 import Util from '../../func/util';
 import { phrase } from '../../settings/phrase';
@@ -44,7 +44,7 @@ const KMemo: React.FC<KMemoProps> = props => {
   }
   
   const { node, ks, labelFocus, moveToConvergent } = props;
-  const fill = node.type === 'task' ? lightBlue[50] : node.type === 'switch' ? amber[100] : yellow[100];
+  const fill = isTask(node.type) ? lightBlue[50] : isSwitch(node.type) ? amber[100] : yellow[100];
   const baseRectProps = {
     x: 0, y: 0,
     width: node.rect.w * ks.unit,
@@ -61,7 +61,7 @@ const KMemo: React.FC<KMemoProps> = props => {
 
   const labelProps =  {
     text: Util.isEmpty(node.label)
-      ? node.type === 'task' ? phrase.empty.task : node.type === 'switch' ? phrase.empty.switch : phrase.empty.case
+      ? isTask(node.type) ? phrase.empty.task : isSwitch(node.type) ? phrase.empty.switch : phrase.empty.case
       : node.label,
     fontSize: ks.fontSize * ks.unit,
     x: (ks.rect.h + ks.fontSize / 2) * ks.unit,

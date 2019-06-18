@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
-import { Tree } from '../../data-types/tree';
+import { Tree, isTask, isSwitch } from '../../data-types/tree';
 import { Task, Switch, Case } from '../../settings/layout';
 import AdapterLink from '../custom-mui/adapter-link';
 
@@ -27,8 +27,8 @@ const ExpansionTree: React.FC<Props> = props => {
         style={{paddingLeft: paddingLeft * (depth + 1)}}
       >
         <ListItemIcon>
-          {node.type === 'task' ? <Task/> :
-            node.type === 'switch' ? <Switch style={{transform: 'scale(1, -1)'}}/> : <Case/>}
+          {isTask(node.type) ? <Task/> :
+          isSwitch(node.type) ? <Switch style={{transform: 'scale(1, -1)'}}/> : <Case/>}
         </ListItemIcon>
         <ListItemText primary={node.label}/>
       </ListItem>

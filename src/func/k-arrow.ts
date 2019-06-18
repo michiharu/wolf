@@ -1,4 +1,4 @@
-import { KWithArrow, Point } from "../data-types/tree";
+import { KWithArrow, Point, isSwitch, isCase, isTask } from "../data-types/tree";
 import KSize from "../data-types/k-size";
 import { buttonArea } from "./k-tree";
 
@@ -21,7 +21,7 @@ export default class KArrowUtil {
 
   static _setInArrowOfNotSwitch = <T extends KWithArrow>(node: T, ks: KSize): T => {
     const children = node.children.map(c => KArrowUtil._setInArrowOfNotSwitch(c, ks));
-    if (node.type !== 'switch' && (node.open && children.length !== 0)) {
+    if (!isSwitch(node.type) && (node.open && children.length !== 0)) {
       const focusMargin = (node.focus && ks.margin.h * ks.unit < buttonArea)
             ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0;
       const arrows: Point[][] = [[
@@ -35,7 +35,7 @@ export default class KArrowUtil {
 
   static _setInArrowOfSwitch = <T extends KWithArrow>(node: T, ks: KSize): T => {
     const children = node.children.map(c => KArrowUtil._setInArrowOfSwitch(c, ks));
-    if (node.open && node.type === 'switch' && children.length !== 0) {
+    if (node.open && isSwitch(node.type) && children.length !== 0) {
       const focusMargin = (node.focus && ks.margin.h * ks.unit < buttonArea)
             ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0;
       var anchor = ks.rect.h + ks.margin.h + ks.rect.h * 0.5 + focusMargin;
@@ -58,7 +58,7 @@ export default class KArrowUtil {
       if (c.open && c.children.length !== 0) {
         return KArrowUtil._setNextArrow(c, ks);
       } else {
-        if (c.type !== 'case' && node.children.length - 1 !== i) {
+        if (!isCase(c.type) && node.children.length - 1 !== i) {
           const focusMargin = (c.focus && ks.margin.h * ks.unit < buttonArea)
             ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0;
           const openMargin = c.open ? ks.margin.h : 0;
@@ -81,7 +81,7 @@ export default class KArrowUtil {
         const isLastChildren = _children.length - 1 === i;
         if (!isLastChildren) {
           if (c.children.length !== 0) {
-            return node.type !== 'switch'
+            return !isSwitch(node.type)
               ? KArrowUtil._setReturnArrow(c, c, _children[i + 1], ks)
               : KArrowUtil._setReturnArrow(c, before, exit, ks);
           } else {
@@ -101,7 +101,7 @@ export default class KArrowUtil {
       });
       return {...node, children};
     }
-    if (!node.open && node.type === 'case' && exit !== null) {
+    if (!node.open && isCase(node.type) && exit !== null) {
       return {...node, arrows: KArrowUtil.getArrowPoints(node, before!, exit, ks)};
     }
 
@@ -117,7 +117,7 @@ export default class KArrowUtil {
 
   static getArrowPoints = <T extends KWithArrow>(node: T, before: T, exit: T, ks: KSize): Point[][] => {
     const dv: Point = {x: exit.point.x - node.point.x, y: exit.point.y - node.point.y};
-    if (before.type === 'task' && !KArrowUtil._hasUnderNode(before, node)) {
+    if (isTask(before.type) && !KArrowUtil._hasUnderNode(before, node)) {
       const exitCenter = ks.rect.w / 2  - ks.spr.w * 4 - (node.point.x - before.point.x);
       if (exitCenter < ks.spr.w) {
         return [[

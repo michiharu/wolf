@@ -13,7 +13,7 @@ import Undo from '@material-ui/icons/Undo';
 
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
-import { TreeNode, Type, CheckNode, CheckRecord } from '../../src/data-types/tree';
+import { TreeNode, Type, CheckNode, CheckRecord, isTask } from '../../src/data-types/tree';
 import { toolbarHeight, toolbarMinHeight, defaultKS as ks } from '../../src/settings/layout';
 
 import CheckNodeUtil from '../../src/func/check-node-util';
@@ -126,7 +126,7 @@ class CheckList extends React.Component<Props, CheckListState> {
   check = (target: CheckNode) => {
     if (!target.focus) { return; }
     const {node: prevNode, nodeHistory: history, checkRecords} = this.state;
-    const node = target.type === 'task'
+    const node = isTask(target.type)
       ? CheckNodeUtil.check(point, prevNode)
       : CheckNodeUtil.select(point, prevNode, target);
     history.push(node);
