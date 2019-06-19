@@ -695,20 +695,20 @@ class NodeEditorComponent extends React.Component<Props, State> {
               }}
             >
               {!isCase(focusNode.type) &&
-              <>
-                <MenuItem onClick={() => this.changeType(Type.task)}>
-                  <ListItemIcon><Task/></ListItemIcon>
-                  <ListItemText inset primary="作業"/>
-                </MenuItem>
-                <MenuItem onClick={() => this.changeType(Type.switch)}>
-                  <ListItemIcon><Switch style={{transform: 'scale(1, -1)'}}/></ListItemIcon>
-                  <ListItemText inset primary="分岐"/>
-                </MenuItem>
-                <MenuItem onClick={() => this.changeType(Type.case)}>
-                  <ListItemIcon><Case/></ListItemIcon>
-                  <ListItemText inset primary="条件"/>
-                </MenuItem>
-              </>}
+              <MenuItem onClick={() => this.changeType(Type.task)}>
+                <ListItemIcon><Task/></ListItemIcon>
+                <ListItemText inset primary="作業"/>
+              </MenuItem>}
+              {!isCase(focusNode.type) &&
+              <MenuItem onClick={() => this.changeType(Type.switch)}>
+                <ListItemIcon><Switch style={{transform: 'scale(1, -1)'}}/></ListItemIcon>
+                <ListItemText inset primary="分岐"/>
+              </MenuItem>}
+              {isCase(focusNode.type) &&
+              <MenuItem onClick={() => this.changeType(Type.case)}>
+                <ListItemIcon><Case/></ListItemIcon>
+                <ListItemText inset primary="条件"/>
+              </MenuItem>}
             </Menu>
           </div>
         );
@@ -745,6 +745,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
           <TextField
             inputRef={this.labelRef}
             style={labelStyle}
+            variant="standard"
             InputProps={{style: fontSize}}
             placeholder={
               isTask(focusNode.type) ? phrase.placeholder.task :

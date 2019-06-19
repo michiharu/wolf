@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
   Theme, createStyles, WithStyles, Snackbar, IconButton,
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Modal, withStyles, Portal,
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Modal, withStyles, Portal, ButtonGroup, Box,
 } from '@material-ui/core';
 
 import CloseIcon from '@material-ui/icons/Close';
@@ -152,22 +152,26 @@ class EditorFrameComponent extends React.Component<Props, State> {
     const cannotSave: CannotSaveReason = cannotSaveReason !== null ? cannotSaveReason :
       !TreeUtil._isAllSwitchHasCase(node) ? 'switch' :
       !TreeUtil._isAllCaseHasItem(node)   ? 'case'   : null;
-    const getStyle = (buttonMode: NodeEditMode) => {
+    const getStyle = (buttonMode: NodeEditMode): React.CSSProperties => {
       return mode === buttonMode
-      ? { height: '100%', backgroundColor: theme.palette.background.paper }
+      ? { height: '100%', backgroundColor: theme.palette.background.paper, borderLeftColor: 'rgba(0, 0, 0, 0.24)' }
       : { height: '100%' };
     };
     return (
       <div>
         <Portal container={modeRef.current}>
-          <>
-            <Button style={getStyle('d')}  onClick={() => this.setState({mode: 'd'})} ><Divergent/></Button>
-            <Button style={getStyle('dc')} onClick={() => this.setState({mode: 'dc'})}><Divergent/><Convergent className={classes.convergent}/></Button>
-            <Button style={getStyle('c')}  onClick={() => this.setState({mode: 'c'})} ><Convergent className={classes.convergent}/></Button>
-          </>
+          <Box mt={0.9} mr={2}>
+            <ButtonGroup size="small">
+              <Button style={getStyle('d')}  onClick={() => this.setState({mode: 'd'})} ><Divergent/></Button>
+              <Button style={getStyle('dc')} onClick={() => this.setState({mode: 'dc'})}><Divergent/><Convergent className={classes.convergent}/></Button>
+              <Button style={getStyle('c')}  onClick={() => this.setState({mode: 'c'})} ><Convergent className={classes.convergent}/></Button>
+            </ButtonGroup>
+          </Box>
         </Portal>
         <Portal container={buttonRef.current}>
-          <Button color="primary" onClick={this.save} style={{height: '100%'}}>編集完了</Button>
+          <Box mt={0.7}>
+            <Button color="primary" onClick={this.save}>編集完了</Button>
+          </Box>
         </Portal>
 
         <NodeEditorContainer {...nodeProps}/>

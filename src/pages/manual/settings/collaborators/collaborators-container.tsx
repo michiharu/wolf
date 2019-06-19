@@ -13,7 +13,7 @@ export interface CollaboratorsActions {
 function mapStateToProps(appState: AppState) {
   const { manuals, selectId } = appState.manuals;
   const manual = manuals.find(m => m.id === selectId)!;
-  return {...appState.users, manual};
+  return {user: appState.loginUser.user!, ...appState.users, manual};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {

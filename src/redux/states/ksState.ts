@@ -14,3 +14,5 @@ const initialState: KSState = {
 export const ksReducer = reducerWithInitialState(initialState)
 .case(ksActions.change, (state, ks) => ({...state, ks}))
 .case(ksActions.reset, (state) => ({...state, ks: defaultKS}))
+.case(ksActions.zoomIn, (state) => ({...state, ks: {...state.ks, unit: state.ks.unit + 2}}))
+.case(ksActions.zoomOut, (state) => ({...state, ks: {...state.ks, unit: state.ks.unit - 2}}))

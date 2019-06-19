@@ -11,10 +11,43 @@ import LoginRouter from './pages/login-router';
 import Notifier from './notifier';
 
 export const theme = createMuiTheme({
+  mixins: {
+    toolbar: {
+        minHeight: 42
+    }
+  },
   palette: {
     primary: blue,
     secondary: pink,
-  }
+  },
+  typography: {
+    // fontSize: 12,
+    button: {
+        textTransform: "none"
+    }
+  },
+  props: {
+    MuiCheckbox: {
+        color: "primary"
+    },
+    MuiList: {
+        dense: true
+    },
+    MuiRadio: {
+        color: "primary"
+    },
+    MuiSwitch: {
+        color: "primary"
+    },
+    MuiTextField: {
+        variant: "outlined"
+        // InputProps: {
+        //     style: {
+        //         height: 38
+        //     }
+        // }
+    }
+  },
 });
 
 const Providers: React.FC<{}> = () => (

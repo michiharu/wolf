@@ -7,7 +7,6 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { LoginUserState } from '../../redux/states/main/loginUserState';
 import PageRouter from '../page-router';
 import { Search, AccountCircle } from '@material-ui/icons';
 import { InputBase, Button, Menu, MenuItem } from '@material-ui/core';
@@ -16,6 +15,7 @@ import links from '../../settings/links';
 import AdapterLink from '../../components/custom-mui/adapter-link';
 import DrawerContentContainer from './drawer-content/drawer-content-container';
 import { LayoutActions } from './layout-container';
+import User from '../../data-types/user';
 
 export const drawerWidth = 300;
 
@@ -71,9 +71,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     width: '100%',
   },
   inputInput: {
-    paddingTop: theme.spacing(1.5),
-    paddingRight: theme.spacing(1.5),
-    paddingBottom: theme.spacing(1.5),
+    paddingTop: theme.spacing(0.8),
+    paddingRight: theme.spacing(0.8),
+    paddingBottom: theme.spacing(0.8),
     paddingLeft: theme.spacing(10),
     transition: theme.transitions.create('width'),
     width: '100%',
@@ -83,6 +83,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   grow: {
     flexGrow: 1,
+  },
+  accountCircle: {
+    marginRight: theme.spacing(1)
   },
   toolbar: theme.mixins.toolbar,
   drawerPaper: {
@@ -94,7 +97,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface Props extends LoginUserState, LayoutActions, RouteComponentProps {}
+interface Props extends LayoutActions, RouteComponentProps {
+  user: User;
+}
 
 function AppFrameComponent({user, logout, location}: Props) {
 
@@ -153,7 +158,7 @@ function AppFrameComponent({user, logout, location}: Props) {
           >
             <MenuIcon />
           </IconButton>
-          <Button component={AdapterLink} to={links.dashboard}>
+          <Button component={AdapterLink} to={links.dashboard} size="small">
             <Typography variant="h6" noWrap>Flow Like</Typography>
           </Button>
           
@@ -171,16 +176,16 @@ function AppFrameComponent({user, logout, location}: Props) {
             />
           </div>}
           <div className={classes.grow} />
-          <IconButton
-            edge="end"
+          <Button
             aria-label="Account of current user"
             aria-controls={menuId}
             aria-haspopup="true"
             onClick={handleProfileMenuOpen}
             color="inherit"
           >
-            <AccountCircle />
-          </IconButton>
+            <AccountCircle className={classes.accountCircle}/>
+            {`${user.lastName} ${user.firstName}`}
+          </Button>
           {renderMenu}
 
         </Toolbar>

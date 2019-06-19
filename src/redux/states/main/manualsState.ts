@@ -92,7 +92,9 @@ export const manualsReducer = reducerWithInitialState(initialState)
     const selectNode = cloneManual.rootTree !== null
       ? TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneManual.rootTree!, baseTreeNode))
       : null;
+    if (selectNode !== null) { selectNode.label = cloneManual.title; }
     const beforeManual = state.manuals.find(m => m.id === manual.id)!
+
     return ({
       ...state,
       manuals: state.manuals.map(m => m.id === cloneManual.id ? cloneManual : m),
@@ -108,6 +110,8 @@ export const manualsReducer = reducerWithInitialState(initialState)
     const selectNode = cloneManual.rootTree !== null
     ? TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneManual.rootTree!, baseTreeNode))
     : null;
+    if (selectNode !== null) { selectNode.label = cloneManual.title; }
+
     return ({
       ...state,
       manuals: state.manuals.map(m => m.id === beforeId ? cloneManual : m),
@@ -124,6 +128,8 @@ export const manualsReducer = reducerWithInitialState(initialState)
     const selectNode = before.rootTree !== null
     ? TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(before.rootTree!, baseTreeNode))
     : null;
+    if (selectNode !== null) { selectNode.label = before.title; }
+
     return {
       ...state,
       manuals: state.manuals.map(m => m.id === beforeId ? before : m),

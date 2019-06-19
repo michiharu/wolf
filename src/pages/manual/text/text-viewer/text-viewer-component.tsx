@@ -110,9 +110,9 @@ const TextViewer: React.FC<Props> = (props: Props) => {
                     p => isTask(focusType) ? <Task {...p}/> : isSwitch(focusType) ? <Switch {...p}/> : <Case {...p}/>}
                   disabled
                 >
-                  <MenuItem value="task">作業</MenuItem>
-                  <MenuItem value="switch">分岐</MenuItem>
-                  {isCase(node.type) && <MenuItem value="case">条件</MenuItem>}
+                  <MenuItem value="0">作業</MenuItem>
+                  <MenuItem value="1">分岐</MenuItem>
+                  {isCase(node.type) && <MenuItem value="2">条件</MenuItem>}
                 </Select>
               </FormControl>
             </Grid>

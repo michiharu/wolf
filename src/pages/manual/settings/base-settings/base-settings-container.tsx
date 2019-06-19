@@ -13,7 +13,7 @@ export interface BaseSettingsActions {
 function mapStateToProps(appState: AppState) {
   const { manuals, selectId } = appState.manuals;
   const manual = manuals.find(m => m.id === selectId)!;
-  return {manual, categories: appState.categories.categories};
+  return {user: appState.loginUser.user!, manual, categories: appState.categories.categories};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {

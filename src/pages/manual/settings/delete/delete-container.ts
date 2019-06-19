@@ -13,7 +13,7 @@ export interface DeleteActions {
 function mapStateToProps(appState: AppState) {
   const { manuals, selectId } = appState.manuals;
   const manual = manuals.find(m => m.id === selectId)!;
-  return {manual};
+  return {user: appState.loginUser.user!,manual};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {

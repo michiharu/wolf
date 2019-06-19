@@ -64,6 +64,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
       options: {
         display: "false",
         filter: false,
+        viewColumns: false,
       }
     },
     {
@@ -71,6 +72,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
       options: {
         display: "false",
         filter: false,
+        viewColumns: false,
       }
     },
     {
@@ -84,7 +86,6 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     },
     {
       name: "favoriteSum",
-      
       options: {
         filter: false,
         sort: true,
@@ -111,7 +112,6 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     },
     {
       name: "likeSum",
-      label: "-",
       options: {
         filter: false,
         sort: true,
@@ -195,7 +195,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     download: false,
     sortFilterList: false,
     selectableRows: 'none',
-    viewColumns: false,
+    // viewColumns: false,
     elevation: 0,
     responsive: 'scroll',
     rowsPerPageOptions: [10,20,50],

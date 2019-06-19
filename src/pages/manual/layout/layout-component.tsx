@@ -10,13 +10,14 @@ import TextViewer from '../text/text-viewer/text-viewer-container';
 import ManualSettings from '../settings/settings';
 import ViewSettingsContainer from '../../../components/view-settings/view-settings-container';
 import User from '../../../data-types/user';
-import { Star, StarBorder, ThumbUp, ThumbUpAltOutlined } from '@material-ui/icons';
+import { Star, StarBorder, ThumbUp, ThumbUpAltOutlined, ZoomIn, ZoomOut } from '@material-ui/icons';
 import { yellow, blue } from '@material-ui/core/colors';
 import { Action } from 'typescript-fsa';
 import NodeEditorContainer from '../node/node-editor/node-editor-frame-container';
 import { drawerWidth } from '../../layout/layout-component';
 import TextEditorContainer from '../text/text-editor/text-editor-container';
 import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequestParams, LikeDeleteRequestParams } from '../../../api/definitions';
+import KSize from '../../../data-types/k-size';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -61,16 +62,19 @@ interface Props {
   manual: Manual;
   selectNode: TreeNode | null;
   isEditing: boolean;
+  ks: KSize;
   replace: (manual: Manual) => Action<Manual>;
   postFavorite: (params: FavoritePostRequestParams) => Action<FavoritePostRequestParams>,
   deleteFavorite: (params: FavoriteDeleteRequestParams) => Action<FavoriteDeleteRequestParams>,
   postLike: (params: LikePostRequestParams) => Action<LikePostRequestParams>,
   deleteLike: (params: LikeDeleteRequestParams) => Action<LikeDeleteRequestParams>,
   editStart: () => Action<void>;
+  zoomIn: () => Action<void>;
+  zoomOut: () => Action<void>;
 }
 
 const LayoutComponent: React.FC<Props> = props => {
-  const { user, manual, selectNode, isEditing } =  props;
+  const { user, manual, selectNode, isEditing, ks, zoomIn, zoomOut } =  props;
 
   const [tabIndex, setTabIndex] = useState(0);
   const [showVS, setShowVS] = useState(false);
@@ -127,7 +131,12 @@ const LayoutComponent: React.FC<Props> = props => {
     <div className={classes.root}>
       <Box mt={1} mx={2}>
         <Grid container justify="space-between" alignItems="center" spacing={2}>
-          <Grid item><Typography variant="h4" noWrap>{manual.title}</Typography></Grid>
+          <Grid item>
+            <Box display="flex" flexDirection="row">
+              <Typography variant="h5" color="textSecondary">{`${user.lastName} ${user.firstName} /`}</Typography>
+              <Box ml={1}><Typography variant="h4">{manual.title}</Typography></Box>
+            </Box>
+          </Grid>
           <Grid item>
             <Box display="flex" flexDirection="row">
               <Box ml={2}>
@@ -153,9 +162,18 @@ const LayoutComponent: React.FC<Props> = props => {
         <div style={{flexGrow: 1}} />
         <div ref={modeRef}/>
         {(tabIndex === 0 || tabIndex === 1) && isCommiter && !isEditing &&
-        <Button color="primary" onClick={onClickEditStart}>編集する</Button>}
+        <Box mt={0.7}>
+          <Button color="primary" onClick={onClickEditStart}>編集する</Button>
+        </Box>}
         <div ref={buttonRef}/>
-
+        {tabIndex === 0 &&
+        <IconButton className={classes.viewSettingButton} onClick={zoomIn} disabled={ks.unit === 30}>
+          <ZoomIn/>
+        </IconButton>}
+        {tabIndex === 0 &&
+        <IconButton className={classes.viewSettingButton} onClick={zoomOut} disabled={ks.unit === 8}>
+          <ZoomOut/>
+        </IconButton>}
         {tabIndex === 0 &&
         <IconButton className={classes.viewSettingButton} onClick={handleShowVS}><ViewSettingsIcon/></IconButton>}
       </div>

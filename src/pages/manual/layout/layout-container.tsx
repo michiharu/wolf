@@ -15,6 +15,8 @@ import { manualsAction, favoriteActions, likeActions } from '../../../redux/acti
 import { viewAction } from '../../../redux/actions/viewAction';
 import { ViewState } from '../../../redux/states/viewState';
 import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequestParams, LikeDeleteRequestParams } from '../../../api/definitions';
+import { ksActions } from '../../../redux/actions/ksAction';
+import { KSState } from '../../../redux/states/ksState';
 
 export interface ViewActions {
   get: (manual: Manual) => Action<Manual>;
@@ -25,12 +27,15 @@ export interface ViewActions {
   deleteLike: (params: LikeDeleteRequestParams) => Action<LikeDeleteRequestParams>,
   clear: () => Action<void>;
   editStart: () => Action<void>;
+  zoomIn: () => Action<void>;
+  zoomOut: () => Action<void>;
 }
 
 interface Props extends
   ManualsState,
   CategoriesState,
   ViewState,
+  KSState,
   ViewActions,
   RouteComponentProps<{id: string}> {
     user: User;
@@ -43,6 +48,7 @@ const ViewContainer: React.FC<Props> = props => {
     selectId,
     selectNode,
     isEditing,
+    ks,
     match,
     get,
     replace,
@@ -51,6 +57,8 @@ const ViewContainer: React.FC<Props> = props => {
     postLike,
     deleteLike,
     editStart,
+    zoomIn,
+    zoomOut,
   } =  props;
 
   if (selectId !== match.params.id || selectNode === null) {
@@ -64,12 +72,15 @@ const ViewContainer: React.FC<Props> = props => {
     manual,
     selectNode,
     isEditing,
+    ks,
     replace,
     postFavorite,
     deleteFavorite,
     postLike,
     deleteLike,
-    editStart
+    editStart,
+    zoomIn,
+    zoomOut,
   };
   return <LayoutComponent {...componentProps}/>;
 }
@@ -93,6 +104,8 @@ function mapDispatchToProps(dispatch: Dispatch) {
     postLike: (params: LikePostRequestParams) => dispatch(likeActions.post(params)),
     deleteLike: (params: LikeDeleteRequestParams) => dispatch(likeActions.delete(params)),
     editStart: () => dispatch(viewAction.editStart()),
+    zoomIn: () => dispatch(ksActions.zoomIn()),
+    zoomOut: () => dispatch(ksActions.zoomOut()),
   };
 }
 

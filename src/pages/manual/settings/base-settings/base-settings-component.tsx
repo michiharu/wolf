@@ -8,6 +8,7 @@ import { Manual } from '../../../../data-types/tree';
 import { BaseSettingsActions } from './base-settings-container';
 import Category from '../../../../data-types/category';
 import { maxWidth } from '../settings';
+import User from '../../../../data-types/user';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -20,12 +21,14 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props extends BaseSettingsActions {
+  user: User;
   categories: Category[];
   manual: Manual;
 }
 
 const Collaborators: React.FC<Props> = props => {
-  const { manual, categories, replace } =  props;
+  const { user, manual, categories, replace } =  props;
+  const isOwner = manual.ownerId === user.id;
   const [isEditing, setIsEditing] = useState(false);
   function handleClickEdit() {
     if (isEditing) {
@@ -52,6 +55,7 @@ const Collaborators: React.FC<Props> = props => {
     setTitle(manual.title);
   }, [manual.title]);
 
+
   const classes = useStyles();
   return (
     <div className={classes.root}>
@@ -67,13 +71,13 @@ const Collaborators: React.FC<Props> = props => {
             onChange={handleChangeTitle}
             disabled={!isEditing}
           />
-          <Button onClick={handleClickEdit}>変更</Button>
+          <Button onClick={handleClickEdit} disabled={!isOwner}>変更</Button>
         </Box>
       </Box>
       <Box p={2} maxWidth={maxWidth}>
         <Typography variant="caption">カテゴリー</Typography>
         <FormControl fullWidth>
-          <Select value={manual.categoryId} onChange={handleCategorySelect}>
+          <Select value={manual.categoryId} onChange={handleCategorySelect} disabled={!isOwner}>
             {categories.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
           </Select>
         </FormControl>
@@ -85,6 +89,7 @@ const Collaborators: React.FC<Props> = props => {
             className={classes.switch}
             control={<Switch checked={manual.isPublic} color="primary" onChange={handleSwitch} />}
             label="公開"
+            disabled={!isOwner}
           />
         </Box>
       </Box>

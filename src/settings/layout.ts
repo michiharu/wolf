@@ -28,7 +28,7 @@ export { default as Convergent } from '@material-ui/icons/ClearAll'; // converge
 
 
 export const defaultKS: KSize = {
-  unit: 20,
+  unit: 16,
   rect: {w: 24, h: 3},
   margin: {w: 1, h: 2},
   spr: {w: 1, h: 1},

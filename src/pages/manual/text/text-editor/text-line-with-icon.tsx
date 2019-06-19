@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import {
   Theme, createStyles, WithStyles, withStyles, TextField, Grid,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
-  InputAdornment, FormControl, Select, MenuItem, Button, IconButton, Typography, Paper
+  InputAdornment, FormControl, Select, MenuItem, Button, IconButton, Typography, Paper, Box
 } from '@material-ui/core';
 import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
@@ -35,7 +35,14 @@ const styles = (theme: Theme) => createStyles({
   title: {
     fontSize: 40,
   },
-  imageIcon: {marginRight: theme.spacing(1)},
+  imageButton: {
+    paddingTop: theme.spacing(1.8),
+    paddingBottom: theme.spacing(1.8),
+  },
+  imageIcon: {
+    // marginLeft: -theme.spacing(0.28),
+    marginRight: theme.spacing(1)
+  },
   imageFormContainer: {
     marginTop: -theme.spacing(2),
     marginBottom: -theme.spacing(1),
@@ -86,7 +93,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
 
   const cahngeType = (e: any) => {
     if (node === null) { return; }
-    const newType = isTask(e.target.value) ? Type.task : Type.switch;
+    const newType: Type = e.target.value === '1' ? Type.task : Type.switch;
     if (node.type === newType) { return; }
 
     if (node.children.length === 0) {
@@ -186,8 +193,8 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
                   }
                   disabled={isCase(node.type)}
                 >
-                  <MenuItem value="task">作業</MenuItem>
-                  <MenuItem value="switch">分岐</MenuItem>
+                  <MenuItem value="0">作業</MenuItem>
+                  <MenuItem value="1">分岐</MenuItem>
                   {isCase(node.type) && <MenuItem value="case">条件</MenuItem>}
                 </Select>
               </FormControl>
@@ -278,13 +285,13 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
               InputProps={{startAdornment: ExceptionsIcon}}
               fullWidth
             />
-            <div style={{paddingLeft: 72}}>
-              <Button component="label" size="small">
+            <Box ml={10}>
+              <Button component="label" variant="outlined" className={classes.imageButton} fullWidth>
                 <Image className={classes.imageIcon}/>
                 {node.imageName.length !== 0 ? node.imageName : 'ファイルを選択'}
                 <form><input type="file" style={{ display: 'none' }} onChange={handleFileChosen}/></form>
               </Button>
-            </div>
+            </Box>
         </Grid>
         <Grid item xs={12} lg={4}>
           {node.imageBlob.length !== 0 &&

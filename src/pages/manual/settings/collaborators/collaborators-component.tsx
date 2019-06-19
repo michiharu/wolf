@@ -8,6 +8,7 @@ import { Manual } from '../../../../data-types/tree';
 import { CollaboratorsActions } from './collaborators-container';
 import { UsersState } from '../../../../redux/states/main/usersState';
 import { maxWidth } from '../settings';
+import User from '../../../../data-types/user';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -18,11 +19,14 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface Props extends UsersState, CollaboratorsActions, WithStyles<typeof styles> {
+  user: User;
   manual: Manual;
 }
 
 const Collaborators: React.FC<Props> = props => {
-  const { users, manual, classes } =  props;
+  const { user, users, manual, classes } =  props;
+  const isOwner = manual.ownerId === user.id;
+
   const collaboratorIds = manual.collaboratorIds;
   const [collaboratorId, setCollaboratorId] = useState('');
   const changeCollaborators = (collaboratorIds: string[]) => {
@@ -56,7 +60,7 @@ const Collaborators: React.FC<Props> = props => {
           key={i}
           className={classes.chip}
           label={`${c.lastName} ${c.firstName}`}
-          onDelete={deleteCollaborator(c.id)}
+          onDelete={isOwner ? deleteCollaborator(c.id) : undefined}
         />)}
       </Box>
       <Box p={2} maxWidth={maxWidth}>
@@ -64,7 +68,7 @@ const Collaborators: React.FC<Props> = props => {
           <Grid item xs={6}>
             <FormControl fullWidth>
               <InputLabel>コラボレーターの追加</InputLabel>
-              <Select value={collaboratorId} onChange={handleSelect}>
+              <Select value={collaboratorId} onChange={handleSelect} disabled={!isOwner}>
                 <MenuItem value=""><em>None</em></MenuItem>
                 {others.map(o => <MenuItem key={o.id} value={o.id}>{`${o.lastName} ${o.firstName}`}</MenuItem>)}
               </Select>

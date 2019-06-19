@@ -5,14 +5,18 @@ import { DeleteActions } from './delete-container';
 import { Close } from '@material-ui/icons';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import links from '../../../../settings/links';
+import User from '../../../../data-types/user';
 
 
 interface Props extends DeleteActions, RouteComponentProps {
+  user: User;
   manual: Manual;
 }
 
 const DeleteComponent: React.FC<Props> = props => {
-  const { manual, manualDelete, history } = props;
+  const { user, manual, manualDelete, history } = props;
+  const isOwner = manual.ownerId === user.id;
+
   const [title, setTitle] = useState('');
   function handleChangeTitle(e: React.ChangeEvent<HTMLInputElement>) {
     setTitle(e.target.value);
@@ -43,12 +47,13 @@ const DeleteComponent: React.FC<Props> = props => {
               placeholder="確認のためタイトルを入力"
               value={title}
               onChange={handleChangeTitle}
-              error={manual.title !== title}
+              error={manual.title !== title && isOwner}
               fullWidth
+              disabled={!isOwner}
             />
           </Grid>
           <Grid item>
-            <Button variant="contained" color="primary" onClick={handleClick}>削除する</Button>
+            <Button variant="contained" color="primary" onClick={handleClick} disabled={!isOwner}>削除する</Button>
           </Grid>
         </Grid>
       </Box>
