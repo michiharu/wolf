@@ -1,24 +1,10 @@
 import React, {useEffect, useState} from 'react';
 
-import {
-  makeStyles, Theme, Typography,
-  Box, FormControlLabel, Switch, FormControl, Select, MenuItem, TextField, Button,
-} from '@material-ui/core';
+import { Typography, Box, MenuItem, TextField, Button } from '@material-ui/core';
 import { Manual } from '../../../../data-types/tree';
 import { BaseSettingsActions } from './base-settings-container';
 import Category from '../../../../data-types/category';
-import { maxWidth } from '../settings';
 import User from '../../../../data-types/user';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-
-  },
-  title: { width: 'calc(100% - 64px)' },
-
-  chip: { margin: theme.spacing(1) },
-  switch: { width: 200 },
-}));
 
 interface Props extends BaseSettingsActions {
   user: User;
@@ -26,74 +12,55 @@ interface Props extends BaseSettingsActions {
   manual: Manual;
 }
 
-const Collaborators: React.FC<Props> = props => {
-  const { user, manual, categories, replace } =  props;
+const BaseSettings: React.FC<Props> = props => {
+  const { user, manual: propManual, categories, replace } =  props;
+  const [manual, setManual] = useState(propManual);
   const isOwner = manual.ownerId === user.id;
-  const [isEditing, setIsEditing] = useState(false);
-  function handleClickEdit() {
-    if (isEditing) {
-      const newManual: Manual = {...manual, title};
-      replace(newManual);
-    }
-    setIsEditing(!isEditing);
-  }
-  const [title, setTitle] = useState(manual.title);
+  const hasChange = manual.title !== propManual.title || manual.categoryId !== propManual.categoryId;
+
   const handleChangeTitle: React.ChangeEventHandler<HTMLInputElement> = e => {
-    setTitle(e.target.value);
+    setManual({...manual, title: e.target.value});
+  }
+  const handleCategorySelect = (e: React.ChangeEvent<{ value: unknown; name?: string; }>) => {
+    setManual({...manual, categoryId: e.target.value as string});
   }
 
-  const handleCategorySelect = (e: React.ChangeEvent<{ value: unknown; name?: string; }>) => {
-    const newManual: Manual = {...manual, categoryId: e.target.value as string};
-    replace(newManual);
+  function handleReset() {
+    setManual(propManual);
   }
-  const handleSwitch = (e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-    const newManual: Manual = {...manual, isPublic: checked};
-    replace(newManual);
+
+  function handleClickSave() {
+    replace(manual);
   }
 
   useEffect(() => {
-    setTitle(manual.title);
-  }, [manual.title]);
+    setManual(propManual);
+  }, [propManual]);
 
-
-  const classes = useStyles();
   return (
-    <div className={classes.root}>
-      <Box p={2} maxWidth={maxWidth}>
-        <Typography variant="h5">マニュアルの基本設定</Typography>
+    <div>
+      <Box display="flex" flexDirection="row" alignItems="flex-end" p={2}>
+        <Box flexGrow={1}><Typography variant="h5">マニュアルの基本設定</Typography></Box>
+        {isOwner && <Box><Button onClick={handleReset} disabled={!hasChange}>元に戻す</Button></Box>}
+        {isOwner && <Box><Button color="primary" onClick={handleClickSave} disabled={!hasChange}>変更する</Button></Box>}
       </Box>
-      <Box p={2} maxWidth={maxWidth}>
-        <Typography variant="caption">マニュアル名称</Typography>
-        <Box>
-          <TextField
-            className={classes.title}
-            value={title}
-            onChange={handleChangeTitle}
-            disabled={!isEditing}
-          />
-          <Button onClick={handleClickEdit} disabled={!isOwner}>変更</Button>
-        </Box>
+      <Box p={2}>
+        <TextField label="マニュアルの名称" value={manual.title} onChange={handleChangeTitle} disabled={!isOwner} fullWidth/>
       </Box>
-      <Box p={2} maxWidth={maxWidth}>
-        <Typography variant="caption">カテゴリー</Typography>
-        <FormControl fullWidth>
-          <Select value={manual.categoryId} onChange={handleCategorySelect} disabled={!isOwner}>
-            {categories.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
-          </Select>
-        </FormControl>
-      </Box>
-      <Box p={2} maxWidth={maxWidth}>
-        <div><Typography variant="caption">公開・非公開</Typography></div>
-        <Box pt={1}>
-          <FormControlLabel
-            className={classes.switch}
-            control={<Switch checked={manual.isPublic} color="primary" onChange={handleSwitch} />}
-            label="公開"
-            disabled={!isOwner}
-          />
-        </Box>
+      <Box p={2} width="100%">
+        <TextField
+          select
+          variant="outlined"
+          label="カテゴリー"
+          value={manual.categoryId}
+          onChange={handleCategorySelect}
+          disabled={!isOwner}
+          fullWidth
+        >
+          {categories.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
+        </TextField>
       </Box>
     </div>
   );
 }
-export default Collaborators;
+export default BaseSettings;

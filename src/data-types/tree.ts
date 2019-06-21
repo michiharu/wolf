@@ -44,14 +44,14 @@ export const baseTree: Tree = {
 
 export interface Manual {
   id: string;
-  beforeSaving: boolean;
   title: string;
   description: string;
   ownerId: string;
   collaboratorIds: string[];
   categoryId: string;
   isPublic: boolean;
-  viewerIds: string[];
+  viewerIdsOfUser: string[];
+  viewerIdsOfGroup: string[];
   visible: boolean;
   favoriteIds: string[];
   likeIds: string[];
@@ -60,14 +60,14 @@ export interface Manual {
 
 export const baseManual: Manual = {
   id: '',
-  beforeSaving: false,
   title: '',
   description: '',
   ownerId: '',
   collaboratorIds: [],
   categoryId: '',
   isPublic: true,
-  viewerIds: [],
+  viewerIdsOfUser: [],
+  viewerIdsOfGroup: [],
   visible: true,
   favoriteIds: [],
   likeIds: [],

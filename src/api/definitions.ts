@@ -7,6 +7,7 @@ import User, { LoginUser } from "../data-types/user";
 import { Manual, Tree, KTreeNode } from "../data-types/tree";
 import Category from "../data-types/category";
 import { Password } from "../data-types/password";
+import UserGroup from "../data-types/user-group";
 
 /* Login */
 export const loginURL = '/api/v1/login';
@@ -19,6 +20,7 @@ export interface LoginPostRequest {
 export interface LoginPostResponse {
   user: LoginUser;
   users: User[];
+  userGroups: UserGroup[];
   categories: Category[];
   manuals: Manual[];
   memos: KTreeNode[];

@@ -46,7 +46,7 @@ const CreateManualComponent: React.FC<Props> = props => {
   const create = () => {
     const {user, add} = props;
     const newManual: Manual = {
-      ...baseManual, id: Util.getID(), beforeSaving: true, title, categoryId, isPublic, ownerId: user.id, rootTree: baseTree
+      ...baseManual, id: Util.getID(), title, categoryId, isPublic, ownerId: user.id, rootTree: baseTree
     };
     add(newManual);
     close();

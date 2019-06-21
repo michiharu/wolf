@@ -17,6 +17,7 @@ import { ViewState } from '../../../redux/states/viewState';
 import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequestParams, LikeDeleteRequestParams } from '../../../api/definitions';
 import { ksActions } from '../../../redux/actions/ksAction';
 import { KSState } from '../../../redux/states/ksState';
+import { UsersState } from '../../../redux/states/main/usersState';
 
 export interface ViewActions {
   get: (manual: Manual) => Action<Manual>;
@@ -33,6 +34,7 @@ export interface ViewActions {
 
 interface Props extends
   ManualsState,
+  UsersState,
   CategoriesState,
   ViewState,
   KSState,
@@ -45,6 +47,7 @@ const ViewContainer: React.FC<Props> = props => {
   const {
     user,
     manuals,
+    users,
     selectId,
     selectNode,
     isEditing,
@@ -70,6 +73,7 @@ const ViewContainer: React.FC<Props> = props => {
   const componentProps = {
     user,
     manual,
+    users,
     selectNode,
     isEditing,
     ks,
@@ -89,6 +93,7 @@ function mapStateToProps(appState: AppState) {
   return {
     user: appState.loginUser.user!,
     ...appState.manuals,
+    ...appState.users,
     ...appState.categories,
     ...appState.view,
     ...appState.ks

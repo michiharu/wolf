@@ -60,6 +60,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface Props {
   user: User;
   manual: Manual;
+  users: User[];
   selectNode: TreeNode | null;
   isEditing: boolean;
   ks: KSize;
@@ -74,8 +75,8 @@ interface Props {
 }
 
 const LayoutComponent: React.FC<Props> = props => {
-  const { user, manual, selectNode, isEditing, ks, zoomIn, zoomOut } =  props;
-
+  const { user, manual, users, selectNode, isEditing, ks, zoomIn, zoomOut } =  props;
+  const manualUser = users.find(u => u.id === manual.ownerId)!;
   const [tabIndex, setTabIndex] = useState(0);
   const [showVS, setShowVS] = useState(false);
 
@@ -133,7 +134,9 @@ const LayoutComponent: React.FC<Props> = props => {
         <Grid container justify="space-between" alignItems="center" spacing={2}>
           <Grid item>
             <Box display="flex" flexDirection="row">
-              <Typography variant="h5" color="textSecondary">{`${user.lastName} ${user.firstName} /`}</Typography>
+              <Typography variant="h5" color="textSecondary">
+                {`${manualUser.lastName} ${manualUser.firstName} /`}
+              </Typography>
               <Box ml={1}><Typography variant="h4">{manual.title}</Typography></Box>
             </Box>
           </Grid>

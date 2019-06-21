@@ -34,6 +34,7 @@ export const manual3: Manual = {
   ownerId: 'c',
   collaboratorIds:['b'],
   categoryId: '3',
+  isPublic: false,
   favoriteIds: [],
   rootTree: null,  
 };
@@ -46,6 +47,7 @@ export const manual4: Manual = {
   ownerId: 'a',
   collaboratorIds:['b'],
   categoryId: '1',
+  visible: false,
   favoriteIds: ['a', 'c', 'd'],
   likeIds: ['a', 'd'],
   rootTree: null,

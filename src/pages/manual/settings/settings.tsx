@@ -5,10 +5,10 @@ import {
 } from '@material-ui/core';
 import BaseSettings from './base-settings/base-settings-container';
 import Collaborators from './collaborators/collaborators-container';
+import PublishingSettings from './publishing-settings/publishing-settings-container';
 import Copy from './copy/copy-container';
 import Delete from './delete/delete-container';
-
-export const maxWidth = 600;
+import ChangeOwner from './change-owner/change-owner-container';
 
 interface Props {}
 
@@ -28,19 +28,29 @@ const ManualSettings: React.FC<Props> = props => {
                 <ListItemText>コラボレーター</ListItemText>
               </ListItem>
               <ListItem button selected={selected === 2} onClick={handleSelect(2)}>
-                <ListItemText>マニュアルの複製</ListItemText>
+                <ListItemText>公開設定</ListItemText>
               </ListItem>
               <ListItem button selected={selected === 3} onClick={handleSelect(3)}>
+                <ListItemText>マニュアルの複製</ListItemText>
+              </ListItem>
+              <ListItem button selected={selected === 4} onClick={handleSelect(4)}>
+                <ListItemText>マニュアルのオーナー変更</ListItemText>
+              </ListItem>
+              <ListItem button selected={selected === 5} onClick={handleSelect(5)}>
                 <ListItemText>マニュアルの削除</ListItemText>
               </ListItem>
             </List>
           </Paper>
         </Grid>
         <Grid item xs={12} sm={7}>
-          {selected === 0 && <BaseSettings/>}
-          {selected === 1 && <Collaborators/>}
-          {selected === 2 && <Copy/>}
-          {selected === 3 && <Delete/>}
+          <Box maxWidth={600}>
+            {selected === 0 && <BaseSettings/>}
+            {selected === 1 && <Collaborators/>}
+            {selected === 2 && <PublishingSettings/>}
+            {selected === 3 && <Copy/>}
+            {selected === 4 && <ChangeOwner/>}
+            {selected === 5 && <Delete/>}
+          </Box>
         </Grid>
       </Grid>
     </Box>

@@ -85,6 +85,11 @@ export default class TreeUtil {
     return {...node, id, children};
   }
 
+  static _clearId = (node: Tree): Tree => {
+    const children = node.children.map(c => TreeUtil._clearId(c));
+    return {...node, id: '', children};
+  }
+
   static getNewNode = <T extends Tree>(parentType: Type, base: T): T => ({
     ...base, 
     id: 'rand:' + String(Math.random()).slice(2),

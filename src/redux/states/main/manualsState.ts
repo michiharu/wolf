@@ -53,9 +53,9 @@ export const manualsReducer = reducerWithInitialState(initialState)
   manualsAction.getError,
   (state) => ({ ...state})
 )
-// POST
+// POST for copy
 .case(
-  manualsAction.post,
+  manualsAction.postForCopy,
   (state, manual) => {
     const cloneManual = cloneDeep({...manual, beforeSaving: true});
     return ({
@@ -83,6 +83,17 @@ export const manualsReducer = reducerWithInitialState(initialState)
     manuals: state.manuals.filter(m => m.id !== beforeId),
     manualBeforeSaving: state.manualBeforeSaving.filter(m => m.id !== beforeId)
   })
+)
+.case(
+  manualsAction.post,
+  (state, manual) => {
+    const cloneManual = cloneDeep({...manual, beforeSaving: true});
+    return ({
+      ...state,
+      manuals: state.manuals.concat([cloneManual]),
+      manualBeforeSaving: state.manualBeforeSaving.concat([cloneManual])
+    })
+  }
 )
 //PUT
 .case(
@@ -360,5 +371,26 @@ export const manualsReducer = reducerWithInitialState(initialState)
     });
     const treeBeforeSaving = before.filter(b => b.manualId !== manualId);
     return ({...state, manuals: newManuals, selectNode: tree, treeBeforeSaving});
+  }
+)
+// PUT TREE for copy
+.case(
+  treeActions.putForCopy,
+  (state, {manualId, rootTree}) => {
+    const cloneTree = cloneDeep(rootTree);
+    const { manuals, selectNode: before, treeBeforeSaving } = state;
+    const newManuals = manuals.map(m => {
+      if (m.id === manualId) {
+        m.rootTree = cloneTree
+      }
+      return m;
+    });
+    const selectNode = TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(cloneTree, baseTreeNode));
+    return ({
+      ...state,
+      manuals: newManuals,
+      selectNode,
+      treeBeforeSaving: treeBeforeSaving.concat([{manualId, tree: before}]),
+    });
   }
 )

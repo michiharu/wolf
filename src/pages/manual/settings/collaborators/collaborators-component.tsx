@@ -1,60 +1,72 @@
-import * as React from 'react';
-import {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles, Typography, Chip, Button, FormControl, InputLabel, Select, MenuItem, Grid, Box
-
+  Theme, makeStyles, Typography, Chip, Button, MenuItem, Box, TextField
 } from '@material-ui/core';
 import { Manual } from '../../../../data-types/tree';
 import { CollaboratorsActions } from './collaborators-container';
 import { UsersState } from '../../../../redux/states/main/usersState';
-import { maxWidth } from '../settings';
 import User from '../../../../data-types/user';
+import _ from 'lodash';
 
-const styles = (theme: Theme) => createStyles({
-  root: {
-
-  },
-  container: { padding: theme.spacing(2) },
+const useStyles = makeStyles((theme: Theme) => ({
   chip: { margin: theme.spacing(1) },
-});
+}));
 
-interface Props extends UsersState, CollaboratorsActions, WithStyles<typeof styles> {
+interface Props extends UsersState, CollaboratorsActions {
   user: User;
   manual: Manual;
 }
 
 const Collaborators: React.FC<Props> = props => {
-  const { user, users, manual, classes } =  props;
+  const { user, users, manual: propManual, replace } =  props;
+  const [manual, setManual] = useState(propManual);
   const isOwner = manual.ownerId === user.id;
-
-  const collaboratorIds = manual.collaboratorIds;
-  const [collaboratorId, setCollaboratorId] = useState('');
-  const changeCollaborators = (collaboratorIds: string[]) => {
-    const newManual: Manual = {...manual, collaboratorIds};
-    props.replace(newManual);
+  const hasChange =
+  _.difference(manual.collaboratorIds, propManual.collaboratorIds).length !== 0 ||
+  _.difference(propManual.collaboratorIds, manual.collaboratorIds).length !== 0;
+  
+  const deleteCollaborator = (id: string) => () => {
+    setManual({...manual, collaboratorIds: manual.collaboratorIds.filter(cid => cid !== id)});    
   };
-  const deleteCollaborator = (id: string) => () => changeCollaborators(collaboratorIds.filter(cid => cid !== id));
 
+  const [selectCollaboratorId, setCollaboratorId] = useState('');
   const handleSelect = (e: any) => setCollaboratorId(e.target.value);
   const addCollaborator = () => {
-    changeCollaborators(collaboratorIds.concat([collaboratorId]));
+    setManual({...manual, collaboratorIds: manual.collaboratorIds.concat([selectCollaboratorId])});    
     setCollaboratorId('');
   }
 
-  const owner = users.find(u => u.id === manual.ownerId)!;
-  const collaborators = collaboratorIds.map(cid => users.find(u => u.id === cid)!);
-  const others = users.filter(u => collaboratorIds.find(cid => cid === u.id) === undefined);
+  function handleReset() {
+    setManual(propManual);
+  }
+
+  function handleClickSave() {
+    replace(manual);
+  }
+
+  useEffect(() => {
+    setManual(propManual);
+  }, [propManual]);
+
+  const collaborators = manual.collaboratorIds
+  .map(cid => users.find(u => u.id === cid)!);
+  const others = users
+  .filter(u => manual.collaboratorIds.find(cid => cid === u.id) === undefined && u.id !== user.id);
+
+  const classes = useStyles();
+
   return (
-    <div className={classes.root}>
-      <Box p={2} maxWidth={maxWidth}>
-        <Typography variant="h5">コラボレーター</Typography>
+    <div>
+      <Box display="flex" flexDirection="row" alignItems="flex-end" p={2}>
+        <Box flexGrow={1}>
+          <Typography variant="h5">コラボレーター</Typography>
+        </Box>
+        {isOwner && <Box><Button onClick={handleReset} disabled={!hasChange}>元に戻す</Button></Box>}
+        {isOwner && <Box><Button color="primary" onClick={handleClickSave} disabled={!hasChange}>変更する</Button></Box>}
       </Box>
-      <Box p={2} maxWidth={maxWidth}>
-        <Typography variant="caption">オーナー</Typography>
-        <Chip className={classes.chip} label={`${owner.lastName} ${owner.firstName}`}/>
-      </Box>
-      <Box p={2} maxWidth={maxWidth}>
-        <Typography variant="caption">コラボレーター</Typography>
+      <Box p={2}>
+        <Box><Typography variant="caption">コラボレーター</Typography></Box>
+        {collaborators.length === 0 && <Chip className={classes.chip} label="未登録"/>}
         {collaborators.map((c, i) => 
         <Chip
           key={i}
@@ -63,23 +75,26 @@ const Collaborators: React.FC<Props> = props => {
           onDelete={isOwner ? deleteCollaborator(c.id) : undefined}
         />)}
       </Box>
-      <Box p={2} maxWidth={maxWidth}>
-        <Grid container alignItems="flex-end" spacing={3}>
-          <Grid item xs={6}>
-            <FormControl fullWidth>
-              <InputLabel>コラボレーターの追加</InputLabel>
-              <Select value={collaboratorId} onChange={handleSelect} disabled={!isOwner}>
-                <MenuItem value=""><em>None</em></MenuItem>
-                {others.map(o => <MenuItem key={o.id} value={o.id}>{`${o.lastName} ${o.firstName}`}</MenuItem>)}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item>
-            <Button variant="contained" color="primary" onClick={addCollaborator} disabled={collaboratorId === ''}>追加</Button>
-          </Grid>
-        </Grid>
+      <Box display="flex" flexDirection="row" alignItems="flex-end" p={2}>
+        <Box flexGrow={1}>
+          <TextField
+            select
+            variant="outlined"
+            label="コラボレーターの追加"
+            value={selectCollaboratorId}
+            onChange={handleSelect}
+            disabled={!isOwner}
+            fullWidth
+          >
+            <MenuItem value=""><em>None</em></MenuItem>
+            {others.map(o => <MenuItem key={o.id} value={o.id}>{`${o.lastName} ${o.firstName}`}</MenuItem>)}
+          </TextField>
+        </Box>
+        <Box ml={2}>
+          <Button variant="contained" color="primary" onClick={addCollaborator} disabled={selectCollaboratorId === ''}>追加</Button>
+        </Box>
       </Box>
     </div>
   );
 }
-export default withStyles(styles)(Collaborators);
+export default Collaborators;

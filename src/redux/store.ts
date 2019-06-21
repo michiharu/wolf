@@ -11,11 +11,13 @@ import { UsersState, usersReducer } from './states/main/usersState';
 import { ViewState, viewReducer } from './states/viewState';
 import { NotificationsState, notificationsReducer } from './states/notificationsState';
 import { LoadingState, loadingReducer } from './states/loadingState';
+import { UserGroupsState, userGroupsReducer } from './states/main/userGroupsState';
 
 export type AppState = {
   loading: LoadingState;
   loginUser: LoginUserState;
   users: UsersState;
+  userGroups: UserGroupsState;
   manuals: ManualsState;
   categories: CategoriesState;
   memos: MemoState;
@@ -33,6 +35,7 @@ const store = createStore(
     loading: loadingReducer,
     loginUser: loginUserReducer,
     users: usersReducer,
+    userGroups: userGroupsReducer,
     manuals: manualsReducer,
     categories: categoriesReducer,
     memos: memoReducer,

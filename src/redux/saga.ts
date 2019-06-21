@@ -3,12 +3,15 @@ import { MyNotification } from './states/notificationsState';
 import * as API from '../api/axios-func';
 import { ACTIONS_LOGIN, ACTIONS_LOGOUT } from './actions/loginAction';
 import { loginUserAction, ACTIONS_LOGINUSER_PUT } from './actions/main/loginUserAction';
-import { LoginPostResponse } from '../api/definitions';
+import { LoginPostResponse, TreePutRequest } from '../api/definitions';
 import * as ManualAction from './actions/main/manualsAction';
 import { usersAction } from './actions/main/usersAction';
 import { categoriesAction } from './actions/main/categoriesAction';
 import { notificationsAction } from './actions/notificationsAction';
 import { loadingActions } from './actions/loadingAction';
+import { Manual } from '../data-types/tree';
+import TreeUtil from '../func/tree';
+import { userGroupsAction } from './actions/main/userGroupsAction';
 
 export const getKey = () => new Date().getTime() + Math.random();
 
@@ -19,9 +22,10 @@ function* handleRequestLogin() {
     const data = yield call(API.login, action.payload);
     yield put(loadingActions.endLogin());
     if (data.error === undefined) {
-      const { user, users, manuals, categories } = data as LoginPostResponse;
+      const { user, users, userGroups, manuals, categories } = data as LoginPostResponse;
       yield put(loginUserAction.set(user));
       yield put(usersAction.change(users));
+      yield put(userGroupsAction.change(userGroups));
       yield put(ManualAction.manualsAction.set(manuals));
       yield put(categoriesAction.set(categories));
     }
@@ -146,6 +150,45 @@ function* handleRequestDeleteManual() {
   }
 }
 
+function* handleManualCopy() {
+  while (true) {
+    const action = yield take(ManualAction.ACTIONS_MANUAL_COPY);
+    const manual: Manual = action.payload;
+    yield put(ManualAction.manualsAction.postForCopy(manual));
+    const manualPostRes = yield call(API.manualPost, action.payload);
+    if (manualPostRes.error === undefined) {
+      yield put(ManualAction.manualsAction.postSuccess({ beforeId: manual.id, manual: manualPostRes }));
+      
+      if (manual.rootTree !== null) {
+        const tree = TreeUtil._clearId(manual.rootTree);
+        const params: TreePutRequest = {
+          manualId: (manualPostRes as Manual).id,
+          rootTree: tree
+        }
+        yield put(ManualAction.treeActions.putForCopy(params));
+        const treePutRes = yield call(API.treePut, params);
+        if (treePutRes.error === undefined) {
+          yield put(ManualAction.treeActions.putSuccess(params.manualId));
+          const notification: MyNotification =
+            { key: getKey(), variant: 'success', message: 'マニュアルをコピーしました' };
+          yield put(notificationsAction.enqueue(notification));
+        } else {
+          yield put(ManualAction.treeActions.putError(params.manualId));
+          const notification: MyNotification =
+            { key: getKey(), variant: 'warning', message: 'マニュアルのコピーに失敗しました' };
+          yield put(notificationsAction.enqueue(notification));
+        }
+      }
+
+    } else {
+      yield put(ManualAction.manualsAction.postError(manual.id));
+      const notification: MyNotification =
+        { key: getKey(), variant: 'warning', message: 'マニュアルのコピーに失敗しました' };
+      yield put(notificationsAction.enqueue(notification));
+    }
+  }
+}
+
 function* handleRequestPostFavorite() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_FAVORITE_POST);
@@ -240,6 +283,7 @@ export function* rootSaga() {
   yield fork(handleRequestPostManual);
   yield fork(handleRequestPutManual);
   yield fork(handleRequestDeleteManual);
+  yield fork(handleManualCopy);
 
   yield fork(handleRequestPostFavorite);
   yield fork(handleRequestDeleteFavorite);

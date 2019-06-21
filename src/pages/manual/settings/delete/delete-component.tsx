@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, Button, Grid, TextField, Box, Snackbar, IconButton } from '@material-ui/core';
+import { Typography, Button, TextField, Box, Snackbar, IconButton } from '@material-ui/core';
 import { Manual } from '../../../../data-types/tree';
 import { DeleteActions } from './delete-container';
 import { Close } from '@material-ui/icons';
@@ -37,26 +37,23 @@ const DeleteComponent: React.FC<Props> = props => {
 
   return (
     <div>
-      <Box p={2}>
-        <Typography variant="h5">マニュアルを削除する</Typography>    
+      <Box p={2}><Typography variant="h5">マニュアルを削除する</Typography></Box>
+      <Box display="flex" flexDirection="row" alignItems="flex-end" p={2}>
+        <Box flexGrow={1}>
+          <TextField
+            label="確認のためタイトルを入力"
+            value={title}
+            onChange={handleChangeTitle}
+            error={manual.title !== title && isOwner}
+            fullWidth
+            disabled={!isOwner}
+          />
+        </Box>
+        <Box ml={2}>
+          <Button variant="contained" color="primary" onClick={handleClick} disabled={!isOwner}>削除する</Button>
+        </Box>
       </Box>
-      <Box p={2}>
-        <Grid container alignItems="flex-end" spacing={3}>
-          <Grid item xs={6}>
-            <TextField
-              placeholder="確認のためタイトルを入力"
-              value={title}
-              onChange={handleChangeTitle}
-              error={manual.title !== title && isOwner}
-              fullWidth
-              disabled={!isOwner}
-            />
-          </Grid>
-          <Grid item>
-            <Button variant="contained" color="primary" onClick={handleClick} disabled={!isOwner}>削除する</Button>
-          </Grid>
-        </Grid>
-      </Box>
+
       <Snackbar
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         open={miss}

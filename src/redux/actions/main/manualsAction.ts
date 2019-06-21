@@ -21,6 +21,9 @@ export const ACTIONS_MANUAL_DELETE         = 'ACTIONS_MANUAL_DELETE';
 export const ACTIONS_MANUAL_DELETE_SUCCESS = 'ACTIONS_MANUAL_DELETE_SUCCESS';
 export const ACTIONS_MANUAL_DELETE_ERROR   = 'ACTIONS_MANUAL_DELETE_ERROR';
 
+export const ACTIONS_MANUAL_COPY   = 'ACTIONS_MANUAL_COPY';
+export const ACTIONS_MANUAL_POST_FOR_COPY   = 'ACTIONS_MANUAL_POST_FOR_COPY';
+
 export const manualsAction = {
   set: actionCreator<Manual[]>(ACTIONS_MANUAL_SET),
 
@@ -39,6 +42,9 @@ export const manualsAction = {
   delete: actionCreator<Manual>(ACTIONS_MANUAL_DELETE),
   deleteSuccess: actionCreator<string>(ACTIONS_MANUAL_DELETE_SUCCESS),
   deleteError: actionCreator<string>(ACTIONS_MANUAL_DELETE_ERROR),
+
+  copy: actionCreator<Manual>(ACTIONS_MANUAL_COPY),
+  postForCopy: actionCreator<Manual>(ACTIONS_MANUAL_POST_FOR_COPY),
 };
 
 export const ACTIONS_SELECT_UPDATE = 'ACTIONS_SELECT_UPDATE';
@@ -89,8 +95,12 @@ export const ACTIONS_TREE_PUT         = 'ACTIONS_TREE_PUT';
 export const ACTIONS_TREE_PUT_SUCCESS = 'ACTIONS_TREE_PUT_SUCCESS';
 export const ACTIONS_TREE_PUT_ERROR   = 'ACTIONS_TREE_PUT_ERROR';
 
+export const ACTIONS_TREE_PUT_FOR_COPY = 'ACTIONS_TREE_PUT_FOR_COPY';
+
 export const treeActions = {
   put: actionCreator<TreePutRequest>(ACTIONS_TREE_PUT),
   putSuccess: actionCreator<string>(ACTIONS_TREE_PUT_SUCCESS),
   putError: actionCreator<string>(ACTIONS_TREE_PUT_ERROR),
+
+  putForCopy: actionCreator<TreePutRequest>(ACTIONS_TREE_PUT_FOR_COPY),
 }
