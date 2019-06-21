@@ -3,9 +3,10 @@
  * POSTについてはサーバーサイドではIdの値を採番する。
  * そのためフロントからサーバーに送られるIDの値については無視すること。
  */
-import User from "../data-types/user";
+import User, { LoginUser } from "../data-types/user";
 import { Manual, Tree, KTreeNode } from "../data-types/tree";
 import Category from "../data-types/category";
+import { Password } from "../data-types/password";
 
 /* Login */
 export const loginURL = '/api/v1/login';
@@ -16,7 +17,7 @@ export interface LoginPostRequest {
 }
 
 export interface LoginPostResponse {
-  user: User;
+  user: LoginUser;
   users: User[];
   categories: Category[];
   manuals: Manual[];
@@ -27,13 +28,19 @@ export interface LoginPostResponse {
 /* Users */
 export const usersURL = '/api/v1/users';
 // GET
-// POST(/api/v1/users)
-export type UserPostRequest = User;
-export type UserPostResponse = User;
 // PUT(/api/v1/users/:id)
-export type UserPutRequest = User;
-export type UserPutResponse = User;
+export type LoginUserPutRequest = LoginUser;
+export type LoginUserPutResponse = LoginUser;
 // DELETE
+
+/* Users */
+export const passwordURL = '/api/v1/password';
+// GET
+// PUT(/api/v1/password/:id) -> 成功の場合、ステータスコード200のみを返す
+export type PasswordPutRequestParams = {
+  user: LoginUser;
+  password: Password;
+}
 
 /* Manuals */
 /**

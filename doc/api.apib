@@ -21,68 +21,39 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
                 "id": "user1234",
                 "lastName": "テスト",
                 "firstName": "太郎",
-                "userManagement": {
-                    "canCreate": true,
-                    "canEdit": true,
-                    "canDelete": true
-                },
-                "groupManagement": {
-                    "canCreate": true,
-                    "canEdit": true,
-                    "canDelete": true
-                },
-                "isOperationManager": true
+                "mail": "user@user.com"
             },
             "users": [
                 {
                     "id": "user1234",
                     "lastName": "テスト",
-                    "firstName": "太郎",
-                    "userManagement": {
-                        "canCreate": true,
-                        "canEdit": true,
-                        "canDelete": true
-                    },
-                    "groupManagement": {
-                        "canCreate": true,
-                        "canEdit": true,
-                        "canDelete": true
-                    },
-                    "isOperationManager": true
+                    "firstName": "太郎"
                 },
                 {
                     "id": "user2222",
                     "lastName": "テスト",
-                    "firstName": "太郎2",
-                    "userManagement": {
-                        "canCreate": true,
-                        "canEdit": true,
-                        "canDelete": true
-                    },
-                    "groupManagement": {
-                        "canCreate": true,
-                        "canEdit": true,
-                        "canDelete": true
-                    },
-                    "isOperationManager": true
+                    "firstName": "太郎2"
                 },
                 {
                     "id": "user3333",
                     "lastName": "テスト",
-                    "firstName": "太郎3",
-                    "userManagement": {
-                        "canCreate": true,
-                        "canEdit": true,
-                        "canDelete": true
-                    },
-                    "groupManagement": {
-                        "canCreate": true,
-                        "canEdit": true,
-                        "canDelete": true
-                    },
-                    "isOperationManager": true
+                    "firstName": "太郎3"
                 }
             ],
+
+            "groups": [
+                {
+                    "id": "user1234",
+                    "name": "営業グループ１",
+                    "memberIds": ["user1234"],
+                },
+                {
+                    "id": "user2222",
+                    "name": "経営企画グループ",
+                    "memberIds": ["user1234", "user2222"];
+                },
+            ],
+
             "categories": [
                 {
                     "id": "1",
@@ -117,7 +88,8 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
                     "collaboratorIds": ["user2222"],
                     "categoryId": "2",
                     "isPublic": true,
-                    "viewerIds": [],
+                    "viewerOfUserIds": [],
+                    "viewerOfGroupIds": [],
                     "visible": true,
                     "favoriteIds": [],
                     "likeIds": [],
@@ -129,7 +101,8 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
                     "collaboratorIds": ["user2222"],
                     "categoryId": "3",
                     "isPublic": true,
-                    "viewerIds": [],
+                    "viewerOfUserIds": [],
+                    "viewerOfGroupIds": [],
                     "visible": true,
                     "favoriteIds": [],
                     "likeIds": [],
@@ -161,6 +134,24 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
 ### ログアウト [DELETE]
 + Response 200
 
+# Group Password
+## パスワード [/api/v1/password/{id}]
+
+### パスワード変更API [PUT]
+
++ Parameters
+    + id: 123 (string, required) - manualId
+
++ Request  (application/json)
+
+        {
+            "now": "pass1",
+            "next": "pass2",
+        }
+
++ Response 200
+
+
 # Group Manual
 ## マニュアル [/api/v1/manual/{id}]
 マニュアルAPIにおけるtreeデータはPUTでは編集しない、代わりにTreeAPIを通じてtreeデータを編集する。
@@ -180,7 +171,8 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
             "collaboratorIds": ["user2222"],
             "categoryId": "2",
             "isPublic": true,
-            "viewerIds": [],
+            "viewerOfUserIds": [],
+            "viewerOfGroupIds": [],
             "visible": true,
             "favoriteIds": [],
             "likeIds": [],
@@ -231,7 +223,8 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
             "collaboratorIds": [],
             "category": "3",
             "isPublic": true,
-            "viewerIds": [],
+            "viewerOfUserIds": [],
+            "viewerOfGroupIds": [],
             "visible": true,
             "favorites": [],
             "likes": []
@@ -247,7 +240,8 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
             "categoryId": "3",
             "isPublic": true,
             "visible": true,
-            "viewerIds": [],
+            "viewerOfUserIds": [],
+            "viewerOfGroupIds": [],
             "favorites": [],
             "likes": []
         }
@@ -268,7 +262,8 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
             "collaboratorIds": [],
             "categoryId": "3",
             "isPublic": true,
-            "viewerIds": [],
+            "viewerOfUserIds": [],
+            "viewerOfGroupIds": [],
             "visible": true,
             "favorites": [],
             "likes": [],
@@ -283,7 +278,8 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
             "collaboratorIds": [],
             "category": "3",
             "isPublic": true,
-            "viewerIds": [],
+            "viewerOfUserIds": [],
+            "viewerOfGroupIds": [],
             "visible": true,
             "favoriteIds": [],
             "likeIds": []

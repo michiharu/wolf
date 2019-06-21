@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import { pink, blue } from '@material-ui/core/colors';
+
 import { connect } from 'react-redux';
 import { LoginUserState } from '../../redux/states/main/loginUserState';
 import { ManualsState } from '../../redux/states/main/manualsState';
@@ -7,7 +9,6 @@ import MUIDataTable, { MUIDataTableOptions, MUIDataTableColumn } from 'mui-datat
 import { Star, StarBorder, ThumbUpAlt, ThumbUpAltOutlined } from '@material-ui/icons';
 import { TableCell, TableSortLabel, createMuiTheme, Typography } from '@material-ui/core';
 import { MuiThemeProvider, makeStyles, Theme } from '@material-ui/core/styles';
-import { theme } from '../..';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { categoriesAction } from '../../redux/actions/main/categoriesAction';
 import { Dispatch } from 'redux';
@@ -36,7 +37,10 @@ interface Props extends
 }
 
 const getMuiTheme = () => createMuiTheme({
-  ...theme,
+  palette: {
+    primary: blue,
+    secondary: pink,
+  },
   overrides: {
     MuiTableCell: {
       root: {
@@ -173,7 +177,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
   const data: CellData[] = manuals
   .filter(m => filter === null || filter.id === m.categoryId)
   .map((m, i) => {
-    const owner = users.find(u => u.id === m.ownerId)!;
+    const owner = user.id === m.ownerId ? user : users.find(u => u.id === m.ownerId)!;
     const isFavorite = m.favoriteIds.find(f => f === user.id) !== undefined;
     const isLike = m.likeIds.find(l => l === user.id) !== undefined;
     return {

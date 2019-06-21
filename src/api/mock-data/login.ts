@@ -36,7 +36,7 @@ export const postLogin = (config: AxiosRequestConfig) => {
     memos: [],
   };
 
-  const data = req.id === '1' ? data1 : req.id === '2' ? data2 : req.id === '3' ? data3 : data4;
+  const data = req.id === 'a' ? data1 : req.id === 'b' ? data2 : req.id === 'c' ? data3 : data4;
   console.log(method, url, req, data);
   return [200, data]
 };

@@ -9,13 +9,14 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import PageRouter from '../page-router';
 import { Search, AccountCircle } from '@material-ui/icons';
-import { InputBase, Button, Menu, MenuItem } from '@material-ui/core';
+import { InputBase, Button, Menu, MenuItem, Dialog } from '@material-ui/core';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import links from '../../settings/links';
 import AdapterLink from '../../components/custom-mui/adapter-link';
 import DrawerContentContainer from './drawer-content/drawer-content-container';
 import { LayoutActions } from './layout-container';
 import User from '../../data-types/user';
+import ProfileContainer from './profile/profile-container';
 
 export const drawerWidth = 300;
 
@@ -125,6 +126,18 @@ function AppFrameComponent({user, logout, location}: Props) {
   function handleMenuClose() {
     setAnchorEl(null);
   }
+
+  const [showProfile, setShowProfile] = React.useState(false);
+
+  function handleShowProfile() {
+    setAnchorEl(null);
+    setShowProfile(true);
+  }
+
+  function handleHideProfile() {
+    setShowProfile(false);
+  }
+
   function handleLogout() {
     setAnchorEl(null);
     logout();
@@ -141,8 +154,15 @@ function AppFrameComponent({user, logout, location}: Props) {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
+      <MenuItem onClick={handleShowProfile}>プロフィール</MenuItem>
       <MenuItem onClick={handleLogout}>ログアウト</MenuItem>
     </Menu>
+  );
+
+  const renderProfile = (
+    <Dialog open={showProfile} onClose={handleHideProfile} maxWidth="sm" fullWidth>
+      <ProfileContainer onClose={handleHideProfile}/>
+    </Dialog>
   );
 
   return (
@@ -187,6 +207,7 @@ function AppFrameComponent({user, logout, location}: Props) {
             {`${user.lastName} ${user.firstName}`}
           </Button>
           {renderMenu}
+          {renderProfile}
 
         </Toolbar>
       </AppBar>

@@ -1,12 +1,14 @@
 import axiosbase from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import * as env from '../settings/env.json';
-import { loginURL, manualURL, favoriteURL, likeURL, treeURL } from './definitions';
+import { loginURL, manualURL, favoriteURL, likeURL, treeURL, usersURL, passwordURL } from './definitions';
 import { postLogin, deleteLogin } from './mock-data/login';
 import * as Manual from './mock-data/manual';
 import * as Favorite from './mock-data/favorite';
 import * as Like from './mock-data/like';
 import { putTree } from './mock-data/tree';
+import { putLoginUser } from './mock-data/login-user';
+import { putPassword } from './mock-data/password';
 
 export const baseURL = 'http://localhost:55616';
 
@@ -15,6 +17,15 @@ const mockAdapter = () => {
   // login
   mock.onPost(loginURL).reply(postLogin);
   mock.onDelete(loginURL).reply(deleteLogin);
+
+  // LoginUser
+  const regexUsersURL = new RegExp(`${usersURL}/*`);
+  mock.onPut(regexUsersURL).reply(putLoginUser);
+
+  // Password
+  const regexPasswordURL = new RegExp(`${passwordURL}/*`);
+  mock.onPut(regexPasswordURL).reply(putPassword);
+
 
   // manual
   const regexManualsURL = new RegExp(`${manualURL}/*`);

@@ -3,16 +3,16 @@ import { reducerWithInitialState } from 'typescript-fsa-reducers';
 import { VariantType } from 'notistack';
 import { notificationsAction } from '../actions/notificationsAction';
 
-export interface Notification {
+export interface MyNotification {
   key: number;
   variant: VariantType;
   message: string;
 }
 
 export interface NotificationsState {
-  enqueue: Notification | null;
-  dequeue: Notification | null;
-  displayed: Notification[];
+  enqueue: MyNotification | null;
+  dequeue: MyNotification | null;
+  displayed: MyNotification[];
 }
 
 const initialState: NotificationsState = {

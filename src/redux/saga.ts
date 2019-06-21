@@ -1,14 +1,16 @@
 import { put, call, fork, take } from 'redux-saga/effects';
-import { Notification } from './states/notificationsState';
+import { MyNotification } from './states/notificationsState';
 import * as API from '../api/axios-func';
 import { ACTIONS_LOGIN, ACTIONS_LOGOUT } from './actions/loginAction';
-import { loginUserAction } from './actions/main/loginUserAction';
+import { loginUserAction, ACTIONS_LOGINUSER_PUT } from './actions/main/loginUserAction';
 import { LoginPostResponse } from '../api/definitions';
 import * as ManualAction from './actions/main/manualsAction';
 import { usersAction } from './actions/main/usersAction';
 import { categoriesAction } from './actions/main/categoriesAction';
 import { notificationsAction } from './actions/notificationsAction';
 import { loadingActions } from './actions/loadingAction';
+
+export const getKey = () => new Date().getTime() + Math.random();
 
 function* handleRequestLogin() {
   while (true) {
@@ -31,7 +33,7 @@ function* handleRequestLogout() {
     yield take(ACTIONS_LOGOUT);
 
     const key = getKey();
-    const notification: Notification = { key, variant: 'info', message: 'ログアウトしています..' };
+    const notification: MyNotification = { key, variant: 'info', message: 'ログアウトしています..' };
     yield put(notificationsAction.enqueue(notification));
 
     const data = yield call(API.logout);
@@ -39,18 +41,36 @@ function* handleRequestLogout() {
     
     if (data.error === undefined) {
       yield put(loginUserAction.reset());
-      const notification: Notification =
+      const notification: MyNotification =
         { key: getKey(), variant: 'success', message: 'ログアウトしました' };
       yield put(notificationsAction.enqueue(notification));
     } else {
-      const notification: Notification =
+      const notification: MyNotification =
       { key: getKey(), variant: 'warning', message: 'ログアウトに失敗しました' };
       yield put(notificationsAction.enqueue(notification));
     }
   }
 }
 
-const getKey = () => new Date().getTime() + Math.random();
+function* handleRequestPutLoginUser() {
+  while (true) {
+    const action = yield take(ACTIONS_LOGINUSER_PUT);
+    yield put(loadingActions.beginLogin());
+    const data = yield call(API.loginUserPut, action.payload);
+    yield put(loadingActions.endLogin());
+    if (data.error === undefined) {
+      yield put(loginUserAction.putSuccess());
+      const notification: MyNotification =
+        { key: getKey(), variant: 'success', message: 'プロフィールを更新しました' };
+      yield put(notificationsAction.enqueue(notification));
+    } else {
+      yield put(loginUserAction.putError());
+      const notification: MyNotification =
+        { key: getKey(), variant: 'warning', message: 'プロフィールの更新に失敗しました' };
+      yield put(notificationsAction.enqueue(notification));
+    }
+  }
+}
 
 function* handleRequestGetManual() {
   while (true) {
@@ -60,7 +80,7 @@ function* handleRequestGetManual() {
       yield put(ManualAction.manualsAction.getSuccess(data));
     } else {
       yield put(ManualAction.manualsAction.getError());
-      const notification: Notification =
+      const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'マニュアルの読み込みに失敗しました' };
       yield put(notificationsAction.enqueue(notification));
     }
@@ -74,13 +94,13 @@ function* handleRequestPostManual() {
     const data = yield call(API.manualPost, action.payload);
     if (data.error === undefined) {
       yield put(ManualAction.manualsAction.postSuccess({ beforeId, manual: data }));
-      const notification: Notification =
+      const notification: MyNotification =
         { key: getKey(), variant: 'success', message: 'マニュアルを新規作成しました' };
       yield put(notificationsAction.enqueue(notification));
 
     } else {
       yield put(ManualAction.manualsAction.postError(beforeId));
-      const notification: Notification =
+      const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'マニュアルの作成に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
     }
@@ -94,12 +114,12 @@ function* handleRequestPutManual() {
     const data = yield call(API.manualPut, action.payload);
     if (data.error === undefined) {
       yield put(ManualAction.manualsAction.putSuccess({ beforeId, manual: data }));
-      const notification: Notification =
+      const notification: MyNotification =
         { key: getKey(), variant: 'success', message: 'マニュアルを保存しました' };
       yield put(notificationsAction.enqueue(notification));
     } else {
       yield put(ManualAction.manualsAction.putError(beforeId));
-      const notification: Notification =
+      const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'マニュアルの保存に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
 
@@ -114,12 +134,12 @@ function* handleRequestDeleteManual() {
     const data = yield call(API.manualDelete, action.payload);
     if (data.error === undefined) {
       yield put(ManualAction.manualsAction.deleteSuccess(beforeId));
-      const notification: Notification =
+      const notification: MyNotification =
         { key: getKey(), variant: 'success', message: 'マニュアルを削除しました' };
       yield put(notificationsAction.enqueue(notification));
     } else {
       yield put(ManualAction.manualsAction.deleteError(beforeId));
-      const notification: Notification =
+      const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'マニュアルの削除に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
     }
@@ -135,7 +155,7 @@ function* handleRequestPostFavorite() {
       yield put(ManualAction.favoriteActions.postSuccess(beforeId));
     } else {
       yield put(ManualAction.favoriteActions.postError(beforeId));
-      const notification: Notification =
+      const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'お気に入り登録に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
     }
@@ -151,7 +171,7 @@ function* handleRequestDeleteFavorite() {
       yield put(ManualAction.favoriteActions.deleteSuccess(beforeId));
     } else {
       yield put(ManualAction.favoriteActions.deleteError(beforeId));
-      const notification: Notification =
+      const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'お気に入り解除に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
     }
@@ -167,7 +187,7 @@ function* handleRequestPostLike() {
       yield put(ManualAction.likeActions.postSuccess(beforeId));
     } else {
       yield put(ManualAction.likeActions.postError(beforeId));
-      const notification: Notification =
+      const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'いいね登録に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
     }
@@ -183,7 +203,7 @@ function* handleRequestDeleteLike() {
       yield put(ManualAction.likeActions.deleteSuccess(beforeId));
     } else {
       yield put(ManualAction.likeActions.deleteError(beforeId));
-      const notification: Notification =
+      const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'いいね解除に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
     }
@@ -197,12 +217,12 @@ function* handleRequestPutTree() {
     const data = yield call(API.treePut, action.payload);
     if (data.error === undefined) {
       yield put(ManualAction.treeActions.putSuccess(beforeId));
-      const notification: Notification =
+      const notification: MyNotification =
         { key: getKey(), variant: 'success', message: 'マニュアルを保存しました' };
       yield put(notificationsAction.enqueue(notification));
     } else {
       yield put(ManualAction.treeActions.putError(beforeId));
-      const notification: Notification =
+      const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'マニュアルの保存に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
     }
@@ -213,6 +233,8 @@ function* handleRequestPutTree() {
 export function* rootSaga() {
   yield fork(handleRequestLogin);
   yield fork(handleRequestLogout);
+
+  yield fork(handleRequestPutLoginUser);
 
   yield fork(handleRequestGetManual);
   yield fork(handleRequestPostManual);
