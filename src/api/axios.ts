@@ -1,7 +1,7 @@
 import axiosbase from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import * as env from '../settings/env.json';
-import { loginURL, manualURL, favoriteURL, likeURL, treeURL, usersURL, passwordURL } from './definitions';
+import { loginURL, manualURL, favoriteURL, likeURL, treeURL, usersURL, passwordURL, titleCheckURL, similarTitleURL } from './definitions';
 import { postLogin, deleteLogin } from './mock-data/login';
 import * as Manual from './mock-data/manual';
 import * as Favorite from './mock-data/favorite';
@@ -9,6 +9,8 @@ import * as Like from './mock-data/like';
 import { putTree } from './mock-data/tree';
 import { putLoginUser } from './mock-data/login-user';
 import { putPassword } from './mock-data/password';
+import { postTitleCheck } from './mock-data/title-checker';
+import { postSimilarTitle } from './mock-data/similar-title';
 
 export const baseURL = 'http://localhost:55616';
 
@@ -33,6 +35,11 @@ const mockAdapter = () => {
   mock.onPost(manualURL).reply(Manual.post);
   mock.onPut(regexManualsURL).reply(Manual.put);
   mock.onDelete(regexManualsURL).reply(Manual._delete);
+
+
+  mock.onPost(titleCheckURL).reply(postTitleCheck);
+  mock.onPost(similarTitleURL).reply(postSimilarTitle);
+
 
   // favorite
   const regexFavoriteURL= new RegExp(`${favoriteURL}/*`);

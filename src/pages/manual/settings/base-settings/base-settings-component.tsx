@@ -6,31 +6,33 @@ import { BaseSettingsActions } from './base-settings-container';
 import Category from '../../../../data-types/category';
 import User from '../../../../data-types/user';
 
+import TitleChecker from '../../../../components/title-checker/title-checker';
+
 interface Props extends BaseSettingsActions {
   user: User;
   categories: Category[];
   manual: Manual;
+  title: string;
 }
 
 const BaseSettings: React.FC<Props> = props => {
-  const { user, manual: propManual, categories, replace } =  props;
+  const { user, manual: propManual, title, categories, replace, titleReset } =  props;
   const [manual, setManual] = useState(propManual);
   const isOwner = manual.ownerId === user.id;
-  const hasChange = manual.title !== propManual.title || manual.categoryId !== propManual.categoryId;
+  const hasChange = title !== propManual.title || manual.categoryId !== propManual.categoryId;
 
-  const handleChangeTitle: React.ChangeEventHandler<HTMLInputElement> = e => {
-    setManual({...manual, title: e.target.value});
-  }
   const handleCategorySelect = (e: React.ChangeEvent<{ value: unknown; name?: string; }>) => {
     setManual({...manual, categoryId: e.target.value as string});
   }
 
   function handleReset() {
     setManual(propManual);
+    titleReset();
   }
 
   function handleClickSave() {
-    replace(manual);
+    replace({...manual, title});
+    titleReset();
   }
 
   useEffect(() => {
@@ -45,7 +47,7 @@ const BaseSettings: React.FC<Props> = props => {
         {isOwner && <Box><Button color="primary" onClick={handleClickSave} disabled={!hasChange}>変更する</Button></Box>}
       </Box>
       <Box p={2}>
-        <TextField label="マニュアルの名称" value={manual.title} onChange={handleChangeTitle} disabled={!isOwner} fullWidth/>
+        <TitleChecker defaultTitle={propManual.title} disabled={!isOwner}/>
       </Box>
       <Box p={2} width="100%">
         <TextField

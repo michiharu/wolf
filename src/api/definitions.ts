@@ -8,6 +8,7 @@ import { Manual, Tree, KTreeNode } from "../data-types/tree";
 import Category from "../data-types/category";
 import { Password } from "../data-types/password";
 import UserGroup from "../data-types/user-group";
+import { TitleCheckResult } from "../redux/actions/titileCheckAction";
 
 /* Login */
 export const loginURL = '/api/v1/login';
@@ -70,6 +71,14 @@ export type ManualPutRequest = Manual;
 export type ManualPutResponse = Manual;
 // DELETE
 export type ManualDeleteResponse = {};
+
+export const titleCheckURL = '/api/v1/manual-title-check';
+export type TitleCheckPostRequest = { title: string; };
+export type TitleCheckPostResponse = TitleCheckResult;
+
+export const similarTitleURL = '/api/v1/similar-title';
+export type SimilarTitleRequest = { original: string; };
+export type SimilarTitleResponse = { newTitle: string; };
 
 /* Tree */
 export const treeURL = '/api/v1/tree';

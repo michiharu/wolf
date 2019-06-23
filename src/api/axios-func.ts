@@ -5,10 +5,13 @@ import {
   treeURL, TreePutRequest,
   favoriteURL, FavoritePostRequestParams, FavoriteDeleteRequestParams,
   likeURL, LikePostRequestParams, LikeDeleteRequestParams,
+  passwordURL, PasswordPutRequestParams,
+  titleCheckURL, TitleCheckPostRequest, SimilarTitleRequest,
 } from "./definitions";
 
 import axios from "./axios";
 import { LoginInfo } from "../redux/actions/loginAction";
+import { Password } from "../data-types/password";
 
 export const login = (loginInfo: LoginInfo) => axios
   .post<LoginPostResponse>(loginURL, loginInfo)
@@ -25,10 +28,14 @@ export const loginUserPut = (user: LoginUserPutRequest) => axios
   .then(res => res.data)
   .catch(error => ({ error }));
 
-  // export const passwordPut = (params: PasswordPutRequestParams) => axios
-  // .put<Password>(`${passwordURL}/${params.user.id}`, params.password)
-  // .then(res => res.data)
-  // .catch(error => ({ error }));
+  /**
+   * パスワード変更についてのロジックはprofileコンポーネントに直接記述したため、
+   * この"passwordPut"は使用していない。
+   */
+  export const passwordPut = (params: PasswordPutRequestParams) => axios
+  .put<Password>(`${passwordURL}/${params.user.id}`, params.password)
+  .then(res => res.data)
+  .catch(error => ({ error }));
 
 export const manualGet = (manual: ManualGetRequestParams) => axios
   .get(`${manualURL}/${manual.id}`)
@@ -47,6 +54,16 @@ export const manualPut = (manual: ManualPostRequest) => axios
 
 export const manualDelete = (manual: ManualPostRequest) => axios
   .delete(`${manualURL}/${manual.id}`)
+  .then(res => res.data)
+  .catch(error => ({ error }));
+
+export const titleCheckPost = (checkRequest: TitleCheckPostRequest) => axios
+  .post<TitleCheckPostRequest>(titleCheckURL, checkRequest)
+  .then(res => res.data)
+  .catch(error => ({ error }));
+
+export const similarTitlePost = (original: SimilarTitleRequest) => axios
+  .post<SimilarTitleRequest>(titleCheckURL, original)
   .then(res => res.data)
   .catch(error => ({ error }));
 

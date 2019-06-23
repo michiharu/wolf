@@ -1,4 +1,4 @@
-import { put, call, fork, take } from 'redux-saga/effects';
+import { put, call, fork, take, select, throttle } from 'redux-saga/effects';
 import { MyNotification } from './states/notificationsState';
 import * as API from '../api/axios-func';
 import { ACTIONS_LOGIN, ACTIONS_LOGOUT } from './actions/loginAction';
@@ -12,6 +12,9 @@ import { loadingActions } from './actions/loadingAction';
 import { Manual } from '../data-types/tree';
 import TreeUtil from '../func/tree';
 import { userGroupsAction } from './actions/main/userGroupsAction';
+import { getTitleForCheck } from './selectors';
+import { titleCheckAction, ACTIONS_TITLECHECK_ENQUEUE } from './actions/titileCheckAction';
+import { TitleCheckState } from './states/titleCheckState';
 
 export const getKey = () => new Date().getTime() + Math.random();
 
@@ -150,6 +153,14 @@ function* handleRequestDeleteManual() {
   }
 }
 
+function* handleTitleCheck() {
+  const titleCheckState: TitleCheckState = yield select(getTitleForCheck);
+  if (titleCheckState.title !== titleCheckState.preTitle) {
+    const data = yield call(API.titleCheckPost, {title: titleCheckState.title});
+    yield put(titleCheckAction.get(data));
+  }
+}
+
 function* handleManualCopy() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_MANUAL_COPY);
@@ -283,6 +294,8 @@ export function* rootSaga() {
   yield fork(handleRequestPostManual);
   yield fork(handleRequestPutManual);
   yield fork(handleRequestDeleteManual);
+
+  yield throttle(1000, ACTIONS_TITLECHECK_ENQUEUE, handleTitleCheck);
   yield fork(handleManualCopy);
 
   yield fork(handleRequestPostFavorite);

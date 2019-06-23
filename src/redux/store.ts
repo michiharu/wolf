@@ -12,6 +12,7 @@ import { ViewState, viewReducer } from './states/viewState';
 import { NotificationsState, notificationsReducer } from './states/notificationsState';
 import { LoadingState, loadingReducer } from './states/loadingState';
 import { UserGroupsState, userGroupsReducer } from './states/main/userGroupsState';
+import { TitleCheckState, titleCheckReducer } from './states/titleCheckState';
 
 export type AppState = {
   loading: LoadingState;
@@ -23,6 +24,7 @@ export type AppState = {
   memos: MemoState;
   view: ViewState;
   notifications: NotificationsState;
+  titleCheck: TitleCheckState;
   ks: KSState;
   rs: RSState;
 };
@@ -41,6 +43,7 @@ const store = createStore(
     memos: memoReducer,
     view: viewReducer,
     notifications: notificationsReducer,
+    titleCheck: titleCheckReducer,
     ks: ksReducer,
     rs: rsReducer,
   }),

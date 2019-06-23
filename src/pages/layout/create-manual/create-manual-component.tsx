@@ -2,15 +2,16 @@ import * as React from 'react';
 import { useState } from 'react';
 
 import {
-  Theme,  TextField, FormControlLabel, Switch,
+  Theme, FormControlLabel, Switch,
   Button, DialogTitle, DialogContent, DialogActions, makeStyles, Box, Typography, FormControl, Select, MenuItem,
 } from '@material-ui/core';
-
 import { CreateManualActions } from './create-manual-container';
 import { baseManual, Manual, baseTree } from '../../../data-types/tree';
 import User from '../../../data-types/user';
 import Util from '../../../func/util';
 import { CategoriesState } from '../../../redux/states/main/categoriesState';
+import TitleChecker from '../../../components/title-checker/title-checker';
+import { TitleCheckState } from '../../../redux/states/titleCheckState';
 
 const useStyles = makeStyles((theme: Theme) => ({
   switch: {
@@ -20,16 +21,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-interface Props extends CategoriesState, CreateManualActions {
+interface Props extends CategoriesState, TitleCheckState, CreateManualActions {
   user: User;
   onClose: () => void;
 }
 
 const CreateManualComponent: React.FC<Props> = props => {
 
-  const { categories, onClose } = props;
-  const [title, setTitle] = useState('');
-  const handleLabel = (e: any) => setTitle(e.target.value);
+  const { categories, onClose, title, result, titleReset } = props;
   const [categoryId, setCategoryId] = useState(categories[0].id);
   const handleCategorySelect = (e: React.ChangeEvent<{ value: unknown; name?: string; }>) => {
     setCategoryId(e.target.value as string);
@@ -38,7 +37,7 @@ const CreateManualComponent: React.FC<Props> = props => {
   const [isPublic, setIsPublic] = useState(true);
   const handleIsPublic = (e: any) => setIsPublic(e.target.checked);
   const close = () => {
-    setTitle('');
+    titleReset();
     setIsPublic(true);
     onClose();
   }
@@ -56,12 +55,7 @@ const CreateManualComponent: React.FC<Props> = props => {
     <>
       <DialogTitle>マニュアルの新規作成</DialogTitle>
       <DialogContent>
-        <TextField
-          placeholder="マニュアルの名称"
-          value={title}
-          onChange={handleLabel}
-          fullWidth
-        />
+        <TitleChecker defaultTitle=""/>
         <Box py={2}>
           <Typography variant="caption">カテゴリー</Typography>
           <FormControl fullWidth>
@@ -78,7 +72,13 @@ const CreateManualComponent: React.FC<Props> = props => {
       </DialogContent>
       <DialogActions>
         <Button onClick={close}>キャンセル</Button>
-        <Button onClick={create} color="primary">作成</Button>
+        <Button
+          onClick={create}
+          color="primary"
+          disabled={title === '' || result === null || title !== result.title}
+        >
+          作成
+        </Button>
       </DialogActions>
     </>
   );
