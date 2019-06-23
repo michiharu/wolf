@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { pink, blue } from '@material-ui/core/colors';
 
 import { connect } from 'react-redux';
@@ -6,8 +6,8 @@ import { LoginUserState } from '../../redux/states/main/loginUserState';
 import { ManualsState } from '../../redux/states/main/manualsState';
 import { AppState } from '../../redux/store';
 import MUIDataTable, { MUIDataTableOptions, MUIDataTableColumn } from 'mui-datatables';
-import { Star, StarBorder, ThumbUpAlt, ThumbUpAltOutlined, VisibilityOff, Visibility } from '@material-ui/icons';
-import { TableCell, TableSortLabel, createMuiTheme, Typography, Button, IconButton, TableRow } from '@material-ui/core';
+import { Star, StarBorder, ThumbUpAlt, ThumbUpAltOutlined } from '@material-ui/icons';
+import { TableCell, TableSortLabel, createMuiTheme, Typography, Button, TableRow } from '@material-ui/core';
 import { MuiThemeProvider, makeStyles, Theme } from '@material-ui/core/styles';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { categoriesAction } from '../../redux/actions/main/categoriesAction';
@@ -70,30 +70,30 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     filterReset();
   }
 
-  const handleClickVisibleRow = (value: {id: string, visible: boolean}) => () => {
+  // const handleClickVisibleRow = (value: {id: string, visible: boolean}) => () => {
 
-  }
+  // }
 
   const columns: MUIDataTableColumn[] = [
-    {
-      name: "visible",
-      options: {
-        display: "false",
-        filter: false,
-        sort: false,
-        customHeadRender: () =>
-          <TableCell>
-            <IconButton>
-              <Visibility/>
-            </IconButton>
-          </TableCell>,
+    // {
+    //   name: "visible",
+    //   options: {
+    //     display: "false",
+    //     filter: false,
+    //     sort: false,
+    //     customHeadRender: () =>
+    //       <TableCell>
+    //         <IconButton>
+    //           <Visibility/>
+    //         </IconButton>
+    //       </TableCell>,
 
-        customBodyRender: value =>
-          <IconButton onClick={handleClickVisibleRow(value)}>
-            {value.visible ? <Visibility /> : <VisibilityOff />}
-          </IconButton>
-      }
-    },
+    //     customBodyRender: value =>
+    //       <IconButton onClick={handleClickVisibleRow(value)}>
+    //         {value.visible ? <Visibility /> : <VisibilityOff />}
+    //       </IconButton>
+    //   }
+    // },
     {
       name: "favorite",
       label: "お気に入り",
@@ -135,6 +135,16 @@ const Dashboard: React.FC<Props> = (props: Props) => {
       label: "いいね",
       options: {
         filter: true,
+        filterOptions: {
+          names: ["いいね登録済み", "いいね未登録"],
+          logic(value: string, filters: string[]) {
+            const show =
+              (filters.indexOf("いいね登録済み") >= 0 && value === 'true') ||
+              (filters.indexOf("いいね未登録") >= 0 && value === 'false');
+            const filtered = !show;
+            return filtered;
+          }
+        },
         sort: false,
         customBodyRender: value => value === 'true' ? <ThumbUpAlt /> : <ThumbUpAltOutlined />
       }
@@ -203,9 +213,11 @@ const Dashboard: React.FC<Props> = (props: Props) => {
   const { user, users, manuals, history, filter, filterReset } = props;
   if (user === null) { throw new Error('LoginUser cannot be null.') }
 
-  const [showUnVisible, setShowUnVisible] = useState(false);
+  // const [showUnVisible, setShowUnVisible] = useState(false);
   const data: CellData[] = manuals
-    .filter(m => (filter === null || filter.id === m.categoryId) && (showUnVisible || m.visible))
+    .filter(m => (filter === null || filter.id === m.categoryId)
+              // && (showUnVisible || m.visible)
+    )
     .map((m, i) => {
       const owner = user.id === m.ownerId ? user : users.find(u => u.id === m.ownerId)!;
       const isFavorite = m.favoriteIds.find(f => f === user.id) !== undefined;
@@ -236,18 +248,16 @@ const Dashboard: React.FC<Props> = (props: Props) => {
       return (
         <TableRow>
           <TableCell colSpan={colSpan}>
-            {rowData[6]}
+            {rowData[5]}
           </TableCell>
         </TableRow>
       )
     },
-    onColumnViewChange(changedColumn: string, action: string) {
-      console.log(changedColumn)
-      console.log(action)
-      if (changedColumn === 'visible') {
-        setShowUnVisible(action === 'add');
-      }
-    },
+    // onColumnViewChange(changedColumn: string, action: string) {
+    //   if (changedColumn === 'visible') {
+    //     setShowUnVisible(action === 'add');
+    //   }
+    // },
     elevation: 0,
     rowHover: false,
     responsive: 'scroll',
