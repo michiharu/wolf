@@ -43,6 +43,7 @@ const TitleChecker: React.FC<Props> = props => {
   const helperText: string | undefined =
   title === defaultTitle ? '' :
   result === null ? '' :
+  title !== result.title ? '' :
   result.valid ? 'このタイトルは使用可能です' : 'このタイトルは重複しているため使用できません';
   
   return (
