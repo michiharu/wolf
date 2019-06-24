@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { Action } from 'typescript-fsa';
@@ -19,8 +19,10 @@ interface Props extends TitleCheckState {
 }
 
 const TitleChecker: React.FC<Props> = props => {
-  const {defaultTitle, disabled, willGenerate, title, preTitle, result, set, generate, enqueue} = props;
-  if (defaultTitle !== preTitle) {
+  const {defaultTitle, disabled, willGenerate, title, result, set, generate, enqueue} = props;
+  const [isFirstRender, setIsFirstRender] = useState(true);
+  if (isFirstRender) {
+    setIsFirstRender(false);
     set({preTitle: defaultTitle, willGenerate});
     if (willGenerate !== undefined) {
       generate()
