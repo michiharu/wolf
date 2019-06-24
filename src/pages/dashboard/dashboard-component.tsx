@@ -7,7 +7,7 @@ import { ManualsState } from '../../redux/states/main/manualsState';
 import { AppState } from '../../redux/store';
 import MUIDataTable, { MUIDataTableOptions, MUIDataTableColumn } from 'mui-datatables';
 import { Star, StarBorder, ThumbUpAlt, ThumbUpAltOutlined } from '@material-ui/icons';
-import { TableCell, TableSortLabel, createMuiTheme, Typography, Button, TableRow } from '@material-ui/core';
+import { TableCell, TableSortLabel, createMuiTheme, Typography, Button, Box } from '@material-ui/core';
 import { MuiThemeProvider, makeStyles, Theme } from '@material-ui/core/styles';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { categoriesAction } from '../../redux/actions/main/categoriesAction';
@@ -16,14 +16,16 @@ import { Action } from 'typescript-fsa';
 import { CategoriesState } from '../../redux/states/main/categoriesState';
 import { UsersState } from '../../redux/states/main/usersState';
 import { selectActions } from '../../redux/actions/main/manualsAction';
+import { drawerWidth } from '../layout/layout-component';
+
+const otherWidthSum = 720;
 
 const useStyles = makeStyles((theme: Theme) => ({
   description: {
-    width: '100%',
-    // width: 'calc(100vw - 750px)',
-    // [theme.breakpoints.down('sm')]: {
-    //   width: 'calc(100vw - 450px)',
-    // },
+    width: `calc(100vw - ${otherWidthSum + drawerWidth}px)`,
+    [theme.breakpoints.down('sm')]: {
+      width: `calc(100vw - ${otherWidthSum}px)`,
+    },
   },
 }));
 
@@ -41,6 +43,12 @@ const getMuiTheme = () => createMuiTheme({
   palette: {
     primary: blue,
     secondary: pink,
+  },
+  typography: {
+    // fontSize: 12,
+    button: {
+        textTransform: "none"
+    }
   },
   overrides: {
     MuiTableCell: {
@@ -70,30 +78,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     filterReset();
   }
 
-  // const handleClickVisibleRow = (value: {id: string, visible: boolean}) => () => {
-
-  // }
-
   const columns: MUIDataTableColumn[] = [
-    // {
-    //   name: "visible",
-    //   options: {
-    //     display: "false",
-    //     filter: false,
-    //     sort: false,
-    //     customHeadRender: () =>
-    //       <TableCell>
-    //         <IconButton>
-    //           <Visibility/>
-    //         </IconButton>
-    //       </TableCell>,
-
-    //     customBodyRender: value =>
-    //       <IconButton onClick={handleClickVisibleRow(value)}>
-    //         {value.visible ? <Visibility /> : <VisibilityOff />}
-    //       </IconButton>
-    //   }
-    // },
     {
       name: "favorite",
       label: "お気に入り",
@@ -110,7 +95,10 @@ const Dashboard: React.FC<Props> = (props: Props) => {
           }
         },
         sort: false,
-        customBodyRender: value => value === 'true' ? <Star /> : <StarBorder />
+        customBodyRender: value =>
+        <Box display="flex" justifyContent="center">
+          {value === 'true' ? <Star /> : <StarBorder />}
+        </Box>
       }
     },
     {
@@ -128,6 +116,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
               <StarBorder />
             </TableSortLabel>
           </TableCell>,
+        customBodyRender: value => <Typography align="center">{value}</Typography>
       }
     },
     {
@@ -146,7 +135,10 @@ const Dashboard: React.FC<Props> = (props: Props) => {
           }
         },
         sort: false,
-        customBodyRender: value => value === 'true' ? <ThumbUpAlt /> : <ThumbUpAltOutlined />
+        customBodyRender: value =>
+        <Box display="flex" justifyContent="center">
+          {value === 'true' ? <ThumbUpAlt /> : <ThumbUpAltOutlined />}
+        </Box>
       }
     },
     {
@@ -164,6 +156,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
               <ThumbUpAltOutlined />
             </TableSortLabel>
           </TableCell>,
+        customBodyRender: value => <Typography align="center">{value}</Typography>
       }
     },
     {
@@ -179,16 +172,6 @@ const Dashboard: React.FC<Props> = (props: Props) => {
       }
     },
     {
-      name: "description",
-      label: "説明",
-      options: {
-        display: "false",
-        filter: false,
-        sort: false,
-        viewColumns: false,
-      }
-    },
-    {
       name: "owner",
       label: "オーナー",
       options: {
@@ -196,10 +179,34 @@ const Dashboard: React.FC<Props> = (props: Props) => {
         sort: false,
       }
     },
+    {
+      name: "description",
+      label: "説明",
+      options: {
+        filter: false,
+        sort: false,
+        customBodyRender: value => <Typography className={classes.description} noWrap>{value}</Typography>
+      }
+    },
+    {
+      name: "updateAt",
+      label: "更新日時",
+      options: {
+        filter: false,
+        sort: true,
+      }
+    },
+    {
+      name: "createAt",
+      label: "作成日時",
+      options: {
+        filter: false,
+        sort: true,
+      }
+    },
   ];
 
   interface CellData {
-    visible: { id: string; visible: boolean; };
     favorite: string;
     favoriteSum: string;
     like: string;
@@ -208,22 +215,19 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     description: string;
     owner: string;
     updateAt: string;
+    createAt: string;
   }
 
   const { user, users, manuals, history, filter, filterReset } = props;
   if (user === null) { throw new Error('LoginUser cannot be null.') }
 
-  // const [showUnVisible, setShowUnVisible] = useState(false);
   const data: CellData[] = manuals
-    .filter(m => (filter === null || filter.id === m.categoryId)
-              // && (showUnVisible || m.visible)
-    )
+    .filter(m => (filter === null || filter.id === m.categoryId))
     .map((m, i) => {
       const owner = user.id === m.ownerId ? user : users.find(u => u.id === m.ownerId)!;
       const isFavorite = m.favoriteIds.find(f => f === user.id) !== undefined;
       const isLike = m.likeIds.find(l => l === user.id) !== undefined;
       return {
-        visible: { id: m.id, visible: m.visible },
         favorite: isFavorite ? 'true' : 'false',
         favoriteSum: String(m.favoriteIds.length),
         like: isLike ? 'true' : 'false',
@@ -231,7 +235,8 @@ const Dashboard: React.FC<Props> = (props: Props) => {
         title: { id: m.id, title: m.title },
         description: m.description,
         owner: `${owner.lastName} ${owner.firstName}`,
-        updateAt: `2019/6/${i + 1}`
+        updateAt: m.updateAt,
+        createAt: m.createAt,
       };
     });
 
@@ -240,24 +245,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     download: false,
     sortFilterList: false,
     selectableRows: 'none',
-    expandableRows: true,
-    renderExpandableRow: (rowData, rowMeta) => {
-      const colSpan = rowData.length + 1;
-      console.log(rowData);
-      console.log(rowMeta);
-      return (
-        <TableRow>
-          <TableCell colSpan={colSpan}>
-            {rowData[5]}
-          </TableCell>
-        </TableRow>
-      )
-    },
-    // onColumnViewChange(changedColumn: string, action: string) {
-    //   if (changedColumn === 'visible') {
-    //     setShowUnVisible(action === 'add');
-    //   }
-    // },
+    viewColumns: false,
     elevation: 0,
     rowHover: false,
     responsive: 'scroll',

@@ -18,6 +18,8 @@ import { drawerWidth } from '../../layout/layout-component';
 import TextEditorContainer from '../text/text-editor/text-editor-container';
 import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequestParams, LikeDeleteRequestParams } from '../../../api/definitions';
 import KSize from '../../../data-types/k-size';
+import AdapterLink from '../../../components/custom-mui/adapter-link';
+import { Switch, Route, RouteComponentProps, withRouter } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -39,6 +41,9 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   body: {
     width: `calc(100vw - ${drawerWidth}px)`,
+    [theme.breakpoints.down('sm')]: {
+      width: '100vw',
+    },
   },
   progressContainer: {
     width: ``,
@@ -57,25 +62,25 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }));
 
-interface Props {
+interface Props extends RouteComponentProps {
   user: User;
   manual: Manual;
   users: User[];
   selectNode: TreeNode | null;
-  isEditing: boolean;
   ks: KSize;
   replace: (manual: Manual) => Action<Manual>;
   postFavorite: (params: FavoritePostRequestParams) => Action<FavoritePostRequestParams>,
   deleteFavorite: (params: FavoriteDeleteRequestParams) => Action<FavoriteDeleteRequestParams>,
   postLike: (params: LikePostRequestParams) => Action<LikePostRequestParams>,
   deleteLike: (params: LikeDeleteRequestParams) => Action<LikeDeleteRequestParams>,
-  editStart: () => Action<void>;
+
   zoomIn: () => Action<void>;
   zoomOut: () => Action<void>;
 }
 
 const LayoutComponent: React.FC<Props> = props => {
-  const { user, manual, users, selectNode, isEditing, ks, zoomIn, zoomOut } =  props;
+  const { user, manual, users, selectNode, ks, zoomIn, zoomOut } =  props;
+  const { location } = props;
   const manualUser = users.find(u => u.id === manual.ownerId)!;
   const [tabIndex, setTabIndex] = useState(0);
   const [showVS, setShowVS] = useState(false);
@@ -104,19 +109,24 @@ const LayoutComponent: React.FC<Props> = props => {
     props.postLike({manualId: manual.id, userId: user.id});
   }
 
-  function onClickEditStart() { props.editStart(); }
-
   const modeRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
 
   const classes = useStyles();
   const ShowTree = (
     <div className={classes.body}>
-      {tabIndex === 0 && (!isEditing ? <NodeViewer/> : <NodeEditorContainer modeRef={modeRef} buttonRef={buttonRef}/>)}
-      {tabIndex === 1 &&
-      (!isEditing
-        ? <TextViewer itemNumber={manual.title} />
-        : <TextEditorContainer buttonRef={buttonRef}/>)}
+      {tabIndex === 0 && 
+        <Switch>
+          <Route path={`/manual/:id/edit`} render={() => <NodeEditorContainer modeRef={modeRef} buttonRef={buttonRef}/>}/>
+          <Route path={`/manual/:id`} render={() => <NodeViewer/>}/>
+        </Switch>}
+
+      {tabIndex === 1 && 
+        <Switch>
+          <Route path={`/manual/:id/edit`} render={() => <TextEditorContainer buttonRef={buttonRef}/>}/>
+          <Route path={`/manual/:id`} render={() => <TextViewer itemNumber={manual.title} />}/>
+        </Switch>}
+
       {tabIndex === 2 && <ManualSettings/>}
     </div>
   );
@@ -127,7 +137,7 @@ const LayoutComponent: React.FC<Props> = props => {
     </div>
   );
 
-  
+  const isEditing = location.pathname.slice(-4) === 'edit';
   return (
     <div className={classes.root}>
       <Box mt={1} mx={2}>
@@ -166,7 +176,7 @@ const LayoutComponent: React.FC<Props> = props => {
         <div ref={modeRef}/>
         {(tabIndex === 0 || tabIndex === 1) && isCommiter && !isEditing &&
         <Box mt={0.7}>
-          <Button color="primary" onClick={onClickEditStart}>編集する</Button>
+          <Button component={AdapterLink} to={`/manual/${manual.id}/edit`} color="primary">編集する</Button>
         </Box>}
         <div ref={buttonRef}/>
         {tabIndex === 0 &&
@@ -195,4 +205,4 @@ const LayoutComponent: React.FC<Props> = props => {
   );
 }
 
-export default LayoutComponent;
+export default withRouter(LayoutComponent);

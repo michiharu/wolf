@@ -17,17 +17,26 @@ interface Props extends TitleCheckState, BaseSettingsActions {
 }
 
 const BaseSettings: React.FC<Props> = props => {
-  const { user, manual: propManual, title, categories, replace } =  props;
+  const { user, manual: propManual, title, result, categories, replace, titleReset } =  props;
   const [manual, setManual] = useState(propManual);
   const isOwner = manual.ownerId === user.id;
-  const hasChange = title !== propManual.title || manual.categoryId !== propManual.categoryId;
+  const hasChange = title !== propManual.title ||
+                    manual.categoryId !== propManual.categoryId ||
+                    manual.description !== propManual.description;
+
+  const isValid = title !== '' && result !== null && title === result.title && result.valid;
 
   const handleCategorySelect = (e: React.ChangeEvent<{ value: unknown; name?: string; }>) => {
     setManual({...manual, categoryId: e.target.value as string});
   }
 
+  const handleChangeDescription = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setManual({...manual, description: e.target.value as string});
+  }
+
   function handleReset() {
     setManual(propManual);
+    titleReset({preTitle: manual.title})
   }
 
   function handleClickSave() {
@@ -40,15 +49,16 @@ const BaseSettings: React.FC<Props> = props => {
 
   return (
     <div>
-      <Box display="flex" flexDirection="row" alignItems="flex-end" p={2}>
+      <Box display="flex" flexDirection="row" alignItems="flex-end" py={2}>
         <Box flexGrow={1}><Typography variant="h5">マニュアルの基本設定</Typography></Box>
         {isOwner && <Box><Button onClick={handleReset} disabled={!hasChange}>元に戻す</Button></Box>}
-        {isOwner && <Box><Button color="primary" onClick={handleClickSave} disabled={!hasChange}>変更する</Button></Box>}
+        {isOwner &&
+        <Box><Button color="primary" onClick={handleClickSave} disabled={!hasChange || !isValid}>変更する</Button></Box>}
       </Box>
-      <Box p={2}>
+      <Box py={2}>
         <TitleChecker defaultTitle={propManual.title} disabled={!isOwner}/>
       </Box>
-      <Box p={2} width="100%">
+      <Box py={2} width="100%">
         <TextField
           select
           variant="outlined"
@@ -60,6 +70,19 @@ const BaseSettings: React.FC<Props> = props => {
         >
           {categories.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
         </TextField>
+      </Box>
+      <Box py={2}>
+        <TextField
+          variant="outlined"
+          label="説明"
+          value={manual.description}
+          onChange={handleChangeDescription}
+          multiline
+          rows={6}
+          rowsMax={12}
+          disabled={!isOwner}
+          fullWidth
+        />
       </Box>
     </div>
   );

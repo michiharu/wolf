@@ -86,14 +86,14 @@ const PublishingSettingsComponent: React.FC<Props> = props => {
 
   return (
     <div>
-      <Box display="flex" flexDirection="row" alignItems="flex-end" p={2}>
+      <Box display="flex" flexDirection="row" alignItems="flex-end" py={2}>
         <Box flexGrow={1}>
           <Typography variant="h5">公開設定</Typography>
         </Box>
         {isOwner && <Box><Button onClick={handleReset} disabled={!hasChange}>元に戻す</Button></Box>}
         {isOwner && <Box><Button color="primary" onClick={handleClickSave} disabled={!hasChange}>変更する</Button></Box>}
       </Box>
-      <Box p={2} width="100%">
+      <Box py={2} width="100%">
         <div><Typography variant="caption">公開・非公開</Typography></div>
         <Box pt={1}>
           <FormControlLabel
@@ -118,7 +118,7 @@ const PublishingSettingsComponent: React.FC<Props> = props => {
         </Box>}
 
       {!manual.isPublic && isOwner &&
-        <Box display="flex" flexDirection="row" alignItems="flex-end" p={2}>
+        <Box display="flex" flexDirection="row" alignItems="flex-end" py={2}>
           <Box flexGrow={1}>
             <TextField
               select
@@ -152,7 +152,7 @@ const PublishingSettingsComponent: React.FC<Props> = props => {
         </Box>}
 
       {!manual.isPublic && isOwner &&
-        <Box display="flex" flexDirection="row" alignItems="flex-end" p={2}>
+        <Box display="flex" flexDirection="row" alignItems="flex-end" py={2}>
           <Box flexGrow={1}>
             <TextField
               select

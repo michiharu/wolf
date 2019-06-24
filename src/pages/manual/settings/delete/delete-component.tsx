@@ -37,8 +37,8 @@ const DeleteComponent: React.FC<Props> = props => {
 
   return (
     <div>
-      <Box p={2}><Typography variant="h5">マニュアルを削除する</Typography></Box>
-      <Box display="flex" flexDirection="row" alignItems="flex-end" p={2}>
+      <Box py={2}><Typography variant="h5">マニュアルを削除する</Typography></Box>
+      <Box display="flex" flexDirection="row" alignItems="flex-end" py={2}>
         <Box flexGrow={1}>
           <TextField
             label="確認のためタイトルを入力"

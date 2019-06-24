@@ -33,7 +33,7 @@ const TitleChecker: React.FC<Props> = props => {
     enqueue({preTitle: defaultTitle, title: e.target.value});
   }
 
-  const renderAdornment = title !== defaultTitle ? (
+  const renderAdornment = (title !== '' && title !== defaultTitle) ? (
     <InputAdornment position="end">
       {(result === null || title !== result.title) ? <CircularProgress size={24}/> :
       result.valid ? <Check style={{color: green[300]}}/> : <Error style={{color: red[300]}}/>}
@@ -42,8 +42,9 @@ const TitleChecker: React.FC<Props> = props => {
 
   const helperText: string | undefined =
   title === defaultTitle ? '' :
+  title === '' ? '' :
   result === null ? '' :
-  title !== result.title ? '' :
+  title !== result.title ? '-' :
   result.valid ? 'このタイトルは使用可能です' : 'このタイトルは重複しているため使用できません';
   
   return (

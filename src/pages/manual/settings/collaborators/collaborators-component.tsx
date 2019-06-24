@@ -57,14 +57,14 @@ const Collaborators: React.FC<Props> = props => {
 
   return (
     <div>
-      <Box display="flex" flexDirection="row" alignItems="flex-end" p={2}>
+      <Box display="flex" flexDirection="row" alignItems="flex-end" py={2}>
         <Box flexGrow={1}>
           <Typography variant="h5">コラボレーター</Typography>
         </Box>
         {isOwner && <Box><Button onClick={handleReset} disabled={!hasChange}>元に戻す</Button></Box>}
         {isOwner && <Box><Button color="primary" onClick={handleClickSave} disabled={!hasChange}>変更する</Button></Box>}
       </Box>
-      <Box p={2}>
+      <Box py={2}>
         <Box><Typography variant="caption">コラボレーター</Typography></Box>
         {collaborators.length === 0 && <Chip className={classes.chip} label="未登録"/>}
         {collaborators.map((c, i) => 
@@ -75,7 +75,7 @@ const Collaborators: React.FC<Props> = props => {
           onDelete={isOwner ? deleteCollaborator(c.id) : undefined}
         />)}
       </Box>
-      <Box display="flex" flexDirection="row" alignItems="flex-end" p={2}>
+      <Box display="flex" flexDirection="row" alignItems="flex-end" py={2}>
         <Box flexGrow={1}>
           <TextField
             select

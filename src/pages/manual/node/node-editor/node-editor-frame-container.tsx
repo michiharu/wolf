@@ -7,13 +7,11 @@ import { Memo } from '../../../../data-types/tree';
 import { treeActions } from '../../../../redux/actions/main/manualsAction';
 import { memosActions } from '../../../../redux/actions/main/memoAction';
 import EditorFrameComponent from './node-editor-frame-component';
-import { viewAction } from '../../../../redux/actions/viewAction';
 import { TreePutRequest } from '../../../../api/definitions';
 
 export interface EditorFrameActions {
   putTree: (params: TreePutRequest) => Action<TreePutRequest>;
   changeMemos: (memos: Memo[]) => Action<Memo[]>;
-  editEnd: () => Action<void>;
 
 }
 
@@ -27,7 +25,6 @@ function mapDispatchToProps(dispatch: Dispatch) {
   return {
     putTree: (params: TreePutRequest) => dispatch(treeActions.put(params)),
     changeMemos:   (memos: Memo[]) => dispatch(memosActions.change(memos)),
-    editEnd: () => dispatch(viewAction.editEnd()),
   };
 }
 

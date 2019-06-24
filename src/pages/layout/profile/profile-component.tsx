@@ -110,13 +110,13 @@ const ProfileComponent: React.FC<Props> = props => {
     <div>
       <Box pb={2} display="flex" flexDirection="row">
         <Box flexGrow={1} pr={1}>
-          <TextField label="姓" value={lastName} onChange={handleLastName} fullWidth disabled={!isEditing} />
+          <TextField label="姓" value={lastName} onChange={handleLastName} fullWidth disabled={!isEditing} error={lastName === ''}/>
         </Box>
         <Box flexGrow={1} pl={1}>
-          <TextField label="名" value={firstName} onChange={handleFirstName} fullWidth disabled={!isEditing}/>
+          <TextField label="名" value={firstName} onChange={handleFirstName} fullWidth disabled={!isEditing} error={firstName === ''}/>
         </Box>
       </Box>
-      <TextField label="メールアドレス" value={mail} onChange={handleMail} fullWidth disabled={!isEditing}/>
+      <TextField label="メールアドレス" value={mail} onChange={handleMail} fullWidth disabled={!isEditing} error={mail === ''}/>
     </div>
   );
 
@@ -133,6 +133,8 @@ const ProfileComponent: React.FC<Props> = props => {
       />
     </div>
   );
+
+  const isValid = lastName !== '' && firstName !== '' && mail !== '';
 
   const classes = useStyles();
   return (
@@ -159,7 +161,7 @@ const ProfileComponent: React.FC<Props> = props => {
         {isEditing && <Button onClick={cancel}>キャンセル</Button>}
         {!isEditing && <Button onClick={startEditing} color="primary">編集</Button>}
         {isEditing && tabIndex === 0 &&
-        <Button onClick={handleUpdate} color="primary">基本情報の更新</Button>}
+        <Button onClick={handleUpdate} color="primary" disabled={!isValid}>基本情報の更新</Button>}
         {isEditing && tabIndex === 1 &&
         <Button onClick={handlePasswordUpdate} color="primary" disabled={newPassword !== confirmation}>パスワードの更新</Button>}
       </DialogActions>

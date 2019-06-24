@@ -5,9 +5,11 @@ import { Manual } from '../../../../data-types/tree';
 import { manualsAction } from '../../../../redux/actions/main/manualsAction';
 import BaseSettingsComponent from './base-settings-component';
 import { Action } from 'typescript-fsa';
+import { titleCheckAction } from '../../../../redux/actions/titileCheckAction';
 
 export interface BaseSettingsActions {
   replace: (manual: Manual) => Action<Manual>;
+  titleReset: (params: {preTitle: string; willGenerate?: string}) => Action<{preTitle: string; willGenerate?: string}>;
 }
 
 function mapStateToProps(appState: AppState) {
@@ -24,6 +26,7 @@ function mapStateToProps(appState: AppState) {
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
     replace: (manual: Manual) => dispatch(manualsAction.put(manual)),
+    titleReset: (params: {preTitle: string; willGenerate?: string}) => dispatch(titleCheckAction.set(params)) 
   };
 }
 

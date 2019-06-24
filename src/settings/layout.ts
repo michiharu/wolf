@@ -4,7 +4,6 @@ import TextEditSettings from '../data-types/text-edit-settings';
 export const toolbarHeight = 64;
 export const toolbarMinHeight = 56;
 
-export const drawerWidth = 260;
 export const rightPainWidth = 300;
 export { default as Task } from '@material-ui/icons/Assignment';
 export { default as Switch } from '@material-ui/icons/CallSplit';

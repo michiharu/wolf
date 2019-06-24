@@ -8,7 +8,6 @@ import createSagaMiddleware from '@redux-saga/core';
 import { rootSaga } from './saga';
 import { CategoriesState, categoriesReducer } from './states/main/categoriesState';
 import { UsersState, usersReducer } from './states/main/usersState';
-import { ViewState, viewReducer } from './states/viewState';
 import { NotificationsState, notificationsReducer } from './states/notificationsState';
 import { LoadingState, loadingReducer } from './states/loadingState';
 import { UserGroupsState, userGroupsReducer } from './states/main/userGroupsState';
@@ -22,7 +21,6 @@ export type AppState = {
   manuals: ManualsState;
   categories: CategoriesState;
   memos: MemosState;
-  view: ViewState;
   notifications: NotificationsState;
   titleCheck: TitleCheckState;
   ks: KSState;
@@ -41,7 +39,6 @@ const store = createStore(
     manuals: manualsReducer,
     categories: categoriesReducer,
     memos: memoReducer,
-    view: viewReducer,
     notifications: notificationsReducer,
     titleCheck: titleCheckReducer,
     ks: ksReducer,

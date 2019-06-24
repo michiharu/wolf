@@ -56,6 +56,8 @@ export interface Manual {
   favoriteIds: string[];
   likeIds: string[];
   rootTree: Tree | null;
+  createAt: string;
+  updateAt: string;
 }
 
 export const baseManual: Manual = {
@@ -71,7 +73,9 @@ export const baseManual: Manual = {
   visible: true,
   favoriteIds: [],
   likeIds: [],
-  rootTree: null
+  rootTree: null,
+  createAt: '',
+  updateAt: '',
 };
 
 export interface ManualWithObject extends Manual {

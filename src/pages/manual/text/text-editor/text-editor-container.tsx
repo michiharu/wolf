@@ -5,12 +5,10 @@ import { AppState } from '../../../../redux/store';
 import { Manual } from '../../../../data-types/tree';
 import TextEditorComponent from './text-editor-component';
 import { manualsAction } from '../../../../redux/actions/main/manualsAction';
-import { viewAction } from '../../../../redux/actions/viewAction';
 
 
 export interface NodeViewerActions {
   replaceManual: (manual: Manual) => Action<Manual>;
-  editEnd: () => Action<void>;
 
 }
 
@@ -23,7 +21,6 @@ function mapStateToProps(appState: AppState) {
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
     replaceManual: (manual: Manual) => dispatch(manualsAction.put(manual)),
-    editEnd: () => dispatch(viewAction.editEnd()),
   };
 }
 

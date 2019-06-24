@@ -17,6 +17,7 @@ import { EditorFrameActions } from './node-editor-frame-container';
 import ViewSettingsContainer from '../../../../components/view-settings/view-settings-container';
 import { NodeEditorProps } from './node-editor-component';
 import { TreePutRequest } from '../../../../api/definitions';
+import { RouteComponentProps, withRouter, Prompt } from 'react-router';
 
 export const styles = (theme: Theme) => createStyles({
   convergent: {
@@ -43,7 +44,7 @@ export const styles = (theme: Theme) => createStyles({
   },
 });
 
-interface Props extends MemosState, EditorFrameActions, WithStyles<typeof styles> {
+interface Props extends MemosState, EditorFrameActions, RouteComponentProps, WithStyles<typeof styles> {
   manual: Manual;
   node: TreeNode;
   modeRef: React.RefObject<HTMLDivElement>;
@@ -55,7 +56,6 @@ interface State {
   mode: NodeEditMode;
   node: TreeNode;
   memos: KTreeNode[];
-  hasDifference: boolean;
   cannotSaveReason: CannotSaveReason;
   saved: boolean;
   showVS: boolean;
@@ -73,7 +73,6 @@ class EditorFrameComponent extends React.Component<Props, State> {
       mode: 'c',
       node,
       memos: TreeUtil.getAsArray(memos, baseKTreeNode),
-      hasDifference: false,
       cannotSaveReason: null,
       saved: false,
       showVS: false,
@@ -103,7 +102,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 
   save = () => {
-    const { manual, putTree, changeMemos, editEnd } = this.props;
+    const { manual, putTree, changeMemos, history } = this.props;
     if (manual === null) { throw new Error('Manual cannot be null.'); }
     const {node, memos } = this.state;
     const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
@@ -116,25 +115,27 @@ class EditorFrameComponent extends React.Component<Props, State> {
       const params: TreePutRequest = {manualId: manual.id, rootTree: node };
       putTree(params);
       changeMemos(memos);
-      editEnd();
+      history.goBack();
     }
   }
 
   saveAndGo = () => {
-    const { manual, putTree, changeMemos, editEnd } = this.props;
+    const { manual, putTree, changeMemos, history } = this.props;
     if (manual === null) { throw new Error('Manual cannot be null.'); }
     const { node, memos } = this.state;
     const params: TreePutRequest = {manualId: manual.id, rootTree: node };
     putTree(params);
     changeMemos(memos);
-    editEnd();
+    history.goBack();
   }
+
+  handleCancel = () => this.props.history.goBack();
 
   handleShowVS = (showVS: boolean) => () => this.setState({showVS});
 
   render() {
-    const { modeRef, buttonRef, editEnd, classes } = this.props;
-    const { mode, node, memos, hasDifference, cannotSaveReason, saved, showVS } = this.state;
+    const { modeRef, buttonRef, classes } = this.props;
+    const { mode, node, memos, cannotSaveReason, saved, showVS } = this.state;
   
     const nodeProps: NodeEditorProps = {
       mode,
@@ -146,14 +147,15 @@ class EditorFrameComponent extends React.Component<Props, State> {
       editMemo: this.editMemo,
     };
 
-    const cannotSave: CannotSaveReason = cannotSaveReason !== null ? cannotSaveReason :
-      !TreeUtil._isAllSwitchHasCase(node) ? 'switch' :
-      !TreeUtil._isAllCaseHasItem(node)   ? 'case'   : null;
+    // const cannotSave: CannotSaveReason = cannotSaveReason !== null ? cannotSaveReason :
+    //   !TreeUtil._isAllSwitchHasCase(node) ? 'switch' :
+    //   !TreeUtil._isAllCaseHasItem(node)   ? 'case'   : null
     const getStyle = (buttonMode: NodeEditMode): React.CSSProperties => {
       return mode === buttonMode
       ? { height: '100%', backgroundColor: theme.palette.background.paper, borderLeftColor: 'rgba(0, 0, 0, 0.24)' }
       : { height: '100%' };
     };
+    const hasDifference = TreeUtil._hasDifference(this.props.node, this.state.node);
     return (
       <div>
         <Portal container={modeRef.current}>
@@ -166,10 +168,16 @@ class EditorFrameComponent extends React.Component<Props, State> {
           </Box>
         </Portal>
         <Portal container={buttonRef.current}>
-          <Box mt={0.7}>
+          <Box display="flex" flexDirection="row" mt={0.7}>
+            <Button onClick={this.handleCancel}>キャンセル</Button>
             <Button color="primary" onClick={this.save}>編集完了</Button>
           </Box>
         </Portal>
+
+        <Prompt
+          when={hasDifference}
+          message="編集内容を保存していませんが、編集を終了して良いですか？"
+        />
 
         <NodeEditorContainer {...nodeProps}/>
 
@@ -182,7 +190,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
           <ViewSettingsContainer />
         </Modal>
         
-        <Dialog open={hasDifference} onClose={() => this.setState({hasDifference: false})}>
+        {/* <Dialog open={hasDifference} onClose={() => this.setState({hasDifference: false})}>
           <DialogTitle>マニュアルを保存せずに画面を移動してもよろしいですか？</DialogTitle>
           <DialogContent>
             <DialogContentText>
@@ -194,9 +202,9 @@ class EditorFrameComponent extends React.Component<Props, State> {
             <Button onClick={() => this.setState({hasDifference: false})}>いいえ</Button>
             {cannotSave === null &&
             <Button onClick={this.saveAndGo} color="primary" autoFocus>保存して移動</Button>}
-            <Button onClick={editEnd} color="primary">保存せずに移動</Button>
+            <Button onClick={() => {}} color="primary">保存せずに移動</Button>
           </DialogActions>
-        </Dialog>
+        </Dialog> */}
 
         <Dialog open={cannotSaveReason !== null} onClose={() => this.setState({cannotSaveReason: null})}>
           <DialogTitle>このデータは保存できません</DialogTitle>
@@ -234,4 +242,4 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 }
 
-export default withStyles(styles)(EditorFrameComponent);
+export default withRouter(withStyles(styles)(EditorFrameComponent));

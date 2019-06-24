@@ -32,14 +32,14 @@ const ChangeOwnerComponent: React.FC<Props> = props => {
 
   return (
     <div>
-      <Box display="flex" flexDirection="row" alignItems="flex-end" p={2}>
+      <Box display="flex" flexDirection="row" alignItems="flex-end" py={2}>
         <Box flexGrow={1}>
           <Typography variant="h5">コラボレーター</Typography>
         </Box>
         {isOwner && <Box><Button onClick={handleReset} disabled={!hasChange}>元に戻す</Button></Box>}
         {isOwner && <Box><Button color="primary" onClick={handleClickSave} disabled={!hasChange}>変更する</Button></Box>}
       </Box>
-      <Box display="flex" p={2}>
+      <Box display="flex" py={2}>
         <Box flexGrow={1}>
           <TextField
             select

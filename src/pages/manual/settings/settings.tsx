@@ -42,7 +42,7 @@ const ManualSettings: React.FC<Props> = props => {
             </List>
           </Paper>
         </Grid>
-        <Grid item xs={12} sm={7}>
+        <Grid item xs={12} sm={7} md={8} lg={9}>
           <Box maxWidth={600}>
             {selected === 0 && <BaseSettings/>}
             {selected === 1 && <Collaborators/>}

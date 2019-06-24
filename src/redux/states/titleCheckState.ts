@@ -24,13 +24,12 @@ export const titleCheckReducer = reducerWithInitialState(initialState)
 )
 .case(
   titleCheckAction.enqueue,
-  (state, titleSet) => ({...state, ...titleSet})
+  (state, titleSet) => titleSet.title !== '' ? {...state, ...titleSet} : {...state, ...titleSet, result: null}
 )
 .case(
   titleCheckAction.get,
   (state, result) => ({...state, result})
 )
-
 .case(
   titleCheckAction.done,
   (state, result) => ({...state, result, title: result.title})

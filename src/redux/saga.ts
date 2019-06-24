@@ -2,7 +2,7 @@ import { put, call, fork, take, select, throttle } from 'redux-saga/effects';
 import { MyNotification } from './states/notificationsState';
 import * as API from '../api/axios-func';
 import { ACTIONS_LOGIN, ACTIONS_LOGOUT } from './actions/loginAction';
-import { loginUserAction, ACTIONS_LOGINUSER_PUT } from './actions/main/loginUserAction';
+import { loginUserAction, ACTIONS_LOGINUSER_PUT, ACTIONS_LOGINUSER_PUT_SUCCESS } from './actions/main/loginUserAction';
 import { LoginPostResponse, TreePutRequest, GenerateTitleRequest } from '../api/definitions';
 import * as ManualAction from './actions/main/manualsAction';
 import { usersAction } from './actions/main/usersAction';
@@ -12,10 +12,14 @@ import { loadingActions } from './actions/loadingAction';
 import { Manual } from '../data-types/tree';
 import TreeUtil from '../func/tree';
 import { userGroupsAction } from './actions/main/userGroupsAction';
-import { getTitleForCheck } from './selectors';
+import { getTitleForCheck, getKSize, getLoginUser, getUsers } from './selectors';
 import { titleCheckAction, ACTIONS_TITLECHECK_ENQUEUE, ACTIONS_TITLECHECK_GENERATE } from './actions/titileCheckAction';
 import { TitleCheckState } from './states/titleCheckState';
 import { ACTIONS_MEMOS_CHANGE, memosActions } from './actions/main/memoAction';
+import { ACTIONS_KSIZE_CHANGE, ACTIONS_KSIZE_ZOOM_IN, ACTIONS_KSIZE_ZOOM_OUT } from './actions/ksAction';
+import keys from '../settings/storage-keys';
+import KSize from '../data-types/k-size';
+import User from '../data-types/user';
 
 export const getKey = () => new Date().getTime() + Math.random();
 
@@ -77,6 +81,15 @@ function* handleRequestPutLoginUser() {
         { key: getKey(), variant: 'warning', message: 'プロフィールの更新に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
     }
+  }
+}
+
+function* handleUpdateLoginUser() {
+  while (true) {
+    yield take(ACTIONS_LOGINUSER_PUT_SUCCESS);
+    const user: User = yield select(getLoginUser);
+    const users: User[] = yield select(getUsers);
+    yield put(usersAction.change(users.map(u => u.id === user.id ? user : u)))
   }
 }
 
@@ -155,9 +168,9 @@ function* handleRequestDeleteManual() {
 }
 
 function* handleTitleCheck() {
-  const titleCheckState: TitleCheckState = yield select(getTitleForCheck);
-  if (titleCheckState.title !== titleCheckState.preTitle) {
-    const data = yield call(API.titleCheckPost, {title: titleCheckState.title});
+  const { title, preTitle }: TitleCheckState = yield select(getTitleForCheck);
+  if (title !== '' && title !== preTitle) {
+    const data = yield call(API.titleCheckPost, {title});
     yield put(titleCheckAction.get(data));
   }
 }
@@ -306,12 +319,37 @@ function* handleRequestPutMemo() {
   }
 }
 
+function* saveByChangeKS() {
+  while (true) {
+    yield take(ACTIONS_KSIZE_CHANGE);
+    const ks: KSize = yield select(getKSize);
+    localStorage.setItem(keys.ks, JSON.stringify(ks));
+  }
+}
+
+function* saveByZoomInKS() {
+  while (true) {
+    yield take(ACTIONS_KSIZE_ZOOM_IN);
+    const ks: KSize = yield select(getKSize);
+    localStorage.setItem(keys.ks, JSON.stringify(ks));
+  }
+}
+
+function* saveByZoomOutKS() {
+  while (true) {
+    yield take(ACTIONS_KSIZE_ZOOM_OUT);
+    const ks: KSize = yield select(getKSize);
+    localStorage.setItem(keys.ks, JSON.stringify(ks));
+  }
+}
+
 
 export function* rootSaga() {
   yield fork(handleRequestLogin);
   yield fork(handleRequestLogout);
 
   yield fork(handleRequestPutLoginUser);
+  yield fork(handleUpdateLoginUser);
 
   yield fork(handleRequestGetManual);
   yield fork(handleRequestPostManual);
@@ -330,4 +368,8 @@ export function* rootSaga() {
   yield fork(handleRequestDeleteLike);
 
   yield fork(handleRequestPutTree);
+
+  yield fork(saveByChangeKS);
+  yield fork(saveByZoomInKS);
+  yield fork(saveByZoomOutKS);
 }
