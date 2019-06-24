@@ -76,7 +76,7 @@ export const titleCheckURL = '/api/v1/manual-title-check';
 export type TitleCheckPostRequest = { title: string; };
 export type TitleCheckPostResponse = TitleCheckResult;
 
-export const generateTitleURL = '/api/v1/generate-title';
+export const generateTitleURL = '/api/v1/manual-generate-title';
 export type GenerateTitleRequest = { title: string; };
 export type GenerateTitleResponse = TitleCheckResult;
 

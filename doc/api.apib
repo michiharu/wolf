@@ -310,6 +310,24 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
             "valid": true
         }
 
+# Group Manual Generate Title
+## マニュアルタイトル生成 [/api/v1/manual-generate-title]
+
+### マニュアルタイトル生成API [POST]
+
++ Request  (application/json)
+
+        {
+            "title": "元となるタイトル名"
+        }
+
++ Response 200 (application/json)
+
+        {
+            "title": "生成したタイトル",
+            "valid": true
+        }
+
 # Group Tree
 ## マニュアルツリー [/api/v1/tree/{manualId}]
 DB未保存のデータはidを"tmp:~"で始めるルールとする。
