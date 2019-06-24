@@ -3,7 +3,7 @@ import { MyNotification } from './states/notificationsState';
 import * as API from '../api/axios-func';
 import { ACTIONS_LOGIN, ACTIONS_LOGOUT } from './actions/loginAction';
 import { loginUserAction, ACTIONS_LOGINUSER_PUT } from './actions/main/loginUserAction';
-import { LoginPostResponse, TreePutRequest } from '../api/definitions';
+import { LoginPostResponse, TreePutRequest, GenerateTitleRequest } from '../api/definitions';
 import * as ManualAction from './actions/main/manualsAction';
 import { usersAction } from './actions/main/usersAction';
 import { categoriesAction } from './actions/main/categoriesAction';
@@ -13,7 +13,7 @@ import { Manual } from '../data-types/tree';
 import TreeUtil from '../func/tree';
 import { userGroupsAction } from './actions/main/userGroupsAction';
 import { getTitleForCheck } from './selectors';
-import { titleCheckAction, ACTIONS_TITLECHECK_ENQUEUE } from './actions/titileCheckAction';
+import { titleCheckAction, ACTIONS_TITLECHECK_ENQUEUE, ACTIONS_TITLECHECK_GENERATE } from './actions/titileCheckAction';
 import { TitleCheckState } from './states/titleCheckState';
 
 export const getKey = () => new Date().getTime() + Math.random();
@@ -161,6 +161,18 @@ function* handleTitleCheck() {
   }
 }
 
+function* handleRequestGenerateTitle() {
+  while (true) {
+    yield take(ACTIONS_TITLECHECK_GENERATE);
+    const titleCheckState: TitleCheckState = yield select(getTitleForCheck);
+    const requestBody: GenerateTitleRequest = { title: titleCheckState.seed! };
+    const data = yield call(API.generateTitlePost, requestBody);
+    if (data.error === undefined) {
+      yield put(titleCheckAction.done(data));
+    }
+  }
+}
+
 function* handleManualCopy() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_MANUAL_COPY);
@@ -296,6 +308,7 @@ export function* rootSaga() {
   yield fork(handleRequestDeleteManual);
 
   yield throttle(1000, ACTIONS_TITLECHECK_ENQUEUE, handleTitleCheck);
+  yield fork(handleRequestGenerateTitle);
   yield fork(handleManualCopy);
 
   yield fork(handleRequestPostFavorite);

@@ -1,7 +1,7 @@
 import axiosbase from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import * as env from '../settings/env.json';
-import { loginURL, manualURL, favoriteURL, likeURL, treeURL, usersURL, passwordURL, titleCheckURL, similarTitleURL } from './definitions';
+import { loginURL, manualURL, favoriteURL, likeURL, treeURL, usersURL, passwordURL, titleCheckURL, generateTitleURL } from './definitions';
 import { postLogin, deleteLogin } from './mock-data/login';
 import * as Manual from './mock-data/manual';
 import * as Favorite from './mock-data/favorite';
@@ -10,7 +10,7 @@ import { putTree } from './mock-data/tree';
 import { putLoginUser } from './mock-data/login-user';
 import { putPassword } from './mock-data/password';
 import { postTitleCheck } from './mock-data/title-checker';
-import { postSimilarTitle } from './mock-data/similar-title';
+import { postGenerateTitle } from './mock-data/generate-title';
 
 export const baseURL = 'http://localhost:55616';
 
@@ -38,7 +38,7 @@ const mockAdapter = () => {
 
 
   mock.onPost(titleCheckURL).reply(postTitleCheck);
-  mock.onPost(similarTitleURL).reply(postSimilarTitle);
+  mock.onPost(generateTitleURL).reply(postGenerateTitle);
 
 
   // favorite

@@ -7,8 +7,9 @@ import Category from '../../../../data-types/category';
 import User from '../../../../data-types/user';
 
 import TitleChecker from '../../../../components/title-checker/title-checker';
+import { TitleCheckState } from '../../../../redux/states/titleCheckState';
 
-interface Props extends BaseSettingsActions {
+interface Props extends TitleCheckState, BaseSettingsActions {
   user: User;
   categories: Category[];
   manual: Manual;
@@ -16,7 +17,7 @@ interface Props extends BaseSettingsActions {
 }
 
 const BaseSettings: React.FC<Props> = props => {
-  const { user, manual: propManual, title, categories, replace, titleReset } =  props;
+  const { user, manual: propManual, title, categories, replace } =  props;
   const [manual, setManual] = useState(propManual);
   const isOwner = manual.ownerId === user.id;
   const hasChange = title !== propManual.title || manual.categoryId !== propManual.categoryId;
@@ -27,12 +28,10 @@ const BaseSettings: React.FC<Props> = props => {
 
   function handleReset() {
     setManual(propManual);
-    titleReset();
   }
 
   function handleClickSave() {
     replace({...manual, title});
-    titleReset();
   }
 
   useEffect(() => {

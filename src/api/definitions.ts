@@ -76,9 +76,9 @@ export const titleCheckURL = '/api/v1/manual-title-check';
 export type TitleCheckPostRequest = { title: string; };
 export type TitleCheckPostResponse = TitleCheckResult;
 
-export const similarTitleURL = '/api/v1/similar-title';
-export type SimilarTitleRequest = { original: string; };
-export type SimilarTitleResponse = { newTitle: string; };
+export const generateTitleURL = '/api/v1/generate-title';
+export type GenerateTitleRequest = { title: string; };
+export type GenerateTitleResponse = TitleCheckResult;
 
 /* Tree */
 export const treeURL = '/api/v1/tree';

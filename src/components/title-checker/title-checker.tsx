@@ -12,15 +12,19 @@ import { green, red } from '@material-ui/core/colors';
 interface Props extends TitleCheckState {
   defaultTitle: string;
   disabled?: boolean;
-  generate?: boolean;
-  set: (preTitle: string) => Action<string>;
+  willGenerate?: string;
+  set: (params: {preTitle: string; willGenerate?: string}) => Action<{preTitle: string; willGenerate?: string}>;
+  generate: () => Action<void>;
   enqueue: (titleSet: TitleSet) => Action<TitleSet>;
 }
 
 const TitleChecker: React.FC<Props> = props => {
-  const {defaultTitle, disabled, title, preTitle, result, set, enqueue} = props;
+  const {defaultTitle, disabled, willGenerate, title, preTitle, result, set, generate, enqueue} = props;
   if (defaultTitle !== preTitle) {
-    set(defaultTitle);
+    set({preTitle: defaultTitle, willGenerate});
+    if (willGenerate !== undefined) {
+      generate()
+    }
   }
 
   function handleTitleChange(e: any) {
@@ -58,7 +62,8 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    set: (preTitle: string) => dispatch(titleCheckAction.set(preTitle)),
+    set: (params: {preTitle: string; willGenerate?: string}) => dispatch(titleCheckAction.set(params)),
+    generate: () => dispatch(titleCheckAction.generate()),
     enqueue: (titleSet: TitleSet) => dispatch(titleCheckAction.enqueue(titleSet)),
   };
 }

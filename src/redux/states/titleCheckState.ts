@@ -5,20 +5,22 @@ export interface TitleCheckState {
   preTitle: string;
   title: string;
   result: TitleCheckResult | null;
-  willGenerate: boolean;
+  seed: string | null;
 }
 
 const initialState: TitleCheckState = {
   preTitle: '',
   title: '',
   result: null,
-  willGenerate: false,
+  seed: null,
 };
 
 export const titleCheckReducer = reducerWithInitialState(initialState)
 .case(
   titleCheckAction.set,
-  (state, preTitle) => ({...state, preTitle, title: preTitle})
+  (state, { preTitle, willGenerate }) => (
+    {...state, preTitle, title: preTitle, result: null, seed: willGenerate !== undefined ? willGenerate : null}
+  )
 )
 .case(
   titleCheckAction.enqueue,
@@ -28,7 +30,8 @@ export const titleCheckReducer = reducerWithInitialState(initialState)
   titleCheckAction.get,
   (state, result) => ({...state, result})
 )
+
 .case(
-  titleCheckAction.reset,
-  (state) => ({...state, preTitle: '', title: '', result: null})
+  titleCheckAction.done,
+  (state, result) => ({...state, result, title: result.title})
 )

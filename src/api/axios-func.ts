@@ -6,7 +6,8 @@ import {
   favoriteURL, FavoritePostRequestParams, FavoriteDeleteRequestParams,
   likeURL, LikePostRequestParams, LikeDeleteRequestParams,
   passwordURL, PasswordPutRequestParams,
-  titleCheckURL, TitleCheckPostRequest, SimilarTitleRequest,
+  titleCheckURL, TitleCheckPostRequest,
+  generateTitleURL, GenerateTitleRequest, 
 } from "./definitions";
 
 import axios from "./axios";
@@ -62,8 +63,8 @@ export const titleCheckPost = (checkRequest: TitleCheckPostRequest) => axios
   .then(res => res.data)
   .catch(error => ({ error }));
 
-export const similarTitlePost = (original: SimilarTitleRequest) => axios
-  .post<SimilarTitleRequest>(titleCheckURL, original)
+export const generateTitlePost = (original: GenerateTitleRequest) => axios
+  .post<GenerateTitleRequest>(generateTitleURL, original)
   .then(res => res.data)
   .catch(error => ({ error }));
 

@@ -28,7 +28,7 @@ interface Props extends CategoriesState, TitleCheckState, CreateManualActions {
 
 const CreateManualComponent: React.FC<Props> = props => {
 
-  const { categories, onClose, title, result, titleReset } = props;
+  const { categories, onClose, title, result } = props;
   const [categoryId, setCategoryId] = useState(categories[0].id);
   const handleCategorySelect = (e: React.ChangeEvent<{ value: unknown; name?: string; }>) => {
     setCategoryId(e.target.value as string);
@@ -37,7 +37,6 @@ const CreateManualComponent: React.FC<Props> = props => {
   const [isPublic, setIsPublic] = useState(true);
   const handleIsPublic = (e: any) => setIsPublic(e.target.checked);
   const close = () => {
-    titleReset();
     setIsPublic(true);
     onClose();
   }
