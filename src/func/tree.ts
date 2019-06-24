@@ -7,6 +7,10 @@ export default class TreeUtil {
     return {...base, ...node, children};
   }
 
+  static getAsArray = <T1 extends Tree, T2 extends T1>(node: T1[], base: T2): T2[] => {
+    return node.map(n => ({...base, ...n}));
+  }
+
   // genealogy = 系譜：先祖〜targetのNodeリストを返す
   static getGenealogy = (nodeList: Tree[], target: Tree): Tree[] => {
 

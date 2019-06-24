@@ -4,7 +4,7 @@
  * そのためフロントからサーバーに送られるIDの値については無視すること。
  */
 import User, { LoginUser } from "../data-types/user";
-import { Manual, Tree, KTreeNode } from "../data-types/tree";
+import { Manual, Tree, KTreeNode, Memo } from "../data-types/tree";
 import Category from "../data-types/category";
 import { Password } from "../data-types/password";
 import UserGroup from "../data-types/user-group";
@@ -85,6 +85,12 @@ export const treeURL = '/api/v1/tree';
 // PUT(/api/v1/tree/:manualId)
 export type TreePutRequest = { manualId: string; rootTree: Tree; };
 export type TreePutResponse = Tree;
+
+/* Memo */
+export const memosURL = '/api/v1/memos';
+// PUT(/api/v1/memos)
+export type MemosPutRequest = Memo[];
+export type MemosPutResponse = Memo[];
 
 /* Favorite */
 export const favoriteURL = '/api/v1/favorites';

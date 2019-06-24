@@ -15,6 +15,7 @@ import { userGroupsAction } from './actions/main/userGroupsAction';
 import { getTitleForCheck } from './selectors';
 import { titleCheckAction, ACTIONS_TITLECHECK_ENQUEUE, ACTIONS_TITLECHECK_GENERATE } from './actions/titileCheckAction';
 import { TitleCheckState } from './states/titleCheckState';
+import { ACTIONS_MEMOS_CHANGE, memosActions } from './actions/main/memoAction';
 
 export const getKey = () => new Date().getTime() + Math.random();
 
@@ -295,6 +296,16 @@ function* handleRequestPutTree() {
   }
 }
 
+function* handleRequestPutMemo() {
+  while (true) {
+    const action = yield take(ACTIONS_MEMOS_CHANGE);
+    const data = yield call(API.memosPut, action.payload);
+    if (data.error === undefined) {
+      yield put(memosActions.changeSuccess(data));
+    }
+  }
+}
+
 
 export function* rootSaga() {
   yield fork(handleRequestLogin);
@@ -310,6 +321,7 @@ export function* rootSaga() {
   yield throttle(1000, ACTIONS_TITLECHECK_ENQUEUE, handleTitleCheck);
   yield fork(handleRequestGenerateTitle);
   yield fork(handleManualCopy);
+  yield fork(handleRequestPutMemo);
 
   yield fork(handleRequestPostFavorite);
   yield fork(handleRequestDeleteFavorite);

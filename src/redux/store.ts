@@ -1,7 +1,7 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 import { LoginUserState,  loginUserReducer }    from './states/main/loginUserState';
 import { ManualsState, manualsReducer }   from './states/main/manualsState';
-import { MemoState, memoReducer } from './states/main/memoState';
+import { MemosState, memoReducer } from './states/main/memoState';
 import { KSState, ksReducer } from './states/ksState';
 import { RSState, rsReducer } from './states/rsState';
 import createSagaMiddleware from '@redux-saga/core';
@@ -21,7 +21,7 @@ export type AppState = {
   userGroups: UserGroupsState;
   manuals: ManualsState;
   categories: CategoriesState;
-  memos: MemoState;
+  memos: MemosState;
   view: ViewState;
   notifications: NotificationsState;
   titleCheck: TitleCheckState;

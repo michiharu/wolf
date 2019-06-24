@@ -7,7 +7,7 @@ import {
   likeURL, LikePostRequestParams, LikeDeleteRequestParams,
   passwordURL, PasswordPutRequestParams,
   titleCheckURL, TitleCheckPostRequest,
-  generateTitleURL, GenerateTitleRequest, 
+  generateTitleURL, GenerateTitleRequest, MemosPutRequest, memosURL, 
 } from "./definitions";
 
 import axios from "./axios";
@@ -90,5 +90,10 @@ export const likeDelete = (params: LikeDeleteRequestParams) => axios
 
 export const treePut = ({ manualId, rootTree }: TreePutRequest) => axios
   .put<TreePutRequest>(`${treeURL}/${manualId}`, rootTree)
+  .then(res => res.data)
+  .catch(error => ({ error }));
+
+  export const memosPut = (memos: MemosPutRequest) => axios
+  .put<MemosPutRequest>(`${memosURL}`, memos)
   .then(res => res.data)
   .catch(error => ({ error }));

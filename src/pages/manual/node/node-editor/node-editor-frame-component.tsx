@@ -7,12 +7,12 @@ import {
 import CloseIcon from '@material-ui/icons/Close';
 import { Divergent, Convergent } from '../../../../settings/layout' 
 
-import { TreeNode, KTreeNode, Manual } from '../../../../data-types/tree';
+import { TreeNode, KTreeNode, Manual, baseKTreeNode } from '../../../../data-types/tree';
 import TreeUtil from '../../../../func/tree';
 import NodeEditorContainer from '../../node/node-editor/node-editor-container';
 import { theme } from '../../../..';
 import { NodeEditMode } from '../../../../data-types/node-edit-mode';
-import { MemoState } from '../../../../redux/states/main/memoState';
+import { MemosState } from '../../../../redux/states/main/memoState';
 import { EditorFrameActions } from './node-editor-frame-container';
 import ViewSettingsContainer from '../../../../components/view-settings/view-settings-container';
 import { NodeEditorProps } from './node-editor-component';
@@ -43,15 +43,12 @@ export const styles = (theme: Theme) => createStyles({
   },
 });
 
-interface Props extends
-  MemoState,
-  EditorFrameActions,
-  WithStyles<typeof styles> {
-    manual: Manual;
-    node: TreeNode;
-    modeRef: React.RefObject<HTMLDivElement>;
-    buttonRef: React.RefObject<HTMLDivElement>;
-  }
+interface Props extends MemosState, EditorFrameActions, WithStyles<typeof styles> {
+  manual: Manual;
+  node: TreeNode;
+  modeRef: React.RefObject<HTMLDivElement>;
+  buttonRef: React.RefObject<HTMLDivElement>;
+}
 
 interface State {
   // divergent thinking（発散思考）、 convergent thinking（収束思考）
@@ -75,7 +72,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
     this.state = {
       mode: 'c',
       node,
-      memos,
+      memos: TreeUtil.getAsArray(memos, baseKTreeNode),
       hasDifference: false,
       cannotSaveReason: null,
       saved: false,

@@ -1,14 +1,15 @@
 import { reducerWithInitialState } from 'typescript-fsa-reducers';
-import { memoActions } from '../../actions/main/memoAction';
-import { KTreeNode } from '../../../data-types/tree';
+import { memosActions } from '../../actions/main/memoAction';
+import { Memo } from '../../../data-types/tree';
 
-export interface MemoState {
-  memos: KTreeNode[];
+export interface MemosState {
+  memos: Memo[];
 }
 
-const initialState: MemoState = {
+const initialState: MemosState = {
   memos: []
 };
 
 export const memoReducer = reducerWithInitialState(initialState)
-.case(memoActions.change, (state, memos) => ({...state, memos}))
+.case(memosActions.change, (state, memos) => ({...state, memos}))
+.case(memosActions.changeSuccess, (state, memos) => ({...state, memos}))
