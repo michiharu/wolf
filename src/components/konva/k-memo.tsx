@@ -47,8 +47,8 @@ const KMemo: React.FC<KMemoProps> = props => {
   const fill = isTask(node.type) ? lightBlue[50] : isSwitch(node.type) ? amber[100] : yellow[100];
   const baseRectProps = {
     x: 0, y: 0,
-    width: node.rect.w * ks.unit,
-    height: node.rect.h * ks.unit,
+    width: ks.rect.w * ks.unit,
+    height: ks.rect.h * ks.unit,
     cornerRadius: 4,
     fill,
     stroke: node.focus ? '#80bdff' : '#0000',
