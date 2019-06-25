@@ -24,7 +24,7 @@ const BaseSettings: React.FC<Props> = props => {
                     manual.categoryId !== propManual.categoryId ||
                     manual.description !== propManual.description;
 
-  const isValid = title !== '' && result !== null && title === result.title && result.valid;
+  const isValid =　propManual.title === title || (title !== '' && result !== null && title === result.title && result.valid);
 
   const handleCategorySelect = (e: React.ChangeEvent<{ value: unknown; name?: string; }>) => {
     setManual({...manual, categoryId: e.target.value as string});
