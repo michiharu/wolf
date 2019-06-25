@@ -7,6 +7,7 @@ import { TreeNode, Manual } from '../../../../data-types/tree';
 import TreeUtil from '../../../../func/tree';
 import TextLineWithIcon, { TextLineWithIconProps } from './text-line-with-icon';
 import { Action } from 'typescript-fsa';
+import { Prompt } from 'react-router-dom';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -85,12 +86,16 @@ class TextEditor extends React.Component<Props, State> {
       changeNode: this.changeNode,
       deleteSelf: this.deleteSelf,
     };
-
+    const hasDifference = TreeUtil._hasDifference(this.props.node, this.state.node);
     return (
       <div className={classes.root}>
         <Portal container={buttonRef.current}>
           <Button color="primary" onClick={this.save} style={{height: '100%'}}>編集完了</Button>
         </Portal>
+        <Prompt
+          when={hasDifference}
+          message="編集内容を保存していません。編集を終了して良いですか？"
+        />
         <TextLineWithIcon {...textLineWithIconProps}/>
       </div>
     );

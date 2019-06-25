@@ -176,7 +176,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
 
         <Prompt
           when={hasDifference}
-          message="編集内容を保存していませんが、編集を終了して良いですか？"
+          message="編集内容を保存していません。編集を終了して良いですか？"
         />
 
         <NodeEditorContainer {...nodeProps}/>
