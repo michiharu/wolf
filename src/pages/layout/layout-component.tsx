@@ -182,7 +182,7 @@ function AppFrameComponent({user, logout, location}: Props) {
             <Typography variant="h6" noWrap>Flow Like</Typography>
           </Button>
           
-          {location.pathname !== links.dashboard &&
+          {false && location.pathname !== links.dashboard &&
           <div className={classes.search}>
             <div className={classes.searchIcon}><Search /></div>
             <InputBase

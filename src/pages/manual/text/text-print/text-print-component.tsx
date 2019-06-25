@@ -69,7 +69,7 @@ export interface TextLineWithIconProps {
 
 interface Props extends TextLineWithIconProps, WithStyles<typeof styles> {}
 
-const TextViewer: React.FC<Props> = (props: Props) => {
+const TextPrint: React.FC<Props> = (props: Props) => {
 
   const {
     itemNumber, node, classes
@@ -215,10 +215,10 @@ const TextViewer: React.FC<Props> = (props: Props) => {
         </Grid>
       </Grid>
         
-      {node.children.map((c, i) => <TextViewer key={c.id} {...props} itemNumber={`${itemNumber} - ${i + 1}`} node={c}/>)}
+      {node.children.map((c, i) => <TextPrint key={c.id} {...props} itemNumber={`${itemNumber} - ${i + 1}`} node={c}/>)}
 
     </div>
   );
 };
 
-export default withStyles(styles)(TextViewer);
+export default withStyles(styles)(TextPrint);

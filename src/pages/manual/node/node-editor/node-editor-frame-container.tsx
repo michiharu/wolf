@@ -12,13 +12,11 @@ import { TreePutRequest } from '../../../../api/definitions';
 export interface EditorFrameActions {
   putTree: (params: TreePutRequest) => Action<TreePutRequest>;
   changeMemos: (memos: Memo[]) => Action<Memo[]>;
-
 }
 
 function mapStateToProps(appState: AppState) {
-  const { manuals, selectId, selectNode } = appState.manuals;
-  const manual = manuals.find(m => m.id === selectId)!
-  return {manual, node: cloneDeep(selectNode!), ...appState.memos};
+  const { selectId, selectNode } = appState.manuals;
+  return {selectId: selectId!, node: cloneDeep(selectNode!), ...appState.memos};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {

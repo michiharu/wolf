@@ -1,13 +1,12 @@
 import * as React from 'react';
 import {
-  Theme, createStyles, WithStyles, Snackbar, IconButton,
+  Theme, createStyles, WithStyles,
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Modal, withStyles, Portal, ButtonGroup, Box,
 } from '@material-ui/core';
 
-import CloseIcon from '@material-ui/icons/Close';
 import { Divergent, Convergent } from '../../../../settings/layout' 
 
-import { TreeNode, KTreeNode, Manual, baseKTreeNode } from '../../../../data-types/tree';
+import { TreeNode, KTreeNode, baseKTreeNode } from '../../../../data-types/tree';
 import TreeUtil from '../../../../func/tree';
 import NodeEditorContainer from '../../node/node-editor/node-editor-container';
 import { theme } from '../../../..';
@@ -45,7 +44,7 @@ export const styles = (theme: Theme) => createStyles({
 });
 
 interface Props extends MemosState, EditorFrameActions, RouteComponentProps, WithStyles<typeof styles> {
-  manual: Manual;
+  selectId: string;
   node: TreeNode;
   modeRef: React.RefObject<HTMLDivElement>;
   buttonRef: React.RefObject<HTMLDivElement>;
@@ -57,7 +56,6 @@ interface State {
   node: TreeNode;
   memos: KTreeNode[];
   cannotSaveReason: CannotSaveReason;
-  saved: boolean;
   showVS: boolean;
 }
 
@@ -74,7 +72,6 @@ class EditorFrameComponent extends React.Component<Props, State> {
       node,
       memos: TreeUtil.getAsArray(memos, baseKTreeNode),
       cannotSaveReason: null,
-      saved: false,
       showVS: false,
     };
   }
@@ -102,8 +99,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 
   save = () => {
-    const { manual, putTree, changeMemos, history } = this.props;
-    if (manual === null) { throw new Error('Manual cannot be null.'); }
+    const { selectId, putTree, changeMemos, history } = this.props;
     const {node, memos } = this.state;
     const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
     const isAllCaseHasItem = TreeUtil._isAllCaseHasItem(node);
@@ -111,8 +107,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
                                                !isAllCaseHasItem   ? 'case'   : null;
     this.setState({cannotSaveReason});
     if (cannotSaveReason === null) {
-      this.setState({saved: true});
-      const params: TreePutRequest = {manualId: manual.id, rootTree: node };
+      const params: TreePutRequest = {manualId: selectId, rootTree: node };
       putTree(params);
       changeMemos(memos);
       history.goBack();
@@ -120,10 +115,9 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 
   saveAndGo = () => {
-    const { manual, putTree, changeMemos, history } = this.props;
-    if (manual === null) { throw new Error('Manual cannot be null.'); }
+    const { selectId, putTree, changeMemos, history } = this.props;
     const { node, memos } = this.state;
-    const params: TreePutRequest = {manualId: manual.id, rootTree: node };
+    const params: TreePutRequest = {manualId: selectId, rootTree: node };
     putTree(params);
     changeMemos(memos);
     history.goBack();
@@ -135,7 +129,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
 
   render() {
     const { modeRef, buttonRef, classes } = this.props;
-    const { mode, node, memos, cannotSaveReason, saved, showVS } = this.state;
+    const { mode, node, memos, cannotSaveReason, showVS } = this.state;
   
     const nodeProps: NodeEditorProps = {
       mode,
@@ -218,25 +212,6 @@ class EditorFrameComponent extends React.Component<Props, State> {
             <Button onClick={() => this.setState({cannotSaveReason: null})} color="primary" autoFocus>OK</Button>
           </DialogActions>
         </Dialog>
-
-        <Snackbar
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          open={saved}
-          autoHideDuration={5000}
-          onClose={() => this.setState({saved: false})}
-          message={<span>保存しました</span>}
-          action={[
-            <IconButton
-              key="close"
-              aria-label="Close"
-              color="inherit"
-              className={classes.close}
-              onClick={() => this.setState({saved: false})}
-            >
-              <CloseIcon />
-            </IconButton>,
-          ]}
-        />
       </div>
     );
   }

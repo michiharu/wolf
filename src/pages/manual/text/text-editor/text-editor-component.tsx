@@ -1,13 +1,14 @@
 import * as React from 'react';
 import {
-  Theme, createStyles, WithStyles, withStyles, Portal, Button,
+  Theme, createStyles, WithStyles, withStyles, Portal, Button, Box,
 } from '@material-ui/core';
 
-import { TreeNode, Manual } from '../../../../data-types/tree';
+import { TreeNode } from '../../../../data-types/tree';
 import TreeUtil from '../../../../func/tree';
 import TextLineWithIcon, { TextLineWithIconProps } from './text-line-with-icon';
 import { Action } from 'typescript-fsa';
-import { Prompt } from 'react-router-dom';
+import { Prompt, withRouter, RouteComponentProps } from 'react-router-dom';
+import { TreePutRequest } from '../../../../api/definitions';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -39,13 +40,13 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export interface TextEditorProps {
-  manual: Manual;
+  selectId: string;
   node: TreeNode;
-  replaceManual: (manual: Manual) => Action<Manual>;
+  putTree: (params: TreePutRequest) => Action<TreePutRequest>;
   buttonRef: React.RefObject<HTMLDivElement>;
 }
 
-interface Props extends TextEditorProps, WithStyles<typeof styles> {}
+interface Props extends TextEditorProps, RouteComponentProps, WithStyles<typeof styles> {}
 
 interface State {
   node: TreeNode;
@@ -60,9 +61,11 @@ class TextEditor extends React.Component<Props, State> {
   }
 
   save = () => {
-    const { manual, replaceManual } = this.props;
-    const newManual: Manual = {...manual, rootTree: this.state.node};
-    replaceManual(newManual);
+    const { selectId, putTree, history } = this.props;
+    const { node } = this.state;
+    const params: TreePutRequest = {manualId: selectId, rootTree: node };
+    putTree(params);
+    history.goBack();
   }
 
   changeNode = (target: TreeNode) => {
@@ -90,7 +93,9 @@ class TextEditor extends React.Component<Props, State> {
     return (
       <div className={classes.root}>
         <Portal container={buttonRef.current}>
-          <Button color="primary" onClick={this.save} style={{height: '100%'}}>編集完了</Button>
+          <Box mt={0.7}>
+            <Button color="primary" onClick={this.save}>編集完了</Button>
+          </Box>
         </Portal>
         <Prompt
           when={hasDifference}
@@ -102,4 +107,4 @@ class TextEditor extends React.Component<Props, State> {
   }
 }
 
-export default withStyles(styles)(TextEditor);
+export default withRouter(withStyles(styles)(TextEditor));

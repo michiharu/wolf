@@ -10,7 +10,7 @@ import TextViewer from '../text/text-viewer/text-viewer-container';
 import ManualSettings from '../settings/settings';
 import ViewSettingsContainer from '../../../components/view-settings/view-settings-container';
 import User from '../../../data-types/user';
-import { Star, StarBorder, ThumbUp, ThumbUpAltOutlined, ZoomIn, ZoomOut } from '@material-ui/icons';
+import { Star, StarBorder, ThumbUp, ThumbUpAltOutlined, ZoomIn, ZoomOut, Print } from '@material-ui/icons';
 import { yellow, blue } from '@material-ui/core/colors';
 import { Action } from 'typescript-fsa';
 import NodeEditorContainer from '../node/node-editor/node-editor-frame-container';
@@ -20,6 +20,8 @@ import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequest
 import KSize from '../../../data-types/k-size';
 import AdapterLink from '../../../components/custom-mui/adapter-link';
 import { Switch, Route, RouteComponentProps, withRouter } from 'react-router-dom';
+import NodePrintContainer from '../node/node-print/node-print-container';
+import TextPrintDialogContainer from '../text/text-print/text-print-dialog-container';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -57,9 +59,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginTop: -30,
     marginLeft: -30,
   },
-  viewSettingButton: {
-    marginLeft: theme.spacing(1)
-  }
 }));
 
 interface Props extends RouteComponentProps {
@@ -84,13 +83,18 @@ const LayoutComponent: React.FC<Props> = props => {
   const manualUser = users.find(u => u.id === manual.ownerId)!;
   const [tabIndex, setTabIndex] = useState(0);
   const [showVS, setShowVS] = useState(false);
+  const handleShowVS = () => setShowVS(!showVS);
+  const handleCloseVS = () => setShowVS(false);
+  const [showPrintNode, setShowPrintNode] = useState(false);
+  const handleShowPrintNode = () => setShowPrintNode(!showPrintNode);
+  const handleClosePrintNode = () => setShowPrintNode(false);
+  const [showPrintText, setShowPrintText] = useState(false);
+  const handleShowPrintText = () => setShowPrintText(!showPrintText);
+  const handleClosePrintText = () => setShowPrintText(false);
 
   const handleChangeTab = (_: any, i: number) => {
     setTabIndex(i);
   }
-
-  const handleShowVS = () => setShowVS(!showVS);
-  const handleCloseVS = () => setShowVS(false);
 
   const isCommiter = manual.ownerId === user.id || manual.collaboratorIds.find(cid => cid === user.id) !== undefined;
   const isFavorite = manual.favoriteIds.find(fid => fid === user.id) !== undefined;
@@ -138,6 +142,7 @@ const LayoutComponent: React.FC<Props> = props => {
   );
 
   const isEditing = location.pathname.slice(-4) === 'edit';
+
   return (
     <div className={classes.root}>
       <Box mt={1} mx={2}>
@@ -178,20 +183,33 @@ const LayoutComponent: React.FC<Props> = props => {
         <Box mt={0.7}>
           <Button component={AdapterLink} to={`/manual/${manual.id}/edit`} color="primary">編集する</Button>
         </Box>}
+        {tabIndex === 0 && !isEditing &&
+        <Box ml={1}>
+          <IconButton onClick={handleShowPrintNode}><Print/></IconButton>
+        </Box>}
+        {tabIndex === 1 && !isEditing &&
+        <Box ml={1}>
+          <IconButton onClick={handleShowPrintText}><Print/></IconButton>
+        </Box>}
         <div ref={buttonRef}/>
         {tabIndex === 0 &&
-        <IconButton className={classes.viewSettingButton} onClick={zoomIn} disabled={ks.unit === 30}>
-          <ZoomIn/>
-        </IconButton>}
+        <Box ml={1}>
+          <IconButton onClick={zoomIn} disabled={ks.unit === 30}><ZoomIn/></IconButton>
+        </Box>}
         {tabIndex === 0 &&
-        <IconButton className={classes.viewSettingButton} onClick={zoomOut} disabled={ks.unit === 8}>
-          <ZoomOut/>
-        </IconButton>}
+        <Box ml={1}>
+          <IconButton onClick={zoomOut} disabled={ks.unit === 8}><ZoomOut/></IconButton>
+        </Box>}
         {tabIndex === 0 &&
-        <IconButton className={classes.viewSettingButton} onClick={handleShowVS}><ViewSettingsIcon/></IconButton>}
+        <Box ml={1}>
+          <IconButton onClick={handleShowVS}><ViewSettingsIcon/></IconButton>
+        </Box>}
       </div>
       <Divider/>
       {selectNode !== null ? ShowTree : LoadingTree}
+      
+      {selectNode !== null && <NodePrintContainer open={showPrintNode} close={handleClosePrintNode}/>}
+      {selectNode !== null && <TextPrintDialogContainer open={showPrintText} close={handleClosePrintText}/>}
       <Modal
         open={showVS}
         onClose={handleCloseVS}
