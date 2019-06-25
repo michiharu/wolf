@@ -30,12 +30,13 @@ function* handleRequestLogin() {
     const data = yield call(API.login, action.payload);
     yield put(loadingActions.endLogin());
     if (data.error === undefined) {
-      const { user, users, userGroups, manuals, categories } = data as LoginPostResponse;
+      const { user, users, userGroups, manuals, categories, memos } = data as LoginPostResponse;
       yield put(loginUserAction.set(user));
       yield put(usersAction.change(users));
       yield put(userGroupsAction.change(userGroups));
       yield put(ManualAction.manualsAction.set(manuals));
       yield put(categoriesAction.set(categories));
+      yield put(memosActions.change(memos));
     }
   }
 }
