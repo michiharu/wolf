@@ -11,6 +11,8 @@ export const manual1: Manual = {
   favoriteIds: ['a'],
   likeIds: ['a', 'c', 'd'],
   rootTree: null,
+  updateAt: 'yyyy/MM/dd hh:mm',
+  createAt: 'yyyy/MM/dd hh:mm',
 };
 
 export const manual2: Manual = {
@@ -24,6 +26,8 @@ export const manual2: Manual = {
   favoriteIds: ['b', 'd'],
   likeIds: ['a'],
   rootTree: null,
+  updateAt: 'yyyy/MM/dd hh:mm',
+  createAt: 'yyyy/MM/dd hh:mm',
 };
 
 export const manual3: Manual = {
@@ -36,7 +40,9 @@ export const manual3: Manual = {
   categoryId: '3',
   isPublic: false,
   favoriteIds: [],
-  rootTree: null,  
+  rootTree: null,
+  updateAt: 'yyyy/MM/dd hh:mm',
+  createAt: 'yyyy/MM/dd hh:mm',
 };
 
 export const manual4: Manual = {
@@ -51,6 +57,8 @@ export const manual4: Manual = {
   favoriteIds: ['a', 'c', 'd'],
   likeIds: ['a', 'd'],
   rootTree: null,
+  updateAt: 'yyyy/MM/dd hh:mm',
+  createAt: 'yyyy/MM/dd hh:mm',
 };
 
 export const rootTree = {

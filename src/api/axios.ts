@@ -37,7 +37,7 @@ const mockAdapter = () => {
   mock.onPut(regexManualsURL).reply(Manual.put);
   mock.onDelete(regexManualsURL).reply(Manual._delete);
 
-
+  
   mock.onPost(titleCheckURL).reply(postTitleCheck);
   mock.onPost(generateTitleURL).reply(postGenerateTitle);
 

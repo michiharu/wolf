@@ -18,7 +18,7 @@ import { UsersState } from '../../redux/states/main/usersState';
 import { selectActions } from '../../redux/actions/main/manualsAction';
 import { drawerWidth } from '../layout/layout-component';
 
-const otherWidthSum = 720;
+const otherWidthSum = 800;
 
 const useStyles = makeStyles((theme: Theme) => ({
   description: {
@@ -27,6 +27,9 @@ const useStyles = makeStyles((theme: Theme) => ({
       width: `calc(100vw - ${otherWidthSum}px)`,
     },
   },
+  date: {
+    maxWidth: 90
+  }
 }));
 
 interface Props extends
@@ -194,6 +197,8 @@ const Dashboard: React.FC<Props> = (props: Props) => {
       options: {
         filter: false,
         sort: true,
+        customBodyRender: value => <Typography className={classes.date}>{value}</Typography>
+
       }
     },
     {
@@ -202,6 +207,8 @@ const Dashboard: React.FC<Props> = (props: Props) => {
       options: {
         filter: false,
         sort: true,
+        customBodyRender: value => <Typography className={classes.date}>{value}</Typography>
+
       }
     },
   ];
