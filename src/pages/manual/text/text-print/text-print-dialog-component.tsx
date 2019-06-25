@@ -7,13 +7,14 @@ import ReactToPrint from 'react-to-print';
 interface Props {
   open: boolean;
   close: () => void;
-  node: TreeNode;
+  node: TreeNode | null;
 }
 
 const TextPrintDialogComponent: React.FC<Props> = props => {
   const { open, close, node } = props;
   const contentRef = useRef();
 
+  if (node === null) { return <></>; }
 
   return (
     <Dialog open={open} onClose={close} maxWidth="xl">

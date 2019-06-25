@@ -27,7 +27,7 @@ export const ACTIONS_MANUAL_POST_FOR_COPY   = 'ACTIONS_MANUAL_POST_FOR_COPY';
 export const manualsAction = {
   set: actionCreator<Manual[]>(ACTIONS_MANUAL_SET),
 
-  get:        actionCreator<Manual>(ACTIONS_MANUAL_GET),
+  get:        actionCreator<string>(ACTIONS_MANUAL_GET),
   getSuccess: actionCreator<Manual>  (ACTIONS_MANUAL_GET_SUCCESS),
   getError:   actionCreator<void>  (ACTIONS_MANUAL_GET_ERROR),
 

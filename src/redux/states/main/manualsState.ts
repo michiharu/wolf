@@ -7,6 +7,7 @@ import TreeUtil from '../../../func/tree';
 
 export interface ManualsState {
   manuals: Manual[];
+  requestGet: boolean;
   selectId: string | null;
   selectNode: TreeNode | null;
   manualBeforeSaving: Manual[];
@@ -17,6 +18,7 @@ export interface ManualsState {
 
 const initialState: ManualsState = {
   manuals: [],
+  requestGet: false,
   selectId: null,
   selectNode: null,
   manualBeforeSaving: [],
@@ -33,8 +35,8 @@ export const manualsReducer = reducerWithInitialState(initialState)
 // GET
 .case(
   manualsAction.get,
-  (state, manual) => {
-    return ({ ...state, selectId: manual.id, selectNode: null })
+  (state, manualId) => {
+    return ({ ...state, requestGet: true, selectId: manualId, selectNode: null })
   }
 )
 .case(
@@ -46,12 +48,12 @@ export const manualsReducer = reducerWithInitialState(initialState)
 
     selectNode.label = manual.title;
 
-    return ({ ...state, manuals: state.manuals.map(m => m.id === manual.id ? manual : m), selectNode})
+    return ({ ...state, requestGet: false, manuals: state.manuals.map(m => m.id === manual.id ? manual : m), selectNode})
   }
 )
 .case(
   manualsAction.getError,
-  (state) => ({ ...state})
+  (state) => ({ ...state, requestGet: false})
 )
 // POST for copy
 .case(

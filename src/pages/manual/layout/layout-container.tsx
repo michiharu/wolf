@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Action } from 'typescript-fsa';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
@@ -19,7 +19,7 @@ import { KSState } from '../../../redux/states/ksState';
 import { UsersState } from '../../../redux/states/main/usersState';
 
 export interface ViewActions {
-  get: (manual: Manual) => Action<Manual>;
+  get: (id: string) => Action<string>;
   replace: (manual: Manual) => Action<Manual>;
   postFavorite: (params: FavoritePostRequestParams) => Action<FavoritePostRequestParams>,
   deleteFavorite: (params: FavoriteDeleteRequestParams) => Action<FavoriteDeleteRequestParams>,
@@ -45,6 +45,7 @@ const ViewContainer: React.FC<Props> = props => {
   const {
     user,
     manuals,
+    requestGet,
     users,
     selectId,
     selectNode,
@@ -61,13 +62,9 @@ const ViewContainer: React.FC<Props> = props => {
     zoomOut,
   } =  props;
 
-  useEffect(() => {
-    if (selectId !== match.params.id) {
-      const selected = manuals.find(m => m.id === match.params.id)!;
-      get(selected)
-    }
-  }, [get, manuals, selectId, match.params.id]);
-
+  if (!requestGet && (selectId !== match.params.id || selectNode === null)) {
+    get(match.params.id)
+  }
   
   const id = match.params.id;
   const manual = manuals.find(m => m.id === id)!;
@@ -101,7 +98,7 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    get: (manual: Manual) => dispatch(manualsAction.get(manual)),
+    get: (id: string) => dispatch(manualsAction.get(id)),
     replace: (manual: Manual) => dispatch(manualsAction.put(manual)),
     postFavorite: (params: FavoritePostRequestParams) => dispatch(favoriteActions.post(params)),
     deleteFavorite: (params: FavoriteDeleteRequestParams) => dispatch(favoriteActions.delete(params)),

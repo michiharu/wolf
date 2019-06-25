@@ -1,7 +1,7 @@
 import {
   loginURL, LoginPostResponse,
   usersURL, LoginUserPutRequest, LoginUserPutResponse, 
-  manualURL, ManualPostRequest, ManualGetRequestParams,
+  manualURL, ManualPostRequest,
   treeURL, TreePutRequest,
   favoriteURL, FavoritePostRequestParams, FavoriteDeleteRequestParams,
   likeURL, LikePostRequestParams, LikeDeleteRequestParams,
@@ -38,8 +38,8 @@ export const loginUserPut = (user: LoginUserPutRequest) => axios
   .then(res => res.data)
   .catch(error => ({ error }));
 
-export const manualGet = (manual: ManualGetRequestParams) => axios
-  .get(`${manualURL}/${manual.id}`)
+export const manualGet = (manualId: string) => axios
+  .get(`${manualURL}/${manualId}`)
   .then(res => res.data)
   .catch(error => ({ error }));
 

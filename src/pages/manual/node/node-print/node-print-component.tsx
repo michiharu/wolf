@@ -18,25 +18,28 @@ import ReactToPrint from 'react-to-print';
 interface Props extends KSState, RSState {
   open: boolean;
   close: () => void;
-  node: TreeNode;
+  node: TreeNode | null;
 }
 
 const NodePrintComponent: React.FC<Props> = props => {
   const { open, close, node: tree, ks } = props;
 
-  const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
-  const node = KArrowUtil.setArrow(kTreeNode, ks)
-
   const stageRef = useCallback(stage => {
-    if (stage !== null) {
+    if (stage !== null && tree !== null) {
+      const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
+      const node = KArrowUtil.setArrow(kTreeNode, ks)
       stage.width((node.self.w + ks.spr.w) * ks.unit);
       stage.height((node.self.h + ks.spr.h) * ks.unit);
       stage.draw();
     }
-  }, [ks, node]);
+  }, [ks, tree]);
 
   const contentRef = useRef();
 
+  if (tree === null) { return <></>; }
+
+  const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
+  const node = KArrowUtil.setArrow(kTreeNode, ks)
   const flatNodes = TreeNodeUtil.toArrayWithoutClose(node);
   const nodeProps = { ks, expand: (target: KWithArrow) => {} };
 
