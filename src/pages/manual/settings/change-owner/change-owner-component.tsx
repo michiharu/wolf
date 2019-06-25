@@ -34,7 +34,7 @@ const ChangeOwnerComponent: React.FC<Props> = props => {
     <div>
       <Box display="flex" flexDirection="row" alignItems="flex-end" py={2}>
         <Box flexGrow={1}>
-          <Typography variant="h5">コラボレーター</Typography>
+          <Typography variant="h5">オーナーの変更</Typography>
         </Box>
         {isOwner && <Box><Button onClick={handleReset} disabled={!hasChange}>元に戻す</Button></Box>}
         {isOwner && <Box><Button color="primary" onClick={handleClickSave} disabled={!hasChange}>変更する</Button></Box>}
