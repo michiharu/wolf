@@ -77,7 +77,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
   if ( classes !== null ){}
 
   const handleClickTitle = (id: string) => () => {
-    history.push(`/manual/${id}`);
+    history.push(`/manual/${id}/tree`);
     filterReset();
   }
 

@@ -50,6 +50,7 @@ interface Props extends TextEditorProps, RouteComponentProps, WithStyles<typeof 
 
 interface State {
   node: TreeNode;
+  saved: boolean;
 }
 
 class TextEditor extends React.Component<Props, State> {
@@ -57,15 +58,19 @@ class TextEditor extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.state = {node: props.node};
+    this.state = {node: props.node, saved: false};
   }
 
   save = () => {
     const { selectId, putTree, history } = this.props;
     const { node } = this.state;
-    const params: TreePutRequest = {manualId: selectId, rootTree: node };
-    putTree(params);
-    history.goBack();
+    const hasDifference = TreeUtil._hasDifference(this.props.node, this.state.node);
+    if (hasDifference) {
+      const params: TreePutRequest = {manualId: selectId, rootTree: node };
+      putTree(params);
+    }
+    this.setState({saved: true})
+    process.nextTick(() => history.push(`/manual/${selectId}/text`));
   }
 
   changeNode = (target: TreeNode) => {
@@ -81,7 +86,7 @@ class TextEditor extends React.Component<Props, State> {
 
   render() {
     const { buttonRef, classes } = this.props;
-    const { node } = this.state;
+    const { node, saved } = this.state;
 
     const textLineWithIconProps: TextLineWithIconProps = {
       itemNumber: node.label,
@@ -98,7 +103,7 @@ class TextEditor extends React.Component<Props, State> {
           </Box>
         </Portal>
         <Prompt
-          when={hasDifference}
+          when={hasDifference && !saved}
           message="編集内容を保存していません。編集を終了して良いですか？"
         />
         <TextLineWithIcon {...textLineWithIconProps}/>

@@ -30,7 +30,7 @@ function ExpansionListItemComponent(props: Props) {
   const { category: c, filter, manuals, filterSet, filterReset, location, history } = props;
   if (manuals === null) { throw new Error('Manual cannot be null.'); }
   const classes = useStyles();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const onClickCategory = () => {
     if (filter !== null && filter.id === c.id) {
@@ -46,11 +46,11 @@ function ExpansionListItemComponent(props: Props) {
   }
 
   const onClickManual = (manual: Manual) => () => {
-    if (location.pathname === `/manual/${manual.id}`) {
+    if (location.pathname === `/manual/${manual.id}/tree`) {
       history.push(links.dashboard);
     } else {
       filterReset();
-      history.push(`/manual/${manual.id}`);
+      history.push(`/manual/${manual.id}/tree`);
     }
   }
 
@@ -63,7 +63,7 @@ function ExpansionListItemComponent(props: Props) {
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {manuals.filter(m => m.categoryId === c.id).map(m => (
-            <ListItem button className={classes.nested} key={m.id} onClick={onClickManual(m)} selected={location.pathname === `/manual/${m.id}`}>
+            <ListItem button className={classes.nested} key={m.id} onClick={onClickManual(m)} selected={location.pathname === `/manual/${m.id}/tree`}>
               <ListItemText primary={m.title} />
             </ListItem>
           ))}

@@ -57,6 +57,7 @@ interface State {
   memos: KTreeNode[];
   cannotSaveReason: CannotSaveReason;
   showVS: boolean;
+  saved: boolean;
 }
 
 export type CannotSaveReason = 'switch' | 'case' | null;
@@ -73,6 +74,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
       memos: TreeUtil.getAsArray(memos, baseKTreeNode),
       cannotSaveReason: null,
       showVS: false,
+      saved: false,
     };
   }
 
@@ -107,20 +109,15 @@ class EditorFrameComponent extends React.Component<Props, State> {
                                                !isAllCaseHasItem   ? 'case'   : null;
     this.setState({cannotSaveReason});
     if (cannotSaveReason === null) {
-      const params: TreePutRequest = {manualId: selectId, rootTree: node };
-      putTree(params);
+      const hasDifference = TreeUtil._hasDifference(this.props.node, this.state.node);
+      if (hasDifference) {
+        const params: TreePutRequest = {manualId: selectId, rootTree: node };
+        putTree(params);
+      }
       changeMemos(memos);
-      history.goBack();
+      this.setState({saved: true})
+      process.nextTick(() => history.push(`/manual/${selectId}/tree`));
     }
-  }
-
-  saveAndGo = () => {
-    const { selectId, putTree, changeMemos, history } = this.props;
-    const { node, memos } = this.state;
-    const params: TreePutRequest = {manualId: selectId, rootTree: node };
-    putTree(params);
-    changeMemos(memos);
-    history.goBack();
   }
 
   handleCancel = () => this.props.history.goBack();
@@ -129,7 +126,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
 
   render() {
     const { modeRef, buttonRef, classes } = this.props;
-    const { mode, node, memos, cannotSaveReason, showVS } = this.state;
+    const { mode, node, memos, cannotSaveReason, showVS, saved } = this.state;
   
     const nodeProps: NodeEditorProps = {
       mode,
@@ -141,9 +138,6 @@ class EditorFrameComponent extends React.Component<Props, State> {
       editMemo: this.editMemo,
     };
 
-    // const cannotSave: CannotSaveReason = cannotSaveReason !== null ? cannotSaveReason :
-    //   !TreeUtil._isAllSwitchHasCase(node) ? 'switch' :
-    //   !TreeUtil._isAllCaseHasItem(node)   ? 'case'   : null
     const getStyle = (buttonMode: NodeEditMode): React.CSSProperties => {
       return mode === buttonMode
       ? { height: '100%', backgroundColor: theme.palette.background.paper, borderLeftColor: 'rgba(0, 0, 0, 0.24)' }
@@ -169,7 +163,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
         </Portal>
 
         <Prompt
-          when={hasDifference}
+          when={hasDifference && !saved}
           message="編集内容を保存していません。編集を終了して良いですか？"
         />
 
@@ -183,22 +177,6 @@ class EditorFrameComponent extends React.Component<Props, State> {
         >
           <ViewSettingsContainer />
         </Modal>
-        
-        {/* <Dialog open={hasDifference} onClose={() => this.setState({hasDifference: false})}>
-          <DialogTitle>マニュアルを保存せずに画面を移動してもよろしいですか？</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              {cannotSave === 'switch' && '現在のデータは、分岐に条件が設定されていない項目があるため保存できません。'}
-              {cannotSave === 'case'   && '現在のデータは、条件に詳細項目が設定されていない項目があるため保存できません。'}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => this.setState({hasDifference: false})}>いいえ</Button>
-            {cannotSave === null &&
-            <Button onClick={this.saveAndGo} color="primary" autoFocus>保存して移動</Button>}
-            <Button onClick={() => {}} color="primary">保存せずに移動</Button>
-          </DialogActions>
-        </Dialog> */}
 
         <Dialog open={cannotSaveReason !== null} onClose={() => this.setState({cannotSaveReason: null})}>
           <DialogTitle>このデータは保存できません</DialogTitle>

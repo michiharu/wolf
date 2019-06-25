@@ -12,9 +12,8 @@ import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
   WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Close,
 } from '../../../../settings/layout';
-import { TreeNode, Type, baseTreeNode, isTask, isSwitch, isCase } from '../../../../data-types/tree';
+import { TreeNode, Type, isTask, isSwitch, isCase } from '../../../../data-types/tree';
 
-import TreeUtil from '../../../../func/tree';
 import { phrase } from '../../../../settings/phrase';
 
 const styles = (theme: Theme) => createStyles({
@@ -91,28 +90,6 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
     changeNode, classes
   } = props;
 
-  const cahngeType = (e: any) => {
-    if (node === null) { return; }
-    const newType: Type = e.target.value === '1' ? Type.task : Type.switch;
-    if (node.type === newType) { return; }
-
-    if (node.children.length === 0) {
-      const newNode: TreeNode = {...node, type: newType};
-      changeNode(newNode);
-    }
-
-    if (isTask(newType)) {
-      const children: TreeNode[] = node.children.map(c => c.children).reduce((a, b) => a.concat(b));
-      const newNode: TreeNode = {...node, type: newType, children};
-      changeNode(newNode);
-    } else {
-      const newCase = TreeUtil.getNewNode(Type.switch, baseTreeNode);
-      const children: TreeNode[] = [{...newCase, children: node.children}];
-      const newNode: TreeNode = {...node, type: newType, children};
-      changeNode(newNode);
-    }
-  };
-
   const selectIsCommonRef = useRef(null);
   const [, setSelectIsCommonWidth] = useState(0);
   const selectTypeRef = useRef(null);
@@ -175,7 +152,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
     <div className={classes.root}>
       <Grid container spacing={2}>
         <Grid item xs={12} lg={8}>
-          <Grid container alignItems="flex-end" spacing={8}>
+          <Grid container alignItems="flex-end" spacing={1}>
             <Grid item>
               <FormControl>
                 <Select
@@ -185,13 +162,11 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
                       : classnames(classes.selectType, classes.switchIcon),
                     select: classes.select
                   }}
-                  // input={<OutlinedInput labelWidth={selectTypeWidth}/>}
                   value={node.type}
-                  onChange={cahngeType}
                   IconComponent={
                     p => isTask(focusType) ? <Task {...p}/> : isSwitch(focusType) ? <Switch {...p}/> : <Case {...p}/>
                   }
-                  disabled={isCase(node.type)}
+                  disabled
                 >
                   <MenuItem value="0">作業</MenuItem>
                   <MenuItem value="1">分岐</MenuItem>

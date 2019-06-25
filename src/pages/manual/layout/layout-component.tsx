@@ -79,9 +79,17 @@ interface Props extends RouteComponentProps {
 
 const LayoutComponent: React.FC<Props> = props => {
   const { user, manual, users, selectNode, ks, zoomIn, zoomOut } =  props;
-  const { location } = props;
+  const { location, history } = props;
+  
+  const tabIndex =
+    location.pathname.slice(-'tree/edit'.length) === 'tree/edit' ? 0 :
+    location.pathname.slice(-'tree'.length)      === 'tree'      ? 0 :
+    location.pathname.slice(-'text/edit'.length) === 'text/edit' ? 1 :
+    location.pathname.slice(-'text'.length)      === 'text'      ? 1 : 2;
+
+  const isEditing = location.pathname.slice(-4) === 'edit';
+
   const manualUser = users.find(u => u.id === manual.ownerId)!;
-  const [tabIndex, setTabIndex] = useState(0);
   const [showVS, setShowVS] = useState(false);
   const handleShowVS = () => setShowVS(!showVS);
   const handleCloseVS = () => setShowVS(false);
@@ -93,7 +101,8 @@ const LayoutComponent: React.FC<Props> = props => {
   const handleClosePrintText = () => setShowPrintText(false);
 
   const handleChangeTab = (_: any, i: number) => {
-    setTabIndex(i);
+    const tabType = i === 0 ? 'tree' : i === 1 ? 'text' : 'settings';
+    history.push(`/manual/${manual.id}/${tabType}${isEditing ? '/edit' : ''}`);
   }
 
   const isCommiter = manual.ownerId === user.id || manual.collaboratorIds.find(cid => cid === user.id) !== undefined;
@@ -119,19 +128,13 @@ const LayoutComponent: React.FC<Props> = props => {
   const classes = useStyles();
   const ShowTree = (
     <div className={classes.body}>
-      {tabIndex === 0 && 
-        <Switch>
-          <Route path={`/manual/:id/edit`} render={() => <NodeEditorContainer modeRef={modeRef} buttonRef={buttonRef}/>}/>
-          <Route path={`/manual/:id`} render={() => <NodeViewer/>}/>
-        </Switch>}
-
-      {tabIndex === 1 && 
-        <Switch>
-          <Route path={`/manual/:id/edit`} render={() => <TextEditorContainer buttonRef={buttonRef}/>}/>
-          <Route path={`/manual/:id`} render={() => <TextViewer itemNumber={manual.title} />}/>
-        </Switch>}
-
-      {tabIndex === 2 && <ManualSettings/>}
+      <Switch>
+        <Route path={`/manual/:id/tree/edit`} render={() => <NodeEditorContainer modeRef={modeRef} buttonRef={buttonRef}/>}/>
+        <Route path={`/manual/:id/tree`}      render={() => <NodeViewer/>}/>
+        <Route path={`/manual/:id/text/edit`} render={() => <TextEditorContainer buttonRef={buttonRef}/>}/>
+        <Route path={`/manual/:id/text`}      render={() => <TextViewer itemNumber={manual.title} />}/>
+        <Route path={`/manual/:id/settings`}  render={() => <ManualSettings/>}/>
+      </Switch>
     </div>
   );
 
@@ -141,7 +144,7 @@ const LayoutComponent: React.FC<Props> = props => {
     </div>
   );
 
-  const isEditing = location.pathname.slice(-4) === 'edit';
+  const to = `/manual/${manual.id}/${tabIndex === 0 ? 'tree' : 'text'}/edit`;
 
   return (
     <div className={classes.root}>
@@ -181,7 +184,7 @@ const LayoutComponent: React.FC<Props> = props => {
         <div ref={modeRef}/>
         {(tabIndex === 0 || tabIndex === 1) && isCommiter && !isEditing &&
         <Box mt={0.7}>
-          <Button component={AdapterLink} to={`/manual/${manual.id}/edit`} color="primary">編集する</Button>
+          <Button component={AdapterLink} to={to} color="primary">編集する</Button>
         </Box>}
         {tabIndex === 0 && !isEditing &&
         <Box ml={1}>
