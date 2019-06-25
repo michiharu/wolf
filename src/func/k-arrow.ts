@@ -19,6 +19,8 @@ export default class KArrowUtil {
     return {...node, children, arrows: []};
   }
 
+  // InArrow は親要素から子要素への矢印
+  // NotSwitchのとき矢印は「↓」
   static _setInArrowOfNotSwitch = <T extends KWithArrow>(node: T, ks: KSize): T => {
     const children = node.children.map(c => KArrowUtil._setInArrowOfNotSwitch(c, ks));
     if (!isSwitch(node.type) && (node.open && children.length !== 0)) {
@@ -33,6 +35,8 @@ export default class KArrowUtil {
     return {...node, children};
   }
 
+  // InArrow は親要素から子要素への矢印
+  // Switchのとき矢印は、各Caseに対して「↓→」
   static _setInArrowOfSwitch = <T extends KWithArrow>(node: T, ks: KSize): T => {
     const children = node.children.map(c => KArrowUtil._setInArrowOfSwitch(c, ks));
     if (node.open && isSwitch(node.type) && children.length !== 0) {
@@ -53,6 +57,7 @@ export default class KArrowUtil {
     return {...node, children};
   }
 
+  // 並列関係の下に向かう矢印「↓」
   static _setNextArrow = <T extends KWithArrow>(node: T, ks: KSize): T => {
     const children = node.children.map((c, i) => {
       if (c.open && c.children.length !== 0) {
@@ -74,7 +79,11 @@ export default class KArrowUtil {
     });
     return {...node, children};
   }
-
+  // 子要素から先祖要素に戻る矢印には３種類ある
+  // 子要素がCaseでなければ
+  //   ネストが深くない場合は「↓」
+  //   ネストが深い場合は「↓←↓」
+  // 子要素がCaseなら
   static _setReturnArrow = <T extends KWithArrow>(node: T, before: T | null, exit: T | null, ks: KSize): T => {
     if (node.open && node.children.length !== 0) {
       const children = node.children.map((c, i, _children) => {
