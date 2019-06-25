@@ -11,5 +11,6 @@ const initialState: MemosState = {
 };
 
 export const memoReducer = reducerWithInitialState(initialState)
+.case(memosActions.set, (state, memos) => ({...state, memos}))
 .case(memosActions.change, (state, memos) => ({...state, memos}))
 .case(memosActions.changeSuccess, (state, memos) => ({...state, memos}))
