@@ -54,6 +54,12 @@ export const styles = (theme: Theme) => createStyles({
   viewSettingModal: {
     backgroundColor: '#0002',
   },
+  img: {
+    width: '100%',
+    height: 400,
+    objectFit: 'contain',
+    verticalAlign: 'bottom',
+  },
 });
 
 export interface NodeEditorProps {
@@ -563,6 +569,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
 
     var CreateBox:        JSX.Element | undefined = undefined;
     var ActionButtonBox:  JSX.Element | undefined = undefined;
+    var ImageBox:         JSX.Element | undefined = undefined;
     var TypeButton:       JSX.Element | undefined = undefined;
     var ExpandButton:     JSX.Element | undefined = undefined;
     var Label:            JSX.Element | undefined = undefined;
@@ -654,6 +661,21 @@ class NodeEditorComponent extends React.Component<Props, State> {
               </Button>}
             </MuiThemeProvider>
           </Paper>
+        );
+      }
+
+      if (!labelFocus && typeAnchorEl === null) {
+        const boxStyle: React.CSSProperties = {
+          position: 'absolute',
+          left: (focusNode!.point.x + ks.rect.w) * ks.unit + (mode === 'dc' ? stage.width() / 2 : 0),
+          top: (focusNode!.point.y) * ks.unit,
+          width: '400px',
+          height: '400px',
+        };
+        ImageBox = (
+          <div style={boxStyle}>
+            <img src={focusNode.imageBlob} className={classes.img} alt={focusNode.imageName} />
+          </div>
         );
       }
 
@@ -825,6 +847,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
           </Stage>
           {CreateBox}
           {ActionButtonBox}
+          {ImageBox}
           {Label}
           {TypeButton}
           {ExpandButton}

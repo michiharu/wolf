@@ -49,25 +49,17 @@ const styles = (theme: Theme) => createStyles({
   },
   imageContainer: {
     position: 'relative',
-    // width: '100%',
-    // height: '100%',
   },
   img: {
-    [theme.breakpoints.up('lg')]: {
-      width: '100%',
-      height: 340,
-      objectFit: 'cover',
-    },
-    [theme.breakpoints.down('md')]: {
-      maxWidth: '100%',
-      height: 340,
-      objectFit: 'cover',
-    },
+    width: '100%',
+    height: 400,
+    objectFit: 'contain',
+    verticalAlign: 'bottom',
   },
   deleteButton: {
     position: 'absolute',
-    top: -theme.spacing(1),
-    right: -theme.spacing(1),
+    top: -theme.spacing(2),
+    right: -theme.spacing(2),
   }
 });
 
@@ -118,6 +110,10 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
     const filePath = String(e.target.value).split('\\');
     fileName = filePath[filePath.length - 1];
     e.target.value = '';
+  }
+
+  const handleDeleteImage = (node: TreeNode) => () => {
+    changeNode({ ...node!, imageName: '', imageBlob: '' })
   }
 
   const InputIcon = <InputAdornment position="start"><Input /></InputAdornment>;
@@ -292,22 +288,24 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
         {RemarksField}
         {NecessaryToolsField}
         {ExceptionsField}
+        {isEditing && node.imageBlob.length === 0 &&
         <Box mt={1} pl={10} pr={2}>
           <Button component="label" variant="outlined" className={classes.imageButton} fullWidth>
             <Image className={classes.imageIcon} />
             {node.imageName.length !== 0 ? node.imageName : 'ファイルを選択'}
             <form><input type="file" style={{ display: 'none' }} onChange={handleFileChosen} /></form>
           </Button>
-        </Box>
+        </Box>}
       </Collapse>
 
       {node.imageBlob.length !== 0 &&
-        <Box justifyContent="center" px={2}>
+        <Box mt={1} pl={10} pr={2} justifyContent="center">
           <Paper className={classes.imageContainer}>
             <img src={node.imageBlob} className={classes.img} alt={node.imageName} />
-            <IconButton className={classes.deleteButton} onClick={() => changeNode({ ...node!, imageName: '', imageBlob: '' })}>
+            {isEditing &&
+            <IconButton className={classes.deleteButton} onClick={handleDeleteImage(node)}>
               <Close />
-            </IconButton>
+            </IconButton>}
           </Paper>
         </Box>}
 
