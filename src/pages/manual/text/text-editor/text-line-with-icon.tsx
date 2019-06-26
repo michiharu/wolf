@@ -4,13 +4,12 @@ import ReactDOM from 'react-dom';
 import classnames from 'classnames';
 
 import {
-  Theme, createStyles, WithStyles, withStyles, TextField, Grid,
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions,
-  InputAdornment, FormControl, Select, MenuItem, Button, IconButton, Typography, Paper, Box
+  Theme, createStyles, WithStyles, withStyles, TextField, Button,
+  InputAdornment, FormControl, Select, MenuItem, IconButton, Typography, Paper, Box, Collapse
 } from '@material-ui/core';
 import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
-  WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Close,
+  WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Close, Less, More,
 } from '../../../../settings/layout';
 import { TreeNode, Type, isTask, isSwitch, isCase } from '../../../../data-types/tree';
 
@@ -75,21 +74,21 @@ const styles = (theme: Theme) => createStyles({
 export interface TextLineWithIconProps {
   itemNumber: string;
   node: TreeNode;
+  isEditing: boolean;
   changeNode: (node: TreeNode) => void;
-  deleteSelf: (node: TreeNode) => void;
 }
 
-interface Props extends TextLineWithIconProps, WithStyles<typeof styles> {}
+interface Props extends TextLineWithIconProps, WithStyles<typeof styles> { }
 
 const TextLineWithIcon: React.FC<Props> = (props: Props) => {
   var fileReader: FileReader;
   var fileName: string;
 
-  const {
-    itemNumber, node, deleteSelf,
-    changeNode, classes
-  } = props;
-
+  const { itemNumber, node, changeNode, isEditing, classes } = props;
+  const [open, setOpen] = useState(false);
+  function handleOpenClose() {
+    setOpen(!open);
+  }
   const selectIsCommonRef = useRef(null);
   const [, setSelectIsCommonWidth] = useState(0);
   const selectTypeRef = useRef(null);
@@ -101,39 +100,12 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
       if (commonEl !== null) { setSelectIsCommonWidth(commonEl.offsetWidth); }
       const typeEl = ReactDOM.findDOMNode(selectTypeRef.current) as HTMLElement | null;
       if (typeEl !== null) { setSelectTypeWidth(typeEl.offsetWidth); }
-    });      
+    });
   }
-
-  const InputIcon = <InputAdornment position="start"><Input/></InputAdornment>;
-
-  const OutputIcon = <InputAdornment position="start"><Output/></InputAdornment>;
-
-  const PreConditionsIcon = <InputAdornment position="start"><PreConditions/></InputAdornment>;
-
-  const PostConditionsIcon = <InputAdornment position="start"><PostConditions/></InputAdornment>;
-
-  const WorkerInChargeIcon = <InputAdornment position="start"><WorkerInCharge/></InputAdornment>;
-
-  const RemarksIcon = <InputAdornment position="start"><Remarks/></InputAdornment>;
-
-  const NecessaryToolsIcon = <InputAdornment position="start"><NecessaryTools/></InputAdornment>;
-
-  const ExceptionsIcon = <InputAdornment position="start"><Exceptions/></InputAdornment>;
-
-  const focusType: Type = node === null ? Type.task : node.type;
-
-  const [deleteFlag, setDeleteFlag] = useState(false);
-  // const handleClickDelete = () => {
-  //   if (node!.children.length !== 0) {
-  //     setDeleteFlag(true);
-  //   } else {
-  //     deleteSelf(node);
-  //   }
-  // }
 
   const handleFileRead = () => {
     const content = fileReader.result as string;
-    changeNode({...node!, imageName: fileName, imageBlob: content});
+    changeNode({ ...node!, imageName: fileName, imageBlob: content });
     fileName = '';
   }
 
@@ -148,172 +120,199 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
     e.target.value = '';
   }
 
+  const InputIcon = <InputAdornment position="start"><Input /></InputAdornment>;
+
+  const OutputIcon = <InputAdornment position="start"><Output /></InputAdornment>;
+
+  const PreConditionsIcon = <InputAdornment position="start"><PreConditions /></InputAdornment>;
+
+  const PostConditionsIcon = <InputAdornment position="start"><PostConditions /></InputAdornment>;
+
+  const WorkerInChargeIcon = <InputAdornment position="start"><WorkerInCharge /></InputAdornment>;
+
+  const RemarksIcon = <InputAdornment position="start"><Remarks /></InputAdornment>;
+
+  const NecessaryToolsIcon = <InputAdornment position="start"><NecessaryTools /></InputAdornment>;
+
+  const ExceptionsIcon = <InputAdornment position="start"><Exceptions /></InputAdornment>;
+
+  const focusType: Type = node === null ? Type.task : node.type;
+
+  const InputField = (
+    <Box mt={1} pl={10} pr={2}>
+      <TextField
+        placeholder="インプット"
+        value={node.input}
+        InputProps={{ startAdornment: InputIcon }}
+        fullWidth
+        multiline
+        disabled={!isEditing}
+      />
+    </Box>);
+
+  const OutputField = (
+    <Box mt={1} pl={10} pr={2}>
+      <TextField
+        placeholder="アウトプット"
+        value={node.output}
+        InputProps={{ startAdornment: OutputIcon }}
+        fullWidth
+        disabled={!isEditing}
+      />
+    </Box>);
+
+  const PreConditionsField = (
+    <Box mt={1} pl={10} pr={2}>
+      <TextField
+        placeholder="事前条件"
+        value={node.preConditions}
+        InputProps={{ startAdornment: PreConditionsIcon }}
+        fullWidth
+        multiline
+        disabled={!isEditing}
+      />
+    </Box>);
+
+  const PostConditionsField = (
+    <Box mt={1} pl={10} pr={2}>
+      <TextField
+        placeholder="事後条件"
+        value={node.postConditions}
+        InputProps={{ startAdornment: PostConditionsIcon }}
+        fullWidth
+        disabled={!isEditing}
+      />
+    </Box>);
+
+  const WorkerInChargeField = (
+    <Box mt={1} pl={10} pr={2}>
+      <TextField
+        placeholder="担当者"
+        value={node.workerInCharge}
+        InputProps={{ startAdornment: WorkerInChargeIcon }}
+        fullWidth
+        multiline
+        disabled={!isEditing}
+      />
+    </Box>);
+
+  const RemarksField = (
+    <Box mt={1} pl={10} pr={2}>
+      <TextField
+        placeholder="備考"
+        value={node.remarks}
+        InputProps={{ startAdornment: RemarksIcon }}
+        fullWidth
+        disabled={!isEditing}
+      />
+    </Box>);
+
+  const NecessaryToolsField = (
+    <Box mt={1} pl={10} pr={2}>
+      <TextField
+        placeholder="必要システム・ツール"
+        value={node.necessaryTools}
+        InputProps={{ startAdornment: NecessaryToolsIcon }}
+        fullWidth
+        multiline
+        disabled={!isEditing}
+      />
+    </Box>);
+
+  const ExceptionsField = (
+    <Box mt={1} pl={10} pr={2}>
+      <TextField
+        placeholder="例外"
+        value={node.exceptions}
+        InputProps={{ startAdornment: ExceptionsIcon }}
+        fullWidth
+        disabled={!isEditing}
+      />
+    </Box>);
+
   return (
-    <div className={classes.root}>
-      <Grid container spacing={2}>
-        <Grid item xs={12} lg={8}>
-          <Grid container alignItems="flex-end" spacing={1}>
-            <Grid item>
-              <FormControl>
-                <Select
-                  classes={{
-                    icon: !isSwitch(focusType)
-                      ? classes.selectType
-                      : classnames(classes.selectType, classes.switchIcon),
-                    select: classes.select
-                  }}
-                  value={node.type}
-                  IconComponent={
-                    p => isTask(focusType) ? <Task {...p}/> : isSwitch(focusType) ? <Switch {...p}/> : <Case {...p}/>
-                  }
-                  disabled
-                >
-                  <MenuItem value="0">作業</MenuItem>
-                  <MenuItem value="1">分岐</MenuItem>
-                  {isCase(node.type) && <MenuItem value="case">条件</MenuItem>}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs>
-              {node.label !== itemNumber && <Typography variant="h5">{itemNumber}</Typography>}
-            </Grid>
-          </Grid>
+    <Box pl={2} py={2}>
+      <Box display="flex" flexDirection="row" alignItems="flex-end" pr={2}>
+        <Box pr={1}>
+          <FormControl>
+            <Select
+              classes={{
+                icon: !isSwitch(focusType) ? classes.selectType : classnames(classes.selectType, classes.switchIcon),
+                select: classes.select
+              }}
+              value={node.type}
+              IconComponent={
+                p => isTask(focusType) ? <Task {...p} /> : isSwitch(focusType) ? <Switch {...p} /> : <Case {...p} />}
+              disabled
+            >
+              <MenuItem value="0">作業</MenuItem>
+              <MenuItem value="1">分岐</MenuItem>
+              {isCase(node.type) && <MenuItem value="2">条件</MenuItem>}
+            </Select>
+          </FormControl>
+        </Box>
+        <Box>
+          {node.label !== itemNumber && <Typography variant="h5">{itemNumber}</Typography>}
+        </Box>
+      </Box>
+      <Box display="flex" flexDirection="row" alignItems="center" pr={2}>
+        <Box pr={4}>
+          <IconButton onClick={handleOpenClose}>{open ? <Less /> : <More />}</IconButton>
+        </Box>
+        <Box flexGrow={1}>
           <TextField
-            style={{paddingLeft: 80}}
             placeholder={
               isTask(node.type) ? phrase.placeholder.task :
-              isSwitch(node.type) ? phrase.placeholder.switch : phrase.placeholder.case
+                isSwitch(node.type) ? phrase.placeholder.switch : phrase.placeholder.case
             }
             value={node.label}
-            InputProps={{classes: {input: classes.title}}}
-            onChange={(e: any) => changeNode({...node!, label: e.target.value})}
+            InputProps={{ classes: { input: classes.title } }}
             fullWidth
+            disabled={!isEditing}
           />
-          <TextField
-            style={{paddingLeft: 80}}
-            placeholder="インプット"
-            value={node.input}
-            onChange={(e: any) => changeNode({...node!, input: e.target.value})}
-            InputProps={{startAdornment: InputIcon}}
-            fullWidth
-            multiline
-          />
-          
-          <TextField
-            style={{paddingLeft: 80}}
-            placeholder="アウトプット"
-            value={node.output}
-            onChange={(e: any) => changeNode({...node!, output: e.target.value})}
-            InputProps={{startAdornment: OutputIcon}}
-            fullWidth
-          />
+        </Box>
+      </Box>
+      <Collapse in={!open}>
+        {node.input.length !== 0 && InputField}
+        {node.output.length !== 0 && OutputField}
+        {node.preConditions.length !== 0 && PreConditionsField}
+        {node.postConditions.length !== 0 && PostConditionsField}
+        {node.workerInCharge.length !== 0 && WorkerInChargeField}
+        {node.remarks.length !== 0 && RemarksField}
+        {node.necessaryTools.length !== 0 && NecessaryToolsField}
+        {node.exceptions.length !== 0 && ExceptionsField}
+      </Collapse>
 
-            <TextField
-              style={{paddingLeft: 80}}
-              placeholder="事前条件"
-              value={node.preConditions}
-              onChange={(e: any) => changeNode({...node!, preConditions: e.target.value})}
-              InputProps={{startAdornment: PreConditionsIcon}}
-              fullWidth
-              multiline
-            />
-            <TextField
-              style={{paddingLeft: 80}}
-              placeholder="事後条件"
-              value={node.postConditions}
-              onChange={(e: any) => changeNode({...node!, postConditions: e.target.value})}
-              InputProps={{startAdornment: PostConditionsIcon}}
-              fullWidth
-            />
-            <TextField
-              style={{paddingLeft: 80}}
-              placeholder="担当者"
-              value={node.workerInCharge}
-              onChange={(e: any) => changeNode({...node!, workerInCharge: e.target.value})}
-              InputProps={{startAdornment: WorkerInChargeIcon}}
-              fullWidth
-              multiline
-            />
-            <TextField
-              style={{paddingLeft: 80}}
-              placeholder="備考"
-              value={node.remarks}
-              onChange={(e: any) => changeNode({...node!, remarks: e.target.value})}
-              InputProps={{startAdornment: RemarksIcon}}
-              fullWidth
-            />
-            <TextField
-              style={{paddingLeft: 80}}
-              placeholder="必要システム・ツール"
-              value={node.necessaryTools}
-              onChange={(e: any) => changeNode({...node!, necessaryTools: e.target.value})}
-              InputProps={{startAdornment: NecessaryToolsIcon
-              }}
-              fullWidth
-              multiline
-            />
-            <TextField
-              style={{paddingLeft: 80}}
-              placeholder="例外"
-              value={node.exceptions}
-              onChange={(e: any) => changeNode({...node!, exceptions: e.target.value})}
-              InputProps={{startAdornment: ExceptionsIcon}}
-              fullWidth
-            />
-            <Box ml={10}>
-              <Button component="label" variant="outlined" className={classes.imageButton} fullWidth>
-                <Image className={classes.imageIcon}/>
-                {node.imageName.length !== 0 ? node.imageName : 'ファイルを選択'}
-                <form><input type="file" style={{ display: 'none' }} onChange={handleFileChosen}/></form>
-              </Button>
-            </Box>
-        </Grid>
-        <Grid item xs={12} lg={4}>
-          {node.imageBlob.length !== 0 &&
-          <Grid container justify="center">
-            <Grid item>
-              <Paper className={classes.imageContainer}>
-                <img src={node.imageBlob} className={classes.img} alt={node.imageName}/>
-                <IconButton className={classes.deleteButton} onClick={() => changeNode({...node!, imageName: '', imageBlob: ''})}>
-                  <Close/>
-                </IconButton>
-              </Paper>
-            </Grid>
-          </Grid>}
-        </Grid>
-      </Grid>
-        
-      {node.children.map((c, i) => <TextLineWithIcon key={c.id} {...props} itemNumber={`${itemNumber} - ${i + 1}`} node={c}/>)}
-          
-      <Dialog open={deleteFlag} onClose={() => setDeleteFlag(false)}>
-        <DialogTitle>この項目を削除してもよろしいですか？</DialogTitle>
-        <DialogContent>
-          <DialogContentText>この項目には詳細項目が含まれています。削除してもよろしいですか？
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteFlag(false)}>Cancel</Button>
-          <Button onClick={() => { deleteSelf(node); setDeleteFlag(false)}} color="primary" autoFocus>Delete</Button>
-        </DialogActions>
-      </Dialog>
-{/* 
-      {node !== null &&
-      <Dialog
-        fullWidth
-        maxWidth="lg"
-        open={filteredSimilarityList !== null}
-        onClose={() => setFilteredSimilarityList(null)}
-      >
-        <DialogTitle>{`「${node!.label}」を共通マニュアルに登録してもよろしいですか？`}</DialogTitle>
-        <DialogContent>
-          <SimilarityTable target={node} list={commonNodes}/>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setFilteredSimilarityList(null)}>キャンセル</Button>
-          <Button onClick={() => {setFilteredSimilarityList(null); registAsCommon(node!);}} color="primary" autoFocus>登録</Button>
-        </DialogActions>
-      </Dialog>} */}
-    </div>
+      <Collapse in={open}>
+        {InputField}
+        {OutputField}
+        {PreConditionsField}
+        {PostConditionsField}
+        {WorkerInChargeField}
+        {RemarksField}
+        {NecessaryToolsField}
+        {ExceptionsField}
+        <Box mt={1} pl={10} pr={2}>
+          <Button component="label" variant="outlined" className={classes.imageButton} fullWidth>
+            <Image className={classes.imageIcon} />
+            {node.imageName.length !== 0 ? node.imageName : 'ファイルを選択'}
+            <form><input type="file" style={{ display: 'none' }} onChange={handleFileChosen} /></form>
+          </Button>
+        </Box>
+      </Collapse>
+
+      {node.imageBlob.length !== 0 &&
+        <Box justifyContent="center" px={2}>
+          <Paper className={classes.imageContainer}>
+            <img src={node.imageBlob} className={classes.img} alt={node.imageName} />
+            <IconButton className={classes.deleteButton} onClick={() => changeNode({ ...node!, imageName: '', imageBlob: '' })}>
+              <Close />
+            </IconButton>
+          </Paper>
+        </Box>}
+
+      {node.children.map((c, i) => <TextLineWithIcon key={c.id} {...props} itemNumber={`${itemNumber} - ${i + 1}`} node={c} />)}
+    </Box>
   );
 };
 

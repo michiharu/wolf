@@ -98,6 +98,9 @@ export default class TreeUtil {
     ...base, 
     id: 'rand:' + String(Math.random()).slice(2),
     type: !isSwitch(parentType) ? Type.task : Type.case,
+    open: isSwitch(parentType),
+    children: !isSwitch(parentType) ? [] :
+      [{...base, id: 'rand:' + String(Math.random()).slice(2)}]
   });
 
   static match = (node: Tree, words: string[]): boolean => {

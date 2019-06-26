@@ -42,6 +42,7 @@ const styles = (theme: Theme) => createStyles({
 export interface TextEditorProps {
   selectId: string;
   node: TreeNode;
+  isEditing: boolean;
   putTree: (params: TreePutRequest) => Action<TreePutRequest>;
   buttonRef: React.RefObject<HTMLDivElement>;
 }
@@ -85,27 +86,31 @@ class TextEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const { buttonRef, classes } = this.props;
+    const { buttonRef, isEditing, classes } = this.props;
     const { node, saved } = this.state;
 
     const textLineWithIconProps: TextLineWithIconProps = {
       itemNumber: node.label,
       node,
+      isEditing,
       changeNode: this.changeNode,
-      deleteSelf: this.deleteSelf,
     };
     const hasDifference = TreeUtil._hasDifference(this.props.node, this.state.node);
     return (
       <div className={classes.root}>
-        <Portal container={buttonRef.current}>
-          <Box mt={0.7}>
-            <Button color="primary" onClick={this.save}>編集完了</Button>
-          </Box>
-        </Portal>
-        <Prompt
-          when={hasDifference && !saved}
-          message="編集内容を保存していません。編集を終了して良いですか？"
-        />
+        {isEditing &&
+        <>
+          <Portal container={buttonRef.current}>
+            <Box mt={0.7}>
+              <Button color="primary" onClick={this.save}>編集完了</Button>
+            </Box>
+          </Portal>
+          <Prompt
+            when={hasDifference && !saved}
+            message="編集内容を保存していません。編集を終了して良いですか？"
+          />
+        </>}
+        
         <TextLineWithIcon {...textLineWithIconProps}/>
       </div>
     );

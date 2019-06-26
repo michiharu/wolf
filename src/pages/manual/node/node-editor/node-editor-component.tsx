@@ -306,10 +306,6 @@ class NodeEditorComponent extends React.Component<Props, State> {
             edit(TreeUtil.moveBrother(node, target, row.node));
             process.nextTick(() => this.resize());
           }
-          if (row.action === 'moveInOut' && dragParent!.id === row.node.id) {
-            edit(TreeUtil.moveInOut(node, target, row.node));
-            process.nextTick(() => this.resize());
-          }
           return;
         }
 
@@ -460,12 +456,22 @@ class NodeEditorComponent extends React.Component<Props, State> {
     }
 
     if (isTask(type)) {
+      console.log('task')
       const children = node.children.map(c => c.children).reduce((a, b) => a.concat(b));
       const newNode = { ...node, type, children, open: true };
       this.changeFocusNode(newNode);
     } else {
+      console.log('not task')
       const newCase = TreeUtil.getNewNode(Type.switch, baseKWithArrow);
-      const children = [{ ...newCase, children: node.children }];
+      const children = [
+        {
+          ...newCase,
+          open: true,
+          children: node.children.length === 0
+            ? [{...baseKWithArrow, id: 'rand:' + String(Math.random()).slice(2)}]
+            : node.children
+        }
+      ];
       const newNode = { ...node, type, children, open: true };
       this.changeFocusNode(newNode);
     }
@@ -485,23 +491,6 @@ class NodeEditorComponent extends React.Component<Props, State> {
     const addNextBrotherResult = TreeNodeUtil.addNextBrother(node, focusNode);
     edit(addNextBrotherResult.node);
     process.nextTick(() => {this.resize(); this.scrollToNew(addNextBrotherResult)});
-  }
-
-  // addFromCommon = (e: any) => {
-  //   const { node, edit, commons } = this.props;
-  //   const common = commons.find(c => c.id === e.target.value);
-  //   if (common === undefined) { return; }
-    
-  //   const setIdCommon = TreeUtil._setId(common);
-  //   const focusNode = TreeNodeUtil._getFocusNode(node)!;
-  //   edit(TreeNodeUtil.addFromCommon(node, focusNode, setIdCommon, baseTreeNode));
-  //   process.nextTick(() => this.resize());
-  // }
-
-  registAsCommon = (target: TreeNode) => {
-    // const { addNode} = this.props;
-    // const newNode = TreeUtil._setId(target);
-    // addNode(newNode);
   }
 
   deleteSelf = () => {

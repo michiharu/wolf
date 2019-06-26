@@ -6,7 +6,6 @@ import ViewSettingsIcon from '@material-ui/icons/Settings';
 
 import { Manual, TreeNode } from '../../../data-types/tree';
 import NodeViewer from '../node/node-viewer/node-viewer-container';
-import TextViewer from '../text/text-viewer/text-viewer-container';
 import ManualSettings from '../settings/settings';
 import ViewSettingsContainer from '../../../components/view-settings/view-settings-container';
 import User from '../../../data-types/user';
@@ -131,8 +130,7 @@ const LayoutComponent: React.FC<Props> = props => {
       <Switch>
         <Route path={`/manual/:id/tree/edit`} render={() => <NodeEditorContainer modeRef={modeRef} buttonRef={buttonRef}/>}/>
         <Route path={`/manual/:id/tree`}      render={() => <NodeViewer/>}/>
-        <Route path={`/manual/:id/text/edit`} render={() => <TextEditorContainer buttonRef={buttonRef}/>}/>
-        <Route path={`/manual/:id/text`}      render={() => <TextViewer itemNumber={manual.title} />}/>
+        <Route path={`/manual/:id/text`} render={() => <TextEditorContainer buttonRef={buttonRef} isEditing={isEditing}/>}/>
         <Route path={`/manual/:id/settings`}  render={() => <ManualSettings/>}/>
       </Switch>
     </div>
