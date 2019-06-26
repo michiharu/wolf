@@ -121,6 +121,7 @@ export default class KArrowUtil {
     if (node.children.length === 0) { return false; }
     const hasUnder = node.children.map(c => target.point.y < c.point.y).reduce((a, b) => a || b);
     if (hasUnder) { return true; }
+    if (node.children[node.children.length - 1].id === target.id && !target.open) { return false; }
     return node.children.map(c => KArrowUtil._hasUnderNode(c, target)).reduce((a, b) => a || b);;
   } 
 
