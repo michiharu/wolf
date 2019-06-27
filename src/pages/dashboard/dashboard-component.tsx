@@ -23,7 +23,7 @@ const otherWidthSum = 800;
 const useStyles = makeStyles((theme: Theme) => ({
   description: {
     width: `calc(100vw - ${otherWidthSum + drawerWidth}px)`,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       width: `calc(100vw - ${otherWidthSum}px)`,
     },
   },
@@ -74,7 +74,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
   }, [props]);
 
   const classes = useStyles();
-  if ( classes !== null ){}
+
 
   const handleClickTitle = (id: string) => () => {
     history.push(`/manual/${id}/tree`);

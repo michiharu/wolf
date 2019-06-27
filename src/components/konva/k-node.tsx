@@ -122,14 +122,22 @@ class KNode extends React.Component<KNodeProps> {
       scale: isSwitch(node.type) ? {x: 1, y: -1} : undefined,
     };
 
+    // onTouchStart?(evt: Konva.KonvaEventObject<TouchEvent>): void;
+    // onTouchMove?(evt: Konva.KonvaEventObject<TouchEvent>): void;
+    // onTouchEnd?(evt: Konva.KonvaEventObject<TouchEvent>): void;
+
     const rectGroupProps = {
       x: 0, y:0,
       ref: this.draggableRef,
       onClick: this.handleFocus,
+      onTap: this.handleFocus,
       draggable: true,
       onDragStart: this.handleDragStart,
+      onTouchStart: this.handleDragStart,
       onDragMove: this.handleDragMove,
+      onTouchMove: this.handleDragMove,
       onDragEnd: this.handleDragEnd,
+      onTouchEnd: this.handleDragEnd,
     };
 
     const baseEl = this.baseRef.current;
@@ -155,6 +163,7 @@ class KNode extends React.Component<KNodeProps> {
       width: (node.self.w - (ks.indent / 2 - ks.spr.w)) * ks.unit,
       height: (node.self.h - ks.spr.h) * ks.unit,
       onClick: this.handleDeleteFocus,
+      onTap: this.handleDeleteFocus,
       cornerRadius: ks.cornerRadius * ks.unit,
       stroke: grey[500],
       fill: node.depth.top === 0 ? theme.palette.background.paper : '#00000009',

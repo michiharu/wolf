@@ -37,6 +37,7 @@ const IconWithBadge: React.FC<IconWithBadgeProps> = (props: IconWithBadgeProps) 
     fill: theme.palette.primary.main,
     cornerRadius: bl / 2 * ks.unit,
     onClick,
+    onTap: onClick,
   };
 
   const textProps = {
@@ -45,7 +46,8 @@ const IconWithBadge: React.FC<IconWithBadgeProps> = (props: IconWithBadgeProps) 
     text: String(badgeContent),
     fontSize: ks.badgeFontSize * ks.unit,
     fill: '#fff',
-    onClick
+    onClick,
+    onTap: onClick,
   };
 
   return (

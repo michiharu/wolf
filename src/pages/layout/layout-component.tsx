@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     display: 'flex',
   },
   drawer: {
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('lg')]: {
       width: drawerWidth,
       flexShrink: 0,
     },
@@ -35,14 +35,14 @@ const useStyles = makeStyles((theme: Theme) => ({
     borderBottom: `1px solid rgb(0,0,0,0.12)`,
   },
   logoContainer: {
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('lg')]: {
       width: drawerWidth - theme.spacing(3),
       flexShrink: 0,
     },
   },
   menuButton: {
     marginRight: theme.spacing(2),
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('lg')]: {
       display: 'none',
     },
   },
@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     marginRight: theme.spacing(1),
     marginLeft: theme.spacing(3),
     width: 'auto',
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('lg')]: {
       width: 'auto',
       marginLeft: theme.spacing(24),
     },
@@ -78,7 +78,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     paddingLeft: theme.spacing(10),
     transition: theme.transitions.create('width'),
     width: '100%',
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('lg')]: {
       width: 240,
     },
   },
@@ -212,7 +212,7 @@ function AppFrameComponent({user, logout, location}: Props) {
         </Toolbar>
       </AppBar>
       <nav className={classes.drawer}>
-        <Hidden mdUp implementation="css">
+        <Hidden lgUp implementation="css">
           <Drawer
             variant="temporary"
             open={mobileOpen}
@@ -223,7 +223,7 @@ function AppFrameComponent({user, logout, location}: Props) {
             <DrawerContentContainer/>
           </Drawer>
         </Hidden>
-        <Hidden smDown implementation="css">
+        <Hidden mdDown implementation="css">
           <Drawer classes={{ paper: classes.drawerPaper }} variant="permanent" open>
             <DrawerContentContainer/>
           </Drawer>

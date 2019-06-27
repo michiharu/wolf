@@ -664,7 +664,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
         );
       }
 
-      if (!labelFocus && typeAnchorEl === null) {
+      if (!labelFocus && typeAnchorEl === null && focusNode.imageBlob.length !== 0) {
         const boxStyle: React.CSSProperties = {
           position: 'absolute',
           left: (focusNode!.point.x + ks.rect.w) * ks.unit + (mode === 'dc' ? stage.width() / 2 : 0),
