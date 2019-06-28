@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Action } from 'typescript-fsa';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { AppState } from '../../../redux/store';
-import { ManualsState } from       '../../../redux/states/main/manualsState';
+import { ManualState } from       '../../../redux/states/main/manualsState';
 
 import { RouteComponentProps } from 'react-router-dom';
 import {  Manual } from '../../../data-types/tree';
@@ -11,7 +11,7 @@ import {  Manual } from '../../../data-types/tree';
 import LayoutComponent from './layout-component';
 import { CategoriesState } from '../../../redux/states/main/categoriesState';
 import User from '../../../data-types/user';
-import { manualsAction, favoriteActions, likeActions } from '../../../redux/actions/main/manualsAction';
+import { manualAction, favoriteActions, likeActions } from '../../../redux/actions/main/manualsAction';
 
 import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequestParams, LikeDeleteRequestParams } from '../../../api/definitions';
 import { ksActions } from '../../../redux/actions/ksAction';
@@ -32,7 +32,7 @@ export interface ViewActions {
 }
 
 interface Props extends
-  ManualsState,
+  ManualState,
   UsersState,
   CategoriesState,
   KSState,
@@ -44,11 +44,9 @@ interface Props extends
 const ViewContainer: React.FC<Props> = props => {
   const {
     user,
-    manuals,
-    requestGet,
+    manual,
     users,
-    selectId,
-    selectNode,
+    node,
     ks,
     match,
     get,
@@ -62,24 +60,23 @@ const ViewContainer: React.FC<Props> = props => {
     zoomOut,
   } =  props;
 
-  if (!requestGet && (selectId !== match.params.id || selectNode === null)) {
-    get(match.params.id)
-  }
+  useEffect(() => { get(match.params.id); }, []);
   
   const id = match.params.id;
-  const manual = manuals.find(m => m.id === id)!;
+
+  if (manual === null) { return <></>; }
+
   const componentProps = {
     user,
     manual,
     users,
-    selectNode,
+    selectNode: node,
     ks,
     replace,
     postFavorite,
     deleteFavorite,
     postLike,
     deleteLike,
-
     zoomIn,
     zoomOut,
   };
@@ -98,8 +95,8 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    get: (id: string) => dispatch(manualsAction.get(id)),
-    replace: (manual: Manual) => dispatch(manualsAction.put(manual)),
+    get: (id: string) => dispatch(manualAction.get(id)),
+    replace: (manual: Manual) => dispatch(manualAction.put(manual)),
     postFavorite: (params: FavoritePostRequestParams) => dispatch(favoriteActions.post(params)),
     deleteFavorite: (params: FavoriteDeleteRequestParams) => dispatch(favoriteActions.delete(params)),
     postLike: (params: LikePostRequestParams) => dispatch(likeActions.post(params)),

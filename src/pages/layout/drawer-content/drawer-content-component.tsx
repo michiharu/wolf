@@ -3,12 +3,10 @@ import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { CategoriesState } from '../../../redux/states/main/categoriesState';
-import { ManualsState } from '../../../redux/states/main/manualsState';
+import { ManualState } from '../../../redux/states/main/manualsState';
 import ExpansionListItemContainer from './expansion-list-item-container';
 import { Fab, Box, Dialog } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
-import { RouteComponentProps, withRouter } from 'react-router-dom';
-import links from '../../../settings/links';
 import CreateManualContainer from '../create-manual/create-manual-container';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -20,24 +18,19 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 interface Props extends
   CategoriesState,
-  ManualsState,
-  RouteComponentProps {}
+  ManualState {}
 
 function DrawerContentComponent(props: Props) {
-  const { categories, manuals, location, history } = props;
+  const { categories, manuals } = props;
   if (manuals === null) { throw new Error('Manual cannot be null.'); }
 
   const [open, setOpen] = useState(false);
   function handleOpen() {
     setOpen(true);
-    if (location.pathname !== links.dashboard) {
-      history.push(links.dashboard);
-    }
   }
   function handleClose() {
     setOpen(false);
   }
-
 
   const classes = useStyles();
   return (
@@ -65,4 +58,4 @@ function DrawerContentComponent(props: Props) {
   );
 }
 
-export default withRouter(DrawerContentComponent);
+export default DrawerContentComponent;

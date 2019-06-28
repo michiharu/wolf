@@ -45,7 +45,57 @@ export type PasswordPutRequestParams = {
   password: Password;
 }
 
-/* Manuals */
+/**
+ * queryParamsは以下の通り
+ * -filterList
+ * -searchText
+ * -sortColumn
+ * -sortDirection
+ * -page
+ * -rowsPerPage
+ * -count
+ * 
+ * 本来はGETメソッドでquery-stringsとしてパラメーターを渡したいが、
+ * filterListのネストが深いのでPOSTを採用する
+ **/
+export const manualsURL = '/api/v1/manuals';
+
+export interface ManualsQueryParams {
+  filters: {
+    favorite: Show;
+    like: Show;
+    categoryId: string | null;
+  },
+  searchText: string[];
+  sortColumn: string;
+  sortDirection: 'asc' | 'desc';
+  page: number;
+  rowsPerPage: number;
+}
+
+export enum Show { ALL, CHECK, UNCHECK }
+
+export const baseManualQueryParams: ManualsQueryParams = {
+  filters: {
+    favorite: Show.ALL,
+    like: Show.ALL,
+    categoryId: null,
+  },
+  searchText: [],
+  sortColumn: 'updateAt',
+  sortDirection: 'desc',
+  page: 0,
+  rowsPerPage: 10
+}
+
+// レスポンスにQueryParamsを含めて返す
+export interface ManualsQueryResponse {
+  queryParams: ManualsQueryParams;
+  manuals: Manual[];
+  count: number;
+}
+
+/* Manual */
 /**
  * PUTでのIdの扱いについて
  * マニュアルは編集終了ボタン押下時にサーバーへPUTされる。

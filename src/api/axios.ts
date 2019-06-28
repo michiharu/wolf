@@ -1,7 +1,7 @@
 import axiosbase from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import * as env from '../settings/env.json';
-import { loginURL, manualURL, favoriteURL, likeURL, treeURL, usersURL, passwordURL, titleCheckURL, generateTitleURL, memosURL } from './definitions';
+import { loginURL, manualURL, favoriteURL, likeURL, treeURL, usersURL, passwordURL, titleCheckURL, generateTitleURL, memosURL, manualsURL } from './definitions';
 import { postLogin, deleteLogin } from './mock-data/login';
 import * as Manual from './mock-data/manual';
 import * as Favorite from './mock-data/favorite';
@@ -12,11 +12,12 @@ import { putPassword } from './mock-data/password';
 import { postTitleCheck } from './mock-data/title-checker';
 import { postGenerateTitle } from './mock-data/generate-title';
 import { putMemos } from './mock-data/memos';
+import { postManualsQuery } from './mock-data/manuals';
 
 export const baseURL = 'http://localhost:55616';
 
 const mockAdapter = () => {
-  const mock = new MockAdapter(axiosbase, { delayResponse: 1000 });
+  const mock = new MockAdapter(axiosbase, { delayResponse: 500 });
   // login
   mock.onPost(loginURL).reply(postLogin);
   mock.onDelete(loginURL).reply(deleteLogin);
@@ -29,6 +30,8 @@ const mockAdapter = () => {
   const regexPasswordURL = new RegExp(`${passwordURL}/*`);
   mock.onPut(regexPasswordURL).reply(putPassword);
 
+  // manuals query
+  mock.onPost(manualsURL).reply(postManualsQuery);
 
   // manual
   const regexManualsURL = new RegExp(`${manualURL}/*`);

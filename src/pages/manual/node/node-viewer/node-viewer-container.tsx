@@ -13,6 +13,7 @@ export interface NodeViewerActions {
 
 function mapStateToProps(appState: AppState) {
   const { selectNode } = appState.manuals;
+  // if (selectNode === null) { throw new Error('SelectNode cannot be null.') }
   return {node: selectNode!, ...appState.ks, ...appState.rs};
 }
 

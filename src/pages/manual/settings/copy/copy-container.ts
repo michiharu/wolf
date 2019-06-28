@@ -2,7 +2,7 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { AppState } from '../../../../redux/store';
 import { Manual } from '../../../../data-types/tree';
-import { manualsAction } from '../../../../redux/actions/main/manualsAction';
+import { manualAction } from '../../../../redux/actions/main/manualsAction';
 import CopyComponent from './copy-component';
 import { Action } from 'typescript-fsa';
 
@@ -18,7 +18,7 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    copy: (manual: Manual) => dispatch(manualsAction.copy(manual)),
+    copy: (manual: Manual) => dispatch(manualAction.copy(manual)),
   };
 }
 

@@ -57,7 +57,7 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface Props extends KSState, RSState, NodeViewerActions, WithStyles<typeof styles> {
-  node: TreeNode;
+  node: TreeNode | null;
 }
 
 interface State {
@@ -82,7 +82,7 @@ class NodeViewerComponent extends React.Component<Props, State> {
     super(props);
     const state = NodeViewerComponent.getInitialState();
     this.state = state;
-    const kTree = TreeUtil._get(props.node, baseKTreeNode);
+    const kTree = props.node === null ? baseKTreeNode : TreeUtil._get(props.node, baseKTreeNode);
     this.kTree = KTreeUtil.setCalcProps(kTree, props.ks);
   }
 
@@ -103,7 +103,7 @@ class NodeViewerComponent extends React.Component<Props, State> {
 
   addScrollEventListener = () => {
     const scrollContainer = this.mainRef.current;
-    if (scrollContainer === null) { throw new Error('Cannot find elements.'); }
+    if (scrollContainer === null) { return; }
     scrollContainer.addEventListener('scroll', this.scroll);
   }
 
@@ -117,7 +117,7 @@ class NodeViewerComponent extends React.Component<Props, State> {
   resize = () => {
     const mref = this.mainRef.current;
     const stage = this.stageRef.current;
-    if (mref === null || stage === null) { throw  new Error('Cannot find elements.'); }
+    if (mref === null || stage === null) { return; }
     stage.width(mref.offsetWidth - theme.spacing(2));
     stage.height(mref.offsetHeight - theme.spacing(2));
     stage.draw();
@@ -145,20 +145,20 @@ class NodeViewerComponent extends React.Component<Props, State> {
     const f = TreeNodeUtil._getFocusNode(this.kTree)!;
     if (f !== undefined) {
       if (f.point.x * ks.unit < dx || stage.width() / 2 + dx < (f.point.x + f.rect.w) * ks.unit) {
-        update(TreeNodeUtil._deleteFocus(node));
+        update(TreeNodeUtil._deleteFocus(node!));
       }
     }
   }
 
   expand = (target: KWithArrow, open: boolean) => {
     const { node, update } = this.props;
-    update(TreeNodeUtil._open(node, target.id, open));
+    update(TreeNodeUtil._open(node!, target.id, open));
     process.nextTick(() => this.resize());
   }
 
   render() {
     const { node: tree, ks, classes } = this.props;
-    const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
+    const kTreeNode = KTreeUtil.setCalcProps(tree === null ? baseKWithArrow : TreeUtil._get(tree, baseKWithArrow), ks);
     const node = KArrowUtil.setArrow(kTreeNode, ks);
     this.kTree = node;
     const flatNodes = TreeNodeUtil.toArrayWithoutClose(node);

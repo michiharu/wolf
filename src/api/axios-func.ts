@@ -7,7 +7,7 @@ import {
   likeURL, LikePostRequestParams, LikeDeleteRequestParams,
   passwordURL, PasswordPutRequestParams,
   titleCheckURL, TitleCheckPostRequest,
-  generateTitleURL, GenerateTitleRequest, MemosPutRequest, memosURL, 
+  generateTitleURL, GenerateTitleRequest, MemosPutRequest, memosURL,
 } from "./definitions";
 
 import axios from "./axios";
@@ -33,10 +33,15 @@ export const loginUserPut = (user: LoginUserPutRequest) => axios
    * パスワード変更についてのロジックはprofileコンポーネントに直接記述したため、
    * この"passwordPut"は使用していない。
    */
-  export const passwordPut = (params: PasswordPutRequestParams) => axios
+export const passwordPut = (params: PasswordPutRequestParams) => axios
   .put<Password>(`${passwordURL}/${params.user.id}`, params.password)
   .then(res => res.data)
   .catch(error => ({ error }));
+
+// export const manualsQuery = (queryParams: ManualsQueryParams) => axios
+//   .post<ManualsQueryResponse>(manualsURL, queryParams)
+//   .then(res => res.data)
+//   .catch(error => ({ error }));
 
 export const manualGet = (manualId: string) => axios
   .get(`${manualURL}/${manualId}`)

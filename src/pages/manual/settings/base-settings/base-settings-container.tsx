@@ -2,7 +2,7 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { AppState } from '../../../../redux/store';
 import { Manual } from '../../../../data-types/tree';
-import { manualsAction } from '../../../../redux/actions/main/manualsAction';
+import { manualAction } from '../../../../redux/actions/main/manualsAction';
 import BaseSettingsComponent from './base-settings-component';
 import { Action } from 'typescript-fsa';
 import { titleCheckAction } from '../../../../redux/actions/titileCheckAction';
@@ -25,7 +25,7 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    replace: (manual: Manual) => dispatch(manualsAction.put(manual)),
+    replace: (manual: Manual) => dispatch(manualAction.put(manual)),
     titleReset: (params: {preTitle: string; willGenerate?: string}) => dispatch(titleCheckAction.set(params)) 
   };
 }

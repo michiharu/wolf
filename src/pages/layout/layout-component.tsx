@@ -17,6 +17,7 @@ import DrawerContentContainer from './drawer-content/drawer-content-container';
 import { LayoutActions } from './layout-container';
 import User from '../../data-types/user';
 import ProfileContainer from './profile/profile-container';
+import { CategoriesState } from '../../redux/states/main/categoriesState';
 
 export const drawerWidth = 300;
 
@@ -98,11 +99,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface Props extends LayoutActions, RouteComponentProps {
+interface Props extends CategoriesState, LayoutActions, RouteComponentProps {
   user: User;
 }
 
-function AppFrameComponent({user, logout, location}: Props) {
+function AppFrameComponent({user, categories, logout, location}: Props) {
 
   const classes = useStyles();
 
@@ -231,7 +232,7 @@ function AppFrameComponent({user, logout, location}: Props) {
       </nav>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <PageRouter/>
+        {categories.length !== 0 && <PageRouter/>}
       </main>
     </div>
   );

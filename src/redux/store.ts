@@ -1,6 +1,6 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 import { LoginUserState,  loginUserReducer }    from './states/main/loginUserState';
-import { ManualsState, manualsReducer }   from './states/main/manualsState';
+import { ManualState, manualReducer }   from './states/main/manualsState';
 import { MemosState, memoReducer } from './states/main/memoState';
 import { KSState, ksReducer } from './states/ksState';
 import { RSState, rsReducer } from './states/rsState';
@@ -18,7 +18,7 @@ export type AppState = {
   loginUser: LoginUserState;
   users: UsersState;
   userGroups: UserGroupsState;
-  manuals: ManualsState;
+  manuals: ManualState;
   categories: CategoriesState;
   memos: MemosState;
   notifications: NotificationsState;
@@ -36,7 +36,7 @@ const store = createStore(
     loginUser: loginUserReducer,
     users: usersReducer,
     userGroups: userGroupsReducer,
-    manuals: manualsReducer,
+    manuals: manualReducer,
     categories: categoriesReducer,
     memos: memoReducer,
     notifications: notificationsReducer,

@@ -2,7 +2,7 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
 import { AppState } from '../../../../redux/store';
 import { Manual } from '../../../../data-types/tree';
-import { manualsAction } from '../../../../redux/actions/main/manualsAction';
+import { manualAction } from '../../../../redux/actions/main/manualsAction';
 import DeleteComponent from './delete-component';
 import { Action } from 'typescript-fsa';
 
@@ -18,7 +18,7 @@ function mapStateToProps(appState: AppState) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
   return {
-    manualDelete: (manual: Manual) => dispatch(manualsAction.delete(manual)),
+    manualDelete: (manual: Manual) => dispatch(manualAction.delete(manual)),
   };
 }
 

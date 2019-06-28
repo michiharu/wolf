@@ -10,7 +10,7 @@ export interface LayoutActions {
 }
 
 function mapStateToProps(appState: AppState) {
-  return {user: appState.loginUser.user!};
+  return {user: appState.loginUser.user!, ...appState.categories};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {

@@ -34,7 +34,6 @@ function* handleRequestLogin() {
       yield put(loginUserAction.set(user));
       yield put(usersAction.change(users));
       yield put(userGroupsAction.change(userGroups));
-      yield put(ManualAction.manualsAction.set(manuals));
       yield put(categoriesAction.set(categories));
       yield put(memosActions.set(memos));
     }
@@ -99,9 +98,8 @@ function* handleRequestGetManual() {
     const action = yield take(ManualAction.ACTIONS_MANUAL_GET);
     const data = yield call(API.manualGet, action.payload);
     if (data.error === undefined) {
-      yield put(ManualAction.manualsAction.getSuccess(data));
+      yield put(ManualAction.manualAction.getSuccess(data));
     } else {
-      yield put(ManualAction.manualsAction.getError());
       const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'マニュアルの読み込みに失敗しました' };
       yield put(notificationsAction.enqueue(notification));
@@ -112,16 +110,13 @@ function* handleRequestGetManual() {
 function* handleRequestPostManual() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_MANUAL_POST);
-    const beforeId = action.payload.id;
     const data = yield call(API.manualPost, action.payload);
     if (data.error === undefined) {
-      yield put(ManualAction.manualsAction.postSuccess({ beforeId, manual: data }));
       const notification: MyNotification =
         { key: getKey(), variant: 'success', message: 'マニュアルを新規作成しました' };
       yield put(notificationsAction.enqueue(notification));
 
     } else {
-      yield put(ManualAction.manualsAction.postError(beforeId));
       const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'マニュアルの作成に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
@@ -132,15 +127,13 @@ function* handleRequestPostManual() {
 function* handleRequestPutManual() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_MANUAL_PUT);
-    const beforeId = action.payload.id;
     const data = yield call(API.manualPut, action.payload);
     if (data.error === undefined) {
-      yield put(ManualAction.manualsAction.putSuccess({ beforeId, manual: data }));
+      yield put(ManualAction.manualAction.putSuccess(data));
       const notification: MyNotification =
         { key: getKey(), variant: 'success', message: 'マニュアルを保存しました' };
       yield put(notificationsAction.enqueue(notification));
     } else {
-      yield put(ManualAction.manualsAction.putError(beforeId));
       const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'マニュアルの保存に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
@@ -152,15 +145,12 @@ function* handleRequestPutManual() {
 function* handleRequestDeleteManual() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_MANUAL_DELETE);
-    const beforeId = action.payload.id;
     const data = yield call(API.manualDelete, action.payload);
     if (data.error === undefined) {
-      yield put(ManualAction.manualsAction.deleteSuccess(beforeId));
       const notification: MyNotification =
         { key: getKey(), variant: 'success', message: 'マニュアルを削除しました' };
       yield put(notificationsAction.enqueue(notification));
     } else {
-      yield put(ManualAction.manualsAction.deleteError(beforeId));
       const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'マニュアルの削除に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
@@ -192,10 +182,9 @@ function* handleManualCopy() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_MANUAL_COPY);
     const manual: Manual = action.payload;
-    yield put(ManualAction.manualsAction.postForCopy(manual));
+    yield put(ManualAction.manualAction.postForCopy(manual));
     const manualPostRes = yield call(API.manualPost, action.payload);
     if (manualPostRes.error === undefined) {
-      yield put(ManualAction.manualsAction.postSuccess({ beforeId: manual.id, manual: manualPostRes }));
       
       if (manual.rootTree !== null) {
         const tree = TreeUtil._clearId(manual.rootTree);
@@ -203,10 +192,9 @@ function* handleManualCopy() {
           manualId: (manualPostRes as Manual).id,
           rootTree: tree
         }
-        yield put(ManualAction.treeActions.putForCopy(params));
         const treePutRes = yield call(API.treePut, params);
         if (treePutRes.error === undefined) {
-          yield put(ManualAction.treeActions.putSuccess(params.manualId));
+          yield put(ManualAction.treeActions.putSuccess(tree));
           const notification: MyNotification =
             { key: getKey(), variant: 'success', message: 'マニュアルをコピーしました' };
           yield put(notificationsAction.enqueue(notification));
@@ -219,7 +207,6 @@ function* handleManualCopy() {
       }
 
     } else {
-      yield put(ManualAction.manualsAction.postError(manual.id));
       const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'マニュアルのコピーに失敗しました' };
       yield put(notificationsAction.enqueue(notification));
@@ -233,9 +220,7 @@ function* handleRequestPostFavorite() {
     const beforeId = action.payload.manualId;
     const data = yield call(API.favoritePost, action.payload);
     if (data.error === undefined) {
-      yield put(ManualAction.favoriteActions.postSuccess(beforeId));
     } else {
-      yield put(ManualAction.favoriteActions.postError(beforeId));
       const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'お気に入り登録に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
@@ -249,9 +234,7 @@ function* handleRequestDeleteFavorite() {
     const beforeId = action.payload.manualId;
     const data = yield call(API.favoriteDelete, action.payload);
     if (data.error === undefined) {
-      yield put(ManualAction.favoriteActions.deleteSuccess(beforeId));
     } else {
-      yield put(ManualAction.favoriteActions.deleteError(beforeId));
       const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'お気に入り解除に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
@@ -265,9 +248,7 @@ function* handleRequestPostLike() {
     const beforeId = action.payload.manualId;
     const data = yield call(API.likePost, action.payload);
     if (data.error === undefined) {
-      yield put(ManualAction.likeActions.postSuccess(beforeId));
     } else {
-      yield put(ManualAction.likeActions.postError(beforeId));
       const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'いいね登録に失敗しました' };
       yield put(notificationsAction.enqueue(notification));
@@ -281,9 +262,7 @@ function* handleRequestDeleteLike() {
     const beforeId = action.payload.manualId;
     const data = yield call(API.likeDelete, action.payload);
     if (data.error === undefined) {
-      yield put(ManualAction.likeActions.deleteSuccess(beforeId));
     } else {
-      yield put(ManualAction.likeActions.deleteError(beforeId));
       const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'いいね解除に失敗しました' };
       yield put(notificationsAction.enqueue(notification));

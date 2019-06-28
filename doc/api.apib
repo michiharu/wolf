@@ -45,68 +45,40 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
                 {
                     "id": "user1234",
                     "name": "営業グループ１",
-                    "memberIds": ["user1234"],
+                    "memberIds": ["user1234"]
                 },
                 {
                     "id": "user2222",
                     "name": "経営企画グループ",
-                    "memberIds": ["user1234", "user2222"];
+                    "memberIds": ["user1234", "user2222"]
                 },
             ],
 
             "categories": [
                 {
                     "id": "1",
-                    "name": "未分類カテゴリー",
+                    "name": "未分類カテゴリー"
                 },
                 {
                     "id": "2",
-                    "name": "営業",
+                    "name": "営業"
                 },
                 {
                     "id": "3",
-                    "name": "ソフトウェア",
+                    "name": "ソフトウェア"
                 },
                 {
                     "id": "4",
-                    "name": "経理",
+                    "name": "経理"
                 },
                 {
                     "id": "5",
-                    "name": "法務",
+                    "name": "法務"
                 },
                 {
                     "id": "6",
-                    "name": "教育",
+                    "name": "教育"
                 },
-            ],
-            "manuals": [
-                {
-                    "id": "1",
-                    "title": "営業マニュアル",
-                    "ownerId": "user1234",
-                    "collaboratorIds": ["user2222"],
-                    "categoryId": "2",
-                    "isPublic": true,
-                    "viewerOfUserIds": [],
-                    "viewerOfGroupIds": [],
-                    "visible": true,
-                    "favoriteIds": [],
-                    "likeIds": [],
-                },
-                {
-                    "id": "2",
-                    "title": "ソフトウェアマニュアル",
-                    "ownerId": "user1234",
-                    "collaboratorIds": ["user2222"],
-                    "categoryId": "3",
-                    "isPublic": true,
-                    "viewerOfUserIds": [],
-                    "viewerOfGroupIds": [],
-                    "visible": true,
-                    "favoriteIds": [],
-                    "likeIds": [],
-                }
             ],
             "memos": [
                 {
@@ -146,12 +118,73 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
 
         {
             "now": "pass1",
-            "next": "pass2",
+            "next": "pass2"
         }
 
 + Response 200
 
+# Group Manuals
+## マニュアルクエリー [/api/v1/manuals]
+### マニュアルクエリーAPI [POST]
 
++ Request  (application/json)
+
+        {
+            "filterList": [
+                { "column": "favorite", "items": ["true"] },
+                { "column": "like", "items": ["false"] }
+            ],
+            "searchText": ["手順１２３"],
+            "sortColumn": "favorite",
+            "sortDirection": "desc",
+            "page": 1,
+            "rowsPerPage" 25
+        }
+
++ Response 200 (application/json)
+
+            {
+                "queryParams": {
+                    "filterList": [
+                        { "column": "favorite", "items": ["true"] },
+                        { "column": "like", "items": ["false"] }
+                    ],
+                    "searchText": ["手順１２３"],
+                    "sortColumn": "updateAt",
+                    "sortDirection": "desc",
+                    "page": 1,
+                    "rowsPerPage" 25
+                },
+                "manuals": [
+                    {
+                        "id": "1",
+                        "title": "営業マニュアル",
+                        "ownerId": "user1234",
+                        "collaboratorIds": ["user2222"],
+                        "categoryId": "2",
+                        "isPublic": true,
+                        "viewerOfUserIds": [],
+                        "viewerOfGroupIds": [],
+                        "visible": true,
+                        "favoriteIds": [],
+                        "likeIds": []
+                    },
+                    {
+                        "id": "2",
+                        "title": "ソフトウェアマニュアル",
+                        "ownerId": "user1234",
+                        "collaboratorIds": ["user2222"],
+                        "categoryId": "3",
+                        "isPublic": true,
+                        "viewerOfUserIds": [],
+                        "viewerOfGroupIds": [],
+                        "visible": true,
+                        "favoriteIds": [],
+                        "likeIds": []
+                    }
+                ],
+                count: 78
+            }
 # Group Manual
 ## マニュアル [/api/v1/manual/{id}]
 マニュアルAPIにおけるtreeデータはPUTでは編集しない、代わりにTreeAPIを通じてtreeデータを編集する。
