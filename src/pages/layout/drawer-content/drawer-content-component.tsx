@@ -3,7 +3,6 @@ import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { CategoriesState } from '../../../redux/states/main/categoriesState';
-import { ManualState } from '../../../redux/states/main/manualsState';
 import ExpansionListItemContainer from './expansion-list-item-container';
 import { Fab, Box, Dialog } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
@@ -17,12 +16,10 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props extends
-  CategoriesState,
-  ManualState {}
+  CategoriesState {}
 
 function DrawerContentComponent(props: Props) {
-  const { categories, manuals } = props;
-  if (manuals === null) { throw new Error('Manual cannot be null.'); }
+  const { categories } = props;
 
   const [open, setOpen] = useState(false);
   function handleOpen() {
@@ -48,7 +45,6 @@ function DrawerContentComponent(props: Props) {
         <ExpansionListItemContainer
           key={c.id}
           category={c}
-          manuals={manuals.filter(m => m.categoryId === c.id)}
         />))}
       </List>
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>

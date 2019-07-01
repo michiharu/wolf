@@ -11,7 +11,7 @@ import {  Manual } from '../../../data-types/tree';
 import LayoutComponent from './layout-component';
 import { CategoriesState } from '../../../redux/states/main/categoriesState';
 import User from '../../../data-types/user';
-import { manualAction, favoriteActions, likeActions } from '../../../redux/actions/main/manualsAction';
+import { manualAction } from '../../../redux/actions/main/manualsAction';
 
 import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequestParams, LikeDeleteRequestParams } from '../../../api/definitions';
 import { ksActions } from '../../../redux/actions/ksAction';
@@ -60,9 +60,9 @@ const ViewContainer: React.FC<Props> = props => {
     zoomOut,
   } =  props;
 
+  // eslint-disable-next-line
   useEffect(() => { get(match.params.id); }, []);
   
-  const id = match.params.id;
 
   if (manual === null) { return <></>; }
 
@@ -86,7 +86,7 @@ const ViewContainer: React.FC<Props> = props => {
 function mapStateToProps(appState: AppState) {
   return {
     user: appState.loginUser.user!,
-    ...appState.manuals,
+    ...appState.manual,
     ...appState.users,
     ...appState.categories,
     ...appState.ks
@@ -97,10 +97,10 @@ function mapDispatchToProps(dispatch: Dispatch) {
   return {
     get: (id: string) => dispatch(manualAction.get(id)),
     replace: (manual: Manual) => dispatch(manualAction.put(manual)),
-    postFavorite: (params: FavoritePostRequestParams) => dispatch(favoriteActions.post(params)),
-    deleteFavorite: (params: FavoriteDeleteRequestParams) => dispatch(favoriteActions.delete(params)),
-    postLike: (params: LikePostRequestParams) => dispatch(likeActions.post(params)),
-    deleteLike: (params: LikeDeleteRequestParams) => dispatch(likeActions.delete(params)),
+    postFavorite: (params: FavoritePostRequestParams) => dispatch(manualAction.checkFavorite(params)),
+    deleteFavorite: (params: FavoriteDeleteRequestParams) => dispatch(manualAction.uncheckFavorite(params)),
+    postLike: (params: LikePostRequestParams) => dispatch(manualAction.checkLike(params)),
+    deleteLike: (params: LikeDeleteRequestParams) => dispatch(manualAction.uncheckLike(params)),
 
     zoomIn: () => dispatch(ksActions.zoomIn()),
     zoomOut: () => dispatch(ksActions.zoomOut()),

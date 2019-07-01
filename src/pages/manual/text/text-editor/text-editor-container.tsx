@@ -11,8 +11,8 @@ export interface NodeViewerActions {
 }
 
 function mapStateToProps(appState: AppState) {
-  const { selectId, selectNode } = appState.manuals;
-  return { selectId: selectId!, node: selectNode!, ...appState.ks, ...appState.rs };
+  const { manual, node } = appState.manual;
+  return { manual: manual!, node: node!, ...appState.ks, ...appState.rs };
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {

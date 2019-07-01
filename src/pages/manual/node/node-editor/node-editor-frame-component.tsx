@@ -6,7 +6,7 @@ import {
 
 import { Divergent, Convergent } from '../../../../settings/layout' 
 
-import { TreeNode, KTreeNode, baseKTreeNode } from '../../../../data-types/tree';
+import { TreeNode, KTreeNode, baseKTreeNode, Manual } from '../../../../data-types/tree';
 import TreeUtil from '../../../../func/tree';
 import NodeEditorContainer from '../../node/node-editor/node-editor-container';
 import { theme } from '../../../..';
@@ -44,7 +44,7 @@ export const styles = (theme: Theme) => createStyles({
 });
 
 interface Props extends MemosState, EditorFrameActions, RouteComponentProps, WithStyles<typeof styles> {
-  selectId: string;
+  manual: Manual;
   node: TreeNode;
   modeRef: React.RefObject<HTMLDivElement>;
   buttonRef: React.RefObject<HTMLDivElement>;
@@ -101,7 +101,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 
   save = () => {
-    const { selectId, putTree, changeMemos, history } = this.props;
+    const { manual, putTree, changeMemos, history } = this.props;
     const {node, memos } = this.state;
     const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
     const isAllCaseHasItem = TreeUtil._isAllCaseHasItem(node);
@@ -111,12 +111,12 @@ class EditorFrameComponent extends React.Component<Props, State> {
     if (cannotSaveReason === null) {
       const hasDifference = TreeUtil._hasDifference(this.props.node, this.state.node);
       if (hasDifference) {
-        const params: TreePutRequest = {manualId: selectId, rootTree: node };
+        const params: TreePutRequest = {manualId: manual.id, rootTree: node };
         putTree(params);
       }
       changeMemos(memos);
       this.setState({saved: true})
-      process.nextTick(() => history.push(`/manual/${selectId}/tree`));
+      process.nextTick(() => history.push(`/manual/${manual.id}/tree`));
     }
   }
 

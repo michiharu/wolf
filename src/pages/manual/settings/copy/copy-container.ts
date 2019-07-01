@@ -11,9 +11,8 @@ export interface CopyActions {
 }
 
 function mapStateToProps(appState: AppState) {
-  const { manuals, selectId } = appState.manuals;
-  const manual = manuals.find(m => m.id === selectId)!;
-  return {...appState.manuals, manual, ...appState.titleCheck };
+  const { manual } = appState.manual;
+  return {...appState.manual, manual: manual!, ...appState.titleCheck };
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {

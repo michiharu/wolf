@@ -30,6 +30,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     position: 'sticky',
     backgroundColor: theme.palette.background.paper,
     top: 0,
+    zIndex: 2000,
   },
   description: {
     width: `calc(100vw - ${otherWidthSum + drawerWidth}px)`,
@@ -429,7 +430,6 @@ function mapStateToProps(appState: AppState) {
   return {
     user: appState.loginUser.user!,
     ...appState.users,
-    ...appState.manuals,
     ...appState.categories
   };
 }

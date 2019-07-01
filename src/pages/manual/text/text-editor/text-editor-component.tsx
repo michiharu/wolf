@@ -3,7 +3,7 @@ import {
   Theme, createStyles, WithStyles, withStyles, Portal, Button, Box,
 } from '@material-ui/core';
 
-import { TreeNode } from '../../../../data-types/tree';
+import { TreeNode, Manual } from '../../../../data-types/tree';
 import TreeUtil from '../../../../func/tree';
 import TextLineWithIcon, { TextLineWithIconProps } from './text-line-with-icon';
 import { Action } from 'typescript-fsa';
@@ -40,7 +40,7 @@ const styles = (theme: Theme) => createStyles({
 });
 
 export interface TextEditorProps {
-  selectId: string;
+  manual: Manual;
   node: TreeNode;
   isEditing: boolean;
   putTree: (params: TreePutRequest) => Action<TreePutRequest>;
@@ -63,15 +63,15 @@ class TextEditor extends React.Component<Props, State> {
   }
 
   save = () => {
-    const { selectId, putTree, history } = this.props;
+    const { manual, putTree, history } = this.props;
     const { node } = this.state;
     const hasDifference = TreeUtil._hasDifference(this.props.node, this.state.node);
     if (hasDifference) {
-      const params: TreePutRequest = {manualId: selectId, rootTree: node };
+      const params: TreePutRequest = {manualId: manual.id, rootTree: node };
       putTree(params);
     }
     this.setState({saved: true})
-    process.nextTick(() => history.push(`/manual/${selectId}/text`));
+    process.nextTick(() => history.push(`/manual/${manual.id}/text`));
   }
 
   changeNode = (target: TreeNode) => {

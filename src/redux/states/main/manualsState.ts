@@ -15,7 +15,7 @@ const initialState: ManualState = {
   node: null,
 };
 
-export const manualsReducer = reducerWithInitialState(initialState)
+export const manualReducer = reducerWithInitialState(initialState)
 
 // GET
 .case(
@@ -73,10 +73,13 @@ export const manualsReducer = reducerWithInitialState(initialState)
 // PUT TREE
 .case(
   treeActions.put,
-  (state, node) => {
+  (state, {rootTree}) => {
+    const node = rootTree !== null
+    ? TreeNodeUtil._init(TreeUtil._get<Tree, TreeNode>(rootTree, baseTreeNode))
+    : null;
     return ({
       ...state,
-      manual: {...state.manual!, rootTree: node},
+      manual: {...state.manual!, rootTree},
       node,
     });
   }

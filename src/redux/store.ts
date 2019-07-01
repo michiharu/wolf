@@ -18,7 +18,7 @@ export type AppState = {
   loginUser: LoginUserState;
   users: UsersState;
   userGroups: UserGroupsState;
-  manuals: ManualState;
+  manual: ManualState;
   categories: CategoriesState;
   memos: MemosState;
   notifications: NotificationsState;
@@ -36,7 +36,7 @@ const store = createStore(
     loginUser: loginUserReducer,
     users: usersReducer,
     userGroups: userGroupsReducer,
-    manuals: manualReducer,
+    manual: manualReducer,
     categories: categoriesReducer,
     memos: memoReducer,
     notifications: notificationsReducer,

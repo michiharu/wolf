@@ -4,7 +4,6 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Category from '../../../data-types/category';
 import { ExpansionActions } from './expansion-list-item-container';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import { Manual } from '../../../data-types/tree';
 import links from '../../../settings/links';
 
 interface Props extends
@@ -12,12 +11,10 @@ interface Props extends
   RouteComponentProps {
     filter: Category | null;
     category: Category;
-    manuals: Manual[];
   }
 
 function ExpansionListItemComponent(props: Props) {
-  const { category: c, filter, manuals, filterSet, filterReset, location, history } = props;
-  if (manuals === null) { throw new Error('Manual cannot be null.'); }
+  const { category: c, filter, filterSet, filterReset, location, history } = props;
 
   const onClickCategory = () => {
     if (filter !== null && filter.id === c.id) {

@@ -15,8 +15,8 @@ export interface EditorFrameActions {
 }
 
 function mapStateToProps(appState: AppState) {
-  const { selectId, selectNode } = appState.manuals;
-  return {selectId: selectId!, node: cloneDeep(selectNode!), ...appState.memos};
+  const { manual, node } = appState.manual;
+  return {manual: cloneDeep(manual)!, node: cloneDeep(node)!, ...appState.memos};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {

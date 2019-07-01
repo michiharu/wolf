@@ -30,7 +30,7 @@ function* handleRequestLogin() {
     const data = yield call(API.login, action.payload);
     yield put(loadingActions.endLogin());
     if (data.error === undefined) {
-      const { user, users, userGroups, manuals, categories, memos } = data as LoginPostResponse;
+      const { user, users, userGroups, categories, memos } = data as LoginPostResponse;
       yield put(loginUserAction.set(user));
       yield put(usersAction.change(users));
       yield put(userGroupsAction.change(userGroups));
@@ -217,7 +217,6 @@ function* handleManualCopy() {
 function* handleRequestPostFavorite() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_FAVORITE_POST);
-    const beforeId = action.payload.manualId;
     const data = yield call(API.favoritePost, action.payload);
     if (data.error === undefined) {
     } else {
@@ -231,7 +230,6 @@ function* handleRequestPostFavorite() {
 function* handleRequestDeleteFavorite() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_FAVORITE_DELETE);
-    const beforeId = action.payload.manualId;
     const data = yield call(API.favoriteDelete, action.payload);
     if (data.error === undefined) {
     } else {
@@ -245,7 +243,6 @@ function* handleRequestDeleteFavorite() {
 function* handleRequestPostLike() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_LIKE_POST);
-    const beforeId = action.payload.manualId;
     const data = yield call(API.likePost, action.payload);
     if (data.error === undefined) {
     } else {
@@ -259,7 +256,6 @@ function* handleRequestPostLike() {
 function* handleRequestDeleteLike() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_LIKE_DELETE);
-    const beforeId = action.payload.manualId;
     const data = yield call(API.likeDelete, action.payload);
     if (data.error === undefined) {
     } else {

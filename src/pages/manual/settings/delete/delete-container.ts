@@ -11,9 +11,8 @@ export interface DeleteActions {
 }
 
 function mapStateToProps(appState: AppState) {
-  const { manuals, selectId } = appState.manuals;
-  const manual = manuals.find(m => m.id === selectId)!;
-  return {user: appState.loginUser.user!,manual};
+  const { manual } = appState.manual;
+  return {user: appState.loginUser.user!, manual: manual!};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {
