@@ -11,7 +11,7 @@ import AddNext from '@material-ui/icons/Forward';
 import { Stage, Layer, Group, Rect } from 'react-konva';
 
 import { TreeNode, Type, KTreeNode, DragRow, Point, baseKTreeNode, baseKWithArrow,  KWithArrow, isSwitch, isTask, isCase } from '../../../../data-types/tree';
-import { toolbarHeight, toolbarMinHeight, Task, Switch, Case, Delete, More, Less } from '../../../../settings/layout';
+import { Task, Switch, Case, Delete, More, Less } from '../../../../settings/layout';
 
 import TreeUtil from '../../../../func/tree';
 import TreeNodeUtil from '../../../../func/tree-node';
@@ -20,31 +20,25 @@ import { phrase } from '../../../../settings/phrase';
 import KNode from '../../../../components/konva/k-node';
 import Util from '../../../../func/util';
 import KArrowUtil from '../../../../func/k-arrow';
-import { theme } from '../../../..';
+import { theme, toolbarHeight } from '../../../..';
 import { NodeEditMode } from '../../../../data-types/node-edit-mode';
 import { grey } from '@material-ui/core/colors';
 import KMemo from '../../../../components/konva/k-memo';
 import KShadow from '../../../../components/konva/k-shadow';
 import { KSState } from '../../../../redux/states/ksState';
 import { RSState } from '../../../../redux/states/rsState';
+import { headerHeight } from '../node-viewer/node-viewer-component';
 
 export const styles = (theme: Theme) => createStyles({
   root: {
     overflow: 'scroll',
-    height: `calc(100vh - ${toolbarHeight + toolbarMinHeight * 2}px)`,
+    height: `calc(100vh - ${toolbarHeight + headerHeight + theme.spacing(2)}px)`,
     [theme.breakpoints.down('xs')]: {
-      height: `calc(100vh - ${toolbarMinHeight * 3}px)`,
+      height: `calc(100vh - ${toolbarHeight + headerHeight + theme.spacing(4)}px)`,
     },
   },
   toolbar: theme.mixins.toolbar,
-  settingsButton: {
-    position: 'fixed',
-    right: theme.spacing(1),
-    top: toolbarHeight + theme.spacing(1),
-    [theme.breakpoints.down('xs')]: {
-      top: toolbarMinHeight + theme.spacing(1),
-    },
-  },
+
   saveButton: {
     minWidth: 100,
   },

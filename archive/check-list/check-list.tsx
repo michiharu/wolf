@@ -11,20 +11,21 @@ import Download from '@material-ui/icons/SaveAlt';
 import PrintIcon from '@material-ui/icons/Print';
 import Undo from '@material-ui/icons/Undo';
 
-import { Stage, Layer, Group, Rect } from 'react-konva';
+import { Stage, Layer } from 'react-konva';
 
-import { TreeNode, Type, CheckNode, CheckRecord, isTask } from '../../src/data-types/tree';
-import { toolbarHeight, toolbarMinHeight, defaultKS as ks } from '../../src/settings/layout';
+import { TreeNode, CheckNode, CheckRecord, isTask } from '../../src/data-types/tree';
+import { defaultKS as ks } from '../../src/settings/layout';
 
 import CheckNodeUtil from '../../src/func/check-node-util';
 import CheckKNode from '../../src/components/konva/check-k-node';
 import { fileDownload } from '../../src/func/file-download';
+import { toolbarHeight } from '../../src';
 
 const styles = (theme: Theme) => createStyles({
   root: {
     height: `calc(100vh - ${toolbarHeight}px)`,
     [theme.breakpoints.down('xs')]: {
-      height: `calc(100vh - ${toolbarMinHeight}px)`,
+      height: `calc(100vh - ${toolbarHeight}px)`,
     },
   },
   printContainerWrapper: {

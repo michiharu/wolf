@@ -1,10 +1,6 @@
 import KSize from '../data-types/k-size';
 import TextEditSettings from '../data-types/text-edit-settings';
 
-export const toolbarHeight = 64;
-export const toolbarMinHeight = 56;
-
-export const rightPainWidth = 300;
 export { default as Task } from '@material-ui/icons/Assignment';
 export { default as Switch } from '@material-ui/icons/CallSplit';
 export { default as Case } from '@material-ui/icons/Check';

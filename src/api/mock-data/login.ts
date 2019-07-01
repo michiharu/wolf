@@ -12,7 +12,10 @@ export const postLogin = (config: AxiosRequestConfig) => {
   const users = [user1, user2, user3, user4];
   const userGroups = [userGroup1, userGroup2];
   const manuals = [manual1, manual2, manual3, manual4];
-  const categories = [category1, category2, category3];
+  const categories = [...Array(300)]
+  .map(_ =>  [category1, category2, category3])
+  .reduce((a, b) => a.concat(b))
+  .map((c, i) => ({...c, id: String(i)}));
 
   const data1: LoginPostResponse = {
     user: user1,

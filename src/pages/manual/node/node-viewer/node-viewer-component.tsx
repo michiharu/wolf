@@ -6,48 +6,27 @@ import {
 import { Stage, Layer, Group } from 'react-konva';
 
 import { TreeNode, KTreeNode, DragRow, baseKTreeNode, baseKWithArrow, KWithArrow } from '../../../../data-types/tree';
-import { toolbarHeight, toolbarMinHeight, rightPainWidth } from '../../../../settings/layout';
 import TreeUtil from '../../../../func/tree';
 import TreeNodeUtil from '../../../../func/tree-node';
 import KTreeUtil from '../../../../func/k-tree';
 import KArrowUtil from '../../../../func/k-arrow';
-import { theme } from '../../../../index';
+import { theme, toolbarHeight } from '../../../../index';
 import KViewNode from '../../../../components/konva/k-view-node';
 import { NodeViewerActions } from './node-viewer-container';
 import { RSState } from '../../../../redux/states/rsState';
 import { KSState } from '../../../../redux/states/ksState';
 
-const headerHeight = 96;
+export const headerHeight = 96;
 const styles = (theme: Theme) => createStyles({
   root: {
     overflow: 'scroll',
     height: `calc(100vh - ${toolbarHeight + theme.spacing(2) + headerHeight}px)`,
     [theme.breakpoints.down('xs')]: {
-      height: `calc(100vh - ${toolbarMinHeight + theme.spacing(2) + headerHeight}px)`,
+      height: `calc(100vh - ${toolbarHeight + theme.spacing(4) + headerHeight}px)`,
     },
   },
   toolbar: theme.mixins.toolbar,
-  settingsButton: {
-    position: 'fixed',
-    right: theme.spacing(1),
-    top: toolbarHeight + theme.spacing(1),
-    [theme.breakpoints.down('xs')]: {
-      top: toolbarMinHeight + theme.spacing(1),
-    },
-  },
-  rightPaneContainer: {
-    
-    width: '40vw',
-    minWidth: rightPainWidth,
-    right: 0,
-    padding: theme.spacing(1),
-    top: toolbarHeight,
-    height: `calc(100vh - ${toolbarHeight}px)`,
-    [theme.breakpoints.down('xs')]: {
-      top: toolbarMinHeight,
-      height: `calc(100vh - ${toolbarMinHeight}px)`,
-    },
-  },
+
   saveButton: {
     minWidth: 100,
   },

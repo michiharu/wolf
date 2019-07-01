@@ -10,10 +10,11 @@ import { pink, blue } from '@material-ui/core/colors';
 import LoginRouter from './pages/login-router';
 import Notifier from './notifier';
 
+export const toolbarHeight = 42;
 export const theme = createMuiTheme({
   mixins: {
     toolbar: {
-        minHeight: 42
+        minHeight: toolbarHeight,
     }
   },
   palette: {
