@@ -34,7 +34,7 @@ export const manualReducer = reducerWithInitialState(initialState)
   }
 )
 
-//PUT
+// PUT
 .case(
   manualAction.put,
   (state, manual) => {
@@ -69,6 +69,53 @@ export const manualReducer = reducerWithInitialState(initialState)
 )
 
 .case(manualAction.clear, (state) => ({...state, manual: null, node: null}))
+
+// Favorite
+.case(
+  manualAction.checkFavorite,
+  (state, {userId}) => {
+    const manual = state.manual!;
+    return ({
+      ...state,
+      manual: {...manual, favoriteIds: manual.favoriteIds.concat([userId])},
+    })
+  }
+)
+
+.case(
+  manualAction.uncheckFavorite,
+  (state, {userId}) => {
+    const manual = state.manual!;
+    return ({
+      ...state,
+      manual: {...manual, favoriteIds: manual.favoriteIds.filter(fid => fid !== userId )},
+    })
+  }
+)
+
+// Like
+.case(
+  manualAction.checkLike,
+  (state, {userId}) => {
+    const manual = state.manual!;
+    return ({
+      ...state,
+      manual: {...manual, likeIds: manual.likeIds.concat([userId])},
+    })
+  }
+)
+
+.case(
+  manualAction.uncheckLike,
+  (state, {userId}) => {
+    const manual = state.manual!;
+
+    return ({
+      ...state,
+      manual: {...manual, likeIds: manual.likeIds.filter(lid => lid !== userId )},
+    })
+  }
+)
 
 // PUT TREE
 .case(
