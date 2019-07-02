@@ -1,11 +1,11 @@
 import { AxiosRequestConfig } from 'axios';
-import { TreePutRequest, TreePutResponse } from '../definitions';
+import { TreePutResponse } from '../definitions';
 
 export const putTree = (config: AxiosRequestConfig) => {
   const { method, url, data: requestJson } = config;
-  const req = JSON.parse(requestJson) as TreePutRequest;
+  const req = JSON.parse(requestJson);
 
-  const data: TreePutResponse = {...req.rootTree};
+  const data: TreePutResponse = {...req};
 
   console.log(method, url, req, data);
   return [200, data]

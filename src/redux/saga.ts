@@ -269,15 +269,13 @@ function* handleRequestDeleteLike() {
 function* handleRequestPutTree() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_TREE_PUT);
-    const beforeId = action.payload.manualId;
     const data = yield call(API.treePut, action.payload);
     if (data.error === undefined) {
-      yield put(ManualAction.treeActions.putSuccess(beforeId));
+      yield put(ManualAction.treeActions.putSuccess(data));
       const notification: MyNotification =
         { key: getKey(), variant: 'success', message: 'マニュアルを保存しました' };
       yield put(notificationsAction.enqueue(notification));
     } else {
-      yield put(ManualAction.treeActions.putError(beforeId));
       const notification: MyNotification =
         { key: getKey(), variant: 'warning', message: 'マニュアルの保存に失敗しました' };
       yield put(notificationsAction.enqueue(notification));

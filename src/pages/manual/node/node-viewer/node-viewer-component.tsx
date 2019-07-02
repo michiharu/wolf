@@ -39,15 +39,11 @@ interface Props extends KSState, RSState, NodeViewerActions, WithStyles<typeof s
   node: TreeNode | null;
 }
 
-interface State {
-  didRender: boolean;
-}
-
 export type FlowType = 'rect' | 'arrow';
 export const flowType = {rect: 'rect', arrow: 'arrow'};
 export const marginBottom = 40;
 
-class NodeViewerComponent extends React.Component<Props, State> {
+class NodeViewerComponent extends React.Component<Props, {}> {
 
   mainRef = React.createRef<HTMLDivElement>();
   stageRef = React.createRef<any>();
@@ -59,16 +55,8 @@ class NodeViewerComponent extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    const state = NodeViewerComponent.getInitialState();
-    this.state = state;
     const kTree = props.node === null ? baseKTreeNode : TreeUtil._get(props.node, baseKTreeNode);
     this.kTree = KTreeUtil.setCalcProps(kTree, props.ks);
-  }
-
-  static getInitialState = (): State => {
-    return {
-      didRender: false,
-    };
   }
   
   componentDidMount() {

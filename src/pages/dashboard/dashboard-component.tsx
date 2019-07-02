@@ -21,6 +21,7 @@ import axios from '../../api/axios';
 import { debounce } from 'lodash';
 import Category from '../../data-types/category';
 import CreateManualContainer from '../layout/create-manual/create-manual-container';
+import { manualAction } from '../../redux/actions/main/manualsAction';
 
 
 const otherWidthSum = 800;
@@ -53,6 +54,7 @@ interface Props extends
   RouteComponentProps {
   filterSet: (category: Category) => Action<Category>;
   filterReset: () => Action<void>;
+  clearSelectManual: () => Action<void>;
 }
 
 const getMuiTheme = () => createMuiTheme({
@@ -129,6 +131,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
   const categoryId = props.filter === null ? null : props.filter.id;
   useEffect(() => {
     if (!isFirstRendering) {
+      props.clearSelectManual();
       setLoading(true);
       const params: ManualsQueryParams = {
         filters: {favorite, like, categoryId},
@@ -438,6 +441,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
   return {
     filterSet: (category: Category) => dispatch(categoriesAction.filterSet(category)),
     filterReset: () => dispatch(categoriesAction.filterReset()),
+    clearSelectManual: () => dispatch(manualAction.clear()),
   };
 }
 

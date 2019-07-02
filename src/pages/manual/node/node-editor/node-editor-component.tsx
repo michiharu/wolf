@@ -91,6 +91,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
 
   createBoxRef = React.createRef<HTMLDivElement>();
   labelRef = React.createRef<any>();
+  nextBrotherButtonRef = React.createRef<any>();
   memoLabelRef = React.createRef<any>();
 
 
@@ -196,7 +197,11 @@ class NodeEditorComponent extends React.Component<Props, State> {
     var  kTree = TreeUtil._get(result.node, baseKTreeNode);
     kTree = KTreeUtil.setCalcProps(kTree, ks);
     const focusNode = TreeUtil._find(kTree, result.newNode.id)!;
-    setTimeout(() => edit(TreeNodeUtil._focus(kTree, result.newNode.id)), 300);
+    setTimeout(() => {
+      edit(TreeNodeUtil._focus(kTree, result.newNode.id));
+      this.setState({labelFocus: true});
+      process.nextTick(() => this.labelRef.current!.focus());
+    }, 300);
 
     if (main.scrollTop + main.offsetHeight < (focusNode.point.y + ks.rect.h) * ks.unit) {
       const largeContainerHeight = (kTree.self.h + ks.spr.h * 2) * ks.unit + marginBottom;
@@ -644,7 +649,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
         ActionButtonBox = (
           <Paper style={boxStyle}>
             <MuiThemeProvider theme={createMuiTheme({palette: {type: 'dark'}})}>
-              {!isRoot && <Button onClick={this.addNextBrother}>
+              {!isRoot && <Button ref={this.nextBrotherButtonRef} onClick={this.addNextBrother}>
                 次の項目を追加<AddNext style={{transform: 'rotate(90deg)'}} /><Add/>
               </Button>}
               <Button onClick={this.addDetails}>
@@ -763,6 +768,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
               if (e.keyCode === 13) {
                 this.labelRef.current!.blur();
                 this.setState({labelFocus: false});
+                process.nextTick(() => this.nextBrotherButtonRef.current!.focus());
               }
             }}
           />
