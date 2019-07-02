@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Divider from '@material-ui/core/Divider';
 import { FixedSizeList as List } from 'react-window';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { CategoriesState } from '../../../redux/states/main/categoriesState';
-import { Fab, Box, Dialog } from '@material-ui/core';
+import { Fab, Box, Dialog, Typography } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
 import CreateManualContainer from '../create-manual/create-manual-container';
 import { ExpansionActions } from './drawer-content-container';
@@ -16,8 +16,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   extendedIcon: {
     marginLeft: theme.spacing(1),
   },
+  listContainer: {
+    height: `calc(100vh - 138px)`,
+  },
   selected: {
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: theme.palette.grey[200],
   },
   notSelected: {
     backgroundColor: theme.palette.background.paper,
@@ -48,6 +51,13 @@ function DrawerContentComponent(props: Props) {
     }
   }
 
+  const [height, setHeight] = useState(300);
+  const listContainerRef = useCallback((el: HTMLDivElement | null) => {
+    if (el) {
+      setHeight(el.offsetHeight);
+    }
+  }, []);
+
   const classes = useStyles();
   return (
     <div>
@@ -59,25 +69,26 @@ function DrawerContentComponent(props: Props) {
           <Add className={classes.extendedIcon} />
         </Fab>
       </Box>
-      <List
-        height={150}
-        itemCount={categories.length}
-        itemSize={35}
-        width={300}
-      >
-        {({ index, style }) => (
-          <div
-            className={
-              (filter !== null && filter.id === categories[index].id)
-                ? classes.selected : classes.notSelected
-            }
-            style={style}
-            onClick={onClickCategory(categories[index])}
-          >
-            {categories[index].name}
-          </div>
-        )}
-      </List>
+      <div ref={listContainerRef} className={classes.listContainer}>
+        <List
+          height={height}
+          itemCount={categories.length}
+          itemSize={50}
+          width={300}
+        >
+          {({ index, style }) => (
+            <div
+              className={(filter !== null && filter.id === categories[index].id) ? classes.selected : classes.notSelected}
+              style={style}
+              onClick={onClickCategory(categories[index])}
+            >
+              <Box display="flex" alignItems="center" height="100%" pl={2}>
+                <Typography>{categories[index].name}</Typography>
+              </Box>
+            </div>
+          )}
+        </List>
+      </div>
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <CreateManualContainer onClose={handleClose}/>
       </Dialog>
