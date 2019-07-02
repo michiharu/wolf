@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from 'react';
-import { Typography, Button, MenuItem, Box, TextField } from '@material-ui/core';
+import { Typography, Button, Box } from '@material-ui/core';
 import { Manual } from '../../../../data-types/tree';
 import { CollaboratorsActions } from './change-owner-container';
 import { UsersState } from '../../../../redux/states/main/usersState';
 import User from '../../../../data-types/user';
+import AutoSingleSelect from '../../../../components/auto-single-select/auto-single-select';
 
 interface Props extends UsersState, CollaboratorsActions {
   user: User;
@@ -16,7 +17,11 @@ const ChangeOwnerComponent: React.FC<Props> = props => {
   const isOwner = propManual.ownerId === user.id;
   const hasChange = manual.ownerId !== propManual.ownerId;
   
-  const handleSelect = (e: any) => setManual({...manual, ownerId: e.target.value});
+  const handleSelect = (item: string | null) => {
+    if (item !== null) {
+      setManual({...manual, ownerId: users.find(u => item === createUserIdentityName(u))!.id});
+    }
+  }
 
   function handleReset() {
     setManual(propManual);
@@ -30,6 +35,11 @@ const ChangeOwnerComponent: React.FC<Props> = props => {
     setManual(propManual);
   }, [propManual]);
 
+  const createUserIdentityName = (u: User) => `${u.lastName} ${u.firstName} (${u.id})`;
+  interface UserAsItem extends User { name: string; }
+  
+  const usersAsItem: UserAsItem[] = users.map(u => ({...u, name: createUserIdentityName(u)}));
+  const item = createUserIdentityName(users.find(u => u.id === manual.ownerId)!);
   return (
     <div>
       <Box display="flex" flexDirection="row" alignItems="flex-end" py={2}>
@@ -41,18 +51,14 @@ const ChangeOwnerComponent: React.FC<Props> = props => {
       </Box>
       <Box display="flex" py={2}>
         <Box flexGrow={1}>
-          <TextField
-            select
-            variant="outlined"
-            label="オーナー"
-            value={manual.ownerId}
+          <AutoSingleSelect
+            inputLabel="オーナーの変更"
+            suggestions={usersAsItem}
+            labelProp="name"
+            initialSelectedItem={item}
             onChange={handleSelect}
             disabled={!isOwner}
-            fullWidth
-          >
-            <MenuItem value=""><em>None</em></MenuItem>
-            {users.map(o => <MenuItem key={o.id} value={o.id}>{`${o.lastName} ${o.firstName}`}</MenuItem>)}
-          </TextField>
+          />
         </Box>
       </Box>
     </div>

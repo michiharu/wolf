@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import {
   Theme, FormControlLabel, Switch,
-  Button, DialogTitle, DialogContent, DialogActions, makeStyles, Box, Typography, FormControl, Select, MenuItem,
+  Button, DialogTitle, DialogContent, DialogActions, makeStyles, Box,
 } from '@material-ui/core';
 import { CreateManualActions } from './create-manual-container';
 import { baseManual, Manual, baseTree } from '../../../data-types/tree';
@@ -12,6 +12,7 @@ import Util from '../../../func/util';
 import { CategoriesState } from '../../../redux/states/main/categoriesState';
 import TitleChecker from '../../../components/title-checker/title-checker';
 import { TitleCheckState } from '../../../redux/states/titleCheckState';
+import AutoSingleSelect from '../../../components/auto-single-select/auto-single-select';
 
 const useStyles = makeStyles((theme: Theme) => ({
   switch: {
@@ -30,8 +31,10 @@ const CreateManualComponent: React.FC<Props> = props => {
 
   const { categories, onClose, title, result } = props;
   const [categoryId, setCategoryId] = useState(categories[0].id);
-  const handleCategorySelect = (e: React.ChangeEvent<{ value: unknown; name?: string; }>) => {
-    setCategoryId(e.target.value as string);
+  const handleCategorySelect = (item: string | null) => {
+    if (item !== null) {
+      setCategoryId(categories.find(c => c.name === item)!.id);
+    }
   }
 
   const [isPublic, setIsPublic] = useState(true);
@@ -53,15 +56,15 @@ const CreateManualComponent: React.FC<Props> = props => {
   return (
     <>
       <DialogTitle>マニュアルの新規作成</DialogTitle>
-      <DialogContent>
+      <DialogContent style={{minHeight: 400}}>
         <TitleChecker defaultTitle=""/>
         <Box py={2}>
-          <Typography variant="caption">カテゴリー</Typography>
-          <FormControl fullWidth>
-            <Select value={categoryId} onChange={handleCategorySelect}>
-              {categories.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
-            </Select>
-          </FormControl>
+          <AutoSingleSelect
+            inputLabel="カテゴリー"
+            suggestions={categories}
+            labelProp="name"
+            onChange={handleCategorySelect}
+          />
         </Box>
         <FormControlLabel
           className={classes.switch}

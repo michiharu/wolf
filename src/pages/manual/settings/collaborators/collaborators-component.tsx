@@ -1,12 +1,13 @@
 import React, {useState, useEffect} from 'react';
 import {
-  Theme, makeStyles, Typography, Chip, Button, MenuItem, Box, TextField
+  Theme, makeStyles, Typography, Chip, Button, Box,
 } from '@material-ui/core';
 import { Manual } from '../../../../data-types/tree';
 import { CollaboratorsActions } from './collaborators-container';
 import { UsersState } from '../../../../redux/states/main/usersState';
 import User from '../../../../data-types/user';
 import _ from 'lodash';
+import AutoSingleSelect from '../../../../components/auto-single-select/auto-single-select';
 
 const useStyles = makeStyles((theme: Theme) => ({
   chip: { margin: theme.spacing(1) },
@@ -29,11 +30,21 @@ const Collaborators: React.FC<Props> = props => {
     setManual({...manual, collaboratorIds: manual.collaboratorIds.filter(cid => cid !== id)});    
   };
 
+  const createUserIdentityName = (u: User) => `${u.lastName} ${u.firstName} (${u.id})`;
+
   const [selectCollaboratorId, setCollaboratorId] = useState('');
-  const handleSelect = (e: any) => setCollaboratorId(e.target.value);
+  const handleSelect = (item: string | null) => {
+    setCollaboratorId(
+      item === null ? '' :
+      users.find(u => item === createUserIdentityName(u))!.id
+    );
+  }
+
+  const [willReset, setWillReset] = useState(false);
   const addCollaborator = () => {
     setManual({...manual, collaboratorIds: manual.collaboratorIds.concat([selectCollaboratorId])});    
     setCollaboratorId('');
+    setWillReset(true);
   }
 
   function handleReset() {
@@ -48,10 +59,16 @@ const Collaborators: React.FC<Props> = props => {
     setManual(propManual);
   }, [propManual]);
 
+  interface UserAsItem extends User { name: string; }
+
   const collaborators = manual.collaboratorIds
   .map(cid => users.find(u => u.id === cid)!);
-  const others = users
-  .filter(u => manual.collaboratorIds.find(cid => cid === u.id) === undefined && u.id !== user.id);
+  const others: UserAsItem[] =  users
+  .filter(u => manual.collaboratorIds.find(cid => cid === u.id) === undefined && u.id !== user.id)
+  .map(u => ({...u, name: createUserIdentityName(u)}));
+
+  const item = selectCollaboratorId === '' ? null :
+  createUserIdentityName(users.find(u => u.id === selectCollaboratorId)!);
 
   const classes = useStyles();
 
@@ -77,18 +94,15 @@ const Collaborators: React.FC<Props> = props => {
       </Box>
       <Box display="flex" flexDirection="row" alignItems="flex-end" py={2}>
         <Box flexGrow={1}>
-          <TextField
-            select
-            variant="outlined"
-            label="コラボレーターの追加"
-            value={selectCollaboratorId}
+          <AutoSingleSelect
+            inputLabel="コラボレーターの追加"
+            suggestions={others}
+            labelProp="name"
+            initialSelectedItem={item}
             onChange={handleSelect}
-            disabled={!isOwner}
-            fullWidth
-          >
-            <MenuItem value=""><em>None</em></MenuItem>
-            {others.map(o => <MenuItem key={o.id} value={o.id}>{`${o.lastName} ${o.firstName}`}</MenuItem>)}
-          </TextField>
+            willReset={willReset}
+            setWillReset={setWillReset}
+          />
         </Box>
         <Box ml={2}>
           <Button variant="contained" color="primary" onClick={addCollaborator} disabled={selectCollaboratorId === ''}>追加</Button>

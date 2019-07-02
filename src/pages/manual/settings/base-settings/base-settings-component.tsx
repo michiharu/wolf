@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
-
-import { Typography, Box, MenuItem, TextField, Button } from '@material-ui/core';
+import { Typography, Box, TextField, Button } from '@material-ui/core';
 import { Manual } from '../../../../data-types/tree';
 import { BaseSettingsActions } from './base-settings-container';
 import Category from '../../../../data-types/category';
@@ -8,6 +7,7 @@ import User from '../../../../data-types/user';
 
 import TitleChecker from '../../../../components/title-checker/title-checker';
 import { TitleCheckState } from '../../../../redux/states/titleCheckState';
+import AutoSingleSelect from '../../../../components/auto-single-select/auto-single-select';
 
 interface Props extends TitleCheckState, BaseSettingsActions {
   user: User;
@@ -26,8 +26,8 @@ const BaseSettings: React.FC<Props> = props => {
 
   const isValid =　propManual.title === title || (title !== '' && result !== null && title === result.title && result.valid);
 
-  const handleCategorySelect = (e: React.ChangeEvent<{ value: unknown; name?: string; }>) => {
-    setManual({...manual, categoryId: e.target.value as string});
+  const handleCategorySelect = (item: string) => {
+    setManual({...manual, categoryId: categories.find(c => c.name === item)!.id});
   }
 
   const handleChangeDescription = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +46,7 @@ const BaseSettings: React.FC<Props> = props => {
   useEffect(() => {
     setManual(propManual);
   }, [propManual]);
-
+  
   return (
     <div>
       <Box display="flex" flexDirection="row" alignItems="flex-end" py={2}>
@@ -59,17 +59,13 @@ const BaseSettings: React.FC<Props> = props => {
         <TitleChecker defaultTitle={propManual.title} disabled={!isOwner}/>
       </Box>
       <Box py={2} width="100%">
-        <TextField
-          select
-          variant="outlined"
-          label="カテゴリー"
-          value={manual.categoryId}
+        <AutoSingleSelect
+          inputLabel="カテゴリー"
+          suggestions={categories}
+          labelProp="name"
+          initialSelectedItem={categories.find(c => manual.categoryId === c.id)!.name}
           onChange={handleCategorySelect}
-          disabled={!isOwner}
-          fullWidth
-        >
-          {categories.map(c => <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>)}
-        </TextField>
+        />
       </Box>
       <Box py={2}>
         <TextField
