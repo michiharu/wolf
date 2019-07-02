@@ -176,7 +176,14 @@ const Dashboard: React.FC<Props> = (props: Props) => {
   }
 
   const [currentSearchText, setCurrentSearchText] = useState<string>('');
-  const debounced = useRef(debounce((str: string) => setSearchText(str.split(/( |　)+/)), 500));
+  const debounced = useRef(
+    debounce(
+      (str: string) => setSearchText(
+        str.split(/( |　)+/).filter(txt => txt.match(/( |　)/) === null && txt !== '')
+      ),
+      500
+    )
+  );
   useEffect(() => debounced.current(currentSearchText), [currentSearchText]);
   
   const changeSearchText = (searchText: string | null) => {
