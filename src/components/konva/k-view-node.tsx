@@ -19,10 +19,11 @@ export interface KNodeProps {
   node: KWithArrow;
   ks: KSize;
   expand: (node: KWithArrow) => void;
+  stageRef?: React.RefObject<any>;
 }
 
 const KViewNode: React.FC<KNodeProps> = props => {
-  const { node, ks, expand } = props;
+  const { node, ks, expand, stageRef } = props;
   const fill = isTask(node.type) ? lightBlue[50] :
   isSwitch(node.type) ? amber[100] : yellow[100];
   const baseRectProps = {
@@ -84,7 +85,17 @@ const KViewNode: React.FC<KNodeProps> = props => {
     x: (ks.rect.w - ks.rect.h) * ks.unit, y: 0,
     svg: node.open ? less : more,
     badgeContent: node.children.length,
-    onClick: () => expand(node)
+    onClick: () => expand(node),
+    onMouseEnter: () => {
+      if (stageRef!.current !== null) {
+        stageRef!.current.container().style.cursor = 'pointer';
+      }
+    },
+    onMouseLeave: () => {
+      if (stageRef!.current !== null) {
+        stageRef!.current.container().style.cursor = 'default';
+      }
+    }
   };
 
   return (

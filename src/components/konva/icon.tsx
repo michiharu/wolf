@@ -15,10 +15,12 @@ export interface IconProps {
   rotate?: number;
   scale?: {x: number, y: number};
   onClick?: (e: any) => void;
+  onMouseEnter?: (e:any) => void;
+  onMouseLeave?: (e:any) => void;
 }
 
 const Icon: React.FC<IconProps> = (props: IconProps) => {
-  const {ks, x, y, svg, color, backgroundColor, rotate, scale, onClick} = props;
+  const {ks, x, y, svg, color, backgroundColor, rotate, scale, onClick, onMouseEnter, onMouseLeave} = props;
   const baseRectProps = {
     x: (ks.rect.h - ks.icon * 2) / 2 * ks.unit,
     y: (ks.rect.h - ks.icon * 2) / 2 * ks.unit,
@@ -27,6 +29,8 @@ const Icon: React.FC<IconProps> = (props: IconProps) => {
     fill: backgroundColor,
     opacity: 0.2,
     cornerRadius: ks.rect.h / 2 * ks.unit,
+    onMouseEnter,
+    onMouseLeave,
   };
   const transRate = ks.unit / 24;
   const svgProps = {
@@ -39,7 +43,9 @@ const Icon: React.FC<IconProps> = (props: IconProps) => {
     rotate: rotate || 0,
     scale: scale
       ? {x: scale.x * transRate, y: scale.y * transRate}
-      : {x: transRate, y: transRate}
+      : {x: transRate, y: transRate},
+    onMouseEnter,
+    onMouseLeave,
   };
 
   return (

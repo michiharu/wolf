@@ -554,7 +554,8 @@ class NodeEditorComponent extends React.Component<Props, State> {
       dragMove: this.dragMove,
       dragEnd: this.dragEnd,
       dragAnimationEnd: this.dragAnimationEnd,
-      deleteFocus: this.deleteFocus
+      deleteFocus: this.deleteFocus,
+      stageRef: this.stageRef,
     };
 
     const memoActionProps = {

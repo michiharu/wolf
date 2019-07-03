@@ -5,7 +5,7 @@ import {
 
 import { Stage, Layer, Group } from 'react-konva';
 
-import { TreeNode, KTreeNode, DragRow, baseKTreeNode, baseKWithArrow, KWithArrow } from '../../../../data-types/tree';
+import { TreeNode, KTreeNode, baseKTreeNode, baseKWithArrow, KWithArrow } from '../../../../data-types/tree';
 import TreeUtil from '../../../../func/tree';
 import TreeNodeUtil from '../../../../func/tree-node';
 import KTreeUtil from '../../../../func/k-tree';
@@ -36,7 +36,7 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface Props extends KSState, RSState, NodeViewerActions, WithStyles<typeof styles> {
-  node: TreeNode | null;
+  node: TreeNode;
 }
 
 export type FlowType = 'rect' | 'arrow';
@@ -50,8 +50,6 @@ class NodeViewerComponent extends React.Component<Props, {}> {
   convergentRef = React.createRef<any>();
 
   kTree: KTreeNode;
-  rows: DragRow[] | null = null;
-  dropRow: number = 0;
 
   constructor(props: Props) {
     super(props);
@@ -119,21 +117,20 @@ class NodeViewerComponent extends React.Component<Props, {}> {
 
   expand = (target: KWithArrow, open: boolean) => {
     const { node, update } = this.props;
-    update(TreeNodeUtil._open(node!, target.id, open));
+    const newNode = TreeNodeUtil._open(node!, target.id, open)
+    update(newNode);
     process.nextTick(() => this.resize());
   }
 
   render() {
     const { node: tree, ks, classes } = this.props;
-    const kTreeNode = KTreeUtil.setCalcProps(tree === null ? baseKWithArrow : TreeUtil._get(tree, baseKWithArrow), ks);
+    const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
     const node = KArrowUtil.setArrow(kTreeNode, ks);
     this.kTree = node;
     const flatNodes = TreeNodeUtil.toArrayWithoutClose(node);
-    const rows = KTreeUtil.makeDragMap(flatNodes, ks);
-    this.rows = rows;
 
     const nodeActionProps = {
-      ks,
+      ks, stageRef: this.stageRef,
       expand: (target: KWithArrow) => this.expand(target, !target.open)
     };
 

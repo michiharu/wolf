@@ -81,11 +81,20 @@ export default class KTreeUtil {
     return {...node, children, index, depth};
   }
 
-  static setCalcProps = <T extends KTreeNode>(node: T, ks: KSize): T => {
+  static setCalcProps = <T extends KTreeNode>(node: T, ks: KSize, startAt: Point = {x: ks.spr.w, y: ks.spr.h}): T => {
     var kNode = KTreeUtil._setSize(node, ks);
-    kNode = KTreeUtil._setPoint({x: ks.spr.w, y: ks.spr.h}, kNode, ks);
+    kNode = KTreeUtil._setPoint(startAt, kNode, ks);
     kNode = KTreeUtil._setIndexAndDepth(0, 0, kNode);
     return kNode;
+  }
+
+  static setCalcPropsForMemos = <T extends KTreeNode>(memos: T[], ks: KSize): T[] => {
+    var anchor = ks.spr.h;
+    return memos.map(node => {
+      const calcedNode = KTreeUtil.setCalcProps(node, ks, {x: ks.spr.w, y: anchor});
+      anchor += calcedNode.self.h;
+      return calcedNode;
+    });
   }
 
   static makeBaseDragMap = <T extends KTreeNode>(node: T): DragRow[] => {

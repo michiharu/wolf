@@ -29,6 +29,7 @@ export interface KNodeProps {
   dragEnd: (node: KTreeNode, point: Point) => void;
   dragAnimationEnd: () => void;
   deleteFocus: () => void;
+  stageRef: React.RefObject<any>;
 }
 
 class KNode extends React.Component<KNodeProps> {
@@ -40,10 +41,43 @@ class KNode extends React.Component<KNodeProps> {
     process.nextTick(() => this.setState({}));
   }
 
+  onMouseEnterBaseRect = (e: any) => {
+    e.cancelBubble = true;
+    const stage = this.props.stageRef.current;
+    if (stage !== null) {
+      stage.container().style.cursor = 'grab';
+    }
+  }
+
+  onMouseLeaveBaseRect = (e: any) => {
+    e.cancelBubble = true;
+    const stage = this.props.stageRef.current;
+    if (stage !== null) {
+      stage.container().style.cursor = 'default';
+    }
+  }
+
   handleFocus = (e: any) => {
     e.cancelBubble = true;
     const {node, focus} = this.props;
     focus(node);
+  }
+
+  onMouseEnterText = (e: any) => {
+    e.cancelBubble = true;
+    const stage = this.props.stageRef.current;
+    if (stage !== null) {
+      const focus = this.props.node.focus;
+      stage.container().style.cursor = focus ? 'text' : 'grab';
+    }
+  }
+
+  onMouseLeaveText = (e: any) => {
+    e.cancelBubble = true;
+    const stage = this.props.stageRef.current;
+    if (stage !== null) {
+      stage.container().style.cursor = 'default';
+    }
   }
 
   handleExpand = (e: any) => {
@@ -52,8 +86,28 @@ class KNode extends React.Component<KNodeProps> {
     expand(node);
   }
 
+  onMouseEnterExpand = (e: any) => {
+    e.cancelBubble = true;
+    const stage = this.props.stageRef.current;
+    if (stage !== null) {
+      stage.container().style.cursor = 'pointer';
+    }
+  }
+
+  onMouseLeaveExpand = (e: any) => {
+    e.cancelBubble = true;
+    const stage = this.props.stageRef.current;
+    if (stage !== null) {
+      stage.container().style.cursor = 'default';
+    }
+  }
+
   handleDragStart = (e: any) => {
     const {node, dragStart} = this.props;
+    const stage = this.props.stageRef.current;
+    if (stage !== null) {
+      stage.container().style.cursor = 'grabbing';
+    }
     dragStart(node);
   }
 
@@ -72,6 +126,10 @@ class KNode extends React.Component<KNodeProps> {
     const x = node.point.x * ks.unit + dragPoint.x;
     const y = node.point.y * ks.unit + dragPoint.y;
     dragEnd(node, { x, y });
+    const stage = this.props.stageRef.current;
+    if (stage !== null) {
+      stage.container().style.cursor = 'default';
+    }
     if (mode === 'dc' && x < 0) {
       e.target.destroy();
       process.nextTick(() => dragAnimationEnd());
@@ -104,6 +162,8 @@ class KNode extends React.Component<KNodeProps> {
       shadowBlur: 6,
       shadowOffsetY: node.focus ? 0 : 3,
       shadowOpacity: node.focus ? 1 : 0.2,
+      onMouseEnter: this.onMouseEnterBaseRect,
+      onMouseLeave: this.onMouseLeaveBaseRect,
     };
 
     const labelProps = {
@@ -112,7 +172,9 @@ class KNode extends React.Component<KNodeProps> {
         : node.label,
       fontSize: ks.fontSize * ks.unit,
       x: (ks.rect.h + ks.fontSize / 2) * ks.unit,
-      y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit
+      y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit,
+      onMouseEnter: this.onMouseEnterText,
+      onMouseLeave: this.onMouseLeaveText,
     };
 
     const typeProps: IconProps = {
@@ -189,6 +251,8 @@ class KNode extends React.Component<KNodeProps> {
       svg: node.open ? less : more,
       badgeContent: node.children.length,
       onClick: this.handleExpand,
+      onMouseEnter: this.onMouseEnterExpand,
+      onMouseLeave: this.onMouseLeaveExpand,
     };
 
     return (

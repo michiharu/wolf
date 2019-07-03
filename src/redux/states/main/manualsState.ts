@@ -68,6 +68,7 @@ export const manualReducer = reducerWithInitialState(initialState)
   }
 )
 
+.case(manualAction.update, (state, node) => ({...state, node}))
 .case(manualAction.clear, (state) => ({...state, manual: null, node: null}))
 
 // Favorite
