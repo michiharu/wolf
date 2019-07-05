@@ -171,7 +171,7 @@ export default class TreeUtil {
     const parentNode = TreeUtil._getPrent(node, from);
     const childrenIds = parentNode!.children.map(c => c.id);
     const isNext = childrenIds.indexOf(from.id) + 1 === childrenIds.indexOf(to.id);
-    const deletedTree = TreeUtil._deleteById(node, from.id); 
+    const deletedTree = TreeUtil._deleteById(node, from.id);
     return TreeUtil._insert(deletedTree, from, to, isNext);
   }
 

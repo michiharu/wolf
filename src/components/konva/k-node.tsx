@@ -1,12 +1,11 @@
-import * as React from 'react';
-import { lightBlue, amber, yellow, grey } from '@material-ui/core/colors';
+import React, { useRef, memo } from 'react';
+import { lightBlue, amber, yellow } from '@material-ui/core/colors';
 import Konva from 'konva';
-import { Rect, Group, Text, Arrow } from 'react-konva';
-import { task, switchSvg, flag } from '../../resource/svg-icon';
+import { Rect, Group, Text } from 'react-konva';
+import { task, switchSvg } from '../../resource/svg-icon';
 
 import { KWithArrow, KTreeNode, Point, isTask, isSwitch } from '../../data-types/tree';
 
-import { theme } from '../..';
 import Util from '../../func/util';
 import { phrase } from '../../settings/phrase';
 import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
@@ -15,10 +14,9 @@ import check from '../../resource/svg-icon/check';
 import Icon, { IconProps } from './icon';
 import more from '../../resource/svg-icon/expand/more';
 import less from '../../resource/svg-icon/expand/less';
-import { NodeEditMode } from '../../data-types/node-edit-mode';
+import TreeUtil from '../../func/tree';
 
 export interface KNodeProps {
-  mode: NodeEditMode;
   node: KWithArrow;
   labelFocus: boolean;
   ks: KSize;
@@ -26,253 +24,235 @@ export interface KNodeProps {
   expand: (node: KWithArrow) => void;
   dragStart: (node: KTreeNode) => void;
   dragMove: (node: KTreeNode, point: Point) => void;
-  dragEnd: (node: KTreeNode, point: Point) => void;
-  dragAnimationEnd: () => void;
-  deleteFocus: () => void;
+  getCurrentTree: () => KTreeNode;
+  dragEnd: () => void;
   stageRef: React.RefObject<any>;
 }
 
-class KNode extends React.Component<KNodeProps> {
-  
-  baseRef = React.createRef<any>();
-  draggableRef = React.createRef<any>();
+const KNode: React.FC<KNodeProps> = memo(props => {
 
-  componentDidMount() {
-    process.nextTick(() => this.setState({}));
-  }
+  const { node, ks, stageRef } = props;
 
-  onMouseEnterBaseRect = (e: any) => {
+  const baseRef = useRef<any>(null);
+  const draggableRef = useRef<any>(null);
+  const rectRef = useRef<any>(null);
+
+  const onMouseEnterBaseRect = (e: any) => {
     e.cancelBubble = true;
-    const stage = this.props.stageRef.current;
+    const stage = stageRef.current;
     if (stage !== null) {
       stage.container().style.cursor = 'grab';
     }
   }
 
-  onMouseLeaveBaseRect = (e: any) => {
+  const onMouseLeaveBaseRect = (e: any) => {
     e.cancelBubble = true;
-    const stage = this.props.stageRef.current;
+    const stage = stageRef.current;
     if (stage !== null) {
       stage.container().style.cursor = 'default';
     }
   }
 
-  handleFocus = (e: any) => {
+  const handleFocus = (e: any) => {
     e.cancelBubble = true;
-    const {node, focus} = this.props;
-    focus(node);
+    props.focus(node);
   }
 
-  onMouseEnterText = (e: any) => {
+  const onMouseEnterText = (e: any) => {
     e.cancelBubble = true;
-    const stage = this.props.stageRef.current;
+    const stage = stageRef.current;
     if (stage !== null) {
-      const focus = this.props.node.focus;
-      stage.container().style.cursor = focus ? 'text' : 'grab';
+      const isFocus = node.focus;
+      stage.container().style.cursor = isFocus ? 'text' : 'grab';
     }
   }
 
-  onMouseLeaveText = (e: any) => {
+  const onMouseLeaveText = (e: any) => {
     e.cancelBubble = true;
-    const stage = this.props.stageRef.current;
+    const stage = stageRef.current;
     if (stage !== null) {
       stage.container().style.cursor = 'default';
     }
   }
 
-  handleExpand = (e: any) => {
+  const handleExpand = (e: any) => {
     e.cancelBubble = true;
-    const {node, expand} = this.props;
-    expand(node);
+    props.expand(node);
   }
 
-  onMouseEnterExpand = (e: any) => {
+  const onMouseEnterExpand = (e: any) => {
     e.cancelBubble = true;
-    const stage = this.props.stageRef.current;
+    const stage = stageRef.current;
     if (stage !== null) {
       stage.container().style.cursor = 'pointer';
     }
   }
 
-  onMouseLeaveExpand = (e: any) => {
+  const onMouseLeaveExpand = (e: any) => {
     e.cancelBubble = true;
-    const stage = this.props.stageRef.current;
+    const stage = stageRef.current;
     if (stage !== null) {
       stage.container().style.cursor = 'default';
     }
   }
 
-  handleDragStart = (e: any) => {
-    const {node, dragStart} = this.props;
-    const stage = this.props.stageRef.current;
-    if (stage !== null) {
-      stage.container().style.cursor = 'grabbing';
+  const handleDown = () => {
+    if (!node.focus) {
+      
     }
-    dragStart(node);
   }
 
-  handleDragMove = (e: any) => {
-    const {node, ks, dragMove} = this.props;
+  const handleDragStart = () => {
+    rectRef.current!.to({
+      shadowColor: 'black',
+      shadowBlur: 10,
+      shadowOffsetY: 6,
+      shadowOpacity: 0.3,
+      duration: 0.1
+    });
+    draggableRef.current.to({
+      scaleX: 1.1,
+      scaleY: 1.1,
+      x: -node.rect.w * ks.unit * 0.05,
+      duration: 0.1
+    });
+    stageRef.current!.container().style.cursor = 'grabbing';
+    props.dragStart(node);
+  }
+
+  const handleDragMove = (e: any) => {
     const dragPoint = e.target.position();
-    dragMove(node, {
+    e.target.x(-node.rect.w * ks.unit * 0.05 + dragPoint.x);
+    e.target.y(-node.rect.h * ks.unit * 0.05 + dragPoint.y);
+    
+    props.dragMove(node, {
       x: node.point.x * ks.unit + dragPoint.x,
       y: node.point.y * ks.unit + dragPoint.y
     });
   }
 
-  handleDragEnd = (e: any) => {
-    const {mode, node, ks, dragEnd, dragAnimationEnd} = this.props;
-    const dragPoint = e.target.position();
-    const x = node.point.x * ks.unit + dragPoint.x;
-    const y = node.point.y * ks.unit + dragPoint.y;
-    dragEnd(node, { x, y });
-    const stage = this.props.stageRef.current;
-    if (stage !== null) {
-      stage.container().style.cursor = 'default';
-    }
-    if (mode === 'dc' && x < 0) {
-      e.target.destroy();
-      process.nextTick(() => dragAnimationEnd());
-    } else {
-      e.target.to({
-        x: 0, y: 0, easing: Konva.Easings.EaseInOut,
-        onFinish: dragAnimationEnd,
-      });
-    }
+  const handleUp = () => {
+    
   }
 
-  handleDeleteFocus = (e: any) => {
-    e.cancelBubble = true;
-    this.props.deleteFocus();
+  const handleDragEnd = () => {
+    stageRef.current!.container().style.cursor = 'default';
+    draggableRef.current.to({
+      x: 0,
+      y: 0,
+      scaleX: 1,
+      scaleY: 1,
+      easing: Konva.Easings.EaseInOut,
+      onFinish: props.dragEnd
+    });
+    const currentTree = props.getCurrentTree();
+    const ct = TreeUtil._find(currentTree, node.id)!;
+    baseRef.current!.to({
+      x: ct.point.x * ks.unit,
+      y: ct.point.y * ks.unit,
+      easing: Konva.Easings.EaseInOut
+    });
   }
-  
-  render() {
-    const { node, ks, labelFocus } = this.props;
-    const fill = isTask(node.type) ? lightBlue[50] :
-               isSwitch(node.type) ? amber[100] : yellow[100];
-    const baseRectProps = {
-      x: 0, y: 0,
-      width: node.rect.w * ks.unit,
-      height: node.rect.h * ks.unit,
-      cornerRadius: 4,
-      fill,
-      stroke: node.focus ? '#80bdff' : '#0000',
-      strokeWidth: 6,
-      shadowColor: node.focus ? '#80bdff' : 'black',
-      shadowBlur: 6,
-      shadowOffsetY: node.focus ? 0 : 3,
-      shadowOpacity: node.focus ? 1 : 0.2,
-      onMouseEnter: this.onMouseEnterBaseRect,
-      onMouseLeave: this.onMouseLeaveBaseRect,
-    };
 
-    const labelProps = {
-      text: Util.isEmpty(node.label)
-        ? isTask(node.type) ? phrase.empty.task : isSwitch(node.type) ? phrase.empty.switch : phrase.empty.case
-        : node.label,
-      fontSize: ks.fontSize * ks.unit,
-      x: (ks.rect.h + ks.fontSize / 2) * ks.unit,
-      y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit,
-      onMouseEnter: this.onMouseEnterText,
-      onMouseLeave: this.onMouseLeaveText,
-    };
+  const fill = isTask(node.type) ? lightBlue[50] :
+    isSwitch(node.type) ? amber[100] : yellow[100];
 
-    const typeProps: IconProps = {
-      ks,
-      x: 0, y: 0,
-      svg: isTask(node.type) ? task : isSwitch(node.type) ? switchSvg : check,
-      scale: isSwitch(node.type) ? {x: 1, y: -1} : undefined,
-    };
+  const baseRectProps = {
+    x: 0, y: 0,
+    width: node.rect.w * ks.unit,
+    height: node.rect.h * ks.unit,
+    cornerRadius: 4,
+    fill,
+    onMouseEnter: onMouseEnterBaseRect,
+    onMouseLeave: onMouseLeaveBaseRect,
+  };
 
-    // onTouchStart?(evt: Konva.KonvaEventObject<TouchEvent>): void;
-    // onTouchMove?(evt: Konva.KonvaEventObject<TouchEvent>): void;
-    // onTouchEnd?(evt: Konva.KonvaEventObject<TouchEvent>): void;
+  const rectProps = node.focus ? {
+    ...baseRectProps,
+    stroke: '#80bdff',
+    shadowColor: '#80bdff',
+    strokeWidth: 6,
+    shadowBlur: 6,
+    shadowOffsetY: 0,
+    shadowOpacity: 1,
+  } : baseRectProps;
 
-    const rectGroupProps = {
-      x: 0, y:0,
-      ref: this.draggableRef,
-      onClick: this.handleFocus,
-      onTap: this.handleFocus,
-      draggable: true,
-      onDragStart: this.handleDragStart,
-      onTouchStart: this.handleDragStart,
-      onDragMove: this.handleDragMove,
-      onTouchMove: this.handleDragMove,
-      onDragEnd: this.handleDragEnd,
-      onTouchEnd: this.handleDragEnd,
-    };
+  const labelProps = {
+    text: Util.isEmpty(node.label)
+      ? isTask(node.type) ? phrase.empty.task : isSwitch(node.type) ? phrase.empty.switch : phrase.empty.case
+      : node.label,
+    fontSize: ks.fontSize * ks.unit,
+    x: (ks.rect.h + ks.fontSize / 2) * ks.unit,
+    y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit,
+    onMouseEnter: onMouseEnterText,
+    onMouseLeave: onMouseLeaveText,
+  };
 
-    const baseEl = this.baseRef.current;
-    const draggableEl = this.draggableRef.current;
-    // dragElが要素の参照を持っていてもなぜか座標を持っていない場合があるため x の値をチェック
-    const willAnimation = baseEl !== null && draggableEl !== null &&
+  const typeProps: IconProps = {
+    ks,
+    x: 0, y: 0,
+    svg: isTask(node.type) ? task : isSwitch(node.type) ? switchSvg : check,
+    scale: isSwitch(node.type) ? { x: 1, y: -1 } : undefined,
+  };
+
+  // onTouchStart?(evt: Konva.KonvaEventObject<TouchEvent>): void;
+  // onTouchMove?(evt: Konva.KonvaEventObject<TouchEvent>): void;
+  // onTouchEnd?(evt: Konva.KonvaEventObject<TouchEvent>): void;
+
+  const rectGroupProps = {
+    x: 0, y: 0,
+    ref: draggableRef,
+    onClick: handleFocus,
+    onTap: handleFocus,
+    draggable: true,
+    onMouseDown: handleDown,
+    onDragStart: handleDragStart,
+    onTouchStart: handleDragStart,
+    onDragMove: handleDragMove,
+    onTouchMove: handleDragMove,
+    onMouseUp: handleUp,
+    onDragEnd: handleDragEnd,
+    onTouchEnd: handleDragEnd,
+  };
+
+  const baseEl = baseRef.current;
+  const draggableEl = draggableRef.current;
+  // dragElが要素の参照を持っていてもなぜか座標を持っていない場合があるため x の値をチェック
+  const willAnimation = baseEl !== null && draggableEl !== null &&
     (baseEl.x() !== 0 && !draggableEl.isDragging());
-
-    if (willAnimation) {
-      baseEl.to({
-        x: node.point.x * ks.unit,
-        y: node.point.y * ks.unit,
-        easing: Konva.Easings.EaseInOut
-      });
-    }
-
-    const x = !willAnimation ? node.point.x * ks.unit : undefined;
-    const y = !willAnimation ? node.point.y * ks.unit : undefined;
-
-    const containerRectProps = {
-      x: (ks.indent / 2 - ks.spr.w) * ks.unit,
-      y: ks.spr.h * ks.unit,
-      width: (node.self.w - (ks.indent / 2 - ks.spr.w)) * ks.unit,
-      height: (node.self.h - ks.spr.h) * ks.unit,
-      onClick: this.handleDeleteFocus,
-      onTap: this.handleDeleteFocus,
-      cornerRadius: ks.cornerRadius * ks.unit,
-      stroke: grey[500],
-      fill: node.depth.top === 0 ? theme.palette.background.paper : '#00000009',
-      strokeWidth: ks.hasArrow ? 0 : 1,
-    };
-
-    const arrowBaseProps = {
-      stroke: grey[700],
-      fill: grey[700],
-      pointerLength: ks.pointerLength * ks.unit,
-      pointerWidth: ks.pointerWidth * ks.unit,
-    }
-    const endIconProps: IconProps = {
-      ks,
-      x: -ks.rect.h * ks.unit, y: 0,
-      svg: flag,
-      color: theme.palette.secondary.main,
-    };
-
-    const expandProps: IconWithBadgeProps = {
-      ks,
-      x: (ks.rect.w - ks.rect.h) * ks.unit, y: 0,
-      svg: node.open ? less : more,
-      badgeContent: node.children.length,
-      onClick: this.handleExpand,
-      onMouseEnter: this.onMouseEnterExpand,
-      onMouseLeave: this.onMouseLeaveExpand,
-    };
-
-    return (
-      <Group ref={this.baseRef} x={x} y={y} >
-        <Group {...rectGroupProps}>
-          
-          {node.open && <Rect {...containerRectProps}/>}
-          <Rect {...baseRectProps}/>
-          <Icon {...typeProps}/>
-          {!(node.focus && labelFocus) &&  <Text {...labelProps}/>}
-          <IconWithBadge {...expandProps}/>
-          {ks.hasArrow && node.arrows.map((a, i) => {
-            const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
-            return <Arrow key={`${node.id}-arrow-${i}`} {...arrowBaseProps} points={points}/>;
-          })}
-          {node.arrows.length === 0 && node.depth.top !== 0 && <Icon {...endIconProps}/>}
-        </Group>
-      </Group>
-    );
+  if (willAnimation) {
+    baseEl.to({
+      x: node.point.x * ks.unit,
+      y: node.point.y * ks.unit,
+      easing: Konva.Easings.EaseInOut
+    });
   }
-}
+
+  const x = !willAnimation ? node.point.x * ks.unit : undefined;
+  const y = !willAnimation ? node.point.y * ks.unit : undefined;
+
+  const expandProps: IconWithBadgeProps = {
+    ks,
+    x: (ks.rect.w - ks.rect.h) * ks.unit, y: 0,
+    svg: node.open ? less : more,
+    badgeContent: node.children.length,
+    onClick: handleExpand,
+    onMouseEnter: onMouseEnterExpand,
+    onMouseLeave: onMouseLeaveExpand,
+  };
+
+  return (
+    <Group ref={baseRef} x={x} y={y} >
+      <Group {...rectGroupProps}>
+        <Rect ref={rectRef} {...rectProps} />
+        <Icon {...typeProps} />
+        {!(node.focus && props.labelFocus) && <Text {...labelProps} />}
+        <IconWithBadge {...expandProps} />
+      </Group>
+    </Group>
+  );
+}, (prev, next) => {
+  return !prev.node.isDragging && next.node.isDragging;
+});
 
 export default KNode;

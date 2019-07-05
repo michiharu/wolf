@@ -20,20 +20,27 @@ export interface KNodeProps {
   node: KWithArrow;
   labelFocus: boolean;
   ks: KSize;
+  deleteFocus: () => void;
 }
 
 class KShadow extends React.Component<KNodeProps> {
-  
+
   groupRef = React.createRef<any>();
 
   componentWillUnmount() {
     this.groupRef.current!.destroy();
   }
-  
+
+  handleDeleteFocus = (e: any) => {
+    e.cancelBubble = true;
+    this.props.deleteFocus();
+  }
+
   render() {
     const { node, ks, labelFocus } = this.props;
-    const fill = isTask(node.type) ? lightBlue[50] :
-                  isSwitch(node.type) ? amber[100] : yellow[100];
+    const fill = node.isDragging ? grey[500] :
+      isTask(node.type) ? lightBlue[50] :
+        isSwitch(node.type) ? amber[100] : yellow[100];
     const baseRectProps = {
       x: 0, y: 0,
       width: node.rect.w * ks.unit,
@@ -54,14 +61,14 @@ class KShadow extends React.Component<KNodeProps> {
         : node.label,
       fontSize: ks.fontSize * ks.unit,
       x: (ks.rect.h + ks.fontSize / 2) * ks.unit,
-      y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit
+      y: (ks.rect.h - ks.fontHeight) / 2 * ks.unit,
     };
 
     const typeProps: IconProps = {
       ks,
       x: 0, y: 0,
       svg: isTask(node.type) ? task : isSwitch(node.type) ? switchSvg : check,
-      scale: isSwitch(node.type) ? undefined : {x: 1, y: -1},
+      scale: isSwitch(node.type) ? { x: 1, y: -1 } : undefined,
     };
 
     const dragEl = this.groupRef.current;
@@ -90,6 +97,7 @@ class KShadow extends React.Component<KNodeProps> {
       stroke: grey[500],
       fill: node.depth.top === 0 ? theme.palette.background.paper : '#00000009',
       strokeWidth: ks.hasArrow ? 0 : 1,
+      onClick: this.handleDeleteFocus
     };
 
     const arrowBaseProps = {
@@ -114,16 +122,21 @@ class KShadow extends React.Component<KNodeProps> {
 
     return (
       <Group ref={this.groupRef} {...rectGroupProps}>
-        {node.open && <Rect {...containerRectProps}/>}
-        <Rect {...baseRectProps}/>
-        <Icon {...typeProps}/>
-        {!(node.focus && labelFocus) &&  <Text {...labelProps}/>}
-        <IconWithBadge {...expandProps}/>
-        {ks.hasArrow && node.arrows.map((a, i) => {
-          const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
-          return <Arrow key={`${node.id}-arrow-${i}`} {...arrowBaseProps} points={points}/>;
-        })}
-        {node.arrows.length === 0 && node.depth.top !== 0 && <Icon {...endIconProps}/>}
+        {!node.isDragging && (
+          <>
+            {node.open && <Rect {...containerRectProps} />}
+            <Rect {...baseRectProps} />
+            <Icon {...typeProps} />
+            {!(node.focus && labelFocus) && <Text {...labelProps} />}
+            <IconWithBadge {...expandProps} />
+            {ks.hasArrow && node.arrows.map((a, i) => {
+              const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
+              return <Arrow key={`${node.id}-arrow-${i}`} {...arrowBaseProps} points={points} />;
+            })}
+            {node.arrows.length === 0 && node.depth.top !== 0 && <Icon {...endIconProps} />}
+          </>
+        )}
+
       </Group>
     );
   }

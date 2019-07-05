@@ -121,14 +121,13 @@ const LayoutComponent: React.FC<Props> = props => {
     props.postLike({manualId: manual.id, userId: user.id});
   }
 
-  const modeRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
 
   const classes = useStyles();
   const ShowTree = (
     <div className={classes.body}>
       <Switch>
-        <Route path={`/manual/:id/tree/edit`} render={() => <NodeEditorContainer modeRef={modeRef} buttonRef={buttonRef}/>}/>
+        <Route path={`/manual/:id/tree/edit`} render={() => <NodeEditorContainer buttonRef={buttonRef}/>}/>
         <Route path={`/manual/:id/tree`}      render={() => <NodeViewer/>}/>
         <Route path={`/manual/:id/text`} render={() => <TextEditorContainer buttonRef={buttonRef} isEditing={isEditing}/>}/>
         <Route path={`/manual/:id/settings`}  render={() => <ManualSettings/>}/>
@@ -178,12 +177,6 @@ const LayoutComponent: React.FC<Props> = props => {
           <Tab label="テキスト表示"/>
           <Tab label="設定" disabled={isEditing}/>
         </Tabs>
-        <div style={{flexGrow: 1}} />
-        <div ref={modeRef}/>
-        {(tabIndex === 0 || tabIndex === 1) && isCommiter && !isEditing &&
-        <Box mt={0.7}>
-          <Button component={AdapterLink} to={to} color="primary">編集する</Button>
-        </Box>}
         {tabIndex === 0 && !isEditing &&
         <Box ml={1}>
           <IconButton onClick={handleShowPrintNode}><Print/></IconButton>
@@ -191,6 +184,11 @@ const LayoutComponent: React.FC<Props> = props => {
         {tabIndex === 1 && !isEditing &&
         <Box ml={1}>
           <IconButton onClick={handleShowPrintText}><Print/></IconButton>
+        </Box>}
+        <div style={{flexGrow: 1}} />
+        {(tabIndex === 0 || tabIndex === 1) && isCommiter && !isEditing &&
+        <Box mt={0.7}>
+          <Button component={AdapterLink} to={to} color="primary">編集する</Button>
         </Box>}
         <div ref={buttonRef}/>
         {tabIndex === 0 &&
