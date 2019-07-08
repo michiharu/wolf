@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import classnames from 'classnames';
 
 import {
-  Theme, createStyles, WithStyles, withStyles, TextField, Button,
+  Theme, TextField, Button,
   InputAdornment, FormControl, Select, MenuItem, IconButton, Typography, Paper, Box, Collapse
 } from '@material-ui/core';
 import {
@@ -14,8 +14,9 @@ import {
 import { TreeNode, Type, isTask, isSwitch, isCase } from '../../../../data-types/tree';
 
 import { phrase } from '../../../../settings/phrase';
+import { makeStyles } from '@material-ui/styles';
 
-const styles = (theme: Theme) => createStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     position: 'relative',
     marginTop: theme.spacing(2),
@@ -61,23 +62,24 @@ const styles = (theme: Theme) => createStyles({
     top: -theme.spacing(2),
     right: -theme.spacing(2),
   }
-});
+}));
 
 export interface TextLineWithIconProps {
   itemNumber: string;
   node: TreeNode;
   isEditing: boolean;
+  showChildren: boolean;
   changeNode: (node: TreeNode) => void;
 }
 
-interface Props extends TextLineWithIconProps, WithStyles<typeof styles> { }
+interface Props extends TextLineWithIconProps { }
 
 const TextLineWithIcon: React.FC<Props> = (props: Props) => {
   var fileReader: FileReader;
   var fileName: string;
 
-  const { itemNumber, node, changeNode, isEditing, classes } = props;
-  const [open, setOpen] = useState(false);
+  const { itemNumber, node, changeNode, isEditing, showChildren } = props;
+  const [open, setOpen] = useState(isEditing);
   function handleOpenClose() {
     setOpen(!open);
   }
@@ -115,6 +117,8 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
   const handleDeleteImage = (node: TreeNode) => () => {
     changeNode({ ...node!, imageName: '', imageBlob: '' })
   }
+
+  const classes = useStyles();
 
   const InputIcon = <InputAdornment position="start"><Input /></InputAdornment>;
 
@@ -262,12 +266,22 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
                 isSwitch(node.type) ? phrase.placeholder.switch : phrase.placeholder.case
             }
             value={node.label}
-            InputProps={{ classes: { input: classes.title } }}
+            InputProps={{ classes: { input: showChildren ? classes.title : undefined } }}
             fullWidth
             disabled={!isEditing}
           />
         </Box>
       </Box>
+      {node.imageBlob.length !== 0 &&
+        <Box mt={1} pl={10} pr={2} justifyContent="center">
+          <Paper className={classes.imageContainer}>
+            <img src={node.imageBlob} className={classes.img} alt={node.imageName} />
+            {isEditing &&
+            <IconButton className={classes.deleteButton} onClick={handleDeleteImage(node)}>
+              <Close />
+            </IconButton>}
+          </Paper>
+        </Box>}
       <Collapse in={!open}>
         {node.input.length !== 0 && InputField}
         {node.output.length !== 0 && OutputField}
@@ -280,6 +294,14 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
       </Collapse>
 
       <Collapse in={open}>
+      {isEditing && node.imageBlob.length === 0 &&
+        <Box mt={1} pl={10} pr={2}>
+          <Button component="label" variant="outlined" className={classes.imageButton} fullWidth>
+            <Image className={classes.imageIcon} />
+            {node.imageName.length !== 0 ? node.imageName : 'ファイルを選択'}
+            <form><input type="file" style={{ display: 'none' }} onChange={handleFileChosen} /></form>
+          </Button>
+        </Box>}
         {InputField}
         {OutputField}
         {PreConditionsField}
@@ -288,30 +310,12 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
         {RemarksField}
         {NecessaryToolsField}
         {ExceptionsField}
-        {isEditing && node.imageBlob.length === 0 &&
-        <Box mt={1} pl={10} pr={2}>
-          <Button component="label" variant="outlined" className={classes.imageButton} fullWidth>
-            <Image className={classes.imageIcon} />
-            {node.imageName.length !== 0 ? node.imageName : 'ファイルを選択'}
-            <form><input type="file" style={{ display: 'none' }} onChange={handleFileChosen} /></form>
-          </Button>
-        </Box>}
       </Collapse>
 
-      {node.imageBlob.length !== 0 &&
-        <Box mt={1} pl={10} pr={2} justifyContent="center">
-          <Paper className={classes.imageContainer}>
-            <img src={node.imageBlob} className={classes.img} alt={node.imageName} />
-            {isEditing &&
-            <IconButton className={classes.deleteButton} onClick={handleDeleteImage(node)}>
-              <Close />
-            </IconButton>}
-          </Paper>
-        </Box>}
-
-      {node.children.map((c, i) => <TextLineWithIcon key={c.id} {...props} itemNumber={`${itemNumber} - ${i + 1}`} node={c} />)}
+      {showChildren && node.children.map((c, i) =>
+      <TextLineWithIcon key={c.id} {...props} itemNumber={`${itemNumber} - ${i + 1}`} node={c} />)}
     </Box>
   );
 };
 
-export default withStyles(styles)(TextLineWithIcon);
+export default TextLineWithIcon;

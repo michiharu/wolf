@@ -24,6 +24,7 @@ import { theme, toolbarHeight } from '../../../..';
 import KShadow from '../../../../components/konva/k-shadow';
 import { KSState } from '../../../../redux/states/ksState';
 import { RSState } from '../../../../redux/states/rsState';
+import TextLineWithIcon, { TextLineWithIconProps } from '../../text/text/text-line-with-icon';
 
 const headerHeight = 96;
 
@@ -66,7 +67,7 @@ interface State {
   didRender: boolean;
   dragParent: TreeNode | null;
   labelFocus: boolean;
-  memoLabelFocus: KTreeNode | null;
+  infoNode: TreeNode | null;
   typeAnchorEl: any;
   deleteFlag: boolean;
   hasDifference: boolean;
@@ -100,7 +101,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
       didRender: false,
       dragParent: null,
       labelFocus: false,
-      memoLabelFocus: null,
+      infoNode: null,
       typeAnchorEl: null,
       deleteFlag: false,
       hasDifference: false,
@@ -199,6 +200,10 @@ class NodeEditorComponent extends React.Component<Props, State> {
     process.nextTick(() => this.resize());
   }
 
+  openInfo = (target: KWithArrow) => {
+    this.setState({infoNode: target});
+  }
+
   focus = (target: KTreeNode) => {
     const { node, rs, edit } = this.props;
     if (!target.focus && rs.playOnClick) {
@@ -229,7 +234,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
   deleteFocus = () => {
     const { node, edit } = this.props;
     edit(TreeNodeUtil._deleteFocus(node));
-    this.setState({labelFocus: false, memoLabelFocus: null});
+    this.setState({labelFocus: false});
     process.nextTick(this.resize);
   }
 
@@ -357,7 +362,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
   render() {
     const { node: tree, isEditing, ks, classes } = this.props;
     const {
-      labelFocus, typeAnchorEl, deleteFlag, dragParent,
+      labelFocus, typeAnchorEl, infoNode, deleteFlag, dragParent,
     } = this.state;
     const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
     const node = KArrowUtil.setArrow(kTreeNode, ks);
@@ -376,6 +381,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
       dragMove: this.dragMove,
       getCurrentTree: this.getCurrentTree,
       dragEnd: this.dragEnd,
+      openInfo: this.openInfo,
       deleteFocus: this.deleteFocus,
       stageRef: this.stageRef,
     };
@@ -536,6 +542,14 @@ class NodeEditorComponent extends React.Component<Props, State> {
       height: Math.max((node.self.h + ks.spr.h * 2) * ks.unit + marginBottom, main.offsetHeight),
     } : undefined;
 
+    const textLineWithIconProps: TextLineWithIconProps = {
+      itemNumber: node.label,
+      node,
+      isEditing,
+      showChildren: false,
+      changeNode: this.changeFocusNode,
+    };
+
     return (
       <div className={classes.root} ref={this.mainRef}>
         <div style={largeContainerStyle}>
@@ -572,6 +586,21 @@ class NodeEditorComponent extends React.Component<Props, State> {
             <Button onClick={() => this.setState({deleteFlag: false})}>キャンセル</Button>
             <Button onClick={this.deleteSelf} color="primary" autoFocus>削除</Button>
           </DialogActions>
+        </Dialog>
+
+        <Dialog open={infoNode !== null} onClose={() => this.setState({infoNode: null})} maxWidth="sm" fullWidth>
+          {infoNode !== null && (
+          <>
+            <DialogTitle>{infoNode!.label}</DialogTitle>
+
+            <DialogContent>
+              <TextLineWithIcon {...textLineWithIconProps}/>
+            </DialogContent>
+
+            <DialogActions>
+              <Button onClick={() => this.setState({infoNode: null})}>OK</Button>
+            </DialogActions>
+          </>)}
         </Dialog>
       </div>
     );

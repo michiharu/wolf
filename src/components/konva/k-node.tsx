@@ -12,6 +12,7 @@ import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
 import KSize from '../../data-types/k-size';
 import check from '../../resource/svg-icon/check';
 import Icon, { IconProps } from './icon';
+import info from '../../resource/svg-icon/info';
 import more from '../../resource/svg-icon/expand/more';
 import less from '../../resource/svg-icon/expand/less';
 import TreeUtil from '../../func/tree';
@@ -27,12 +28,13 @@ export interface KNodeProps {
   dragMove: (node: KTreeNode, point: Point) => void;
   getCurrentTree: () => KTreeNode;
   dragEnd: () => void;
+  openInfo: (node: KWithArrow) => void;
   stageRef: React.RefObject<any>;
 }
 
 const KNode: React.FC<KNodeProps> = memo(props => {
 
-  const { node, ks, stageRef } = props;
+  const { node, isEditing, ks, stageRef } = props;
 
   const baseRef = useRef<any>(null);
   const draggableRef = useRef<any>(null);
@@ -81,12 +83,17 @@ const KNode: React.FC<KNodeProps> = memo(props => {
     }
   }
 
+  const handleInfoOpen= (e: any) => {
+    e.cancelBubble = true;
+    props.openInfo(node);
+  }
+
   const handleExpand = (e: any) => {
     e.cancelBubble = true;
     props.expand(node);
   }
 
-  const onMouseEnterExpand = (e: any) => {
+  const onMouseEnterButton = (e: any) => {
     e.cancelBubble = true;
     const stage = stageRef.current;
     if (stage !== null) {
@@ -94,7 +101,7 @@ const KNode: React.FC<KNodeProps> = memo(props => {
     }
   }
 
-  const onMouseLeaveExpand = (e: any) => {
+  const onMouseLeaveButton = (e: any) => {
     e.cancelBubble = true;
     const stage = stageRef.current;
     if (stage !== null) {
@@ -225,14 +232,25 @@ const KNode: React.FC<KNodeProps> = memo(props => {
   const x = !willAnimation ? node.point.x * ks.unit : undefined;
   const y = !willAnimation ? node.point.y * ks.unit : undefined;
 
+  const showExpand = isEditing || node.children.length !== 0;
+
+  const infoProps: IconProps = {
+    ks,
+    x: (ks.rect.w - ks.rect.h * (showExpand ? 2 : 1)) * ks.unit, y: 0,
+    svg: info,
+    onClick: handleInfoOpen,
+    onMouseEnter: onMouseEnterButton,
+    onMouseLeave: onMouseLeaveButton,
+  };
+
   const expandProps: IconWithBadgeProps = {
     ks,
     x: (ks.rect.w - ks.rect.h) * ks.unit, y: 0,
     svg: node.open ? less : more,
     badgeContent: node.children.length,
     onClick: handleExpand,
-    onMouseEnter: onMouseEnterExpand,
-    onMouseLeave: onMouseLeaveExpand,
+    onMouseEnter: onMouseEnterButton,
+    onMouseLeave: onMouseLeaveButton,
   };
 
   return (
@@ -241,8 +259,8 @@ const KNode: React.FC<KNodeProps> = memo(props => {
         <Rect ref={rectRef} {...rectProps} />
         <Icon {...typeProps} />
         {!(node.focus && props.labelFocus) && <Text {...labelProps} />}
-        {(props.isEditing || node.children.length !== 0) && <IconWithBadge {...expandProps} />}
-        
+        <Icon {...infoProps} />       
+        {showExpand && <IconWithBadge {...expandProps} />}
       </Group>
     </Group>
   );

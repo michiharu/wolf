@@ -93,6 +93,7 @@ class TextEditor extends React.Component<Props, State> {
       itemNumber: node.label,
       node,
       isEditing,
+      showChildren: true,
       changeNode: this.changeNode,
     };
     const hasDifference = TreeUtil._hasDifference(this.props.node, this.state.node);
