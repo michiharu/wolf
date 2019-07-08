@@ -80,7 +80,7 @@ const ViewContainer: React.FC<Props> = props => {
     return (
       <Box display="flex" justifyContent="center" alignItems="flex-end" className={classes.box}>
         <Box>
-          <CircularProgress size={60} color="secondary" />
+          <CircularProgress size={60} color="primary" />
         </Box>
       </Box>
     );

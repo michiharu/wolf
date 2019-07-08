@@ -7,7 +7,6 @@ import {
 import { TreeNode, Manual } from '../../../../data-types/tree';
 import TreeUtil from '../../../../func/tree';
 import NodeEditorContainer from '../../node/node-editor/node-editor-container';
-import { MemosState } from '../../../../redux/states/main/memoState';
 import { EditorFrameActions } from './node-editor-frame-container';
 import ViewSettingsContainer from '../../../../components/view-settings/view-settings-container';
 import { NodeEditorProps } from './node-editor-component';
@@ -39,7 +38,7 @@ export const styles = (theme: Theme) => createStyles({
   },
 });
 
-interface Props extends MemosState, EditorFrameActions, RouteComponentProps, WithStyles<typeof styles> {
+interface Props extends EditorFrameActions, RouteComponentProps, WithStyles<typeof styles> {
   manual: Manual;
   node: TreeNode;
   buttonRef: React.RefObject<HTMLDivElement>;
@@ -59,7 +58,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     const { node } = props;
-    if (node === null) { throw new Error('Node cannot be null.'); }
+    console.log('EditorFrameComponent init!');
     this.state = {
       node,
       cannotSaveReason: null,
@@ -77,8 +76,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
     const { node } = this.state;
     const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
     const isAllCaseHasItem = TreeUtil._isAllCaseHasItem(node);
-    const cannotSaveReason: CannotSaveReason = !isAllSwitchHasCase ? 'switch' :
-      !isAllCaseHasItem ? 'case' : null;
+    const cannotSaveReason: CannotSaveReason = !isAllSwitchHasCase ? 'switch' :　!isAllCaseHasItem ? 'case' : null;
     this.setState({ cannotSaveReason });
     if (cannotSaveReason === null) {
       const hasDifference = TreeUtil._hasDifference(this.props.node, this.state.node);
@@ -115,8 +113,6 @@ class EditorFrameComponent extends React.Component<Props, State> {
               <Button color="primary" onClick={this.save}>編集完了</Button>
             </Box>
           </Portal>)}
-
-
         <Prompt
           when={hasDifference && !saved}
           message="編集内容を保存していません。編集を終了して良いですか？"

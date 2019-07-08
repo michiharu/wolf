@@ -300,7 +300,9 @@ class NodeEditorComponent extends React.Component<Props, State> {
 
   changeFocusNode = (target: TreeNode) => {
     const { node, edit } = this.props;
+    const {infoNode} = this.state;
     edit(TreeUtil._replace(node, target));
+    if (infoNode !== null) { this.setState({infoNode: target}); }
   }
 
   changeType = (type: Type) => {
@@ -547,7 +549,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
 
     const textLineWithIconProps: TextLineWithIconProps = {
       itemNumber: node.label,
-      node,
+      node: infoNode!,
       isEditing,
       showChildren: false,
       changeNode: this.changeFocusNode,
