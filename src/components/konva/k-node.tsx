@@ -18,6 +18,7 @@ import TreeUtil from '../../func/tree';
 
 export interface KNodeProps {
   node: KWithArrow;
+  isEditing: boolean;
   labelFocus: boolean;
   ks: KSize;
   focus: (node: KWithArrow) => void;
@@ -39,6 +40,7 @@ const KNode: React.FC<KNodeProps> = memo(props => {
 
   const onMouseEnterBaseRect = (e: any) => {
     e.cancelBubble = true;
+    if (!props.isEditing) { return; }
     const stage = stageRef.current;
     if (stage !== null) {
       stage.container().style.cursor = 'grab';
@@ -47,6 +49,7 @@ const KNode: React.FC<KNodeProps> = memo(props => {
 
   const onMouseLeaveBaseRect = (e: any) => {
     e.cancelBubble = true;
+    if (!props.isEditing) { return; }
     const stage = stageRef.current;
     if (stage !== null) {
       stage.container().style.cursor = 'default';
@@ -55,11 +58,13 @@ const KNode: React.FC<KNodeProps> = memo(props => {
 
   const handleFocus = (e: any) => {
     e.cancelBubble = true;
+    if (!props.isEditing) { return; }
     props.focus(node);
   }
 
   const onMouseEnterText = (e: any) => {
     e.cancelBubble = true;
+    if (!props.isEditing) { return; }
     const stage = stageRef.current;
     if (stage !== null) {
       const isFocus = node.focus;
@@ -69,6 +74,7 @@ const KNode: React.FC<KNodeProps> = memo(props => {
 
   const onMouseLeaveText = (e: any) => {
     e.cancelBubble = true;
+    if (!props.isEditing) { return; }
     const stage = stageRef.current;
     if (stage !== null) {
       stage.container().style.cursor = 'default';
@@ -93,12 +99,6 @@ const KNode: React.FC<KNodeProps> = memo(props => {
     const stage = stageRef.current;
     if (stage !== null) {
       stage.container().style.cursor = 'default';
-    }
-  }
-
-  const handleDown = () => {
-    if (!node.focus) {
-      
     }
   }
 
@@ -129,10 +129,6 @@ const KNode: React.FC<KNodeProps> = memo(props => {
       x: node.point.x * ks.unit + dragPoint.x,
       y: node.point.y * ks.unit + dragPoint.y
     });
-  }
-
-  const handleUp = () => {
-    
   }
 
   const handleDragEnd = () => {
@@ -204,13 +200,11 @@ const KNode: React.FC<KNodeProps> = memo(props => {
     ref: draggableRef,
     onClick: handleFocus,
     onTap: handleFocus,
-    draggable: true,
-    onMouseDown: handleDown,
+    draggable: props.isEditing,
     onDragStart: handleDragStart,
     onTouchStart: handleDragStart,
     onDragMove: handleDragMove,
     onTouchMove: handleDragMove,
-    onMouseUp: handleUp,
     onDragEnd: handleDragEnd,
     onTouchEnd: handleDragEnd,
   };
@@ -247,7 +241,8 @@ const KNode: React.FC<KNodeProps> = memo(props => {
         <Rect ref={rectRef} {...rectProps} />
         <Icon {...typeProps} />
         {!(node.focus && props.labelFocus) && <Text {...labelProps} />}
-        <IconWithBadge {...expandProps} />
+        {(props.isEditing || node.children.length !== 0) && <IconWithBadge {...expandProps} />}
+        
       </Group>
     </Group>
   );

@@ -227,7 +227,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
     </Box>);
 
   return (
-    <Box pl={2} py={2}>
+    <Box py={2}>
       <Box display="flex" flexDirection="row" alignItems="flex-end" pr={2}>
         <Box pr={1}>
           <FormControl>

@@ -42,6 +42,7 @@ export const styles = (theme: Theme) => createStyles({
 interface Props extends MemosState, EditorFrameActions, RouteComponentProps, WithStyles<typeof styles> {
   manual: Manual;
   node: TreeNode;
+  isEditing: boolean;
   buttonRef: React.RefObject<HTMLDivElement>;
 }
 
@@ -69,7 +70,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
   }
 
   edit = (editNode: TreeNode) => {
-    this.setState({node: editNode});
+    this.setState({ node: editNode });
   }
 
   save = () => {
@@ -78,69 +79,71 @@ class EditorFrameComponent extends React.Component<Props, State> {
     const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
     const isAllCaseHasItem = TreeUtil._isAllCaseHasItem(node);
     const cannotSaveReason: CannotSaveReason = !isAllSwitchHasCase ? 'switch' :
-                                               !isAllCaseHasItem   ? 'case'   : null;
-    this.setState({cannotSaveReason});
+      !isAllCaseHasItem ? 'case' : null;
+    this.setState({ cannotSaveReason });
     if (cannotSaveReason === null) {
       const hasDifference = TreeUtil._hasDifference(this.props.node, this.state.node);
       if (hasDifference) {
-        const params: TreePutRequest = {manualId: manual.id, rootTree: node };
+        const params: TreePutRequest = { manualId: manual.id, rootTree: node };
         putTree(params);
       }
-      this.setState({saved: true})
+      this.setState({ saved: true })
       process.nextTick(() => history.push(`/manual/${manual.id}/tree`));
     }
   }
 
   handleCancel = () => this.props.history.goBack();
 
-  handleShowVS = (showVS: boolean) => () => this.setState({showVS});
+  handleShowVS = (showVS: boolean) => () => this.setState({ showVS });
 
   render() {
-    const { buttonRef, classes } = this.props;
+    const { isEditing, buttonRef, classes } = this.props;
     const { node, cannotSaveReason, showVS, saved } = this.state;
-  
+
     const nodeProps: NodeEditorProps = {
       node,
+      isEditing,
       edit: this.edit,
     };
 
     const hasDifference = TreeUtil._hasDifference(this.props.node, this.state.node);
     return (
       <div>
+        {isEditing && (
+          <Portal container={buttonRef.current}>
+            <Box display="flex" flexDirection="row" mt={0.7}>
+              <Button onClick={this.handleCancel}>キャンセル</Button>
+              <Button color="primary" onClick={this.save}>編集完了</Button>
+            </Box>
+          </Portal>)}
 
-        <Portal container={buttonRef.current}>
-          <Box display="flex" flexDirection="row" mt={0.7}>
-            <Button onClick={this.handleCancel}>キャンセル</Button>
-            <Button color="primary" onClick={this.save}>編集完了</Button>
-          </Box>
-        </Portal>
 
         <Prompt
           when={hasDifference && !saved}
           message="編集内容を保存していません。編集を終了して良いですか？"
         />
 
-        <NodeEditorContainer {...nodeProps}/>
+        <NodeEditorContainer {...nodeProps} />
 
         <Modal
           open={showVS}
           onClose={this.handleShowVS(false)}
-          BackdropProps={{className: classes.viewSettingModal}}
+          BackdropProps={{ className: classes.viewSettingModal }}
           disableAutoFocus
         >
           <ViewSettingsContainer />
         </Modal>
 
-        <Dialog open={cannotSaveReason !== null} onClose={() => this.setState({cannotSaveReason: null})}>
+        <Dialog open={cannotSaveReason !== null} onClose={() => this.setState({ cannotSaveReason: null })}>
           <DialogTitle>このデータは保存できません</DialogTitle>
           <DialogContent>
             <DialogContentText>
               {cannotSaveReason === 'switch' && 'すべての分岐には、１つ以上の条件を設定して下さい。'}
-              {cannotSaveReason === 'case'   && 'すべての条件には、１つ以上の詳細項目を設定して下さい。'}
+              {cannotSaveReason === 'case' && 'すべての条件には、１つ以上の詳細項目を設定して下さい。'}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => this.setState({cannotSaveReason: null})} color="primary" autoFocus>OK</Button>
+            <Button onClick={() => this.setState({ cannotSaveReason: null })} color="primary" autoFocus>OK</Button>
           </DialogActions>
         </Dialog>
       </div>

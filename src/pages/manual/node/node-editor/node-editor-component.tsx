@@ -24,7 +24,8 @@ import { theme, toolbarHeight } from '../../../..';
 import KShadow from '../../../../components/konva/k-shadow';
 import { KSState } from '../../../../redux/states/ksState';
 import { RSState } from '../../../../redux/states/rsState';
-import { headerHeight } from '../node-viewer/node-viewer-component';
+
+const headerHeight = 96;
 
 export const styles = (theme: Theme) => createStyles({
   root: {
@@ -55,6 +56,7 @@ export const styles = (theme: Theme) => createStyles({
 
 export interface NodeEditorProps {
   node: TreeNode;
+  isEditing: boolean;
   edit: (node: TreeNode) => void;
 }
 
@@ -170,7 +172,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
     setTimeout(() => {
       edit(TreeNodeUtil._focus(kTree, result.newNode.id));
       this.setState({labelFocus: true});
-      process.nextTick(() => this.labelRef.current!.focus());
+      process.nextTick(this.labelRef.current!.focus);
     }, 300);
 
     if (main.scrollTop + main.offsetHeight < (focusNode.point.y + ks.rect.h) * ks.unit) {
@@ -215,11 +217,11 @@ class NodeEditorComponent extends React.Component<Props, State> {
       const newNode = TreeNodeUtil._focus(node, target.id);
       edit(newNode);
       this.setState({labelFocus: false});
-      process.nextTick(() => this.resize());
+      process.nextTick(this.resize);
     } else {
       if (target.depth.top !== 0) {
         this.setState({labelFocus: true});
-        process.nextTick(() => this.labelRef.current!.focus());
+        process.nextTick(this.labelRef.current!.focus);
       }
     }
   }
@@ -228,7 +230,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
     const { node, edit } = this.props;
     edit(TreeNodeUtil._deleteFocus(node));
     this.setState({labelFocus: false, memoLabelFocus: null});
-    process.nextTick(() => this.resize());
+    process.nextTick(this.resize);
   }
 
   dragStart = (target: KTreeNode) => {
@@ -333,7 +335,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
     const focusNode = TreeNodeUtil._getFocusNode(node)!;
     const addDetailsNode = TreeNodeUtil.addDetails(node, focusNode);
     edit(addDetailsNode);
-    process.nextTick(() => this.resize());
+    process.nextTick(this.resize);
   }
 
   addNextBrother = () => {
@@ -349,11 +351,11 @@ class NodeEditorComponent extends React.Component<Props, State> {
     const focusNode = TreeNodeUtil._getFocusNode(node)!;
     edit(TreeUtil._deleteById(node, focusNode.id));
     this.setState({deleteFlag: false});
-    process.nextTick(() => this.resize());
+    process.nextTick(this.resize);
   }
 
   render() {
-    const { node: tree, ks, classes } = this.props;
+    const { node: tree, isEditing, ks, classes } = this.props;
     const {
       labelFocus, typeAnchorEl, deleteFlag, dragParent,
     } = this.state;
@@ -366,6 +368,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
 
     const stage = this.stageRef.current;
     const nodeActionProps = {
+      isEditing,
       ks,
       focus: this.focus,
       expand: (target: KWithArrow) => this.expand(target, !target.open),

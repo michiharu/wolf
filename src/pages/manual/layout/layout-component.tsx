@@ -5,7 +5,6 @@ import {
 import ViewSettingsIcon from '@material-ui/icons/Settings';
 
 import { Manual, TreeNode } from '../../../data-types/tree';
-import NodeViewer from '../node/node-viewer/node-viewer-container';
 import ManualSettings from '../settings/settings';
 import ViewSettingsContainer from '../../../components/view-settings/view-settings-container';
 import User from '../../../data-types/user';
@@ -14,7 +13,7 @@ import { yellow, blue } from '@material-ui/core/colors';
 import { Action } from 'typescript-fsa';
 import NodeEditorContainer from '../node/node-editor/node-editor-frame-container';
 import { drawerWidth } from '../../layout/layout-component';
-import TextEditorContainer from '../text/text-editor/text-editor-container';
+import TextEditorContainer from '../text/text/text-container';
 import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequestParams, LikeDeleteRequestParams } from '../../../api/definitions';
 import KSize from '../../../data-types/k-size';
 import AdapterLink from '../../../components/custom-mui/adapter-link';
@@ -127,8 +126,7 @@ const LayoutComponent: React.FC<Props> = props => {
   const ShowTree = (
     <div className={classes.body}>
       <Switch>
-        <Route path={`/manual/:id/tree/edit`} render={() => <NodeEditorContainer buttonRef={buttonRef}/>}/>
-        <Route path={`/manual/:id/tree`}      render={() => <NodeViewer/>}/>
+        <Route path={`/manual/:id/tree`} render={() => <NodeEditorContainer buttonRef={buttonRef} isEditing={isEditing}/>}/>
         <Route path={`/manual/:id/text`} render={() => <TextEditorContainer buttonRef={buttonRef} isEditing={isEditing}/>}/>
         <Route path={`/manual/:id/settings`}  render={() => <ManualSettings/>}/>
       </Switch>

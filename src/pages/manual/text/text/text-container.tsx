@@ -1,7 +1,7 @@
 import { Dispatch, Action } from 'redux';
 import { connect } from 'react-redux';
 import { AppState } from '../../../../redux/store';
-import TextEditorComponent from './text-editor-component';
+import TextEditorComponent from './text-component';
 import { treeActions } from '../../../../redux/actions/main/manualsAction';
 import { TreePutRequest } from '../../../../api/definitions';
 

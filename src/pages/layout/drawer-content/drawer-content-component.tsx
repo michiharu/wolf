@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Divider from '@material-ui/core/Divider';
 import { FixedSizeList as List } from 'react-window';
 import { makeStyles, Theme } from '@material-ui/core/styles';
@@ -52,11 +52,21 @@ function DrawerContentComponent(props: Props) {
   }
 
   const [height, setHeight] = useState(300);
-  const listContainerRef = useCallback((el: HTMLDivElement | null) => {
+  const [listContainerEl, setListContainerEl] = useState<HTMLDivElement | null>(null);
+  const getListContainerRef = useCallback((el: HTMLDivElement | null) => {
     if (el) {
+      setListContainerEl(el);
       setHeight(el.offsetHeight);
     }
   }, []);
+
+  useEffect(() => {
+    window.addEventListener('resize', () => {
+      if (listContainerEl !== null) {
+        setHeight(listContainerEl.offsetHeight);
+      }
+    });
+  }, [listContainerEl]);
 
   const classes = useStyles();
   return (
@@ -69,7 +79,7 @@ function DrawerContentComponent(props: Props) {
           <Add className={classes.extendedIcon} />
         </Fab>
       </Box>
-      <div ref={listContainerRef} className={classes.listContainer}>
+      <div ref={getListContainerRef} className={classes.listContainer}>
         <List
           height={height}
           itemCount={categories.length}
