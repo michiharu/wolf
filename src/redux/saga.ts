@@ -96,7 +96,9 @@ function* handleUpdateLoginUser() {
 function* handleRequestGetManual() {
   while (true) {
     const action = yield take(ManualAction.ACTIONS_MANUAL_GET);
+    yield put(loadingActions.beginManual());
     const data = yield call(API.manualGet, action.payload);
+    yield put(loadingActions.endManual());
     if (data.error === undefined) {
       yield put(ManualAction.manualAction.getSuccess(data));
     } else {
