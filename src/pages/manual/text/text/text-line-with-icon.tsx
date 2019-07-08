@@ -115,8 +115,24 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
   }
 
   const handleDeleteImage = (node: TreeNode) => () => {
-    changeNode({ ...node!, imageName: '', imageBlob: '' })
+    changeNode({ ...node!, imageName: '', imageBlob: '' });
   }
+
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) =>  changeNode({ ...node!, input: e.target.value as string});
+
+  const handleOutput = (e: React.ChangeEvent<HTMLInputElement>) =>  changeNode({ ...node!, output: e.target.value as string});
+
+  const handlePreConditions = (e: React.ChangeEvent<HTMLInputElement>) =>  changeNode({ ...node!, preConditions: e.target.value as string});
+
+  const handlePostConditions = (e: React.ChangeEvent<HTMLInputElement>) =>  changeNode({ ...node!, postConditions: e.target.value as string});
+
+  const handleWorkerInCharge = (e: React.ChangeEvent<HTMLInputElement>) =>  changeNode({ ...node!, workerInCharge: e.target.value as string});
+
+  const handleRemarks = (e: React.ChangeEvent<HTMLInputElement>) =>  changeNode({ ...node!, remarks: e.target.value as string});
+
+  const handleNecessaryTools = (e: React.ChangeEvent<HTMLInputElement>) =>  changeNode({ ...node!, necessaryTools: e.target.value as string});
+
+  const handleExceptions = (e: React.ChangeEvent<HTMLInputElement>) =>  changeNode({ ...node!, exceptions: e.target.value as string});
 
   const classes = useStyles();
 
@@ -143,6 +159,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
       <TextField
         placeholder="インプット"
         value={node.input}
+        onChange={handleInput}
         InputProps={{ startAdornment: InputIcon }}
         fullWidth
         multiline
@@ -155,6 +172,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
       <TextField
         placeholder="アウトプット"
         value={node.output}
+        onChange={handleOutput}
         InputProps={{ startAdornment: OutputIcon }}
         fullWidth
         disabled={!isEditing}
@@ -166,6 +184,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
       <TextField
         placeholder="事前条件"
         value={node.preConditions}
+        onChange={handlePreConditions}
         InputProps={{ startAdornment: PreConditionsIcon }}
         fullWidth
         multiline
@@ -178,6 +197,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
       <TextField
         placeholder="事後条件"
         value={node.postConditions}
+        onChange={handlePostConditions}
         InputProps={{ startAdornment: PostConditionsIcon }}
         fullWidth
         disabled={!isEditing}
@@ -189,6 +209,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
       <TextField
         placeholder="担当者"
         value={node.workerInCharge}
+        onChange={handleWorkerInCharge}
         InputProps={{ startAdornment: WorkerInChargeIcon }}
         fullWidth
         multiline
@@ -201,6 +222,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
       <TextField
         placeholder="備考"
         value={node.remarks}
+        onChange={handleRemarks}
         InputProps={{ startAdornment: RemarksIcon }}
         fullWidth
         disabled={!isEditing}
@@ -212,6 +234,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
       <TextField
         placeholder="必要システム・ツール"
         value={node.necessaryTools}
+        onChange={handleNecessaryTools}
         InputProps={{ startAdornment: NecessaryToolsIcon }}
         fullWidth
         multiline
@@ -224,6 +247,7 @@ const TextLineWithIcon: React.FC<Props> = (props: Props) => {
       <TextField
         placeholder="例外"
         value={node.exceptions}
+        onChange={handleExceptions}
         InputProps={{ startAdornment: ExceptionsIcon }}
         fullWidth
         disabled={!isEditing}

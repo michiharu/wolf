@@ -1,7 +1,5 @@
 import { KWithArrow, Point, isSwitch, isCase, isTask } from "../data-types/tree";
 import KSize from "../data-types/k-size";
-import { buttonArea } from "./k-tree";
-
 
 export default class KArrowUtil {
 
@@ -24,11 +22,9 @@ export default class KArrowUtil {
   static _setInArrowOfNotSwitch = <T extends KWithArrow>(node: T, ks: KSize): T => {
     const children = node.children.map(c => KArrowUtil._setInArrowOfNotSwitch(c, ks));
     if (!isSwitch(node.type) && (node.open && children.length !== 0)) {
-      const focusMargin = (node.focus && ks.margin.h * ks.unit < buttonArea)
-            ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0;
       const arrows: Point[][] = [[
         {x: ks.rect.w / 2 - ks.spr.w * 4 + ks.indent, y: ks.rect.h},
-        {x: ks.rect.w / 2 - ks.spr.w * 4 + ks.indent, y: ks.rect.h + ks.margin.h + focusMargin - ks.pointerSpace}
+        {x: ks.rect.w / 2 - ks.spr.w * 4 + ks.indent, y: ks.rect.h + ks.margin.h - ks.pointerSpace}
       ]];
       return {...node, children, arrows};
     }
@@ -40,9 +36,7 @@ export default class KArrowUtil {
   static _setInArrowOfSwitch = <T extends KWithArrow>(node: T, ks: KSize): T => {
     const children = node.children.map(c => KArrowUtil._setInArrowOfSwitch(c, ks));
     if (node.open && isSwitch(node.type) && children.length !== 0) {
-      const focusMargin = (node.focus && ks.margin.h * ks.unit < buttonArea)
-            ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0;
-      var anchor = ks.rect.h + ks.margin.h + ks.rect.h * 0.5 + focusMargin;
+      var anchor = ks.rect.h + ks.margin.h + ks.rect.h * 0.5;
       const arrows: Point[][] = children.map((c, i) => {
         const points = [
           {x: (ks.indent - ks.pointerSpace) / 2, y: ks.rect.h},
@@ -64,12 +58,10 @@ export default class KArrowUtil {
         return KArrowUtil._setNextArrow(c, ks);
       } else {
         if (!isCase(c.type) && node.children.length - 1 !== i) {
-          const focusMargin = (c.focus && ks.margin.h * ks.unit < buttonArea)
-            ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0;
           const openMargin = c.open ? ks.margin.h : 0;
           const arrows: Point[][] = [[
             {x: ks.rect.w / 2 - ks.spr.w * 4, y: ks.rect.h},
-            {x: ks.rect.w / 2 - ks.spr.w * 4, y: ks.rect.h + ks.margin.h + focusMargin + openMargin - ks.pointerSpace}
+            {x: ks.rect.w / 2 - ks.spr.w * 4, y: ks.rect.h + ks.margin.h + openMargin - ks.pointerSpace}
           ]];
           return {...c, arrows};
         } else {

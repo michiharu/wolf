@@ -19,6 +19,12 @@ export default class TreeNodeUtil {
     return {...node, children};
   }
 
+  static _changeDraft = <T extends TreeNode>(node: T, id: string, isDraft: boolean): T => {
+    if (node.id === id) { return {...node, isDraft}; }
+    const children = node.children.map(c => (TreeNodeUtil._changeDraft(c, id, isDraft)));
+    return {...node, children};
+  }
+
   static _drag = <T extends TreeNode>(node: T, id: string, isDragging: boolean): T => {
     if (node.id === id) { return {...node, isDragging}; }
     const children = node.children.map(c => (TreeNodeUtil._drag(c, id, isDragging)));

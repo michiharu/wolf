@@ -8,8 +8,8 @@ import { Manual, TreeNode } from '../../../data-types/tree';
 import ManualSettings from '../settings/settings';
 import ViewSettingsContainer from '../../../components/view-settings/view-settings-container';
 import User from '../../../data-types/user';
-import { Star, StarBorder, ThumbUp, ThumbUpAltOutlined, ZoomIn, ZoomOut, Print } from '@material-ui/icons';
-import { yellow, blue } from '@material-ui/core/colors';
+import { Star, StarBorder, ThumbUp, ThumbUpAltOutlined, ZoomIn, ZoomOut, Print, Info } from '@material-ui/icons';
+import { yellow, blue, grey } from '@material-ui/core/colors';
 import { Action } from 'typescript-fsa';
 import NodeEditorContainer from '../node/node-editor/node-editor-frame-container';
 import { drawerWidth } from '../../layout/layout-component';
@@ -30,6 +30,10 @@ const useStyles = makeStyles((theme: Theme) => ({
     paddingTop: theme.spacing(1),
     marginLeft: theme.spacing(2),
     marginRight: theme.spacing(2),
+  },
+  info: {
+    color: grey[600],
+    '&:hover': { opacity: 0.5 }
   },
   favorite: {
     color: yellow[600],
@@ -126,8 +130,8 @@ const LayoutComponent: React.FC<Props> = props => {
   const ShowTree = (
     <div className={classes.body}>
       <Switch>
-        <Route path={`/manual/:id/tree`} render={() => <NodeEditorContainer buttonRef={buttonRef} isEditing={isEditing}/>}/>
-        <Route path={`/manual/:id/text`} render={() => <TextEditorContainer buttonRef={buttonRef} isEditing={isEditing}/>}/>
+        <Route path={`/manual/:id/tree`} render={() => <NodeEditorContainer buttonRef={buttonRef}/>}/>
+        <Route path={`/manual/:id/text`} render={() => <TextEditorContainer buttonRef={buttonRef}/>}/>
         <Route path={`/manual/:id/settings`}  render={() => <ManualSettings/>}/>
       </Switch>
     </div>
@@ -151,11 +155,17 @@ const LayoutComponent: React.FC<Props> = props => {
                 {`${manualUser.lastName} ${manualUser.firstName} /`}
               </Typography>
               <Box ml={1}><Typography variant="h4">{manual.title}</Typography></Box>
+              <Box ml={1} mt={-0.8}>
+                
+              </Box>
             </Box>
           </Grid>
           <Grid item>
             <Box display="flex" flexDirection="row">
-              <Box ml={2}>
+              <Box ml={2} mr={1}>
+                <Info className={classes.info} fontSize="large"/>
+              </Box>
+              <Box ml={2} mr={1}>
                 {isFavorite
                 ? <Star className={classes.favorite} fontSize="large" onClick={uncheckFavorite}/>
                 : <StarBorder className={classes.favorite} fontSize="large" onClick={checkFavorite}/>}

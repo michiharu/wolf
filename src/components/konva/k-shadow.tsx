@@ -15,9 +15,11 @@ import check from '../../resource/svg-icon/check';
 import Icon, { IconProps } from './icon';
 import more from '../../resource/svg-icon/expand/more';
 import less from '../../resource/svg-icon/expand/less';
+import info from '../../resource/svg-icon/info';
 
 export interface KNodeProps {
   node: KWithArrow;
+  isEditing: boolean;
   labelFocus: boolean;
   ks: KSize;
   deleteFocus: () => void;
@@ -37,10 +39,10 @@ class KShadow extends React.Component<KNodeProps> {
   }
 
   render() {
-    const { node, ks, labelFocus } = this.props;
-    const fill = node.isDragging ? grey[500] :
+    const { node, isEditing, ks, labelFocus } = this.props;
+    const fill = node.isDraft ? grey[50] :
       isTask(node.type) ? lightBlue[50] :
-        isSwitch(node.type) ? amber[100] : yellow[100];
+      isSwitch(node.type) ? amber[100] : yellow[100];
     const baseRectProps = {
       x: 0, y: 0,
       width: node.rect.w * ks.unit,
@@ -95,7 +97,7 @@ class KShadow extends React.Component<KNodeProps> {
       height: (node.self.h - ks.spr.h) * ks.unit,
       cornerRadius: ks.cornerRadius * ks.unit,
       stroke: grey[500],
-      fill: node.depth.top === 0 ? theme.palette.background.paper : '#00000009',
+      fill: '#00000009',
       strokeWidth: ks.hasArrow ? 0 : 1,
       onClick: this.handleDeleteFocus
     };
@@ -113,6 +115,14 @@ class KShadow extends React.Component<KNodeProps> {
       color: theme.palette.secondary.main,
     };
 
+    const showExpand = isEditing || node.children.length !== 0;
+
+    const infoProps: IconProps = {
+      ks,
+      x: (ks.rect.w - ks.rect.h * (showExpand ? 2 : 1)) * ks.unit, y: 0,
+      svg: info,
+    };
+
     const expandProps: IconWithBadgeProps = {
       ks,
       x: (ks.rect.w - ks.rect.h) * ks.unit, y: 0,
@@ -128,6 +138,7 @@ class KShadow extends React.Component<KNodeProps> {
             <Rect {...baseRectProps} />
             <Icon {...typeProps} />
             {!(node.focus && labelFocus) && <Text {...labelProps} />}
+            <Icon {...infoProps} />
             <IconWithBadge {...expandProps} />
             {ks.hasArrow && node.arrows.map((a, i) => {
               const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
@@ -136,7 +147,6 @@ class KShadow extends React.Component<KNodeProps> {
             {node.arrows.length === 0 && node.depth.top !== 0 && <Icon {...endIconProps} />}
           </>
         )}
-
       </Group>
     );
   }

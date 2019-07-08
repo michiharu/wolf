@@ -25,6 +25,7 @@ import KShadow from '../../../../components/konva/k-shadow';
 import { KSState } from '../../../../redux/states/ksState';
 import { RSState } from '../../../../redux/states/rsState';
 import TextLineWithIcon, { TextLineWithIconProps } from '../../text/text/text-line-with-icon';
+import { CheckBox, CheckBoxOutlineBlank } from '@material-ui/icons';
 
 const headerHeight = 96;
 
@@ -93,7 +94,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
     const state = NodeEditorComponent.getInitialState();
     this.state = state;
     const kTree = TreeUtil._get(props.node, baseKTreeNode);
-    this.kTree = KTreeUtil.setCalcProps(kTree, props.ks);
+    this.kTree = KTreeUtil.setCalcProps(kTree, props.ks, props.isEditing);
   }
 
   static getInitialState = (): State => {
@@ -141,24 +142,15 @@ class NodeEditorComponent extends React.Component<Props, State> {
   }
 
   scroll = () => {
-    const {node, ks, edit } = this.props;
     const scrollContainer = this.mainRef.current;
     const stage = this.stageRef.current;
     if (scrollContainer === null || stage === null) { throw new Error('Cannot find elements.'); }
-    // canvasをmainと一致するよう移動
     const dx = scrollContainer.scrollLeft;
     const dy = scrollContainer.scrollTop;
     stage.container().style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
     stage.x(-dx);
     stage.y(-dy);
     stage.draw();
-
-    const f = TreeNodeUtil._getFocusNode(this.kTree)!;
-    if (f !== undefined) {
-      if (f.point.x * ks.unit < dx || stage.width() / 2 + dx < (f.point.x + f.rect.w) * ks.unit) {
-        edit(TreeNodeUtil._deleteFocus(node));
-      }
-    }
   }
 
   scrollToNew = (result: { node: TreeNode, newNode: TreeNode }) => {
@@ -166,14 +158,14 @@ class NodeEditorComponent extends React.Component<Props, State> {
     const stage = this.stageRef.current;
     if (main === null || stage === null) { throw new Error('Cannot find elements.'); }
 
-    const { ks, edit } = this.props;
+    const { isEditing, ks, edit } = this.props;
     var  kTree = TreeUtil._get(result.node, baseKTreeNode);
-    kTree = KTreeUtil.setCalcProps(kTree, ks);
+    kTree = KTreeUtil.setCalcProps(kTree, ks, isEditing);
     const focusNode = TreeUtil._find(kTree, result.newNode.id)!;
     setTimeout(() => {
       edit(TreeNodeUtil._focus(kTree, result.newNode.id));
       this.setState({labelFocus: true});
-      process.nextTick(this.labelRef.current!.focus);
+      process.nextTick(() => this.labelRef.current!.focus());
     }, 300);
 
     if (main.scrollTop + main.offsetHeight < (focusNode.point.y + ks.rect.h) * ks.unit) {
@@ -193,9 +185,17 @@ class NodeEditorComponent extends React.Component<Props, State> {
     }
   }
 
-  expand = (target: KWithArrow, open: boolean) => {
+  expand = (target: KWithArrow) => {
     const { node, edit } = this.props;
-    var newNode = TreeNodeUtil._open(node, target.id, open);
+    var newNode = TreeNodeUtil._open(node, target.id, !target.open);
+    edit(newNode);
+    process.nextTick(() => this.resize());
+  }
+
+  changeDraft = () => {
+    const { node, edit } = this.props;
+    const focusNode = TreeNodeUtil._getFocusNode(node)!;
+    var newNode = TreeNodeUtil._changeDraft(node, focusNode.id, !focusNode.isDraft);
     edit(newNode);
     process.nextTick(() => this.resize());
   }
@@ -226,7 +226,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
     } else {
       if (target.depth.top !== 0) {
         this.setState({labelFocus: true});
-        process.nextTick(this.labelRef.current!.focus);
+        process.nextTick(() => this.labelRef.current!.focus());
       }
     }
   }
@@ -249,13 +249,13 @@ class NodeEditorComponent extends React.Component<Props, State> {
   }
 
   dragMove = (target: KTreeNode, p: Point) => {
-    const { node: tree, ks, edit } = this.props;
+    const { node: tree, isEditing, ks, edit } = this.props;
     const {dragParent} = this.state;
     const pointX = Math.round(p.x / ks.unit + ks.rect.w / 2);
     const pointY = Math.round(p.y / ks.unit + ks.rect.h / 2);
 
     const rows = this.rows;
-    const node = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
+    const node = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks, isEditing);
 
     if (rows !== null && 0 <= pointX && pointX < node.self.w) {
       const row = rows[pointY];
@@ -364,7 +364,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
     const {
       labelFocus, typeAnchorEl, infoNode, deleteFlag, dragParent,
     } = this.state;
-    const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
+    const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks, isEditing);
     const node = KArrowUtil.setArrow(kTreeNode, ks);
     this.kTree = node;
     const flatNodes = TreeNodeUtil.toArrayWithoutClose(node);
@@ -376,7 +376,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
       isEditing,
       ks,
       focus: this.focus,
-      expand: (target: KWithArrow) => this.expand(target, !target.open),
+      expand: this.expand,
       dragStart: this.dragStart,
       dragMove: this.dragMove,
       getCurrentTree: this.getCurrentTree,
@@ -411,6 +411,9 @@ class NodeEditorComponent extends React.Component<Props, State> {
               </Button>}
               <Button onClick={this.addDetails}>
                 詳細項目を追加<AddNext/><Add/>
+              </Button>
+              <Button onClick={this.changeDraft}>
+                下書き{focusNode.isDraft ? <CheckBox/> : <CheckBoxOutlineBlank/>}
               </Button>
               {!isRoot && <Button onClick={() => focusNode.children.length === 0 ? this.deleteSelf() : this.setState({deleteFlag: true})}>
                 削除<Delete/>
@@ -557,11 +560,14 @@ class NodeEditorComponent extends React.Component<Props, State> {
             <Layer>
               {stage !== null && 
                 flatNodes
+                .filter(n => n.depth.top === 0 ? false : isEditing || !n.isDraft)
                 .map(n => <KShadow key={n.id + 'shadow'} node={n} labelFocus={labelFocus} {...nodeActionProps}/>)}
               
               {stage !== null &&
                 flatNodes
-                .filter(n => dragParent === null ? true : n.isDragging)
+                .filter(n => n.depth.top === 0 ? false : isEditing
+                  ? (dragParent === null ? true : n.isDragging)
+                  : (!n.isDraft))
                 .map(n => <KNode key={n.id} node={n} labelFocus={labelFocus} {...nodeActionProps}/>)}
                 {/* <DragMap node={node} rows={rows} ks={ks} /> */}
                 {/* <DropMap node={node} flatNodes={flatNodes} ks={ks}/> */}

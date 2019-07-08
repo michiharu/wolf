@@ -12,6 +12,7 @@ export interface Tree {
   id: string;
   type: Type;
   label: string;
+  isDraft: boolean;
   input: string;
   output: string;
   preConditions: string;
@@ -29,6 +30,7 @@ export const baseTree: Tree = {
   id: '',
   type: Type.task,
   label: '',
+  isDraft: false,
   input: '',
   output: '',
   preConditions: '',

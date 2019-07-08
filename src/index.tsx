@@ -55,7 +55,7 @@ const Providers: React.FC<{}> = () => (
   <Provider store={Store}>
     <MuiThemeProvider theme={theme}>
       <CssBaseline/>
-      <SnackbarProvider maxSnack={3} autoHideDuration={4000}>
+      <SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} autoHideDuration={4000}>
         <Notifier/>
         <LoginRouter/>
       </SnackbarProvider>

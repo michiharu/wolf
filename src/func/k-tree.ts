@@ -4,7 +4,6 @@ import KSize from "../data-types/k-size";
 export default class KTreeUtil {
 
   static calcSelfLength = (node: KTreeNode, ks: KSize, which: which) => {
-    const over = node.focus && ks.margin.h * ks.unit < buttonArea;
     if (node.open) {
       if (which === 'width') {
         // open, width
@@ -15,7 +14,6 @@ export default class KTreeUtil {
       } else {
         // open, height
         return ks.rect.h + ks.margin.h
-          + (over ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0)
           + (node.children.length !== 0 ?
               node.children.map(c => c.self.h + ks.margin.h).reduce((a, b) => a + b) : 0);
       }
@@ -25,12 +23,12 @@ export default class KTreeUtil {
         return ks.rect.w;
       } else {
         // close, height
-        return ks.rect.h + (over ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0);
+        return ks.rect.h;
       }
     }
   }
 
-  static _setSize = <T extends KTreeNode>(node: T, ks: KSize): T => {
+  static _setSize = <T extends KTreeNode>(node: T, ks: KSize, showDraft: boolean): T => {
 
     const rect = {
       w: ks.rect.w,
@@ -38,8 +36,10 @@ export default class KTreeUtil {
     };
 
     const children = node.children.length !== 0
-      ? node.children.map(c => KTreeUtil._setSize(c, ks))
-      : node.children;
+      ? node.children
+        .filter(c => showDraft || !c.isDraft)
+        .map(c => KTreeUtil._setSize(c, ks, showDraft))
+      : [];
     const newNode = {...node, children};
 
     const self = {
@@ -50,16 +50,17 @@ export default class KTreeUtil {
     return {...node, children, self, rect};
   }
 
-  static _setPoint = <T extends KTreeNode>(point: Point, node: T, ks: KSize): T => {
+  static _setPoint = <T extends KTreeNode>(node: T, ks: KSize, isRoot: boolean, showDraft: boolean, point: Point = {x: ks.spr.w * 3, y: ks.spr.h}): T => {
 
-    var anchor = (node.focus && ks.margin.h * ks.unit < buttonArea)
-      ? Math.ceil((buttonArea - ks.margin.h * ks.unit) / ks.unit) : 0;
-    const children = node.children.map(c => {
+    var anchor = 0;
+    const children = node.children
+    .filter(c => showDraft || !c.isDraft)
+    .map(c => {
       const p: Point = {
-        x: point.x + ks.indent,
-        y: point.y + node.rect.h + ks.margin.h + anchor
+        x: isRoot ? point.x : point.x + ks.indent,
+        y: isRoot ? point.y + anchor : point.y + node.rect.h + ks.margin.h + anchor
       };
-      const child = KTreeUtil._setPoint(p, c, ks);
+      const child = KTreeUtil._setPoint(c, ks, false, showDraft, p);
       anchor += c.self.h + ks.margin.h;
       return child;
     });
@@ -81,20 +82,11 @@ export default class KTreeUtil {
     return {...node, children, index, depth};
   }
 
-  static setCalcProps = <T extends KTreeNode>(node: T, ks: KSize, startAt: Point = {x: ks.spr.w, y: ks.spr.h}): T => {
-    var kNode = KTreeUtil._setSize(node, ks);
-    kNode = KTreeUtil._setPoint(startAt, kNode, ks);
+  static setCalcProps = <T extends KTreeNode>(node: T, ks: KSize, showDraft: boolean): T => {
+    var kNode = KTreeUtil._setSize(node, ks, showDraft);
+    kNode = KTreeUtil._setPoint(kNode, ks, true, showDraft);
     kNode = KTreeUtil._setIndexAndDepth(0, 0, kNode);
     return kNode;
-  }
-
-  static setCalcPropsForMemos = <T extends KTreeNode>(memos: T[], ks: KSize): T[] => {
-    var anchor = ks.spr.h;
-    return memos.map(node => {
-      const calcedNode = KTreeUtil.setCalcProps(node, ks, {x: ks.spr.w, y: anchor});
-      anchor += calcedNode.self.h;
-      return calcedNode;
-    });
   }
 
   static makeBaseDragMap = <T extends KTreeNode>(node: T): DragRow[] => {
@@ -193,6 +185,3 @@ export default class KTreeUtil {
 }
 
 export type which = 'width' | 'height';
-export const buttonSize = 0; // 48;
-export const buttonMargin = 0; // 4;
-export const buttonArea = buttonSize + buttonMargin * 2;

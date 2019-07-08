@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   box: {
     height: '50vh',
     width: `calc(100vw - ${drawerWidth}px)`,
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       width: '100vw',
     },
   },

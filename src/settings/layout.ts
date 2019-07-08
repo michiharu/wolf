@@ -24,8 +24,8 @@ export { default as Convergent } from '@material-ui/icons/ClearAll'; // converge
 
 export const defaultKS: KSize = {
   unit: 16,
-  rect: {w: 24, h: 3},
-  margin: {w: 1, h: 2},
+  rect: {w: 40, h: 2},
+  margin: {w: 1, h: 1},
   spr: {w: 1, h: 1},
   indent: 4,
   fontSize: 0.9,

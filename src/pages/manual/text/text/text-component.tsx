@@ -42,7 +42,6 @@ const styles = (theme: Theme) => createStyles({
 export interface TextEditorProps {
   manual: Manual;
   node: TreeNode;
-  isEditing: boolean;
   putTree: (params: TreePutRequest) => Action<TreePutRequest>;
   buttonRef: React.RefObject<HTMLDivElement>;
 }
@@ -86,7 +85,8 @@ class TextEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const { buttonRef, isEditing, classes } = this.props;
+    const { buttonRef, classes, location } = this.props;
+    const isEditing = location.pathname.slice(-4) === 'edit';
     const { node, saved } = this.state;
 
     const textLineWithIconProps: TextLineWithIconProps = {

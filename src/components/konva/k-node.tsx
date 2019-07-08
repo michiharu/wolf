@@ -1,5 +1,5 @@
 import React, { useRef, memo } from 'react';
-import { lightBlue, amber, yellow } from '@material-ui/core/colors';
+import { lightBlue, amber, yellow, grey } from '@material-ui/core/colors';
 import Konva from 'konva';
 import { Rect, Group, Text } from 'react-konva';
 import { task, switchSvg } from '../../resource/svg-icon';
@@ -157,7 +157,8 @@ const KNode: React.FC<KNodeProps> = memo(props => {
     });
   }
 
-  const fill = isTask(node.type) ? lightBlue[50] :
+  const fill = node.isDraft ? grey[50] :
+    isTask(node.type) ? lightBlue[50] :
     isSwitch(node.type) ? amber[100] : yellow[100];
 
   const baseRectProps = {
@@ -233,7 +234,7 @@ const KNode: React.FC<KNodeProps> = memo(props => {
   const y = !willAnimation ? node.point.y * ks.unit : undefined;
 
   const showExpand = isEditing || node.children.length !== 0;
-
+  
   const infoProps: IconProps = {
     ks,
     x: (ks.rect.w - ks.rect.h * (showExpand ? 2 : 1)) * ks.unit, y: 0,

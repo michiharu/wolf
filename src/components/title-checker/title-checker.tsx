@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import { Action } from 'typescript-fsa';
@@ -8,6 +8,7 @@ import { titleCheckAction, TitleSet } from '../../redux/actions/titileCheckActio
 import { TextField, InputAdornment, CircularProgress } from '@material-ui/core';
 import { Check, Error } from '@material-ui/icons';
 import { green, red } from '@material-ui/core/colors';
+import { debounce } from 'lodash';
 
 interface Props extends TitleCheckState {
   defaultTitle: string;
@@ -29,9 +30,17 @@ const TitleChecker: React.FC<Props> = props => {
     }
   }
 
-  function handleTitleChange(e: any) {
-    enqueue({preTitle: defaultTitle, title: e.target.value});
-  }
+  const [currentTitle, setCurrentTitle] = useState<string>(defaultTitle);
+  const debounced = useRef(
+    debounce((title: string) => {
+      enqueue({preTitle: defaultTitle, title});
+    }, 500)
+  );
+  useEffect(() => debounced.current(currentTitle), [currentTitle]);
+  
+  const handleChangeTitle = (e: any) => {
+    setCurrentTitle(e.target.value);
+  };
 
   const renderAdornment = (title !== '' && title !== defaultTitle) ? (
     <InputAdornment position="end">
@@ -50,8 +59,8 @@ const TitleChecker: React.FC<Props> = props => {
   return (
     <TextField
       label="マニュアルの名称"
-      value={title}
-      onChange={handleTitleChange}
+      value={currentTitle}
+      onChange={handleChangeTitle}
       InputProps={{ endAdornment: renderAdornment }}
       helperText={helperText}
       disabled={disabled !== undefined && disabled}

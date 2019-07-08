@@ -42,7 +42,6 @@ export const styles = (theme: Theme) => createStyles({
 interface Props extends MemosState, EditorFrameActions, RouteComponentProps, WithStyles<typeof styles> {
   manual: Manual;
   node: TreeNode;
-  isEditing: boolean;
   buttonRef: React.RefObject<HTMLDivElement>;
 }
 
@@ -97,9 +96,9 @@ class EditorFrameComponent extends React.Component<Props, State> {
   handleShowVS = (showVS: boolean) => () => this.setState({ showVS });
 
   render() {
-    const { isEditing, buttonRef, classes } = this.props;
+    const { buttonRef, classes, location } = this.props;
     const { node, cannotSaveReason, showVS, saved } = this.state;
-
+    const isEditing = location.pathname.slice(-4) === 'edit';
     const nodeProps: NodeEditorProps = {
       node,
       isEditing,

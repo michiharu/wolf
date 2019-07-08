@@ -26,7 +26,7 @@ const NodePrintComponent: React.FC<Props> = props => {
 
   const stageRef = useCallback(stage => {
     if (stage !== null && tree !== null) {
-      const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
+      const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks, false);
       const node = KArrowUtil.setArrow(kTreeNode, ks)
       stage.width((node.self.w + ks.spr.w) * ks.unit);
       stage.height((node.self.h + ks.spr.h) * ks.unit);
@@ -38,7 +38,7 @@ const NodePrintComponent: React.FC<Props> = props => {
 
   if (tree === null) { return <></>; }
 
-  const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks);
+  const kTreeNode = KTreeUtil.setCalcProps(TreeUtil._get(tree, baseKWithArrow), ks, false);
   const node = KArrowUtil.setArrow(kTreeNode, ks)
   const flatNodes = TreeNodeUtil.toArrayWithoutClose(node);
   const nodeProps = { ks, expand: (target: KWithArrow) => {} };
