@@ -11,7 +11,7 @@ import AddNext from '@material-ui/icons/Forward';
 import { Stage, Layer } from 'react-konva';
 
 import { TreeNode, Type, KTreeNode, DragRow, Point, baseKTreeNode, baseKWithArrow,  KWithArrow, isSwitch, isTask, isCase } from '../../../../data-types/tree';
-import { Task, Switch, Case, Delete, More, Less } from '../../../../settings/layout';
+import { Task, Switch, Case, Delete } from '../../../../settings/layout';
 
 import TreeUtil from '../../../../func/tree';
 import TreeNodeUtil from '../../../../func/tree-node';
@@ -481,27 +481,27 @@ class NodeEditorComponent extends React.Component<Props, State> {
         );
       })();
 
-      (() => {
-        const buttonStyle: React.CSSProperties = {
-          position: 'absolute',
-          left: (focusNode!.point.x + ks.rect.w - ks.rect.h / 2) * ks.unit,
-          top:  (focusNode!.point.y + ks.rect.h / 2) * ks.unit,
-          transform: `translate(-50%, -50%) scale(${ks.unit / 24})`,
-          color: '#000',
-        };
-        ExpandButton = (
-          <IconButton style={buttonStyle} onClick={() => this.expand(focusNode, !focusNode.open)} disableRipple>
-            {!focusNode.open ? <More/> : <Less/>}
-          </IconButton>
-        );
-      })();
+      // (() => {
+      //   const buttonStyle: React.CSSProperties = {
+      //     position: 'absolute',
+      //     left: (focusNode!.point.x + ks.rect.w - ks.rect.h / 2) * ks.unit,
+      //     top:  (focusNode!.point.y + ks.rect.h / 2) * ks.unit,
+      //     transform: `translate(-50%, -50%) scale(${ks.unit / 24})`,
+      //     color: '#000',
+      //   };
+      //   ExpandButton = (
+      //     <IconButton style={buttonStyle} onClick={() => this.expand(focusNode, !focusNode.open)} disableRipple>
+      //       {!focusNode.open ? <More/> : <Less/>}
+      //     </IconButton>
+      //   );
+      // })();
 
       (() => {
         const labelStyle: React.CSSProperties = {
           position: 'absolute',
           left: (focusNode!.point.x + ks.rect.h + ks.spr.w / 2) * ks.unit,
           top:  (focusNode!.point.y + ks.rect.h / 2) * ks.unit,
-          width: (ks.rect.w - (ks.rect.h + ks.spr.w / 2) * 2) * ks.unit,
+          width: (ks.rect.w - (ks.rect.h * 3 + ks.spr.w)) * ks.unit,
           transform: `translateY(-50%)`,
           display: labelFocus ? undefined : 'none',
         };
