@@ -80,8 +80,8 @@ class EditorFrameComponent extends React.Component<Props, State> {
     const { manual, putTree, history } = this.props;
     const { node } = this.state;
     const isAllSwitchHasCase = TreeUtil._isAllSwitchHasCase(node);
-    const isAllCaseHasItem = TreeUtil._isAllCaseHasItem(node);
-    const cannotSaveReason: CannotSaveReason = !isAllSwitchHasCase ? 'switch' :　!isAllCaseHasItem ? 'case' : null;
+    // const isAllCaseHasItem = TreeUtil._isAllCaseHasItem(node);
+    const cannotSaveReason: CannotSaveReason = !isAllSwitchHasCase ? 'switch' : null;
     this.setState({ cannotSaveReason });
     if (cannotSaveReason === null) {
       const hasDifference = TreeUtil._hasDifference(this.props.node, this.state.node);

@@ -6,7 +6,7 @@ export const postTitleCheck = (config: AxiosRequestConfig) => {
   const req = JSON.parse(requestJson) as { title: string };
   const data: TitleCheckPostResponse = {
     title: req.title,
-    valid: Math.random() > 0.3
+    valid: true
   }
   console.log(method, url, req, data);
   return [200, data]

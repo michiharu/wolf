@@ -484,7 +484,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
         );
       }
 
-      if (focusNode.depth.top !== 0) {
+      if (focusNode.depth.top !== 0 && isEditing) {
         const buttonStyle: React.CSSProperties = {
           position: 'absolute',
           left: (focusNode!.point.x + ks.rect.h / 2) * ks.unit,

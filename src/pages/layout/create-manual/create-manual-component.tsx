@@ -29,7 +29,7 @@ interface Props extends CategoriesState, TitleCheckState, CreateManualActions {
 
 const CreateManualComponent: React.FC<Props> = props => {
 
-  const { categories, onClose, title, result } = props;
+  const { categories, filter, onClose, title, result } = props;
   const [categoryId, setCategoryId] = useState(categories[0].id);
   const handleCategorySelect = (item: string | null) => {
     if (item !== null) {
@@ -63,6 +63,7 @@ const CreateManualComponent: React.FC<Props> = props => {
             inputLabel="カテゴリー"
             suggestions={categories}
             labelProp="name"
+            initialSelectedItem={filter !== null ? filter.name : null}
             onChange={handleCategorySelect}
           />
         </Box>
