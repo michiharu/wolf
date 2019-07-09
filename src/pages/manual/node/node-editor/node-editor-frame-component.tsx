@@ -58,7 +58,6 @@ class EditorFrameComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     const { node } = props;
-    console.log('EditorFrameComponent init!');
     this.state = {
       node,
       cannotSaveReason: null,

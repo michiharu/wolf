@@ -7,7 +7,7 @@ export default class SimilarityUtil {
     return nodeList.map(n => ({
       ...n,
       _label: textDistPercent(target.label, n.label),
-      _input: textDistPercent(target.input, n.input),
+      _input: textDistPercent(target.input[0], n.input[0]),
       _output: textDistPercent(target.output, n.output),
       _childrenLength: (() => {
         const short = Math.min(target.children.length, n.children.length);

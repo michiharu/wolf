@@ -24,8 +24,8 @@ import { theme, toolbarHeight } from '../../../..';
 import KShadow from '../../../../components/konva/k-shadow';
 import { KSState } from '../../../../redux/states/ksState';
 import { RSState } from '../../../../redux/states/rsState';
-import TextLineWithIcon, { TextLineWithIconProps } from '../../text/text/text-line-with-icon';
 import { CheckBox, CheckBoxOutlineBlank } from '@material-ui/icons';
+import InfoContentComponent, { InfoContentProps } from './info-content-component';
 
 const headerHeight = 96;
 
@@ -401,8 +401,8 @@ class NodeEditorComponent extends React.Component<Props, State> {
         const isRoot = focusNode.depth.top === 0;
         const boxStyle: React.CSSProperties = {
           position: 'absolute',
-          left: (focusNode!.point.x) * ks.unit + 8,
-          top: (focusNode!.point.y + focusNode.rect.h) * ks.unit - 8,
+          left: (focusNode!.point.x) * ks.unit + 4,
+          top: (focusNode!.point.y + focusNode.rect.h) * ks.unit - 4,
           backgroundColor: theme.palette.grey[800],
         };
         ActionButtonBox = (
@@ -414,9 +414,9 @@ class NodeEditorComponent extends React.Component<Props, State> {
               <Button onClick={this.addDetails}>
                 詳細項目を追加<AddNext/><Add/>
               </Button>
-              <Button onClick={this.changeDraft}>
-                下書き{focusNode.isDraft ? <CheckBox/> : <CheckBoxOutlineBlank/>}
-              </Button>
+              {false && <Button onClick={this.changeDraft}>
+                下書き{focusNode!.isDraft ? <CheckBox/> : <CheckBoxOutlineBlank/>}
+              </Button>}
               {!isRoot && <Button onClick={() => focusNode.children.length === 0 ? this.deleteSelf() : this.setState({deleteFlag: true})}>
                 削除<Delete/>
               </Button>}
@@ -547,11 +547,9 @@ class NodeEditorComponent extends React.Component<Props, State> {
       height: Math.max((node.self.h + ks.spr.h * 2) * ks.unit + marginBottom, main.offsetHeight),
     } : undefined;
 
-    const textLineWithIconProps: TextLineWithIconProps = {
-      itemNumber: node.label,
+    const infoContentProps: InfoContentProps = {
       node: infoNode!,
       isEditing,
-      showChildren: false,
       changeNode: this.changeFocusNode,
     };
 
@@ -602,11 +600,11 @@ class NodeEditorComponent extends React.Component<Props, State> {
             <DialogTitle>{infoNode!.label}</DialogTitle>
 
             <DialogContent>
-              <TextLineWithIcon {...textLineWithIconProps}/>
+              <InfoContentComponent {...infoContentProps}/>
             </DialogContent>
 
             <DialogActions>
-              <Button onClick={() => this.setState({infoNode: null})}>OK</Button>
+              <Button color="primary" onClick={() => this.setState({infoNode: null})}>OK</Button>
             </DialogActions>
           </>)}
         </Dialog>

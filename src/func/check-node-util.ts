@@ -59,10 +59,10 @@ export default class CheckNodeUtil {
 
   static equal = (a: TreeNode, b: TreeNode): boolean => a.id === b.id;
 
-  static calcTextlineHeight = (node: CheckNode): number => {
-    return (!Util.isEmpty(node.input)  ? ks.textline : 0)
-         + (!Util.isEmpty(node.output) ? ks.textline : 0);
-  }
+  // static calcTextlineHeight = (node: CheckNode): number => {
+  //   return (!Util.isEmpty(node.input)  ? ks.textline : 0)
+  //        + (!Util.isEmpty(node.output) ? ks.textline : 0);
+  // }
 
   static calcSelfLength = (node: CheckNode, open: boolean, which: which) => {
 
@@ -80,11 +80,11 @@ export default class CheckNodeUtil {
           // task, open, height
           if (node.children.length !== 0) {
             return ks.rect.h + ks.spr.h
-              + CheckNodeUtil.calcTextlineHeight(node)
+              // + CheckNodeUtil.calcTextlineHeight(node)
               + node.children.map(c => c.self.h + ks.spr.h).reduce((a, b) => a + b);
           } else {
             return ks.rect.h
-              + CheckNodeUtil.calcTextlineHeight(node);
+              // + CheckNodeUtil.calcTextlineHeight(node);
           }
         }
       } else {
@@ -110,11 +110,11 @@ export default class CheckNodeUtil {
           // switch, open, height
           if (node.children.length !== 0) {
             return ks.rect.h + ks.spr.h * 2
-              + CheckNodeUtil.calcTextlineHeight(node)
+              // + CheckNodeUtil.calcTextlineHeight(node)
               + node.children.map(c => c.self.h).reduce((a, b) => Math.max(a, b));
           } else {
             return ks.rect.h
-              + CheckNodeUtil.calcTextlineHeight(node);
+              // + CheckNodeUtil.calcTextlineHeight(node);
           }
         }
       } else {
@@ -300,7 +300,7 @@ export default class CheckNodeUtil {
     const rect = {
       w: ks.rect.w,
       h: ks.rect.h
-        + (node.open ? CheckNodeUtil.calcTextlineHeight(node) : 0)
+
     };
 
     const children = node.children.map(c => (CheckNodeUtil._setSize(c)));
