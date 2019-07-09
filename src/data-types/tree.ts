@@ -94,7 +94,6 @@ export interface TreeNode extends Tree {
   open: boolean;
   focus: boolean;
   isDragging: boolean;
-  isMemo: boolean;
 }
 
 export const baseTreeNode: TreeNode = {
@@ -103,7 +102,6 @@ export const baseTreeNode: TreeNode = {
   open: false,
   focus: false,
   isDragging: false,
-  isMemo: false,
 };
 
 export interface NodeWithSimilarity extends Tree {

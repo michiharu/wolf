@@ -11,7 +11,7 @@ import User from '../../../data-types/user';
 import { Star, StarBorder, ThumbUp, ThumbUpAltOutlined, ZoomIn, ZoomOut, Print, Info } from '@material-ui/icons';
 import { yellow, blue, grey } from '@material-ui/core/colors';
 import { Action } from 'typescript-fsa';
-import NodeEditorContainer from '../node/node-editor/node-editor-frame-container';
+import NodeContainer from '../node/node-frame-container';
 import { drawerWidth } from '../../layout/layout-component';
 import TextEditorContainer from '../text/text/text-container';
 import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequestParams, LikeDeleteRequestParams } from '../../../api/definitions';
@@ -130,7 +130,7 @@ const LayoutComponent: React.FC<Props> = props => {
   const ShowTree = (
     <div className={classes.body}>
       <Switch>
-        <Route path={`/manual/:id/tree`} render={() => <NodeEditorContainer buttonRef={buttonRef}/>}/>
+        <Route path={`/manual/:id/tree`} render={() => <NodeContainer buttonRef={buttonRef}/>}/>
         <Route path={`/manual/:id/text`} render={() => <TextEditorContainer buttonRef={buttonRef}/>}/>
         <Route path={`/manual/:id/settings`}  render={() => <ManualSettings/>}/>
       </Switch>

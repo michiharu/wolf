@@ -4,14 +4,16 @@ import {
   Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Modal, withStyles, Portal, Box,
 } from '@material-ui/core';
 
-import { TreeNode, Manual } from '../../../../data-types/tree';
-import TreeUtil from '../../../../func/tree';
-import NodeEditorContainer from '../../node/node-editor/node-editor-container';
-import { EditorFrameActions } from './node-editor-frame-container';
-import ViewSettingsContainer from '../../../../components/view-settings/view-settings-container';
-import { NodeEditorProps } from './node-editor-component';
-import { TreePutRequest } from '../../../../api/definitions';
+import { TreeNode, Manual, KTreeNode, baseKWithArrow } from '../../../data-types/tree';
+import TreeUtil from '../../../func/tree';
+import NodeContainer from './node-container';
+import { EditorFrameActions } from './node-frame-container';
+import ViewSettingsContainer from '../../../components/view-settings/view-settings-container';
+import { NodeEditorProps } from './node-component';
+import { TreePutRequest } from '../../../api/definitions';
 import { RouteComponentProps, withRouter, Prompt } from 'react-router';
+import KTreeUtil from '../../../func/k-tree';
+import { KSState } from '../../../redux/states/ksState';
 
 export const styles = (theme: Theme) => createStyles({
   convergent: {
@@ -38,14 +40,14 @@ export const styles = (theme: Theme) => createStyles({
   },
 });
 
-interface Props extends EditorFrameActions, RouteComponentProps, WithStyles<typeof styles> {
+interface Props extends KSState, EditorFrameActions, RouteComponentProps, WithStyles<typeof styles> {
   manual: Manual;
   node: TreeNode;
   buttonRef: React.RefObject<HTMLDivElement>;
 }
 
 interface State {
-  node: TreeNode;
+  node: KTreeNode;
   cannotSaveReason: CannotSaveReason;
   showVS: boolean;
   saved: boolean;
@@ -57,17 +59,21 @@ class EditorFrameComponent extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    const { node } = props;
+    const { node, ks, location } = props;
+    const isEditing = location.pathname.slice(-4) === 'edit';
+
     this.state = {
-      node,
+      node: KTreeUtil.setCalcProps(TreeUtil._get(node, baseKWithArrow), ks, isEditing),
       cannotSaveReason: null,
       showVS: false,
       saved: false,
     };
   }
 
-  edit = (editNode: TreeNode) => {
-    this.setState({ node: editNode });
+  edit = (editNode: KTreeNode) => {
+    const { ks, location } = this.props;
+    const isEditing = location.pathname.slice(-4) === 'edit';
+    this.setState({ node: KTreeUtil.setCalcProps(editNode, ks, isEditing) });
   }
 
   save = () => {
@@ -117,7 +123,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
           message="編集内容を保存していません。編集を終了して良いですか？"
         />
 
-        <NodeEditorContainer {...nodeProps} />
+        <NodeContainer {...nodeProps} />
 
         <Modal
           open={showVS}

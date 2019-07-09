@@ -10,10 +10,10 @@ import {
 import {
   Task, Switch, Case, Input, Output, PreConditions, PostConditions,
   WorkerInCharge, Remarks, NecessaryTools, Exceptions, Image, Close, More, Less,
-} from '../../../../settings/layout';
-import { TreeNode, isTask, isSwitch} from '../../../../data-types/tree';
+} from '../../../settings/layout';
+import { isTask, isSwitch, KTreeNode} from '../../../data-types/tree';
 
-import { phrase } from '../../../../settings/phrase';
+import { phrase } from '../../../settings/phrase';
 import { makeStyles } from '@material-ui/styles';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -65,9 +65,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 export interface InfoContentProps {
-  node: TreeNode;
+  node: KTreeNode;
   isEditing: boolean;
-  changeNode: (node: TreeNode) => void;
+  changeNode: (node: KTreeNode) => void;
 }
 
 interface Props extends InfoContentProps { }
@@ -112,7 +112,7 @@ const InfoContentComponent: React.FC<Props> = (props: Props) => {
     e.target.value = '';
   }
 
-  const handleDeleteImage = (node: TreeNode) => () => {
+  const handleDeleteImage = (node: KTreeNode) => () => {
     changeNode({ ...node!, imageName: '', imageBlob: '' });
   }
 
@@ -254,6 +254,7 @@ const InfoContentComponent: React.FC<Props> = (props: Props) => {
 
   return (
     <Box>
+      {node.depth.top !== 0 &&
       <Box display="flex" flexDirection="row">
         <TextField
           select
@@ -276,7 +277,7 @@ const InfoContentComponent: React.FC<Props> = (props: Props) => {
         <Box>
           <IconButton onClick={handleOpenClose}>{open ? <Less /> : <More />}</IconButton>
         </Box>
-      </Box>
+      </Box>}
       <Box mt={1.5}>
         <TextField
           placeholder={

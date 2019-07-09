@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { AppState } from '../../../../redux/store';
-import NodeEditorComponent from './node-editor-component';
+import { AppState } from '../../../redux/store';
+import NodeEditorComponent from './node-component';
 
 export interface NodeEditorActions {
   

@@ -50,17 +50,17 @@ export default class KTreeUtil {
     return {...node, children, self, rect};
   }
 
-  static _setPoint = <T extends KTreeNode>(node: T, ks: KSize, isRoot: boolean, showDraft: boolean, point: Point = {x: ks.spr.w * 3, y: ks.spr.h}): T => {
+  static _setPoint = <T extends KTreeNode>(node: T, ks: KSize, showDraft: boolean, point: Point = {x: ks.spr.w, y: ks.spr.h}): T => {
 
     var anchor = 0;
     const children = node.children
     .filter(c => showDraft || !c.isDraft)
     .map(c => {
       const p: Point = {
-        x: isRoot ? point.x : point.x + ks.indent,
-        y: isRoot ? point.y + anchor : point.y + node.rect.h + ks.margin.h + anchor
+        x: point.x + ks.indent,
+        y: point.y + node.rect.h + ks.margin.h + anchor
       };
-      const child = KTreeUtil._setPoint(c, ks, false, showDraft, p);
+      const child = KTreeUtil._setPoint(c, ks, showDraft, p);
       anchor += c.self.h + ks.margin.h;
       return child;
     });
@@ -84,7 +84,7 @@ export default class KTreeUtil {
 
   static setCalcProps = <T extends KTreeNode>(node: T, ks: KSize, showDraft: boolean): T => {
     var kNode = KTreeUtil._setSize(node, ks, showDraft);
-    kNode = KTreeUtil._setPoint(kNode, ks, true, showDraft);
+    kNode = KTreeUtil._setPoint(kNode, ks, showDraft);
     kNode = KTreeUtil._setIndexAndDepth(0, 0, kNode);
     return kNode;
   }

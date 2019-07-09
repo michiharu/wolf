@@ -13,9 +13,7 @@ import IconWithBadge, { IconWithBadgeProps } from './icon-with-badge';
 import KSize from '../../data-types/k-size';
 import check from '../../resource/svg-icon/check';
 import Icon, { IconProps } from './icon';
-import more from '../../resource/svg-icon/expand/more';
-import less from '../../resource/svg-icon/expand/less';
-import info from '../../resource/svg-icon/info';
+import moreVert from '../../resource/svg-icon/more/more-vert';
 
 export interface KNodeProps {
   node: KWithArrow;
@@ -39,7 +37,7 @@ class KShadow extends React.Component<KNodeProps> {
   }
 
   render() {
-    const { node, isEditing, ks, labelFocus } = this.props;
+    const { node, ks, labelFocus } = this.props;
     const fill = node.isDraft ? grey[50] :
       isTask(node.type) ? lightBlue[50] :
       isSwitch(node.type) ? amber[100] : yellow[100];
@@ -115,18 +113,10 @@ class KShadow extends React.Component<KNodeProps> {
       color: theme.palette.secondary.main,
     };
 
-    const showExpand = isEditing || node.children.length !== 0;
-
-    const infoProps: IconProps = {
-      ks,
-      x: (ks.rect.w - ks.rect.h * (showExpand ? 2 : 1)) * ks.unit, y: 0,
-      svg: info,
-    };
-
-    const expandProps: IconWithBadgeProps = {
+    const moreProps: IconWithBadgeProps = {
       ks,
       x: (ks.rect.w - ks.rect.h) * ks.unit, y: 0,
-      svg: node.open ? less : more,
+      svg: moreVert,
       badgeContent: node.children.length,
     };
 
@@ -138,8 +128,7 @@ class KShadow extends React.Component<KNodeProps> {
             <Rect {...baseRectProps} />
             <Icon {...typeProps} />
             {!(node.focus && labelFocus) && <Text {...labelProps} />}
-            <Icon {...infoProps} />
-            <IconWithBadge {...expandProps} />
+            <IconWithBadge {...moreProps} />
             {ks.hasArrow && node.arrows.map((a, i) => {
               const points = a.map(point => [point.x, point.y]).reduce((before, next) => before.concat(next)).map(p => p * ks.unit);
               return <Arrow key={`${node.id}-arrow-${i}`} {...arrowBaseProps} points={points} />;
