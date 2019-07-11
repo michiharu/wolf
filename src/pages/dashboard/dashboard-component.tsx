@@ -22,6 +22,7 @@ import { debounce } from 'lodash';
 import Category from '../../data-types/category';
 import CreateManualContainer from '../layout/create-manual/create-manual-container';
 import { manualAction } from '../../redux/actions/main/manualsAction';
+import { getTextLabels } from './text-labels';
 
 
 const otherWidthSum = 800;
@@ -128,6 +129,8 @@ const Dashboard: React.FC<Props> = (props: Props) => {
   const [count, setCount] = useState(0);
 
   const [isFirstRendering, setIsFirstRendering] = useState(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
+
   const categoryId = props.filter === null ? null : props.filter.id;
   useEffect(() => {
     if (!isFirstRendering) {
@@ -142,9 +145,11 @@ const Dashboard: React.FC<Props> = (props: Props) => {
         rowsPerPage
       };
 
+
       axios
       .post<ManualsQueryResponse>(manualsURL, params)
       .then(res => {
+        setIsFirstLoad(false);
         setLoading(false);
         setManuals(res.data.manuals);
         setCount(res.data.count);
@@ -394,6 +399,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
       }
     },
     onColumnSortChange,
+    textLabels: getTextLabels(isFirstLoad),
   };
 
   const [open, setOpen] = useState(false);

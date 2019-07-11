@@ -106,24 +106,73 @@ const ProfileComponent: React.FC<Props> = props => {
     setTabIndex(0);
   }
 
+  const mailRegex = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+  const mailValidation = mailRegex.test(mail);
   const renderBase = (
     <div>
       <Box pb={2} display="flex" flexDirection="row">
         <Box flexGrow={1} pr={1}>
-          <TextField label="姓" value={lastName} onChange={handleLastName} fullWidth disabled={!isEditing} error={lastName === ''}/>
+          <TextField
+            label="姓"
+            value={lastName}
+            onChange={handleLastName}
+            error={lastName === ''}
+            helperText={lastName === '' ? "姓は必須です" : undefined}
+            fullWidth
+            disabled={!isEditing}
+          />
         </Box>
         <Box flexGrow={1} pl={1}>
-          <TextField label="名" value={firstName} onChange={handleFirstName} fullWidth disabled={!isEditing} error={firstName === ''}/>
+          <TextField
+            label="名"
+            value={firstName}
+            onChange={handleFirstName}
+            error={firstName === ''}
+            helperText={firstName === '' ? '名は必須です' : undefined}
+            fullWidth
+            disabled={!isEditing}
+          />
         </Box>
       </Box>
-      <TextField label="メールアドレス" value={mail} onChange={handleMail} fullWidth disabled={!isEditing} error={mail === ''}/>
+      <TextField
+        label="メールアドレス"
+        value={mail}
+        onChange={handleMail}
+        error={!mailValidation}
+        helperText={mail === '' ? "メールアドレスは必須です" : !mailValidation ? "不正なメールアドレスです" : undefined}
+        fullWidth
+        disabled={!isEditing}
+      />
     </div>
   );
 
+  const [showOld, setShowOld] = useState(false);
+  const handleShowOld = () => setShowOld(!showOld);
+
+  const [showNew, setShowNew] = useState(false);
+  const handleShowNew = () => setShowNew(!showNew);
+
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const handleShowConfirmation = () => setShowConfirmation(!showConfirmation);
+
   const renderPassword = (
     <div>
-      <Box pb={2}><TextField label="古いパスワード" value={oldPassword} onChange={handleOldPassword} fullWidth/></Box>
-      <Box pb={2}><TextField label="新しいパスワード" value={newPassword} onChange={handleNewPassword} fullWidth/></Box>
+      <Box pb={2}>
+        <TextField
+          label="古いパスワード"
+          value={oldPassword}
+          onChange={handleOldPassword}
+          fullWidth
+        />
+      </Box>
+      <Box pb={2}>
+        <TextField
+          label="新しいパスワード"
+          value={newPassword}
+          onChange={handleNewPassword}
+          fullWidth
+        />
+      </Box>
       <TextField
         label="新しいパスワードの確認"
         value={confirmation}
@@ -134,7 +183,7 @@ const ProfileComponent: React.FC<Props> = props => {
     </div>
   );
 
-  const isValid = lastName !== '' && firstName !== '' && mail !== '';
+  const isValid = lastName !== '' && firstName !== '' && mailValidation;
 
   const classes = useStyles();
   return (
