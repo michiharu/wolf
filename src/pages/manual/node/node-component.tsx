@@ -31,7 +31,7 @@ import KStart from '../../../components/konva/k-start';
 const headerHeight = 96;
 
 export const styles = (theme: Theme) => createStyles({
-  root: {
+  main: {
     overflow: 'scroll',
     height: `calc(100vh - ${toolbarHeight + headerHeight + theme.spacing(2)}px)`,
     [theme.breakpoints.down('xs')]: {
@@ -583,7 +583,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
     };
 
     return (
-      <div className={classes.root} ref={this.mainRef}>
+      <div className={classes.main} ref={this.mainRef}>
         <div style={largeContainerStyle}>
           <Stage ref={this.stageRef} onClick={this.deleteFocus}>
             <Layer>
@@ -592,7 +592,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
                   .filter(n => isEditing || !n.isDraft)
                   .map(n => {
                     return n.depth.top === 0
-                      ? <KStart key={n.id} node={n} {...nodeActionProps} />
+                      ? <KStart key={n.id} node={n} nowDragging={dragParent !== null} {...nodeActionProps} />
                       : <KShadow key={n.id + 'shadow'} node={n} labelFocus={labelFocus} {...nodeActionProps} />
                   })}
 
@@ -601,7 +601,7 @@ class NodeEditorComponent extends React.Component<Props, State> {
                   .filter(n => isEditing ? (dragParent === null ? true : n.isDragging) : !n.isDraft)
                   .map(n => {
                     return n.depth.top === 0
-                      ? <KStart key={n.id} node={n} {...nodeActionProps} />
+                      ? <KStart key={n.id} node={n} nowDragging={dragParent !== null} {...nodeActionProps} />
                       : <KNode key={n.id} node={n} labelFocus={labelFocus} {...nodeActionProps} />
                   })}
               {/* <DragMap node={node} rows={rows} ks={ks} /> */}

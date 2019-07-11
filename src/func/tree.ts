@@ -1,4 +1,4 @@
-import {Tree, Type, isSwitch, isCase } from "../data-types/tree";
+import {Tree, Type, isSwitch, isCase, TreeNode } from "../data-types/tree";
 
 export default class TreeUtil {
 
@@ -127,7 +127,6 @@ export default class TreeUtil {
     if (a.label  !== b.label)  { return true; }
     if (a.input  !== b.input)  { return true; }
     if (a.output !== b.output) { return true; }
-
     if (a.preConditions  !== b.preConditions)  { return true; }
     if (a.postConditions !== b.postConditions) { return true; }
     if (a.workerInCharge !== b.workerInCharge) { return true; }
@@ -142,6 +141,31 @@ export default class TreeUtil {
     return a.children
     .map((_, i) => ({t: a.children[i], e: b.children[i]}))
     .map(te => TreeUtil._hasDifference(te.t, te.e))
+    .reduce((a, b) => a || b);
+  }
+
+  static _hasDifferenceWithAppearance = <T extends TreeNode>(a: T, b: T): boolean => {
+    if (a.open   !== b.open)   { return true; }
+
+    if (a.id     !== b.id)     { return true; }
+    if (a.type   !== b.type)   { return true; }
+    if (a.label  !== b.label)  { return true; }
+    if (a.input  !== b.input)  { return true; }
+    if (a.output !== b.output) { return true; }
+    if (a.preConditions  !== b.preConditions)  { return true; }
+    if (a.postConditions !== b.postConditions) { return true; }
+    if (a.workerInCharge !== b.workerInCharge) { return true; }
+    if (a.remarks        !== b.remarks)        { return true; }
+    if (a.necessaryTools !== b.necessaryTools) { return true; }
+    if (a.exceptions     !== b.exceptions)     { return true; }
+    if (a.imageBlob      !== b.imageBlob)      { return true; }
+
+    if (a.children.length !== b.children.length) { return true; }
+    if (a.children.length === 0) { return false; }
+
+    return a.children
+    .map((_, i) => ({t: a.children[i], e: b.children[i]}))
+    .map(te => TreeUtil._hasDifferenceWithAppearance(te.t, te.e))
     .reduce((a, b) => a || b);
   }
 

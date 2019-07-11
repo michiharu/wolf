@@ -107,7 +107,9 @@ const KNode: React.FC<KNodeProps> = memo(props => {
   }
 
   const handleDragStart = () => {
+    if (!props.isEditing) { return; }
     rectRef.current!.to({
+      strokeWidth: 0,
       shadowColor: 'black',
       shadowBlur: 10,
       shadowOffsetY: 6,
@@ -125,17 +127,19 @@ const KNode: React.FC<KNodeProps> = memo(props => {
   }
 
   const handleDragMove = (e: any) => {
+    if (!props.isEditing) { return; }
     const dragPoint = e.target.position();
     e.target.x(-node.rect.w * ks.unit * 0.05 + dragPoint.x);
     e.target.y(-node.rect.h * ks.unit * 0.05 + dragPoint.y);
     
-    props.dragMove(node, {
+    props.dragMove({...node, focus: false}, {
       x: node.point.x * ks.unit + dragPoint.x,
       y: node.point.y * ks.unit + dragPoint.y
     });
   }
 
   const handleDragEnd = () => {
+    if (!props.isEditing) { return; }
     stageRef.current!.container().style.cursor = 'default';
     draggableRef.current.to({
       x: 0,
@@ -236,6 +240,7 @@ const KNode: React.FC<KNodeProps> = memo(props => {
     svg: moreVert,
     badgeContent: node.children.length,
     onClick: handleFocus,
+    onTap: handleFocus,
     onMouseEnter: onMouseEnterButton,
     onMouseLeave: onMouseLeaveButton,
   };

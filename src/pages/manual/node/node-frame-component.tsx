@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {
   Theme, createStyles, WithStyles,
-  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Modal, withStyles, Portal, Box,
+  Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Modal, withStyles, Portal, Box, Paper, ButtonGroup,
 } from '@material-ui/core';
 
 import { TreeNode, Manual, KTreeNode, baseKWithArrow } from '../../../data-types/tree';
@@ -14,8 +14,19 @@ import { TreePutRequest } from '../../../api/definitions';
 import { RouteComponentProps, withRouter, Prompt } from 'react-router';
 import KTreeUtil from '../../../func/k-tree';
 import { KSState } from '../../../redux/states/ksState';
+import { Undo, Redo } from '@material-ui/icons';
+import TreeNodeUtil from '../../../func/tree-node';
+import { throttle } from 'lodash-es';
 
 export const styles = (theme: Theme) => createStyles({
+  root: {
+    position: 'relative',
+  },
+  toolArea: {
+    position: 'absolute',
+    top: theme.spacing(1),
+    right: theme.spacing(1),
+  },
   convergent: {
     transform: 'scale(1, -1)',
   },
@@ -48,6 +59,8 @@ interface Props extends KSState, EditorFrameActions, RouteComponentProps, WithSt
 
 interface State {
   node: KTreeNode;
+  stream: KTreeNode[];
+  streamPointer: number;
   cannotSaveReason: CannotSaveReason;
   showVS: boolean;
   saved: boolean;
@@ -61,19 +74,77 @@ class EditorFrameComponent extends React.Component<Props, State> {
     super(props);
     const { node, ks, location } = props;
     const isEditing = location.pathname.slice(-4) === 'edit';
+    const kWith = KTreeUtil.setCalcProps(TreeUtil._get(node, baseKWithArrow), ks, isEditing);
 
     this.state = {
-      node: KTreeUtil.setCalcProps(TreeUtil._get(node, baseKWithArrow), ks, isEditing),
+      node: kWith,
+      stream: [kWith],
+      streamPointer: 0,
       cannotSaveReason: null,
       showVS: false,
       saved: false,
     };
   }
 
+  componentDidMount() {
+    window.addEventListener('keydown', this.handleKeydown);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.handleKeydown);
+  }
+
+  updateStream = () => {
+    const {node, stream, streamPointer} = this.state;
+    const isEditing = this.props.location.pathname.slice(-4) === 'edit';
+    if (!isEditing) { return; }
+
+    const dragNode = TreeNodeUtil._getDragNode(node);
+    if (dragNode !== undefined) { return; }
+
+    const current = stream[streamPointer];
+    const hasDifference = TreeUtil._hasDifferenceWithAppearance(current, node);
+    if (!hasDifference) { return; }
+
+    const slicedStream = stream.slice(0, streamPointer + 1);
+
+    const newStream = slicedStream.concat([TreeNodeUtil._deleteFocus(node)])
+    console.log('stream.length: ' + newStream.length);
+    this.setState({stream: newStream, streamPointer: streamPointer + 1});
+  }
+
+  updateStreamThrottle = throttle(this.updateStream, 3000);
+
+  handleKeydown = (event: KeyboardEvent) => {
+    const {stream, streamPointer} = this.state;
+    if (event.ctrlKey || event.metaKey) {
+      if (event.key === 'z' && !event.shiftKey && streamPointer !== 0) {
+        this.undo();
+      }
+      if ((event.key === 'y' || (event.key === 'z' && event.shiftKey)) && streamPointer !== (stream.length - 1)) {
+        this.redo();
+      }
+    }
+  }
+
   edit = (editNode: KTreeNode) => {
     const { ks, location } = this.props;
     const isEditing = location.pathname.slice(-4) === 'edit';
     this.setState({ node: KTreeUtil.setCalcProps(editNode, ks, isEditing) });
+    if (this.state.streamPointer === 0) { this.updateStream(); }
+    this.updateStreamThrottle();
+  }
+
+  undo = () => {
+    const { stream, streamPointer } = this.state;
+    const nextPointer = streamPointer - 1;
+    this.setState({node: stream[nextPointer], streamPointer: nextPointer});
+  }
+
+  redo = () => {
+    const { stream, streamPointer } = this.state;
+    const nextPointer = streamPointer + 1;
+    this.setState({node: stream[nextPointer], streamPointer: nextPointer});
   }
 
   save = () => {
@@ -94,13 +165,19 @@ class EditorFrameComponent extends React.Component<Props, State> {
     }
   }
 
-  handleCancel = () => this.props.history.goBack();
+  handleCancel = () => {
+    const { node: propNode, ks, location, history } = this.props;
+    const isEditing = location.pathname.slice(-4) === 'edit';
+    const node = KTreeUtil.setCalcProps(TreeUtil._get(propNode, baseKWithArrow), ks, isEditing);
+    this.setState({node, stream: [node], streamPointer: 0});
+    history.goBack();
+  }
 
   handleShowVS = (showVS: boolean) => () => this.setState({ showVS });
 
   render() {
     const { buttonRef, classes, location } = this.props;
-    const { node, cannotSaveReason, showVS, saved } = this.state;
+    const { node, cannotSaveReason, showVS, saved, stream, streamPointer } = this.state;
     const isEditing = location.pathname.slice(-4) === 'edit';
     const nodeProps: NodeEditorProps = {
       node,
@@ -110,7 +187,7 @@ class EditorFrameComponent extends React.Component<Props, State> {
 
     const hasDifference = TreeUtil._hasDifference(this.props.node, this.state.node);
     return (
-      <div>
+      <div className={classes.root}>
         {isEditing && (
           <Portal container={buttonRef.current}>
             <Box display="flex" flexDirection="row" mt={0.7}>
@@ -124,6 +201,14 @@ class EditorFrameComponent extends React.Component<Props, State> {
         />
 
         <NodeContainer {...nodeProps} />
+
+        {isEditing &&
+        <Paper className={classes.toolArea}>
+          <ButtonGroup color="primary">
+            <Button onClick={this.undo} disabled={streamPointer === 0}><Undo/></Button>
+            <Button onClick={this.redo} disabled={streamPointer === (stream.length - 1)}><Redo/></Button>
+          </ButtonGroup>
+        </Paper>}
 
         <Modal
           open={showVS}

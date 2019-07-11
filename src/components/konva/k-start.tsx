@@ -15,6 +15,7 @@ import moreVert from '../../resource/svg-icon/more/more-vert';
 export interface KStartProps {
   node: KWithArrow;
   isEditing: boolean;
+  nowDragging: boolean;
   ks: KSize;
   focus: (node: KWithArrow) => void;
   openInfo: (node: KWithArrow) => void;
@@ -82,7 +83,7 @@ const KStart: React.FC<KStartProps> = memo(props => {
     shadowColor: node.focus ? '#80bdff' : 'black',
     shadowBlur: 6,
     shadowOffsetY: node.focus ? 0 : 3,
-    shadowOpacity: node.focus ? 1 : 0.1,
+    shadowOpacity: node.focus ? 1 : props.nowDragging ? 0.2 : 0.1,
     onMouseEnter: onMouseEnterBaseRect,
     onMouseLeave: onMouseLeaveBaseRect,
   };

@@ -18,12 +18,13 @@ export interface IconWithBadgeProps {
   rotate?: number;
   scale?: {x: number, y: number};
   onClick?: (e: any) => void;
+  onTap?: (e: any) => void;
   onMouseEnter?: (e:any) => void;
   onMouseLeave?: (e:any) => void;
 }
 
 const IconWithBadge: React.FC<IconWithBadgeProps> = (props: IconWithBadgeProps) => {
-  const {ks, x, y, badgeContent, onClick, onMouseEnter, onMouseLeave} = props;
+  const {ks, x, y, badgeContent, onClick, onTap, onMouseEnter, onMouseLeave} = props;
   const iconProps: IconProps = {
     ...props, ks, x: 0, y: 0
   };
@@ -51,7 +52,7 @@ const IconWithBadge: React.FC<IconWithBadgeProps> = (props: IconWithBadgeProps) 
     fontSize: ks.badgeFontSize * ks.unit,
     fill: '#fff',
     onClick,
-    onTap: onClick,
+    onTap,
     onMouseEnter,
     onMouseLeave,
   };
