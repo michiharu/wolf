@@ -83,7 +83,6 @@ const LoginComponent: React.FC<Props> = ({loading, login}) => {
         <TextField
           className={classes.textField}
           label="パスワード"
-          variant="outlined"
           type={showPassword ? 'text' : 'password'}
           value={password}
           onChange={handleChangePassword}

@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import {
   Theme,  TextField,
-  Button, DialogTitle, DialogContent, DialogActions, makeStyles, Box, Tabs, Tab, Collapse,
+  Button, DialogTitle, DialogContent, DialogActions, makeStyles, Box, Tabs, Tab, Collapse, InputAdornment, IconButton,
 } from '@material-ui/core';
 
 import { ProfileActions } from './profile-container';
@@ -15,6 +15,8 @@ import { Password } from '../../../data-types/password';
 import { passwordURL } from '../../../api/definitions';
 import { MyNotification } from '../../../redux/states/notificationsState';
 import { getKey } from '../../../redux/saga';
+import { VisibilityOff, Visibility } from '@material-ui/icons';
+import Util from '../../../func/util';
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {},
@@ -63,14 +65,30 @@ const ProfileComponent: React.FC<Props> = props => {
     setMail(next.mail);
   }
 
+  const [beforeFirstPasswordSubmit, setBeforeFirstPasswordSubmit] = useState(true);
+
   const [oldPassword, setOldPassword] = useState('');
   const handleOldPassword = (e: any) => setOldPassword(e.target.value);
+  const [showOld, setShowOld] = useState(false);
+  const handleShowOld = () => setShowOld(!showOld);
+  const oldValidMsg = Util.validPassword(oldPassword);
+
+
   const [newPassword, setNewPassword] = useState('');
   const handleNewPassword = (e: any) => setNewPassword(e.target.value);
+  const [showNew, setShowNew] = useState(false);
+  const handleShowNew = () => setShowNew(!showNew);
+  const newValidMsg = Util.validPassword(newPassword);
+
   const [confirmation, setConfirmation] = useState('');
   const handleConfirmation = (e: any) => setConfirmation(e.target.value);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const handleShowConfirmation = () => setShowConfirmation(!showConfirmation);
 
   const handlePasswordUpdate = () => {
+    setBeforeFirstPasswordSubmit(false);
+    if (oldValidMsg !== undefined || newValidMsg !== undefined) { return; }
+
     const password: Password = {now: oldPassword, next: newPassword};
     axios
     .put<Password>(`${passwordURL}/${user.id}`, password)
@@ -146,38 +164,64 @@ const ProfileComponent: React.FC<Props> = props => {
     </div>
   );
 
-  const [showOld, setShowOld] = useState(false);
-  const handleShowOld = () => setShowOld(!showOld);
-
-  const [showNew, setShowNew] = useState(false);
-  const handleShowNew = () => setShowNew(!showNew);
-
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const handleShowConfirmation = () => setShowConfirmation(!showConfirmation);
-
   const renderPassword = (
     <div>
       <Box pb={2}>
         <TextField
           label="古いパスワード"
+          type={showOld ? 'text' : 'password'}
           value={oldPassword}
           onChange={handleOldPassword}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={handleShowOld}>
+                  {showOld ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          error={!beforeFirstPasswordSubmit && oldValidMsg !== undefined}
+          helperText={!beforeFirstPasswordSubmit ? oldValidMsg : undefined}
           fullWidth
         />
       </Box>
       <Box pb={2}>
         <TextField
           label="新しいパスワード"
+          type={showNew ? 'text' : 'password'}
           value={newPassword}
           onChange={handleNewPassword}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={handleShowNew}>
+                  {showNew ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          error={!beforeFirstPasswordSubmit && newValidMsg !== undefined}
+          helperText={!beforeFirstPasswordSubmit ? newValidMsg : undefined}
           fullWidth
         />
       </Box>
       <TextField
         label="新しいパスワードの確認"
+        type={showConfirmation ? 'text' : 'password'}
         value={confirmation}
         onChange={handleConfirmation}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton onClick={handleShowConfirmation}>
+                {showConfirmation ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
         error={newPassword !== confirmation}
+        helperText={newPassword !== confirmation ? "新しいパスワードと一致していません" : undefined}
         fullWidth
       />
     </div>
@@ -199,7 +243,7 @@ const ProfileComponent: React.FC<Props> = props => {
             </Tabs>
           </Box>
         </Collapse>
-        <Box height={200}>
+        <Box height={260}>
           {(!isEditing || tabIndex === 0) && renderBase}
           {tabIndex === 1 && renderPassword}
         </Box>
@@ -212,7 +256,16 @@ const ProfileComponent: React.FC<Props> = props => {
         {isEditing && tabIndex === 0 &&
         <Button onClick={handleUpdate} color="primary" disabled={!isValid}>基本情報の更新</Button>}
         {isEditing && tabIndex === 1 &&
-        <Button onClick={handlePasswordUpdate} color="primary" disabled={newPassword !== confirmation}>パスワードの更新</Button>}
+        <Button
+          color="primary"
+          onClick={handlePasswordUpdate}
+          disabled={
+            newPassword !== confirmation ||
+            (!beforeFirstPasswordSubmit && (oldValidMsg !== undefined || newValidMsg !== undefined))
+          }
+        >
+          パスワードの更新
+        </Button>}
       </DialogActions>
     </>
   );
