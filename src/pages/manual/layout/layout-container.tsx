@@ -17,18 +17,7 @@ import { FavoritePostRequestParams, FavoriteDeleteRequestParams, LikePostRequest
 import { ksActions } from '../../../redux/actions/ksAction';
 import { KSState } from '../../../redux/states/ksState';
 import { UsersState } from '../../../redux/states/main/usersState';
-import { Box, CircularProgress, makeStyles, Theme } from '@material-ui/core';
-import { drawerWidth } from '../../layout/layout-component';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  box: {
-    height: '50vh',
-    width: `calc(100vw - ${drawerWidth}px)`,
-    [theme.breakpoints.down('md')]: {
-      width: '100vw',
-    },
-  },
-}));
+import NowLoading from '../../../components/now-loading';
 
 export interface ViewActions {
   get: (id: string) => Action<string>;
@@ -75,15 +64,8 @@ const ViewContainer: React.FC<Props> = props => {
   // eslint-disable-next-line
   useEffect(() => { get(match.params.id); }, []);
   
-  const classes = useStyles();
   if (manual === null) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="flex-end" className={classes.box}>
-        <Box>
-          <CircularProgress size={60} color="primary" />
-        </Box>
-      </Box>
-    );
+    return <NowLoading hasDrawer/>;
   }
 
   const componentProps = {

@@ -1,7 +1,7 @@
 import axiosbase from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import * as env from '../settings/env.json';
-import { loginURL, manualURL, favoriteURL, likeURL, treeURL, usersURL, passwordURL, titleCheckURL, generateTitleURL, memosURL, manualsURL } from './definitions';
+import { loginURL, manualURL, favoriteURL, likeURL, treeURL, usersURL, passwordURL, titleCheckURL, generateTitleURL, manualsURL, sessionCheckURL } from './definitions';
 import { postLogin, deleteLogin } from './mock-data/login';
 import * as Manual from './mock-data/manual';
 import * as Favorite from './mock-data/favorite';
@@ -11,8 +11,8 @@ import { putLoginUser } from './mock-data/login-user';
 import { putPassword } from './mock-data/password';
 import { postTitleCheck } from './mock-data/title-checker';
 import { postGenerateTitle } from './mock-data/generate-title';
-import { putMemos } from './mock-data/memos';
 import { postManualsQuery } from './mock-data/manuals';
+import { postSessionCheck } from './mock-data/session-check';
 
 export const baseURL = 'http://localhost:55616';
 
@@ -21,6 +21,9 @@ const mockAdapter = () => {
   // login
   mock.onPost(loginURL).reply(postLogin);
   mock.onDelete(loginURL).reply(deleteLogin);
+
+  // session check
+  mock.onPost(sessionCheckURL).reply(postSessionCheck);
 
   // LoginUser
   const regexUsersURL = new RegExp(`${usersURL}/*`);
@@ -58,9 +61,6 @@ const mockAdapter = () => {
   // tree
   const regexTreeURL = new RegExp(`${treeURL}/*`);
   mock.onPut(regexTreeURL).reply(putTree);
-
-  // memo
-  mock.onPut(memosURL).reply(putMemos);
 
   return axiosbase;
 };

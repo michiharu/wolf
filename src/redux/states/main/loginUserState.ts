@@ -5,12 +5,16 @@ import { loginUserAction } from '../../actions/main/loginUserAction';
 export interface LoginUserState {
   user: LoginUser | null;
   userBeforeSaving: LoginUser | null;
+  sessionChecked: boolean;
 }
 
-const initialState: LoginUserState = { user: null, userBeforeSaving: null };
+const initialState: LoginUserState = { user: null, userBeforeSaving: null, sessionChecked: false };
 
 export const loginUserReducer = reducerWithInitialState(initialState)
 .case(loginUserAction.set, (state, user) => ({...state, user}))
+
+.case(loginUserAction.sessionChecked, (state) => ({...state, sessionChecked: true}))
+
 .case(
   loginUserAction.put,
   (state, user) => ({...state, user, userBeforeSaving: state.user})

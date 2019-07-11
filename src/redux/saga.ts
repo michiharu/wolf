@@ -2,8 +2,8 @@ import { put, call, fork, take, select, throttle } from 'redux-saga/effects';
 import { MyNotification } from './states/notificationsState';
 import * as API from '../api/axios-func';
 import { ACTIONS_LOGIN, ACTIONS_LOGOUT } from './actions/loginAction';
-import { loginUserAction, ACTIONS_LOGINUSER_PUT, ACTIONS_LOGINUSER_PUT_SUCCESS } from './actions/main/loginUserAction';
-import { LoginPostResponse, TreePutRequest, GenerateTitleRequest } from '../api/definitions';
+import { loginUserAction, ACTIONS_LOGINUSER_PUT, ACTIONS_LOGINUSER_PUT_SUCCESS, ACTIONS_LOGINUSER_START_SESSIONCHECK } from './actions/main/loginUserAction';
+import { LoginPostResponse, TreePutRequest, GenerateTitleRequest, SessonCheckPostResponse } from '../api/definitions';
 import * as ManualAction from './actions/main/manualsAction';
 import { usersAction } from './actions/main/usersAction';
 import { categoriesAction } from './actions/main/categoriesAction';
@@ -15,7 +15,6 @@ import { userGroupsAction } from './actions/main/userGroupsAction';
 import { getTitleForCheck, getKSize, getLoginUser, getUsers } from './selectors';
 import { titleCheckAction, ACTIONS_TITLECHECK_ENQUEUE, ACTIONS_TITLECHECK_GENERATE } from './actions/titileCheckAction';
 import { TitleCheckState } from './states/titleCheckState';
-import { ACTIONS_MEMOS_CHANGE, memosActions } from './actions/main/memoAction';
 import { ACTIONS_KSIZE_CHANGE, ACTIONS_KSIZE_ZOOM_IN, ACTIONS_KSIZE_ZOOM_OUT } from './actions/ksAction';
 import keys from '../settings/storage-keys';
 import KSize from '../data-types/k-size';
@@ -30,12 +29,11 @@ function* handleRequestLogin() {
     const data = yield call(API.login, action.payload);
     yield put(loadingActions.endLogin());
     if (data.error === undefined) {
-      const { user, users, userGroups, categories, memos } = data as LoginPostResponse;
+      const { user, users, userGroups, categories } = data as LoginPostResponse;
       yield put(loginUserAction.set(user));
       yield put(usersAction.change(users));
       yield put(userGroupsAction.change(userGroups));
       yield put(categoriesAction.set(categories));
-      yield put(memosActions.set(memos));
     }
   }
 }
@@ -60,6 +58,21 @@ function* handleRequestLogout() {
       const notification: MyNotification =
       { key: getKey(), variant: 'warning', message: 'ログアウトに失敗しました' };
       yield put(notificationsAction.enqueue(notification));
+    }
+  }
+}
+
+function* handleSessionCheck() {
+  while (true) {
+    yield take(ACTIONS_LOGINUSER_START_SESSIONCHECK);
+    const data = yield call(API.sessionCheck);
+    yield put(loginUserAction.sessionChecked());
+    if (data.error === undefined) {
+      const { user, users, userGroups, categories } = data as SessonCheckPostResponse;
+      yield put(loginUserAction.set(user));
+      yield put(usersAction.change(users));
+      yield put(userGroupsAction.change(userGroups));
+      yield put(categoriesAction.set(categories));
     }
   }
 }
@@ -285,16 +298,6 @@ function* handleRequestPutTree() {
   }
 }
 
-function* handleRequestPutMemo() {
-  while (true) {
-    const action = yield take(ACTIONS_MEMOS_CHANGE);
-    const data = yield call(API.memosPut, action.payload);
-    if (data.error === undefined) {
-      yield put(memosActions.changeSuccess(data));
-    }
-  }
-}
-
 function* saveByChangeKS() {
   while (true) {
     yield take(ACTIONS_KSIZE_CHANGE);
@@ -324,6 +327,8 @@ export function* rootSaga() {
   yield fork(handleRequestLogin);
   yield fork(handleRequestLogout);
 
+  yield fork(handleSessionCheck);
+
   yield fork(handleRequestPutLoginUser);
   yield fork(handleUpdateLoginUser);
 
@@ -335,7 +340,6 @@ export function* rootSaga() {
   yield throttle(1000, ACTIONS_TITLECHECK_ENQUEUE, handleTitleCheck);
   yield fork(handleRequestGenerateTitle);
   yield fork(handleManualCopy);
-  yield fork(handleRequestPutMemo);
 
   yield fork(handleRequestPostFavorite);
   yield fork(handleRequestDeleteFavorite);

@@ -12,7 +12,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
         {
             "id": "user1234",
             "password": "pass1234"
-        },
+        }
 
 + Response 200 (application/json)
 
@@ -51,7 +51,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
                     "id": "user2222",
                     "name": "経営企画グループ",
                     "memberIds": ["user1234", "user2222"]
-                },
+                }
             ],
 
             "categories": [
@@ -78,33 +78,85 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
                 {
                     "id": "6",
                     "name": "教育"
-                },
-            ],
-            "memos": [
-                {
-                    "id": "4",
-                    "label": "マニュアル4のメモ",
-                    "input": "",
-                    "output": "",
-                    "preConditions": "",
-                    "postConditions": "",
-                    "workerInCharge": "",
-                    "remarks": "",
-                    "necessaryTools": "",
-                    "exceptions": "",
-                    "imageName": "",
-                    "imageBlob": "",
-                    "point": {
-                        "x": 200,
-                        "y": 300
-                    },
-                    "children": []
                 }
-            ],
+            ]
         }
 
 ### ログアウト [DELETE]
+
 + Response 200
+
+# Group Session Check
+## セッションチェック [/api/v1/session-check]
+### セッションチェックAPI [POST]
+
++ Response 200 (application/json)
+
+        {
+            "user": {
+                "id": "user1234",
+                "lastName": "テスト",
+                "firstName": "太郎",
+                "mail": "user@user.com"
+            },
+            "users": [
+                {
+                    "id": "user1234",
+                    "lastName": "テスト",
+                    "firstName": "太郎"
+                },
+                {
+                    "id": "user2222",
+                    "lastName": "テスト",
+                    "firstName": "太郎2"
+                },
+                {
+                    "id": "user3333",
+                    "lastName": "テスト",
+                    "firstName": "太郎3"
+                }
+            ],
+
+            "userGroups": [
+                {
+                    "id": "user1234",
+                    "name": "営業グループ１",
+                    "memberIds": ["user1234"]
+                },
+                {
+                    "id": "user2222",
+                    "name": "経営企画グループ",
+                    "memberIds": ["user1234", "user2222"]
+                }
+            ],
+
+            "categories": [
+                {
+                    "id": "1",
+                    "name": "未分類カテゴリー"
+                },
+                {
+                    "id": "2",
+                    "name": "営業"
+                },
+                {
+                    "id": "3",
+                    "name": "ソフトウェア"
+                },
+                {
+                    "id": "4",
+                    "name": "経理"
+                },
+                {
+                    "id": "5",
+                    "name": "法務"
+                },
+                {
+                    "id": "6",
+                    "name": "教育"
+                }
+            ]
+        }
 
 # Group Password
 ## パスワード [/api/v1/password/{id}]
@@ -112,6 +164,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
 ### パスワード変更API [PUT]
 
 + Parameters
+
     + id: 123 (string, required) - userId
 
 + Request  (application/json)
@@ -127,33 +180,41 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
 ## マニュアルクエリー [/api/v1/manuals]
 ### マニュアルクエリーAPI [POST]
 
+favoriteやlikeについては、以下の通り。
+
++ 0: 全て
++ 1: チェックしたもののみ
++ 2: チェックしてないもの
+
 + Request  (application/json)
 
         {
-            "filterList": [
-                { "column": "favorite", "items": ["true"] },
-                { "column": "like", "items": ["false"] }
-            ],
+            "filters": {
+                "favorite": 0,
+                "like": 1,
+                "categoryId": null
+            },
             "searchText": ["手順１２３"],
             "sortColumn": "favorite",
             "sortDirection": "desc",
             "page": 1,
-            "rowsPerPage" 25
+            "rowsPerPage": 25
         }
 
 + Response 200 (application/json)
 
             {
                 "queryParams": {
-                    "filterList": [
-                        { "column": "favorite", "items": ["true"] },
-                        { "column": "like", "items": ["false"] }
-                    ],
+                    "filters": {
+                        "favorite": 0,
+                        "like": 1,
+                        "categoryId": null
+                    },
                     "searchText": ["手順１２３"],
                     "sortColumn": "updateAt",
                     "sortDirection": "desc",
                     "page": 1,
-                    "rowsPerPage" 25
+                    "rowsPerPage": 25
                 },
                 "manuals": [
                     {
@@ -183,8 +244,9 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
                         "likeIds": []
                     }
                 ],
-                count: 78
+                "count": 78
             }
+
 # Group Manual
 ## マニュアル [/api/v1/manual/{id}]
 マニュアルAPIにおけるtreeデータはPUTでは編集しない、代わりにTreeAPIを通じてtreeデータを編集する。
@@ -193,6 +255,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
 リクエストパラメーターでmanualIdを渡し、rootTreeにNodeデータを持たせて返す。
 
 + Parameters
+
     + id: 123 (string, required) - manualId
 
 + Response 200 (application/json)
@@ -284,6 +347,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
 配列データを持つプロパティーは別途APIを用意しているのでそこから編集されます。
 
 + Parameters
+
     + id: 123 (string, required) - manualId
 
 + Request  (application/json)
@@ -299,7 +363,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
             "viewerOfGroupIds": [],
             "visible": true,
             "favorites": [],
-            "likes": [],
+            "likes": []
         }
 
 + Response 200 (application/json)
@@ -320,6 +384,7 @@ favorites, likes はマニュアルidを保持する。(マニュアルのプロ
 
 ### マニュアル削除API [DELETE]
 + Parameters
+
     + id: 123 (string, required) - manualId
 
 + Response 200 (application/json)
@@ -369,6 +434,7 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
 ### ツリー編集API [PUT]
 
 + Parameters
+
     + manualId: 123 (string, required) - manualId
 
 + Request  (application/json)
@@ -388,20 +454,22 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
             "imageName": "",
             "imageBlob": "",
             "children": [
-                "id": "tmp:12",
-                "label": "マニュアル１−１",
-                "type": "task",
-                "input": "",
-                "output": "",
-                "preConditions": "",
-                "postConditions": "",
-                "workerInCharge": "",
-                "remarks": "",
-                "necessaryTools": "",
-                "exceptions": "",
-                "imageName": "",
-                "imageBlob": "",
-                "children": []
+                {
+                    "id": "tmp:12",
+                    "label": "マニュアル１−１",
+                    "type": "task",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                }
             ]
         }
 
@@ -422,93 +490,22 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
             "imageName": "",
             "imageBlob": "",
             "children": [
-                "id": "5g6u7i8d",
-                "label": "マニュアル１−１",
-                "type": "task",
-                "input": "",
-                "output": "",
-                "preConditions": "",
-                "postConditions": "",
-                "workerInCharge": "",
-                "remarks": "",
-                "necessaryTools": "",
-                "exceptions": "",
-                "imageName": "",
-                "imageBlob": "",
-                "children": []
-            ]
-        }
-
-
-# Group Memo
-## マニュアルメモ [/api/v1/memo]
-### メモ更新API [PUT]
-
-+ Request  (application/json)
-
-        {
-            "id": "12",
-            "label": "マニュアル１−１",
-            "type": "task",
-            "input": "",
-            "output": "",
-            "preConditions": "",
-            "postConditions": "",
-            "workerInCharge": "",
-            "remarks": "",
-            "necessaryTools": "",
-            "exceptions": "",
-            "imageName": "",
-            "imageBlob": "",
-            "children": [
-                "id": "tmp:12",
-                "label": "マニュアル１−１",
-                "type": "task",
-                "input": "",
-                "output": "",
-                "preConditions": "",
-                "postConditions": "",
-                "workerInCharge": "",
-                "remarks": "",
-                "necessaryTools": "",
-                "exceptions": "",
-                "imageName": "",
-                "imageBlob": "",
-                "children": []
-            ]
-        }
-
-+ Response 200 (application/json)
-
-        {
-            "id": "12",
-            "label": "マニュアル１−１",
-            "type": "task",
-            "input": "",
-            "output": "",
-            "preConditions": "",
-            "postConditions": "",
-            "workerInCharge": "",
-            "remarks": "",
-            "necessaryTools": "",
-            "exceptions": "",
-            "imageName": "",
-            "imageBlob": "",
-            "children": [
-                "id": "5g6u7i8d",
-                "label": "マニュアル１−１",
-                "type": "task",
-                "input": "",
-                "output": "",
-                "preConditions": "",
-                "postConditions": "",
-                "workerInCharge": "",
-                "remarks": "",
-                "necessaryTools": "",
-                "exceptions": "",
-                "imageName": "",
-                "imageBlob": "",
-                "children": []
+                {
+                    "id": "5g6u7i8d",
+                    "label": "マニュアル１−１",
+                    "type": "task",
+                    "input": "",
+                    "output": "",
+                    "preConditions": "",
+                    "postConditions": "",
+                    "workerInCharge": "",
+                    "remarks": "",
+                    "necessaryTools": "",
+                    "exceptions": "",
+                    "imageName": "",
+                    "imageBlob": "",
+                    "children": []
+                }
             ]
         }
 
@@ -517,6 +514,7 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
 ### お気に入り登録 [POST]
 
 + Parameters
+
     + id: 123 (string, required) - manualId
 
 + Response 200 (application/json)
@@ -524,6 +522,7 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
 ### お気に入り解除 [DELETE]
 
 + Parameters
+
     + id: 123 (string, required) - manualId
 
 + Response 200 (application/json)
@@ -533,6 +532,7 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
 ### いいね登録 [POST]
 
 + Parameters
+
     + id: 123 (string, required) - manualId
 
 + Response 200 (application/json)
@@ -540,6 +540,7 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
 ### いいね解除 [DELETE]
 
 + Parameters
+
     + id: 123 (string, required) - manualId
 
 + Response 200 (application/json)
@@ -549,6 +550,7 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
 ### 共同編集者登録 [POST]
 
 + Parameters
+
     + manualId: 123 (string, required) - manualId
     + userId: 123 (string, required) - userId
 
@@ -557,6 +559,7 @@ DB未保存のデータはidを"tmp:~"で始めるルールとする。
 ### 共同編集者解除 [DELETE]
 
 + Parameters
+
     + manualId: 123 (string, required) - manualId
     + userId: 123 (string, required) - userId
 

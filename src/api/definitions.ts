@@ -4,7 +4,7 @@
  * そのためフロントからサーバーに送られるIDの値については無視すること。
  */
 import User, { LoginUser } from "../data-types/user";
-import { Manual, Tree, KTreeNode, Memo } from "../data-types/tree";
+import { Manual, Tree } from "../data-types/tree";
 import Category from "../data-types/category";
 import { Password } from "../data-types/password";
 import UserGroup from "../data-types/user-group";
@@ -24,9 +24,21 @@ export interface LoginPostResponse {
   userGroups: UserGroup[];
   categories: Category[];
   manuals: Manual[];
-  memos: KTreeNode[];
 }
 // DELETE -> ステータスコード200でログアウト
+
+/* Sesson Check */
+export const sessionCheckURL = '/api/v1/session-check';
+// POST
+export interface SessonCheckPostRequest {}
+
+export interface SessonCheckPostResponse {
+  user: LoginUser;
+  users: User[];
+  userGroups: UserGroup[];
+  categories: Category[];
+  manuals: Manual[];
+}
 
 /* Users */
 export const usersURL = '/api/v1/users';
@@ -135,12 +147,6 @@ export const treeURL = '/api/v1/tree';
 // PUT(/api/v1/tree/:manualId)
 export type TreePutRequest = { manualId: string; rootTree: Tree; };
 export type TreePutResponse = Tree;
-
-/* Memo */
-export const memosURL = '/api/v1/memos';
-// PUT(/api/v1/memos)
-export type MemosPutRequest = Memo[];
-export type MemosPutResponse = Memo[];
 
 /* Favorite */
 export const favoriteURL = '/api/v1/favorites';

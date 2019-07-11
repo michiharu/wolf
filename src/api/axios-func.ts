@@ -1,5 +1,6 @@
 import {
   loginURL, LoginPostResponse,
+  sessionCheckURL, SessonCheckPostResponse, 
   usersURL, LoginUserPutRequest, LoginUserPutResponse, 
   manualURL, ManualPostRequest,
   treeURL, TreePutRequest,
@@ -7,7 +8,7 @@ import {
   likeURL, LikePostRequestParams, LikeDeleteRequestParams,
   passwordURL, PasswordPutRequestParams,
   titleCheckURL, TitleCheckPostRequest,
-  generateTitleURL, GenerateTitleRequest, MemosPutRequest, memosURL,
+  generateTitleURL, GenerateTitleRequest,
 } from "./definitions";
 
 import axios from "./axios";
@@ -21,6 +22,11 @@ export const login = (loginInfo: LoginInfo) => axios
 
 export const logout = () => axios
   .delete(loginURL)
+  .then(res => res.data)
+  .catch(error => ({ error }));
+
+export const sessionCheck = () => axios
+  .post<SessonCheckPostResponse>(sessionCheckURL)
   .then(res => res.data)
   .catch(error => ({ error }));
 
@@ -95,10 +101,5 @@ export const likeDelete = (params: LikeDeleteRequestParams) => axios
 
 export const treePut = ({ manualId, rootTree }: TreePutRequest) => axios
   .put(`${treeURL}/${manualId}`, rootTree)
-  .then(res => res.data)
-  .catch(error => ({ error }));
-
-  export const memosPut = (memos: MemosPutRequest) => axios
-  .put<MemosPutRequest>(`${memosURL}`, memos)
   .then(res => res.data)
   .catch(error => ({ error }));
