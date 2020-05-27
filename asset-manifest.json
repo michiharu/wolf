@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.js": "/wolf/static/js/main.eea19f18.chunk.js",
-    "main.js.map": "/wolf/static/js/main.eea19f18.chunk.js.map",
+    "main.js": "/wolf/static/js/main.e75d8b5b.chunk.js",
+    "main.js.map": "/wolf/static/js/main.e75d8b5b.chunk.js.map",
     "runtime-main.js": "/wolf/static/js/runtime-main.8262428f.js",
     "runtime-main.js.map": "/wolf/static/js/runtime-main.8262428f.js.map",
     "static/js/2.1af83bac.chunk.js": "/wolf/static/js/2.1af83bac.chunk.js",
     "static/js/2.1af83bac.chunk.js.map": "/wolf/static/js/2.1af83bac.chunk.js.map",
     "index.html": "/wolf/index.html",
-    "precache-manifest.c5f9230d6f03590acb45ce235d38a8c3.js": "/wolf/precache-manifest.c5f9230d6f03590acb45ce235d38a8c3.js",
+    "precache-manifest.8ebce8e9d01efa5ccc6c0ae968a7e0dd.js": "/wolf/precache-manifest.8ebce8e9d01efa5ccc6c0ae968a7e0dd.js",
     "service-worker.js": "/wolf/service-worker.js",
     "static/js/2.1af83bac.chunk.js.LICENSE.txt": "/wolf/static/js/2.1af83bac.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.8262428f.js",
     "static/js/2.1af83bac.chunk.js",
-    "static/js/main.eea19f18.chunk.js"
+    "static/js/main.e75d8b5b.chunk.js"
   ]
 }
