@@ -81,11 +81,6 @@ const getMuiTheme = () => createMuiTheme({
         marginRight: -10
       }
     },
-    MUIDataTable: {
-      responsiveScroll: {
-        maxHeight: 'calc(100vh - 160px)',
-      }
-    },
   }
 });
 
@@ -228,10 +223,10 @@ const Dashboard: React.FC<Props> = (props: Props) => {
         },
         sort: true,
         customHeadRender: (o, update) =>
-        <TableCell className={classes.head} sortDirection={o.sortDirection} onClick={() => update(o.index)}>
+        <TableCell className={classes.head} sortDirection={o.options!.sortDirection as ("asc" | "desc")} onClick={() => update(o.index)}>
           <TableSortLabel
-            active={o.sortDirection !== null}
-            direction={o.sortDirection || "asc"}
+            active={o.options!.sortDirection !== undefined}
+            direction={o.options!.sortDirection as ("asc" | "desc") || "asc"}
           >
             <StarBorder />
           </TableSortLabel>
@@ -255,10 +250,10 @@ const Dashboard: React.FC<Props> = (props: Props) => {
         },
         sort: true,
         customHeadRender: (o, update) =>
-        <TableCell className={classes.head} sortDirection={o.sortDirection} onClick={() => update(o.index)}>
+        <TableCell className={classes.head} sortDirection={o.options!.sortDirection as ("asc" | "desc")} onClick={() => update(o.index)}>
           <TableSortLabel
-            active={o.sortDirection !== null}
-            direction={o.sortDirection || "asc"}
+            active={o.options!.sortDirection !== undefined}
+            direction={o.options!.sortDirection as ("asc" | "desc") || "asc"}
           >
             <ThumbUpAltOutlined />
           </TableSortLabel>
@@ -375,7 +370,7 @@ const Dashboard: React.FC<Props> = (props: Props) => {
     sortFilterList: false,
     elevation: 0,
     rowHover: false,
-    responsive: 'scroll',
+    responsive: 'scrollFullHeight',
     serverSide: true,
     count,
     searchText: currentSearchText || '',

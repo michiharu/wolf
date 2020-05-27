@@ -1,6 +1,5 @@
 import axiosbase from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import * as env from '../settings/env.json';
 import { loginURL, manualURL, favoriteURL, likeURL, treeURL, usersURL, passwordURL, titleCheckURL, generateTitleURL, manualsURL, sessionCheckURL } from './definitions';
 import { postLogin, deleteLogin } from './mock-data/login';
 import * as Manual from './mock-data/manual';
@@ -65,7 +64,7 @@ const mockAdapter = () => {
   return axiosbase;
 };
 
-const axios = env.useMock ? mockAdapter() : axiosbase.create({
+const axios = true ? mockAdapter() : axiosbase.create({
     baseURL,
     headers: {'Content-Type': 'application/json'},
   });
