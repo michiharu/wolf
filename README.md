@@ -1,30 +1,26 @@
-# Flow Like 開発環境の立ち上げ方
+# [Flow Like](https://michiharu.github.io/wolf/)
 
-## How to use
+Flow Likeはマニュアル作成ツールです。マニュアルに作業の概要から詳細を記述することを簡単にするツールです。
 
-SFSのgitサーバーからプロジェクトをクローンします。
+## 効果的なルールがユーザーをクリエイティブにする
 
-```sh
-git clone https://trac.sfsolutions.jp:55443/git/FlowLike/
-```
+Flow Likeはマニュアルをツリー形式で記述します。
+このツリー形式というルールがマニュアルを記述するための本質的な作業に集中させるための優れたアイディアです。
 
-Install it and run:
+[draw.io](https://drawio-app.com/)という作図ツールをご存知でしょうか？
 
-```sh
-npm install
-```
+draw.ioはユーザーにグリッドのルールに従わせるUXを提供します。
+グリッドのルールが存在することで、図形を配置することも図形を変形することもユーザーには簡単な操作になります。
 
-muidatatableというライブラリーの型定義ファイルを修正する必要があるので修正を行います。
+px単位の微調整が必要ではない図を作っていて隣同士で図形の位置を揃えたい場合、
+1px単位の配置を許容する作図ツールでは想像するだけで大変ですね。
 
-```ts:node_modules/@types/mui-datatables/index.d.ts
-// 43行目にMUIDataTableColumnOptionsを追加
-interface MUIDataTableCustomHeadRenderer extends MUIDataTableColumn, MUIDataTableColumnOptions {
-    index: number;
-}
-```
+繊細なマウス操作やキーボードの上下左右キーによる微調整、それでもうまくいかない場合は座標入力、それは退屈でイライラする作業です。
 
-実行します。
+ユースケース次第ですがdraw.ioのグリッドシステムは、アートではなく理解のための作図に素晴らしいUXを提供していると思います。
 
-```sh
-npm run start
-```
+Flow Likeは作成するドキュメントの種類をマニュアルに限定することでdraw.ioよりもさらに強力なルールを設定し、
+マニュアルを作成するためならdraw.ioよりもふさわしいツールを目指しました。
+
+ツリー形式のインターフェースは直感的なマニュアル編集を可能にします。
+目的にあったツールを使うことで無駄な作業を削ぎ落とし。意識を本質へと向かわせユーザーをクリエイティブにします。
